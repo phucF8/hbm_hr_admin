@@ -1,0 +1,26 @@
+# Visual Studio
+.vs/
+*.suo
+*.vsdx
+DesignTimeBuild.dtbcache.v2
+
+# NodeJS & Angular
+node_modules/
+dist/
+package-lock.json
+.angular/
+
+# Build Output
+bin/
+obj/
+*.cache
+*.dll
+*.exe
+*.pdb
+*.nupkg
+*.snupkg
+
+# Temporary Files
+*.lock
+*.json
+FileListAbsolute.txt

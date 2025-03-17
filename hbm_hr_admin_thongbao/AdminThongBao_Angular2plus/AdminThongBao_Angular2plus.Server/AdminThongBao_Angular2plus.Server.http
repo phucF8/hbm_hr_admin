@@ -1,0 +1,6 @@
+@AdminThongBao_Angular2plus.Server_HostAddress = http://localhost:5168
+
+GET {{AdminThongBao_Angular2plus.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
