@@ -22,5 +22,5 @@ obj/
 
 # Temporary Files
 *.lock
-*.json
+
 FileListAbsolute.txt
