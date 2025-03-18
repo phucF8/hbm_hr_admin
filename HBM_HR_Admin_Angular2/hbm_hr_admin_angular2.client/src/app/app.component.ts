@@ -34,5 +34,5 @@ export class AppComponent implements OnInit {
     );
   }
 
-  title = 'adminthongbao_angular2plus.client';
+  title = 'hbm_hr_admin_angular2.client';
 }

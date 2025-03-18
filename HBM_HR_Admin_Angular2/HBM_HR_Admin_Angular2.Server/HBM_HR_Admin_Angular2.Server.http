@@ -1,0 +1,6 @@
+@HBM_HR_Admin_Angular2.Server_HostAddress = http://localhost:5183
+
+GET {{HBM_HR_Admin_Angular2.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace AdminThongBao_Angular2plus.Server.Controllers
+namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]

@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HBM_HR_Admin_Angular2.Server", "HBM_HR_Admin_Angular2.Server\HBM_HR_Admin_Angular2.Server.csproj", "{63C00258-E092-4EBA-9869-3EAB13E5FD5E}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "hbm_hr_admin_angular2.client", "hbm_hr_admin_angular2.client\hbm_hr_admin_angular2.client.esproj", "{7F381A04-1EB5-48CB-8B9C-00CC0CF8A1BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63C00258-E092-4EBA-9869-3EAB13E5FD5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63C00258-E092-4EBA-9869-3EAB13E5FD5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63C00258-E092-4EBA-9869-3EAB13E5FD5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63C00258-E092-4EBA-9869-3EAB13E5FD5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F381A04-1EB5-48CB-8B9C-00CC0CF8A1BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F381A04-1EB5-48CB-8B9C-00CC0CF8A1BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F381A04-1EB5-48CB-8B9C-00CC0CF8A1BF}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7F381A04-1EB5-48CB-8B9C-00CC0CF8A1BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F381A04-1EB5-48CB-8B9C-00CC0CF8A1BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F381A04-1EB5-48CB-8B9C-00CC0CF8A1BF}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {831F160F-EFEF-4735-840F-2E129FFED91A}
+	EndGlobalSection
+EndGlobal

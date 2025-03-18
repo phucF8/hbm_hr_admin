@@ -1,4 +1,4 @@
-namespace AdminThongBao_Angular2plus.Server
+namespace HBM_HR_Admin_Angular2.Server
 {
     public class WeatherForecast
     {
