@@ -3,17 +3,25 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface ThongBao {
-  id: number;
-  tieuDe: string;
-  noiDung: string;
-  ngayTao: string;
+  id: string;
+  title: string;
+  content: string;
+  senderId: string;
+  triggerAction?: string;
+  notificationType: number;
+  status: number;
+  sentAt?: Date;
+  ngayTao: Date;
+  ngaySua: Date;
+  nguoiTao: string;
+  nguoiSua: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThongBaoService {
-  private apiUrl = 'https://localhost:7046/api/thongbao'; // Đổi cổng nếu cần
+  private apiUrl = 'https://localhost:7046/api/thongbao';
 
   constructor(private http: HttpClient) {}
 

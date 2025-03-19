@@ -1,22 +1,28 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using HBM_HR_Admin_Angular2.Server.Data;
+
 namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
-    using Microsoft.AspNetCore.Mvc;
-    using System.Collections.Generic;
-
     [Route("api/thongbao")]
     [ApiController]
     public class ThongBaoController : ControllerBase
     {
-        private static List<ThongBao> _thongBaoList = new List<ThongBao>
-        {
-            new ThongBao { Id = 1, TieuDe = "Thông báo 1", NoiDung = "Nội dung 1", NgayTao = DateTime.Now },
-            new ThongBao { Id = 2, TieuDe = "Thông báo 2", NoiDung = "Nội dung 2", NgayTao = DateTime.Now }
-        };
+        private readonly ApplicationDbContext _context;
 
-        [HttpGet]
-        public IActionResult GetThongBao()
+        public ThongBaoController(ApplicationDbContext context)
         {
-            return Ok(_thongBaoList);
+            _context = context;
+        }
+
+        // API GET /api/thongbao - Lấy danh sách thông báo
+        [HttpGet]
+        public async Task<IActionResult> GetThongBao()
+        {
+            var notifications = await _context.NS_ADTB_Notifications
+                                              .OrderByDescending(n => n.NgayTao)
+                                              .ToListAsync();
+            return Ok(notifications);
         }
     }
 

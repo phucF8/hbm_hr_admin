@@ -2,8 +2,8 @@
     <h2>Danh sách thông báo</h2>
     <ul>
       <li *ngFor="let tb of thongBaoList">
-        <h3>{{ tb.tieuDe }}</h3>
-        <p>{{ tb.noiDung }}</p>
+        <h3>{{ tb.title }}</h3>
+        <p>{{ tb.content }}</p>
         <small>Ngày tạo: {{ tb.ngayTao | date:'dd/MM/yyyy HH:mm' }}</small>
       </li>
     </ul>
