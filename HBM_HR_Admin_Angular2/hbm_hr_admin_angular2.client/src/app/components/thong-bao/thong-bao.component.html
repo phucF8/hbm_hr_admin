@@ -1,48 +1,63 @@
-<div>
-  <input type="text" placeholder="🔍 tìm kiếm theo tiêu đề" [(ngModel)]="searchText">
-
-  <div>
-    <span>📂 Lọc theo trạng thái: ❌ Send fail | ✅ Send succ | Đã đọc</span>
+<div class="container mt-4">
+  <div class="mb-3">
+    <input type="text" class="form-control" placeholder="🔍 Tìm kiếm theo tiêu đề" [(ngModel)]="searchText">
   </div>
-
-  <table border="1">
-    <thead>
-      <tr>
-        <th>
-          <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
-        </th>
-        <th>Tiêu đề</th>
-        <th>Nội dung</th>
-        <th>Người gửi</th>
-        <th>Ngày giờ gửi</th>
-        <th>Send succ / sum</th>
-        <th>Loại thông báo</th>
-        <th>Hành động</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let tb of thongBaoList">
-        <td><input type="checkbox" [(ngModel)]="tb.selected"></td>
-        <td>{{ tb.title }}</td>
-        <td>{{ tb.content }}</td>
-        <td>{{ tb.senderId }}</td>
-        <td>{{ tb.sentAt }}</td>
-        <td>10/10</td>
-        <td>{{ tb.notificationType }}</td>
-        <td>
-          <button (click)="editThongBao(tb.id)">📝 sửa</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div>
-    <button (click)="deleteSelected()">Xóa</button>
-    <button (click)="sendAgain()">Gửi lại</button>
-    <button>Tạo thông báo</button>
+  
+  <div class="mb-3">
+    <span class="fw-bold">📂 Lọc theo trạng thái: </span>
+    <span class="badge bg-danger">❌ Send fail</span>
+    <span class="badge bg-success">✅ Send succ</span>
+    <span class="badge bg-secondary">Đã đọc</span>
   </div>
-
-  <div>
-    ⬅ 1 | 2 | 3 ➡
+  
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>
+            <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
+          </th>
+          <th>Tiêu đề</th>
+          <th>Nội dung</th>
+          <th>Người gửi</th>
+          <th>Ngày giờ gửi</th>
+          <th>Send succ / sum</th>
+          <th>Loại thông báo</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tb of thongBaoList">
+          <td><input type="checkbox" [(ngModel)]="tb.selected"></td>
+          <td>{{ tb.title }}</td>
+          <td>{{ tb.content }}</td>
+          <td>{{ tb.senderId }}</td>
+          <td>{{ tb.sentAt }}</td>
+          <td>10/10</td>
+          <td>{{ tb.notificationType }}</td>
+          <td>
+            <button class="btn btn-warning btn-sm" (click)="editThongBao(tb.id)">📝 Sửa</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="d-flex justify-content-between mt-3">
+    <div>
+      <button class="btn btn-danger me-2" (click)="deleteSelected()">Xóa</button>
+      <button class="btn btn-primary me-2" (click)="sendAgain()">Gửi lại</button>
+      <button class="btn btn-success">Tạo thông báo</button>
+    </div>
+    
+    <nav>
+      <ul class="pagination mb-0">
+        <li class="page-item"><a class="page-link" href="#">⬅</a></li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">➡</a></li>
+      </ul>
+    </nav>
   </div>
 </div>
