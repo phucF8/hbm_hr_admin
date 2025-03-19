@@ -15,6 +15,7 @@ export interface ThongBao {
   ngaySua: Date;
   nguoiTao: string;
   nguoiSua: string;
+  selected?: boolean;
 }
 
 @Injectable({

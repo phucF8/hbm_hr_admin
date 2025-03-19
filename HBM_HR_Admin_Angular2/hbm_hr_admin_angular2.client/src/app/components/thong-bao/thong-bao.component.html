@@ -1,11 +1,48 @@
-<div class="thong-bao-container">
-    <h2>Danh sách thông báo</h2>
-    <ul>
-      <li *ngFor="let tb of thongBaoList">
-        <h3>{{ tb.title }}</h3>
-        <p>{{ tb.content }}</p>
-        <small>Ngày tạo: {{ tb.ngayTao | date:'dd/MM/yyyy HH:mm' }}</small>
-      </li>
-    </ul>
+<div>
+  <input type="text" placeholder="🔍 tìm kiếm theo tiêu đề" [(ngModel)]="searchText">
+
+  <div>
+    <span>📂 Lọc theo trạng thái: ❌ Send fail | ✅ Send succ | Đã đọc</span>
   </div>
-  
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>
+          <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
+        </th>
+        <th>Tiêu đề</th>
+        <th>Nội dung</th>
+        <th>Người gửi</th>
+        <th>Ngày giờ gửi</th>
+        <th>Send succ / sum</th>
+        <th>Loại thông báo</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tb of thongBaoList">
+        <td><input type="checkbox" [(ngModel)]="tb.selected"></td>
+        <td>{{ tb.title }}</td>
+        <td>{{ tb.content }}</td>
+        <td>{{ tb.senderId }}</td>
+        <td>{{ tb.sentAt }}</td>
+        <td>10/10</td>
+        <td>{{ tb.notificationType }}</td>
+        <td>
+          <button (click)="editThongBao(tb.id)">📝 sửa</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div>
+    <button (click)="deleteSelected()">Xóa</button>
+    <button (click)="sendAgain()">Gửi lại</button>
+    <button>Tạo thông báo</button>
+  </div>
+
+  <div>
+    ⬅ 1 | 2 | 3 ➡
+  </div>
+</div>

@@ -1,27 +1,27 @@
-.thong-bao-container {
-    border: 1px solid #ddd;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  th, td {
     padding: 10px;
-    border-radius: 5px;
-    background: #f9f9f9;
+    text-align: left;
+    border: 1px solid #ddd;
   }
   
-  ul {
-    list-style: none;
-    padding: 0;
+  th {
+    background-color: #f4f4f4;
   }
   
-  li {
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
+  button {
+    padding: 5px 10px;
+    margin: 5px;
+    border: none;
+    cursor: pointer;
   }
   
-  h3 {
-    margin: 0;
-    font-size: 18px;
-    color: #007bff;
-  }
-  
-  small {
-    color: gray;
+  button:hover {
+    opacity: 0.8;
   }
   
