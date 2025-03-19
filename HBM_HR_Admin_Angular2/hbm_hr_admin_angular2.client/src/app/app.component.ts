@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.getForecasts();
+    console.log('APP  đã được khởi tạo!');
   }
 
   getForecasts() {
