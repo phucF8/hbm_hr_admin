@@ -6,11 +6,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { FormsModule } from '@angular/forms';
+import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    ThongBaoComponent
   ],
   imports: [
     BrowserModule,

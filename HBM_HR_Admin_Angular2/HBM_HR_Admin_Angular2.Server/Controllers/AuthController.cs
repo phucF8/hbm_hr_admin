@@ -8,9 +8,9 @@
     public class AuthController : ControllerBase
     {
         private static readonly Dictionary<string, string> users = new()
-    {
-        { "admin", "123456" } // Giả lập user (bạn có thể kết nối DB)
-    };
+        {
+            { "admin", "123456" } // Giả lập user (bạn có thể kết nối DB)
+        };
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
