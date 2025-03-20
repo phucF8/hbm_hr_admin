@@ -7,6 +7,7 @@ export interface ThongBao {
   title: string;
   content: string;
   senderId: string;
+  tenNhanVien: string;
   triggerAction?: string;
   notificationType: number;
   status: number;
