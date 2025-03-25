@@ -3,11 +3,23 @@
     <input type="text" class="form-control" placeholder="🔍 Tìm kiếm theo tiêu đề" [(ngModel)]="searchText">
   </div>
   
-  <div class="mb-3">
-    <span class="fw-bold">📂 Lọc theo trạng thái: </span>
-    <span class="badge bg-danger">❌ Send fail</span>
-    <span class="badge bg-success">✅ Send succ</span>
-    <span class="badge bg-secondary">Đã đọc</span>
+  <div class="mb-3 d-flex align-items-center gap-3">
+    <div>
+      <span class="fw-bold">📂 Lọc theo trạng thái: </span>
+      <span class="badge bg-danger">❌ Send fail</span>
+      <span class="badge bg-success">✅ Send succ</span>
+      <span class="badge bg-secondary">Đã đọc</span>
+    </div>
+    
+    <div>
+      <span class="fw-bold">📋 Loại thông báo: </span>
+      <select class="form-select d-inline-block w-auto" [(ngModel)]="selectedType" (change)="onTypeChange()">
+        <option [value]="0">Tất cả (0)</option>
+        <option [value]="1">Thông báo hệ thống (1)</option>
+        <option [value]="2">Thông báo cá nhân (2)</option>
+        <option [value]="3">Thông báo nhóm (3)</option>
+      </select>
+    </div>
   </div>
   
   <div class="table-responsive">

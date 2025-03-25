@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError } from 'rxjs';
 
 export interface ThongBao {
   id: string;
@@ -25,9 +25,16 @@ export interface ThongBao {
 export class ThongBaoService {
   private apiUrl = 'https://localhost:7046/api/thongbao';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getThongBao(): Observable<ThongBao[]> {
-    return this.http.get<ThongBao[]>(this.apiUrl);
+  getThongBao(notificationType: number = 0): Observable<ThongBao[]> {
+    const url = `${this.apiUrl}?notificationType=${notificationType}`;
+    console.log('Calling API:', url);
+    return this.http.get<ThongBao[]>(url).pipe(
+      catchError(error => {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      })
+    );
   }
 }

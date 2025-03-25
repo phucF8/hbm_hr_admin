@@ -11,13 +11,30 @@ export class ThongBaoComponent implements OnInit {
   thongBaoList: ThongBao[] = [];
   selectAll: boolean = false;
   searchText: string = '';
+  selectedType: number = 0; // 0: Tất cả, 1: Thông báo hệ thống, 2: Thông báo cá nhân, 3: Thông báo nhóm
 
   constructor(private thongBaoService: ThongBaoService) {}
 
   ngOnInit(): void {
-    this.thongBaoService.getThongBao().subscribe(data => {
-      this.thongBaoList = data;
+    this.loadThongBao();
+  }
+
+  loadThongBao() {
+    console.log('Loading notifications with type:', this.selectedType);
+    this.thongBaoService.getThongBao(this.selectedType).subscribe({
+      next: (data) => {
+        console.log('Received notifications:', data);
+        this.thongBaoList = data;
+      },
+      error: (error) => {
+        console.error('Error loading notifications:', error);
+      }
     });
+  }
+
+  onTypeChange() {
+    console.log('Type changed to:', this.selectedType);
+    this.loadThongBao();
   }
 
   sendAgain() {
@@ -32,9 +49,8 @@ export class ThongBaoComponent implements OnInit {
     alert('Chỉnh sửa thông báo có ID: ' + id);
   }
   
-   // Hàm chọn tất cả checkbox
-   toggleSelectAll() {
+  // Hàm chọn tất cả checkbox
+  toggleSelectAll() {
     this.thongBaoList.forEach(tb => tb.selected = this.selectAll);
   }
-  
 }
