@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "@ng-bootstrap/ng-bootstrap": "^18.0.0"
+    "@ng-bootstrap/ng-bootstrap": "^18.0.0",
+    "@types/md5": "^2.3.5",
+    "md5": "^2.3.0"
   }
 }

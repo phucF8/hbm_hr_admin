@@ -1,5 +1,8 @@
 <div class="login-container">
   <h2>Đăng nhập</h2>
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    {{ errorMessage }}
+  </div>
   <form (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="username">Tên đăng nhập:</label>
