@@ -76,40 +76,43 @@ BEGIN
 END
 GO
 
--- =============================================
--- Stored Procedure: NS_ADTB_UpdateNotification
--- Description: Cập nhật thông tin của một thông báo
--- Author: HBM HR Admin
--- Created: 2024-03-19
--- =============================================
-
+-- SỬA THÔNG BÁO
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_UpdateNotification')
     DROP PROCEDURE NS_ADTB_UpdateNotification
 GO
-
 CREATE PROCEDURE NS_ADTB_UpdateNotification
-    @NotificationID VARCHAR(50),
+    @ID VARCHAR(50),
     @Title NVARCHAR(500),
     @Content NVARCHAR(MAX),
-    @NguoiSua NVARCHAR(50)
+    @NguoiSua NVARCHAR(50),
+    @NotificationType INT,
+    @TriggerAction NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    UPDATE NS_ADTB_ThongBao
+    UPDATE NS_ADTB_Notifications
     SET 
         Title = @Title,
         Content = @Content,
         NgaySua = GETDATE(),
         NguoiSua = @NguoiSua
-    WHERE NotificationID = @NotificationID;
-
+        ,NotificationType = @NotificationType,
+        TriggerAction = @TriggerAction
+    WHERE ID = @ID;
     IF @@ROWCOUNT = 0
     BEGIN
-        RAISERROR('Không tìm thấy thông báo với ID: %s', 16, 1, @NotificationID);
+        RAISERROR('Không tìm thấy thông báo với ID: %s', 16, 1, @ID);
     END
 END
 GO
+/*
+EXEC NS_ADTB_UpdateNotification 
+    @ID = '8810c641-7195-4f90-b420-3a9c03cf8ba0',
+    @Title = N'Tiêu đề mới cập nhật',
+    @Content = N'Nội dung thông báo đã được cập nhật.',
+    @NguoiSua = N'admin';*/
+
+
 
 --XÓA THÔNG BÁO
 
@@ -162,11 +165,9 @@ GO
 
 
 --TẠO THÔNG BÁO
-
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'InsertNotification')
     DROP PROCEDURE InsertNotification;
 GO
-
 CREATE PROCEDURE InsertNotification
     @ID VARCHAR(36),
     @Title NVARCHAR(255),
@@ -180,7 +181,6 @@ CREATE PROCEDURE InsertNotification
 AS
 BEGIN
     SET NOCOUNT ON;
-    
     INSERT INTO [dbo].[NS_ADTB_Notifications] (
         ID, Title, Content, SenderId, TriggerAction, NotificationType, SentAt, NgayTao, NgaySua, NguoiTao, NguoiSua
     )

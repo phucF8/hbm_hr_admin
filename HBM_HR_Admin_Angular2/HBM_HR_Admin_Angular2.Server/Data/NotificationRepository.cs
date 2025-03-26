@@ -116,5 +116,33 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
+
+        public async Task<Notification> UpdateNotification(Notification notification)
+        {
+            try
+            {
+                _logger.LogInformation($"Updating notification with ID: {notification.ID}");
+                using var connection = new SqlConnection(_connectionString);
+                await connection.ExecuteAsync(
+                    "NS_ADTB_UpdateNotification",
+                    new { 
+                        ID = notification.ID,
+                        Title = notification.Title,
+                        Content = notification.Content,
+                        NotificationType = notification.NotificationType,
+                        TriggerAction = notification.TriggerAction,
+                        NguoiSua = "System" // You might want to get this from the current user
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+                _logger.LogInformation($"Successfully updated notification with ID: {notification.ID}");
+                return notification;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating notification with ID: {notification.ID}");
+                throw;
+            }
+        }
     }
 } 

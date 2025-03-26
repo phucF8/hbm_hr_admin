@@ -106,7 +106,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         {
             try
             {   
-
                 foreach (var id in notificationIds)
                 {
                     _logger.LogInformation($"Notification ID: {id}");
@@ -125,10 +124,61 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             }
         }
 
-        
+        // API PUT /api/thongbao/{id} - Cập nhật thông báo
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Notification>> UpdateNotification(string id, [FromBody] UpdateNotificationRequest request)
+        {
+            try
+            {
+                _logger.LogInformation($"Updating notification with ID: {id}");
+                
+                // Validate request
+                if (string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Content))
+                {
+                    return BadRequest("Tiêu đề và nội dung không được để trống");
+                }
+
+                if (request.Title.Length < 3)
+                {
+                    return BadRequest("Tiêu đề phải có ít nhất 3 ký tự");
+                }
+
+                if (request.Content.Length < 10)
+                {
+                    return BadRequest("Nội dung phải có ít nhất 10 ký tự");
+                }
+
+                var notification = new Notification
+                {
+                    ID = id,
+                    Title = request.Title,
+                    Content = request.Content,
+                    NotificationType = request.NotificationType,
+                    TriggerAction = request.TriggerAction
+                };
+
+                var result = await _repository.UpdateNotification(notification);
+                
+                _logger.LogInformation($"Successfully updated notification with ID: {id}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating notification with ID: {id}");
+                return StatusCode(500, "Đã xảy ra lỗi khi cập nhật thông báo");
+            }
+        }
     }
 
     public class CreateNotificationRequest
+    {
+        public string Title { get; set; }
+        public string Content { get; set; }
+        public int NotificationType { get; set; }
+        public string TriggerAction { get; set; }
+    }
+
+    public class UpdateNotificationRequest
     {
         public string Title { get; set; }
         public string Content { get; set; }
