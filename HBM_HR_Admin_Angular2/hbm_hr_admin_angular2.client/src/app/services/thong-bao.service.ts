@@ -26,6 +26,10 @@ export interface CreateThongBaoRequest {
   triggerAction?: string;
 }
 
+export interface UpdateThongBaoRequest extends CreateThongBaoRequest {
+  id: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -79,5 +83,14 @@ export class ThongBaoService {
       })
     );
   }
-  
+
+  updateThongBao(request: UpdateThongBaoRequest): Observable<ThongBao> {
+    console.log('Updating notification:', request);
+    return this.http.put<ThongBao>(`${this.apiUrl}/${request.id}`, request).pipe(
+      catchError(error => {
+        console.error('Error updating notification:', error);
+        throw error;
+      })
+    );
+  }
 }

@@ -75,7 +75,12 @@ export class ThongBaoComponent implements OnInit {
   }
 
   editThongBao(id: string) {
-    alert('Chỉnh sửa thông báo có ID: ' + id);
+    console.log('📝 Navigating to edit notification:', id);
+    this.router.navigate(['/thong-bao/sua', id]).then(() => {
+      console.log('✅ Navigation completed successfully');
+    }).catch(error => {
+      console.error('❌ Navigation failed:', error);
+    });
   }
   
   // Hàm chọn tất cả checkbox
