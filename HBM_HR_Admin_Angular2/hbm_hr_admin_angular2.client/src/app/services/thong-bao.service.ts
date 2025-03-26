@@ -19,6 +19,13 @@ export interface ThongBao {
   selected?: boolean;
 }
 
+export interface CreateThongBaoRequest {
+  title: string;
+  content: string;
+  notificationType: number;
+  triggerAction?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -33,6 +40,16 @@ export class ThongBaoService {
     return this.http.get<ThongBao[]>(url).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
+        throw error;
+      })
+    );
+  }
+
+  createThongBao(request: CreateThongBaoRequest): Observable<ThongBao> {
+    console.log('Creating new notification:', request);
+    return this.http.post<ThongBao>(this.apiUrl, request).pipe(
+      catchError(error => {
+        console.error('Error creating notification:', error);
         throw error;
       })
     );

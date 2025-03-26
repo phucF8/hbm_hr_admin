@@ -1,13 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ThongBaoService } from '../../../services/thong-bao.service';
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-tao-thong-bao',
   templateUrl: './tao-thong-bao.component.html',
   styleUrls: ['./tao-thong-bao.component.css'],
-  standalone: false
+  standalone: true,
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule,
+    HttpClientModule,
+    NgbModule
+  ],
+  providers: [ThongBaoService]
 })
 export class TaoThongBaoComponent implements OnInit {
   thongBaoForm: FormGroup;
@@ -16,6 +26,8 @@ export class TaoThongBaoComponent implements OnInit {
     { value: 2, label: 'Thông báo cá nhân' },
     { value: 3, label: 'Thông báo nhóm' }
   ];
+  isSubmitting = false;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -35,11 +47,31 @@ export class TaoThongBaoComponent implements OnInit {
   }
 
   onSubmit() {
+    console.log('Submit button clicked');
+    console.log('Form value:', this.thongBaoForm.value);
+    console.log('Form valid:', this.thongBaoForm.valid);
+    
     if (this.thongBaoForm.valid) {
+      this.isSubmitting = true;
+      this.errorMessage = '';
+      
       console.log('📝 Form submitted:', this.thongBaoForm.value);
-      // TODO: Implement API call to create notification
-      alert('Thông báo đã được tạo thành công!');
-      this.router.navigate(['/thong-bao']);
+      
+      this.thongBaoService.createThongBao(this.thongBaoForm.value).subscribe({
+        next: (response) => {
+          console.log('✅ Notification created successfully:', response);
+          alert('Thông báo đã được tạo thành công!');
+          this.router.navigate(['/thong-bao']);
+        },
+        error: (error) => {
+          console.error('❌ Error creating notification:', error);
+          this.errorMessage = error.error || 'Đã xảy ra lỗi khi tạo thông báo';
+        },
+        complete: () => {
+          console.log('Request completed');
+          this.isSubmitting = false;
+        }
+      });
     } else {
       console.error('❌ Form is invalid');
       Object.keys(this.thongBaoForm.controls).forEach(key => {

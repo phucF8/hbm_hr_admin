@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.Models;
 using Microsoft.Extensions.Logging;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
@@ -32,6 +33,61 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             _logger.LogInformation($"Returning {notifications.Count()} notifications");
             return Ok(notifications);
         }
+
+        // API POST /api/thongbao - Tạo thông báo mới
+        [HttpPost]
+        public async Task<ActionResult<Notification>> CreateNotification([FromBody] CreateNotificationRequest request)
+        {
+            try
+            {
+                _logger.LogInformation($"Creating new notification: {request.Title}");
+                
+                // Validate request
+                if (string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Content))
+                {
+                    return BadRequest("Tiêu đề và nội dung không được để trống");
+                }
+
+                if (request.Title.Length < 3)
+                {
+                    return BadRequest("Tiêu đề phải có ít nhất 3 ký tự");
+                }
+
+                if (request.Content.Length < 10)
+                {
+                    return BadRequest("Nội dung phải có ít nhất 10 ký tự");
+                }
+
+                // Create new notification
+                var notification = new Notification
+                {
+                    Title = request.Title,
+                    Content = request.Content,
+                    NotificationType = request.NotificationType,
+                    TriggerAction = request.TriggerAction,
+                    SentAt = DateTime.Now,
+                    SenderId = "SYS",
+                };
+
+                // Save to database using stored procedure
+                var result = await _repository.CreateNotification(notification);
+                
+                _logger.LogInformation($"Successfully created notification with ID: {result.ID}");
+                return CreatedAtAction(nameof(GetNotifications), new { id = result.ID }, result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating notification");
+                return StatusCode(500, "Đã xảy ra lỗi khi tạo thông báo");
+            }
+        }
     }
 
+    public class CreateNotificationRequest
+    {
+        public string Title { get; set; }
+        public string Content { get; set; }
+        public int NotificationType { get; set; }
+        public string TriggerAction { get; set; }
+    }
 }
