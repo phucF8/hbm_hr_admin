@@ -76,5 +76,25 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
+
+        public async Task DeleteNotification(string notificationId)
+        {
+            try
+            {
+                _logger.LogInformation($"Deleting notification with ID: {notificationId}");
+                using var connection = new SqlConnection(_connectionString);
+                await connection.ExecuteAsync(
+                    "NS_ADTB_DeleteNotification",
+                    new { NotificationID = notificationId },
+                    commandType: CommandType.StoredProcedure
+                );
+                _logger.LogInformation($"Successfully deleted notification with ID: {notificationId}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting notification with ID: {notificationId}");
+                throw;
+            }
+        }
     }
 } 

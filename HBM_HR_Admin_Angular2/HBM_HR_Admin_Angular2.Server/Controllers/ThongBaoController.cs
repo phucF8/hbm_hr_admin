@@ -81,6 +81,24 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi khi tạo thông báo");
             }
         }
+
+        // API DELETE /api/thongbao/{id} - Xóa thông báo
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNotification(string id)
+        {
+            try
+            {
+                _logger.LogInformation($"Deleting notification with ID: {id}");
+                await _repository.DeleteNotification(id);
+                _logger.LogInformation($"Successfully deleted notification with ID: {id}");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting notification with ID: {id}");
+                return StatusCode(500, "Đã xảy ra lỗi khi xóa thông báo");
+            }
+        }
     }
 
     public class CreateNotificationRequest

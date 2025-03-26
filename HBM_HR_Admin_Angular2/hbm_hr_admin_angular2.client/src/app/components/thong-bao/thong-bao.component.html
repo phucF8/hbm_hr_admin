@@ -40,7 +40,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let tb of thongBaoList">
-          <td><input type="checkbox" [(ngModel)]="tb.selected"></td>
+          <td>
+            <input type="checkbox" [(ngModel)]="tb.selected">
+            <div *ngIf="isDebug" class="text-muted small">{{tb.id}}</div>
+          </td>
           <td>{{ tb.title }}</td>
           <td>{{ tb.content }}</td>
           <td>{{ tb.tenNhanVien }}</td>

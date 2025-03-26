@@ -54,4 +54,14 @@ export class ThongBaoService {
       })
     );
   }
+
+  deleteThongBao(id: string): Observable<void> {
+    console.log('Deleting notification:', id);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      catchError(error => {
+        console.error('Error deleting notification:', error);
+        throw error;
+      })
+    );
+  }
 }
