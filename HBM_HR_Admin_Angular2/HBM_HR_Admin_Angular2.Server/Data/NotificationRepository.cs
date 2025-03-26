@@ -96,5 +96,25 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
+
+        public async Task DeleteMultiNotification(string notificationIds)
+        {
+            try
+            {
+                _logger.LogInformation($"Deleting multiple notifications with IDs: {notificationIds}");
+                using var connection = new SqlConnection(_connectionString);
+                await connection.ExecuteAsync(
+                    "NS_ADTB_DeleteMultiNotification",
+                    new { NotificationIDs = notificationIds },
+                    commandType: CommandType.StoredProcedure
+                );
+                _logger.LogInformation($"Successfully deleted multiple notifications");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting multiple notifications with IDs: {notificationIds}");
+                throw;
+            }
+        }
     }
 } 

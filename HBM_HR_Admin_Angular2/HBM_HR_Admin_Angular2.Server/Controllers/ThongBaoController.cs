@@ -99,6 +99,33 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi khi xóa thông báo");
             }
         }
+
+        // API DELETE /api/thongbao/multi - Xóa nhiều thông báo
+        [HttpDelete("multi")]
+        public async Task<IActionResult> DeleteMultiNotification([FromBody]  List<string> notificationIds)
+        {
+            try
+            {   
+
+                foreach (var id in notificationIds)
+                {
+                    _logger.LogInformation($"Notification ID: {id}");
+                }
+
+                string strNotificationIds = string.Join(", ", notificationIds);
+                _logger.LogInformation($"Deleting multiple notifications with IDs: {strNotificationIds}");
+                await _repository.DeleteMultiNotification(strNotificationIds);
+                _logger.LogInformation($"Successfully deleted multiple notifications");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting multiple notifications with IDs: {notificationIds}");
+                return StatusCode(500, "Đã xảy ra lỗi khi xóa thông báo");
+            }
+        }
+
+        
     }
 
     public class CreateNotificationRequest

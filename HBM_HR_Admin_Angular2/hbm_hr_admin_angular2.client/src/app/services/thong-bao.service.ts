@@ -64,4 +64,20 @@ export class ThongBaoService {
       })
     );
   }
+
+  deleteMultiThongBao(notificationIds: string[]): Observable<void> {
+    console.log('Deleting multiple notifications:', notificationIds);
+    return this.http.delete<void>(`${this.apiUrl}/multi`, { 
+      body: JSON.stringify(notificationIds), // Chuyển đổi sang JSON
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).pipe(
+      catchError(error => {
+        console.error('Error deleting multiple notifications:', error);
+        throw error;
+      })
+    );
+  }
+  
 }

@@ -83,6 +83,32 @@ export class ThongBaoComponent implements OnInit {
     this.thongBaoList.forEach(tb => tb.selected = this.selectAll);
   }
 
+  deleteMultiSelected() {
+    const selectedIds = this.thongBaoList
+      .filter(tb => tb.selected)
+      .map(tb => tb.id);
+
+    if (selectedIds.length === 0) {
+      alert('Vui lòng chọn ít nhất một thông báo để xóa!');
+      return;
+    }
+
+    if (confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} thông báo đã chọn?`)) {
+      console.log('🗑️ Deleting selected notifications:', selectedIds);
+      this.thongBaoService.deleteMultiThongBao(selectedIds).subscribe({
+        next: () => {
+          console.log('✅ Successfully deleted selected notifications');
+          alert('Đã xóa các thông báo đã chọn thành công!');
+          this.loadThongBao(); // Reload the list
+        },
+        error: (error) => {
+          console.error('❌ Error deleting notifications:', error);
+          alert('Đã xảy ra lỗi khi xóa thông báo!');
+        }
+      });
+    }
+  }
+
   taoThongBao() {
     console.log('📝 Navigating to /thong-bao/tao-moi');
     this.router.navigate(['/thong-bao/tao-moi']).then(() => {
