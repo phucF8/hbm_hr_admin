@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ThongBaoService, ThongBao } from '../../services/thong-bao.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-thong-bao',
@@ -13,7 +14,10 @@ export class ThongBaoComponent implements OnInit {
   searchText: string = '';
   selectedType: number = 0; // 0: Tất cả, 1: Thông báo hệ thống, 2: Thông báo cá nhân, 3: Thông báo nhóm
 
-  constructor(private thongBaoService: ThongBaoService) {}
+  constructor(
+    private thongBaoService: ThongBaoService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadThongBao();
@@ -52,5 +56,14 @@ export class ThongBaoComponent implements OnInit {
   // Hàm chọn tất cả checkbox
   toggleSelectAll() {
     this.thongBaoList.forEach(tb => tb.selected = this.selectAll);
+  }
+
+  taoThongBao() {
+    console.log('📝 Navigating to /thong-bao/tao-moi');
+    this.router.navigate(['/thong-bao/tao-moi']).then(() => {
+      console.log('✅ Navigation completed successfully');
+    }).catch(error => {
+      console.error('❌ Navigation failed:', error);
+    });
   }
 }
