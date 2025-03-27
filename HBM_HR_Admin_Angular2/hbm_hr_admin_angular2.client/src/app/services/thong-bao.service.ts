@@ -24,6 +24,7 @@ export interface CreateThongBaoRequest {
   content: string;
   notificationType: number;
   triggerAction?: string;
+  sentAt?: Date;
 }
 
 export interface UpdateThongBaoRequest extends CreateThongBaoRequest {

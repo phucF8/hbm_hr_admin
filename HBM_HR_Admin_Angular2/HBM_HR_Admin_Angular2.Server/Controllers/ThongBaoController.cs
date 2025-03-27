@@ -65,7 +65,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     Content = request.Content,
                     NotificationType = request.NotificationType,
                     TriggerAction = request.TriggerAction,
-                    SentAt = DateTime.Now,
+                    SentAt = request.SentAt,
                     SenderId = request.SenderId,
                 };
 
@@ -95,31 +95,25 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error deleting notification with ID: {id}");
+                _logger.LogError(ex, "Error deleting notification");
                 return StatusCode(500, "Đã xảy ra lỗi khi xóa thông báo");
             }
         }
 
-        // API DELETE /api/thongbao/multi - Xóa nhiều thông báo
-        [HttpDelete("multi")]
-        public async Task<IActionResult> DeleteMultiNotification([FromBody]  List<string> notificationIds)
+        // API DELETE /api/thongbao/batch - Xóa nhiều thông báo
+        [HttpDelete("batch")]
+        public async Task<IActionResult> DeleteMultipleNotifications([FromBody] string[] ids)
         {
             try
-            {   
-                foreach (var id in notificationIds)
-                {
-                    _logger.LogInformation($"Notification ID: {id}");
-                }
-
-                string strNotificationIds = string.Join(", ", notificationIds);
-                _logger.LogInformation($"Deleting multiple notifications with IDs: {strNotificationIds}");
-                await _repository.DeleteMultiNotification(strNotificationIds);
-                _logger.LogInformation($"Successfully deleted multiple notifications");
+            {
+                _logger.LogInformation($"Deleting multiple notifications: {string.Join(", ", ids)}");
+                await _repository.DeleteMultiNotification(string.Join(",", ids));
+                _logger.LogInformation($"Successfully deleted {ids.Length} notifications");
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error deleting multiple notifications with IDs: {notificationIds}");
+                _logger.LogError(ex, "Error deleting multiple notifications");
                 return StatusCode(500, "Đã xảy ra lỗi khi xóa thông báo");
             }
         }
@@ -159,12 +153,17 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
                 var result = await _repository.UpdateNotification(notification);
                 
+                if (result == null)
+                {
+                    return NotFound($"Không tìm thấy thông báo với ID: {id}");
+                }
+
                 _logger.LogInformation($"Successfully updated notification with ID: {id}");
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error updating notification with ID: {id}");
+                _logger.LogError(ex, "Error updating notification");
                 return StatusCode(500, "Đã xảy ra lỗi khi cập nhật thông báo");
             }
         }
@@ -177,6 +176,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         public int NotificationType { get; set; }
         public string TriggerAction { get; set; }
         public string SenderId { get; set; }
+        public DateTime? SentAt { get; set; }
     }
 
     public class UpdateNotificationRequest
