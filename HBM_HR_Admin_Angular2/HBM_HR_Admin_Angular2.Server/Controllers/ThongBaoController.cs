@@ -64,7 +64,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     Title = request.Title,
                     Content = request.Content,
                     NotificationType = request.NotificationType,
-                    TriggerAction = request.TriggerAction,
                     SentAt = request.SentAt,
                     SenderId = request.SenderId,
                 };
@@ -147,8 +146,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     ID = id,
                     Title = request.Title,
                     Content = request.Content,
-                    NotificationType = request.NotificationType,
-                    TriggerAction = request.TriggerAction
+                    NotificationType = request.NotificationType
                 };
 
                 var result = await _repository.UpdateNotification(notification);
@@ -174,7 +172,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         public string Title { get; set; }
         public string Content { get; set; }
         public int NotificationType { get; set; }
-        public string TriggerAction { get; set; }
         public string SenderId { get; set; }
         public DateTime? SentAt { get; set; }
     }
@@ -184,6 +181,5 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         public string Title { get; set; }
         public string Content { get; set; }
         public int NotificationType { get; set; }
-        public string TriggerAction { get; set; }
     }
 }

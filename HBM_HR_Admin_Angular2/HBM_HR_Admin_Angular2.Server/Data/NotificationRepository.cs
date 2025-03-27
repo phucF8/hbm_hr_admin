@@ -31,7 +31,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     new SqlParameter("@Title", SqlDbType.NVarChar) { Value = notification.Title },
                     new SqlParameter("@Content", SqlDbType.NVarChar) { Value = notification.Content },
                     new SqlParameter("@SenderId", SqlDbType.VarChar) { Value = notification.SenderId ?? (object)DBNull.Value },
-                    new SqlParameter("@TriggerAction", SqlDbType.NVarChar) { Value = notification.TriggerAction ?? (object)DBNull.Value },
+                   
                     new SqlParameter("@NotificationType", SqlDbType.TinyInt) { Value = notification.NotificationType },
                     new SqlParameter("@SentAt", SqlDbType.DateTime) { Value = notification.SentAt ?? (object)DBNull.Value },
                     new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = "System" }, // You might want to get this from the current user
@@ -39,7 +39,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 };
 
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC InsertNotification @ID, @Title, @Content, @SenderId, @TriggerAction, @NotificationType, @SentAt, @NguoiTao, @NguoiSua",
+                    "EXEC InsertNotification @ID, @Title, @Content, @SenderId, @NotificationType, @SentAt, @NguoiTao, @NguoiSua",
                     parameters);
 
                 _logger.LogInformation($"Successfully created notification with ID: {notification.ID}");
@@ -130,7 +130,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                         Title = notification.Title,
                         Content = notification.Content,
                         NotificationType = notification.NotificationType,
-                        TriggerAction = notification.TriggerAction,
                         NguoiSua = "System" // You might want to get this from the current user
                     },
                     commandType: CommandType.StoredProcedure
