@@ -38,7 +38,7 @@ export class TaoThongBaoComponent implements OnInit {
       content: ['', [Validators.required, Validators.minLength(10)]],
       notificationType: [1, Validators.required],
       triggerAction: [''],
-      sentAt: ['']
+      sentAt: [null]
     });
   }
 
