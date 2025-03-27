@@ -146,7 +146,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     ID = id,
                     Title = request.Title,
                     Content = request.Content,
-                    NotificationType = request.NotificationType
+                    NotificationType = request.NotificationType,
+                    SentAt = request.SentAt
                 };
 
                 var result = await _repository.UpdateNotification(notification);
@@ -181,5 +182,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         public string Title { get; set; }
         public string Content { get; set; }
         public int NotificationType { get; set; }
+        public DateTime? SentAt { get; set; }
+        
     }
 }

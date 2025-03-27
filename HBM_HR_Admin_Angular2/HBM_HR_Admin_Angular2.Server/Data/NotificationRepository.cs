@@ -121,7 +121,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         {
             try
             {
-                _logger.LogInformation($"Updating notification with ID: {notification.ID}");
+                _logger.LogInformation($"Updating notification with ID: {notification.SentAt}");
                 using var connection = new SqlConnection(_connectionString);
                 await connection.ExecuteAsync(
                     "NS_ADTB_UpdateNotification",
@@ -130,6 +130,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                         Title = notification.Title,
                         Content = notification.Content,
                         NotificationType = notification.NotificationType,
+                        SentAt = notification.SentAt,
                         NguoiSua = "System" // You might want to get this from the current user
                     },
                     commandType: CommandType.StoredProcedure

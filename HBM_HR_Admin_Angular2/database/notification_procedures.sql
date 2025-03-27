@@ -85,7 +85,8 @@ CREATE PROCEDURE NS_ADTB_UpdateNotification
     @Title NVARCHAR(500),
     @Content NVARCHAR(MAX),
     @NguoiSua NVARCHAR(50),
-    @NotificationType INT
+    @NotificationType INT,
+	@SentAt DATETIME = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -94,8 +95,9 @@ BEGIN
         Title = @Title,
         Content = @Content,
         NgaySua = GETDATE(),
-        NguoiSua = @NguoiSua
-        ,NotificationType = @NotificationType
+        NguoiSua = @NguoiSua,
+        NotificationType = @NotificationType,
+		SentAt = @SentAt
     WHERE ID = @ID;
     IF @@ROWCOUNT = 0
     BEGIN

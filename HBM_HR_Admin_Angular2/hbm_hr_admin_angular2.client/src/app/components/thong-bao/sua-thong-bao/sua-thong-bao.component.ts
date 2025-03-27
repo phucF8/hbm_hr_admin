@@ -56,11 +56,12 @@ export class SuaThongBaoComponent implements OnInit {
       next: (notifications) => {
         const notification = notifications.find(n => n.id === this.notificationId);
         if (notification) {
+          const formattedDate = notification.sentAt ? new Date(notification.sentAt).toISOString().slice(0, 16) : '';
           this.thongBaoForm.patchValue({
             title: notification.title,
             content: notification.content,
             notificationType: notification.notificationType,
-            sentAt: notification.sentAt
+            sentAt: formattedDate
           });
         } else {
           this.errorMessage = 'Không tìm thấy thông báo';
@@ -74,13 +75,18 @@ export class SuaThongBaoComponent implements OnInit {
   }
 
   onSubmit() {
+    console.log('Submit button clicked');
+    console.log('Form value:', this.thongBaoForm.value);
+    console.log('Form valid:', this.thongBaoForm.valid);
     if (this.thongBaoForm.valid) {
       this.isSubmitting = true;
       this.errorMessage = '';
       
+      const formValue = this.thongBaoForm.value;
       const updateRequest = {
-        ...this.thongBaoForm.value,
-        id: this.notificationId
+        ...formValue,
+        id: this.notificationId,
+        sentAt: formValue.sentAt ? new Date(formValue.sentAt) : null
       };
       
       this.thongBaoService.updateThongBao(updateRequest).subscribe({
