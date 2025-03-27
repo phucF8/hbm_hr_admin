@@ -15,7 +15,7 @@ export class ThongBaoComponent implements OnInit {
   thongBaoList: ThongBao[] = [];
   selectAll: boolean = false;
   searchText: string = '';
-  selectedType: number = 0; // 0: Tất cả, 1: Thông báo hệ thống, 2: Thông báo cá nhân, 3: Thông báo nhóm
+  selectedType: number = 0; // 0: Tất cả
   isDebug = environment.isDebug;
   tenNhanVien: string = '';
   notificationTypes = NOTIFICATION_TYPES;
@@ -96,6 +96,11 @@ export class ThongBaoComponent implements OnInit {
   // Hàm chọn tất cả checkbox
   toggleSelectAll() {
     this.thongBaoList.forEach(tb => tb.selected = this.selectAll);
+  }
+
+  getNotificationTypeName(typeId: number): string {
+    const type = this.notificationTypes.find(t => t.id === typeId);
+    return type ? type.name : 'Không xác định';
   }
 
   deleteMultiSelected() {

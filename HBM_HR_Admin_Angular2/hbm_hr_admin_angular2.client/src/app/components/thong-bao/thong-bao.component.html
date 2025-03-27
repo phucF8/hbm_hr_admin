@@ -59,7 +59,7 @@
           <td>{{ tb.tenNhanVien }}</td>
           <td>{{ tb.sentAt }}</td>
           <td>10/10</td>
-          <td>{{ tb.notificationType }}</td>
+          <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
           <td>
             <button class="btn btn-warning btn-sm" (click)="editThongBao(tb.id)">📝 Sửa</button>
           </td>
