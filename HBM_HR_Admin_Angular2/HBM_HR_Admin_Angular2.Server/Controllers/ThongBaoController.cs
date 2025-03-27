@@ -100,7 +100,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         }
 
         // API DELETE /api/thongbao/batch - Xóa nhiều thông báo
-        [HttpDelete("batch")]
+        [HttpDelete("multi")]
         public async Task<IActionResult> DeleteMultipleNotifications([FromBody] string[] ids)
         {
             try
