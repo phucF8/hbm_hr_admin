@@ -3,6 +3,7 @@ import { ThongBaoService, ThongBao } from '../../services/thong-bao.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
+import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notification-types';
 
 @Component({
   selector: 'app-thong-bao',
@@ -17,6 +18,7 @@ export class ThongBaoComponent implements OnInit {
   selectedType: number = 0; // 0: Tất cả, 1: Thông báo hệ thống, 2: Thông báo cá nhân, 3: Thông báo nhóm
   isDebug = environment.isDebug;
   tenNhanVien: string = '';
+  notificationTypes = NOTIFICATION_TYPES;
 
   constructor(
     private thongBaoService: ThongBaoService,

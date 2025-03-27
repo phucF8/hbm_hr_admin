@@ -27,9 +27,7 @@
       <span class="fw-bold">📋 Loại thông báo: </span>
       <select class="form-select d-inline-block w-auto" [(ngModel)]="selectedType" (change)="onTypeChange()">
         <option [value]="0">Tất cả (0)</option>
-        <option [value]="1">Thông báo hệ thống (1)</option>
-        <option [value]="2">Thông báo cá nhân (2)</option>
-        <option [value]="3">Thông báo nhóm (3)</option>
+        <option *ngFor="let type of notificationTypes" [value]="type.id">{{type.name}} ({{type.id}})</option>
       </select>
     </div>
   </div>
