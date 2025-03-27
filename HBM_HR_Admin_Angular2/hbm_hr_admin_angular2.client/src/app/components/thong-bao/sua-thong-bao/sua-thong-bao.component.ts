@@ -5,6 +5,7 @@ import { ThongBaoService, ThongBao } from '../../../services/thong-bao.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
 
 @Component({
   selector: 'app-sua-thong-bao',
@@ -21,11 +22,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 })
 export class SuaThongBaoComponent implements OnInit {
   thongBaoForm: FormGroup;
-  notificationTypes = [
-    { id: 1, name: 'Thông báo hệ thống' },
-    { id: 2, name: 'Thông báo cá nhân' },
-    { id: 3, name: 'Thông báo nhóm' }
-  ];
+  notificationTypes = NOTIFICATION_TYPES;
   isSubmitting = false;
   errorMessage = '';
   notificationId: string = '';
@@ -56,7 +53,10 @@ export class SuaThongBaoComponent implements OnInit {
       next: (notifications) => {
         const notification = notifications.find(n => n.id === this.notificationId);
         if (notification) {
-          const formattedDate = notification.sentAt ? new Date(notification.sentAt).toISOString().slice(0, 16) : '';
+          const formattedDate = notification.sentAt ? notification.sentAt : '';
+          console.log('notification.sentAt:', notification.sentAt);
+          console.log('Formatted date:', formattedDate);
+
           this.thongBaoForm.patchValue({
             title: notification.title,
             content: notification.content,
@@ -78,6 +78,7 @@ export class SuaThongBaoComponent implements OnInit {
     console.log('Submit button clicked');
     console.log('Form value:', this.thongBaoForm.value);
     console.log('Form valid:', this.thongBaoForm.valid);
+    console.log('notification.sentAt:', this.thongBaoForm.value.sentAt);
     if (this.thongBaoForm.valid) {
       this.isSubmitting = true;
       this.errorMessage = '';
@@ -86,7 +87,7 @@ export class SuaThongBaoComponent implements OnInit {
       const updateRequest = {
         ...formValue,
         id: this.notificationId,
-        sentAt: formValue.sentAt ? new Date(formValue.sentAt) : null
+        sentAt: formValue.sentAt ? formValue.sentAt : null
       };
       
       this.thongBaoService.updateThongBao(updateRequest).subscribe({

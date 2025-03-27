@@ -158,6 +158,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 }
 
                 _logger.LogInformation($"Successfully updated notification with ID: {id}");
+                _logger.LogInformation($"Successfully updated notification with ID: {request.SentAt}");
                 return Ok(result);
             }
             catch (Exception ex)
