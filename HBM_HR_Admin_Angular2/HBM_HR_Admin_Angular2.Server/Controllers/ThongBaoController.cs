@@ -66,7 +66,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     NotificationType = request.NotificationType,
                     TriggerAction = request.TriggerAction,
                     SentAt = DateTime.Now,
-                    SenderId = "SYS",
+                    SenderId = request.SenderId,
                 };
 
                 // Save to database using stored procedure
@@ -176,6 +176,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         public string Content { get; set; }
         public int NotificationType { get; set; }
         public string TriggerAction { get; set; }
+        public string SenderId { get; set; }
     }
 
     public class UpdateNotificationRequest

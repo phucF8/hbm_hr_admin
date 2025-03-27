@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ThongBaoService } from '../../../services/thong-bao.service';
+import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -17,7 +18,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     HttpClientModule,
     NgbModule
   ],
-  providers: [ThongBaoService]
+  providers: [ThongBaoService, AuthService]
 })
 export class TaoThongBaoComponent implements OnInit {
   thongBaoForm: FormGroup;
@@ -32,6 +33,7 @@ export class TaoThongBaoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private thongBaoService: ThongBaoService,
+    private authService: AuthService,
     private router: Router
   ) {
     this.thongBaoForm = this.fb.group({
@@ -55,9 +57,21 @@ export class TaoThongBaoComponent implements OnInit {
       this.isSubmitting = true;
       this.errorMessage = '';
       
-      console.log('📝 Form submitted:', this.thongBaoForm.value);
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        this.errorMessage = 'Không tìm thấy thông tin người dùng';
+        this.isSubmitting = false;
+        return;
+      }
+
+      const notificationData = {
+        ...this.thongBaoForm.value,
+        senderId: currentUser.ID
+      };
       
-      this.thongBaoService.createThongBao(this.thongBaoForm.value).subscribe({
+      console.log('📝 Form submitted:', notificationData);
+      
+      this.thongBaoService.createThongBao(notificationData).subscribe({
         next: (response) => {
           console.log('✅ Notification created successfully:', response);
           alert('Thông báo đã được tạo thành công!');
