@@ -27,7 +27,7 @@
       <span class="fw-bold">📋 Loại thông báo: </span>
       <select class="form-select d-inline-block w-auto" [(ngModel)]="selectedType" (change)="onTypeChange()">
         <option [value]="0">Tất cả (0)</option>
-        <option *ngFor="let type of notificationTypes" [value]="type.id">{{type.name}} ({{type.id}})</option>
+        <option *ngFor="let type of notificationTypes" [value]="type.id">{{type.name}}{{isDebug ? ' (' + type.id + ')' : ''}}</option>
       </select>
     </div>
   </div>
@@ -52,12 +52,14 @@
         <tr *ngFor="let tb of thongBaoList">
           <td>
             <input type="checkbox" [(ngModel)]="tb.selected">
-            <div *ngIf="isDebug" class="text-muted small">{{tb.id}}</div>
           </td>
-          <td>{{ tb.title }}</td>
+          <td>
+            {{ tb.title }}
+            <div *ngIf="isDebug" class="text-muted small">{{ tb.id }}</div>
+          </td>
           <td>{{ tb.content }}</td>
           <td>{{ tb.tenNhanVien }}</td>
-          <td>{{ tb.sentAt }}</td>
+          <td>{{ tb.sentAt | date:'dd/MM/yyyy HH:mm' }}</td>
           <td>10/10</td>
           <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
           <td>
