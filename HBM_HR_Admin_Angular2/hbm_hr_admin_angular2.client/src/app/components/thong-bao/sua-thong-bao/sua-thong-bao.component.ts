@@ -22,9 +22,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 export class SuaThongBaoComponent implements OnInit {
   thongBaoForm: FormGroup;
   notificationTypes = [
-    { value: 1, label: 'Thông báo hệ thống' },
-    { value: 2, label: 'Thông báo cá nhân' },
-    { value: 3, label: 'Thông báo nhóm' }
+    { id: 1, name: 'Thông báo hệ thống' },
+    { id: 2, name: 'Thông báo cá nhân' },
+    { id: 3, name: 'Thông báo nhóm' }
   ];
   isSubmitting = false;
   errorMessage = '';
@@ -40,7 +40,7 @@ export class SuaThongBaoComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(3)]],
       content: ['', [Validators.required, Validators.minLength(10)]],
       notificationType: [1, Validators.required],
-      triggerAction: ['']
+      sentAt: ['']
     });
   }
 
@@ -60,7 +60,7 @@ export class SuaThongBaoComponent implements OnInit {
             title: notification.title,
             content: notification.content,
             notificationType: notification.notificationType,
-            triggerAction: notification.triggerAction
+            sentAt: notification.sentAt
           });
         } else {
           this.errorMessage = 'Không tìm thấy thông báo';
