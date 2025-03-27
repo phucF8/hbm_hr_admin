@@ -4,7 +4,14 @@
       <input type="text" class="form-control" placeholder="🔍 Tìm kiếm theo tiêu đề" [(ngModel)]="searchText">
     </div>
     <div class="text-end">
-      <span class="fw-bold">👤 {{tenNhanVien}}</span>
+      <div class="dropdown">
+        <span class="fw-bold dropdown-toggle" style="cursor: pointer;" data-bs-toggle="dropdown" aria-expanded="false">
+          👤 {{tenNhanVien}}
+        </span>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><button class="dropdown-item" (click)="logout()">Đăng xuất</button></li>
+        </ul>
+      </div>
     </div>
   </div>
   

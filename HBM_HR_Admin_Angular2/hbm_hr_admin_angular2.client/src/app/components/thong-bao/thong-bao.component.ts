@@ -130,4 +130,14 @@ export class ThongBaoComponent implements OnInit {
       console.error('❌ Navigation failed:', error);
     });
   }
+
+  logout() {
+    console.log('🚪 Logging out user');
+    this.authService.logout();
+    this.router.navigate(['/login']).then(() => {
+      console.log('✅ Successfully logged out and redirected to login page');
+    }).catch(error => {
+      console.error('❌ Error during logout:', error);
+    });
+  }
 }
