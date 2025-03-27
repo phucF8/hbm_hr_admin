@@ -82,6 +82,7 @@
           </div>
         </div>
 
+
         <div class="d-flex gap-2 mt-4">
           <button type="submit" class="btn btn-primary px-4" [disabled]="!thongBaoForm.valid || isSubmitting">
             <span *ngIf="!isSubmitting">
@@ -100,3 +101,47 @@
     </div>
   </div>
 </div> 
+
+
+
+<form [formGroup]="searchUserForm" (ngSubmit)="onSearchUser()" class="needs-validation">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="form-floating">
+        <input 
+          type="text" 
+          class="form-control" 
+          id="search" 
+          formControlName="search"
+          placeholder="Nhập từ khóa tìm kiếm">
+        <label for="search">Tìm kiếm</label>
+      </div>
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Tìm</button>
+    </div>
+  </div>
+</form>
+
+<div>
+  <!-- Danh sách người dùng được lọc -->
+  <ul *ngIf="filteredUsers.length > 0">
+    <li *ngFor="let user of filteredUsers" (click)="selectUser(user)">
+      {{ user.name }}
+    </li>
+  </ul>
+  
+  <!-- Hiển thị thông báo nếu không tìm thấy người dùng -->
+  <p *ngIf="filteredUsers.length === 0 && searchUserForm.get('search')?.value.trim() !== ''">
+    Không tìm thấy người dùng nào.
+  </p>
+  
+  <!-- Danh sách người dùng đã chọn -->
+  <h3>Người dùng đã chọn:</h3>
+  <ul *ngIf="selectedUsers.length > 0">
+    <li *ngFor="let user of selectedUsers">
+      {{ user.name }} <button (click)="removeUser(user)">Xóa</button>
+    </li>
+  </ul>
+</div>
+

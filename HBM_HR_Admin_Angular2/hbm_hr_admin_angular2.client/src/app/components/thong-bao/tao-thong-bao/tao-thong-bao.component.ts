@@ -23,9 +23,21 @@ import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
 })
 export class TaoThongBaoComponent implements OnInit {
   thongBaoForm: FormGroup;
+  searchUserForm: FormGroup;
   notificationTypes = NOTIFICATION_TYPES;
   isSubmitting = false;
   errorMessage = '';
+
+  filteredUsers: any[] = [];
+  selectedUsers: any[] = [];
+
+  allUsers = [
+    { id: 1, name: 'Nguyễn Văn A' },
+    { id: 2, name: 'Nguyễn Văn B' },
+    { id: 3, name: 'Trần Thị B' },
+    { id: 4, name: 'Lê Văn C' },
+    { id: 5, name: 'Phạm Thị D' }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -39,6 +51,9 @@ export class TaoThongBaoComponent implements OnInit {
       notificationType: [1, Validators.required],
       triggerAction: [''],
       sentAt: [null]
+    });
+    this.searchUserForm = this.fb.group({
+      search: ['',Validators.required]
     });
   }
 
@@ -99,4 +114,42 @@ export class TaoThongBaoComponent implements OnInit {
     console.log('❌ Cancelling form submission');
     this.router.navigate(['/thong-bao']);
   }
+
+  onSearchUser() {
+    const searchValue = this.searchUserForm.get('search')?.value;
+    console.log('Từ khóa tìm kiếm:', searchValue);
+    if (searchValue.trim() === '') {
+          this.filteredUsers = [];
+          return;
+    }
+    this.filteredUsers = this.allUsers.filter(user =>
+      user.name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  }
+  
+
+
+  // onSearchUser() {
+  //   console.log('onSearchUser: ',this.searchQuery);
+  //   if (this.searchQuery.trim() === '') {
+  //     this.filteredUsers = [];
+  //     return;
+  //   }
+  //   this.filteredUsers = this.allUsers.filter(user =>
+  //     user.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+  //   );
+  // }
+
+  selectUser(user: any) {
+    if (!this.selectedUsers.find(u => u.id === user.id)) {
+      this.selectedUsers.push(user);
+    }
+    this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
+    this.filteredUsers = []; // Ẩn danh sách gợi ý
+  }
+
+  removeUser(user: any) {
+    this.selectedUsers = this.selectedUsers.filter(u => u.id !== user.id);
+  }
+
 } 
