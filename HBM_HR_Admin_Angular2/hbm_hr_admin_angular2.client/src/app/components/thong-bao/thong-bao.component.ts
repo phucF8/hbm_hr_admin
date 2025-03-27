@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ThongBaoService, ThongBao } from '../../services/thong-bao.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-thong-bao',
@@ -15,14 +16,21 @@ export class ThongBaoComponent implements OnInit {
   searchText: string = '';
   selectedType: number = 0; // 0: Tất cả, 1: Thông báo hệ thống, 2: Thông báo cá nhân, 3: Thông báo nhóm
   isDebug = environment.isDebug;
+  tenNhanVien: string = '';
 
   constructor(
     private thongBaoService: ThongBaoService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadThongBao();
+    // Get current user info
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.tenNhanVien = currentUser.TenNhanVien;
+    }
   }
 
   loadThongBao() {
