@@ -1,79 +1,99 @@
-<div class="container mt-4">
-  <div class="card">
-    <div class="card-header bg-primary text-white">
-      <h3 class="mb-0">📝 Tạo Thông Báo Mới</h3>
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white py-3">
+      <h3 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-bell me-2"></i>
+        Tạo Thông Báo Mới
+      </h3>
     </div>
-    <div class="card-body">
-      <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    <div class="card-body p-4">
+      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ errorMessage }}
+        <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Close"></button>
       </div>
 
-      <form [formGroup]="thongBaoForm" (ngSubmit)="onSubmit()">
-        <div class="mb-3">
-          <label for="title" class="form-label">Tiêu đề</label>
-          <input 
-            type="text" 
-            class="form-control" 
-            id="title" 
-            formControlName="title"
-            [class.is-invalid]="thongBaoForm.get('title')?.invalid && thongBaoForm.get('title')?.touched">
-          <div class="invalid-feedback" *ngIf="thongBaoForm.get('title')?.errors?.['required']">
-            Tiêu đề là bắt buộc
+      <form [formGroup]="thongBaoForm" (ngSubmit)="onSubmit()" class="needs-validation">
+        <div class="row g-4">
+          <div class="col-12">
+            <div class="form-floating">
+              <input 
+                type="text" 
+                class="form-control" 
+                id="title" 
+                formControlName="title"
+                placeholder="Nhập tiêu đề"
+                [class.is-invalid]="thongBaoForm.get('title')?.invalid && thongBaoForm.get('title')?.touched">
+              <label for="title">Tiêu đề</label>
+              <div class="invalid-feedback">
+                <div *ngIf="thongBaoForm.get('title')?.errors?.['required']">
+                  Vui lòng nhập tiêu đề
+                </div>
+                <div *ngIf="thongBaoForm.get('title')?.errors?.['minlength']">
+                  Tiêu đề phải có ít nhất 3 ký tự
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="invalid-feedback" *ngIf="thongBaoForm.get('title')?.errors?.['minlength']">
-            Tiêu đề phải có ít nhất 3 ký tự
+
+          <div class="col-12">
+            <div class="form-floating">
+              <textarea 
+                class="form-control" 
+                id="content" 
+                style="height: 150px"
+                formControlName="content"
+                placeholder="Nhập nội dung"
+                [class.is-invalid]="thongBaoForm.get('content')?.invalid && thongBaoForm.get('content')?.touched"></textarea>
+              <label for="content">Nội dung</label>
+              <div class="invalid-feedback">
+                <div *ngIf="thongBaoForm.get('content')?.errors?.['required']">
+                  Vui lòng nhập nội dung
+                </div>
+                <div *ngIf="thongBaoForm.get('content')?.errors?.['minlength']">
+                  Nội dung phải có ít nhất 10 ký tự
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select 
+                class="form-select" 
+                id="notificationType" 
+                formControlName="notificationType">
+                <option *ngFor="let type of notificationTypes" [value]="type.id">
+                  {{type.name}}
+                </option>
+              </select>
+              <label for="notificationType">Loại thông báo</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input 
+                type="datetime-local" 
+                class="form-control" 
+                id="triggerAction" 
+                formControlName="triggerAction">
+              <label for="triggerAction">Thời gian kích hoạt</label>
+            </div>
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="content" class="form-label">Nội dung</label>
-          <textarea 
-            class="form-control" 
-            id="content" 
-            rows="5" 
-            formControlName="content"
-            [class.is-invalid]="thongBaoForm.get('content')?.invalid && thongBaoForm.get('content')?.touched"></textarea>
-          <div class="invalid-feedback" *ngIf="thongBaoForm.get('content')?.errors?.['required']">
-            Nội dung là bắt buộc
-          </div>
-          <div class="invalid-feedback" *ngIf="thongBaoForm.get('content')?.errors?.['minlength']">
-            Nội dung phải có ít nhất 10 ký tự
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label for="notificationType" class="form-label">Loại thông báo</label>
-          <select 
-            class="form-select" 
-            id="notificationType" 
-            formControlName="notificationType">
-            <option *ngFor="let type of notificationTypes" [value]="type.id">
-              {{type.name}}
-            </option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label for="triggerAction" class="form-label">Thời gian kích hoạt (tùy chọn)</label>
-          <input 
-            type="datetime-local" 
-            class="form-control" 
-            id="triggerAction" 
-            formControlName="triggerAction">
-        </div>
-
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary" [disabled]="!thongBaoForm.valid || isSubmitting">
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary px-4" [disabled]="!thongBaoForm.valid || isSubmitting">
             <span *ngIf="!isSubmitting">
-              <i class="fas fa-save"></i> Lưu
+              <i class="fas fa-save me-1"></i> Lưu
             </span>
             <span *ngIf="isSubmitting">
               <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
               Đang lưu...
             </span>
           </button>
-          <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="isSubmitting">
-            <i class="fas fa-times"></i> Hủy
+          <button type="button" class="btn btn-outline-secondary px-4" (click)="onCancel()" [disabled]="isSubmitting">
+            <i class="fas fa-times me-1"></i> Hủy
           </button>
         </div>
       </form>
