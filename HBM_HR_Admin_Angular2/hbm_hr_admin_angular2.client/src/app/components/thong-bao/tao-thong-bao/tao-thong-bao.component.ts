@@ -6,6 +6,7 @@ import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
 
 @Component({
   selector: 'app-tao-thong-bao',
@@ -22,11 +23,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 })
 export class TaoThongBaoComponent implements OnInit {
   thongBaoForm: FormGroup;
-  notificationTypes = [
-    { value: 1, label: 'Thông báo hệ thống' },
-    { value: 2, label: 'Thông báo cá nhân' },
-    { value: 3, label: 'Thông báo nhóm' }
-  ];
+  notificationTypes = NOTIFICATION_TYPES;
   isSubmitting = false;
   errorMessage = '';
 

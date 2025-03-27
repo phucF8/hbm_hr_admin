@@ -47,8 +47,8 @@
             class="form-select" 
             id="notificationType" 
             formControlName="notificationType">
-            <option *ngFor="let type of notificationTypes" [value]="type.value">
-              {{type.label}}
+            <option *ngFor="let type of notificationTypes" [value]="type.id">
+              {{type.name}}
             </option>
           </select>
         </div>
