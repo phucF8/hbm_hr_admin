@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
+import { finalize } from 'rxjs/operators';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-tao-thong-bao',
@@ -32,6 +34,7 @@ export class TaoThongBaoComponent implements OnInit {
   selectedUsers: any[] = [];
   doLookupDatasRP: DoLookupDatasRP | null = null;
   isUserSearchVisible: boolean = false;
+  isSearching: boolean = false;
   
 
 
@@ -66,27 +69,21 @@ export class TaoThongBaoComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('Submit button clicked');
-    console.log('Form value:', this.thongBaoForm.value);
-    console.log('Form valid:', this.thongBaoForm.valid);
-    
     if (this.thongBaoForm.valid) {
       this.isSubmitting = true;
       this.errorMessage = '';
-      
       const currentUser = this.authService.getCurrentUser();
       if (!currentUser) {
         this.errorMessage = 'Không tìm thấy thông tin người dùng';
         this.isSubmitting = false;
         return;
       }
-
       const notificationData = {
+        id: uuidv4(), // Tạo ID ngẫu nhiên
         ...this.thongBaoForm.value,
-        senderId: currentUser.ID
+        senderId: currentUser.ID,
+        recipients: this.selectedUsers.map(user => user.ID), // Lấy danh sách ID từ selectedUsers
       };
-      
-      console.log('📝 Form submitted:', notificationData);
       
       this.thongBaoService.createThongBao(notificationData).subscribe({
         next: (response) => {
@@ -120,24 +117,30 @@ export class TaoThongBaoComponent implements OnInit {
   }
 
   onSearchUser() {
-    const searchValue = this.searchUserForm.get('search')?.value;
+    const searchValue = this.searchUserForm.get('search')?.value?.trim();
     console.log('Từ khóa tìm kiếm:', searchValue);
-    if (searchValue.trim() === '') {
-          this.filteredUsers = [];
-          return;
+    if (!searchValue) {
+        this.filteredUsers = [];
+        return;
     }
- 
-    this.thongBaoService.searchUsers(searchValue).subscribe({
-      next: (response) => {
-        this.doLookupDatasRP = response;
-        this.filteredUsers = response.DatasLookup
-      },
-      error: (error) => {
-        console.error('Lỗi đăng nhập:', error);
-        this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác';
-      }
-    });
+    this.isSearching = true;
+    this.filteredUsers = []; // Reset trước khi tìm kiếm
+    this.thongBaoService.searchUsers(searchValue)
+        .pipe(finalize(() => this.isSearching = false)) // Đảm bảo luôn thực hiện
+        .subscribe({
+            next: (response) => {
+                this.doLookupDatasRP = response;
+                this.filteredUsers = response?.DatasLookup || []; // Tránh lỗi null
+            },
+            error: (error) => {
+                console.error('Lỗi tìm kiếm người dùng:', error);
+                this.errorMessage = 'Đã xảy ra lỗi khi tìm kiếm, vui lòng thử lại';
+                this.filteredUsers = []; // Tránh giữ kết quả sai
+            }
+        });
   }
+
+
   
   // onSearchUser() {
   //   console.log('onSearchUser: ',this.searchQuery);

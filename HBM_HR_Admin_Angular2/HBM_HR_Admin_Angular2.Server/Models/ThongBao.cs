@@ -14,3 +14,5 @@ public class Notification
         public string NguoiTao { get; set; }
         public string NguoiSua { get; set; }
     }
+
+    

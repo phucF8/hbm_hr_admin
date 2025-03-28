@@ -27,7 +27,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 
                 var parameters = new[]
                 {
-                    new SqlParameter("@ID", SqlDbType.VarChar) { Value = Guid.NewGuid().ToString() },
+                    //new SqlParameter("@ID", SqlDbType.VarChar) { Value = Guid.NewGuid().ToString() },
+                    new SqlParameter("@ID", SqlDbType.VarChar) { Value = notification.ID },
                     new SqlParameter("@Title", SqlDbType.NVarChar) { Value = notification.Title },
                     new SqlParameter("@Content", SqlDbType.NVarChar) { Value = notification.Content },
                     new SqlParameter("@SenderId", SqlDbType.VarChar) { Value = notification.SenderId ?? (object)DBNull.Value },
@@ -141,6 +142,29 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error updating notification with ID: {notification.ID}");
+                throw;
+            }
+        }
+    
+    
+        public async Task InsertNotificationRecipient(string notificationId, string recipientId, string creatorId)
+        {
+            try
+            {
+                var parameters = new[]
+                {
+                    new SqlParameter("@NotificationId", SqlDbType.VarChar) { Value = notificationId },
+                    new SqlParameter("@RecipientId", SqlDbType.VarChar) { Value = recipientId },
+                    new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = creatorId }
+                };
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC InsertNotificationRecipient @NotificationId, @RecipientId, @NguoiTao",
+                    parameters);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inserting notification recipient");
                 throw;
             }
         }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError } from 'rxjs';
 
+
 export interface DoLookupData {
   ID: string;
   MaNhanVien: string;
@@ -39,12 +40,15 @@ export interface ThongBao {
 }
 
 export interface CreateThongBaoRequest {
+  id: string;
   title: string;
   content: string;
   notificationType: number;
-  triggerAction?: string;
+  senderId: string;
   sentAt?: Date;
+  recipients: string[]; // Danh sách ID người nhận
 }
+
 
 export interface UpdateThongBaoRequest extends CreateThongBaoRequest {
   id: string;

@@ -47,39 +47,49 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 {
                     return BadRequest("Tiêu đề và nội dung không được để trống");
                 }
-
                 if (request.Title.Length < 3)
                 {
                     return BadRequest("Tiêu đề phải có ít nhất 3 ký tự");
                 }
-
                 if (request.Content.Length < 10)
                 {
                     return BadRequest("Nội dung phải có ít nhất 10 ký tự");
                 }
-
+                
                 // Create new notification
                 var notification = new Notification
                 {
+                    ID = request.ID,
                     Title = request.Title,
                     Content = request.Content,
                     NotificationType = request.NotificationType,
                     SentAt = request.SentAt,
                     SenderId = request.SenderId,
                 };
-
-                // Save to database using stored procedure
-                var result = await _repository.CreateNotification(notification);
                 
-                _logger.LogInformation($"Successfully created notification with ID: {result.ID}");
+                // Save notification to database
+                var result = await _repository.CreateNotification(notification);
+                _logger.LogInformation($"Successfully created notification with ID: {result}");
+                
+                // Insert recipients
+                if (request.Recipients != null && request.Recipients.Any())
+                {
+                    foreach (var recipientId in request.Recipients)
+                    {
+                        _logger.LogInformation($"InsertNotificationRecipient {request.ID}, {recipientId}, {request.SenderId}");
+                        await _repository.InsertNotificationRecipient(result.ID, recipientId,request.SenderId);
+                    }
+                }
+                
                 return CreatedAtAction(nameof(GetNotifications), new { id = result.ID }, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating notification");
                 return StatusCode(500, "Đã xảy ra lỗi khi tạo thông báo");
-            }
+            }   
         }
+
 
         // API DELETE /api/thongbao/{id} - Xóa thông báo
         [HttpDelete("{id}")]
@@ -171,11 +181,13 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
     public class CreateNotificationRequest
     {
+        public string ID { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public int NotificationType { get; set; }
         public string SenderId { get; set; }
         public DateTime? SentAt { get; set; }
+        public List<string> Recipients { get; set; } // Danh sách ID người nhận
     }
 
     public class UpdateNotificationRequest
