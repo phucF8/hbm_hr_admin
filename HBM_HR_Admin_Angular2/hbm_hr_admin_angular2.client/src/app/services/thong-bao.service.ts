@@ -2,6 +2,25 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError } from 'rxjs';
 
+export interface DoLookupData {
+  ID: string;
+  MaNhanVien: string;
+  TenNhanVien: string;
+  UserID: string;
+  TenPhongBan: string;
+  TenChucDanh: string;
+  Anh: string;
+  DonViRoot: string;
+  DiDong: string;
+}
+
+export interface DoLookupDatasRP {
+  Status: string;
+  DatasLookup: DoLookupData[];
+}
+
+
+
 export interface ThongBao {
   id: string;
   title: string;
@@ -45,6 +64,33 @@ export class ThongBaoService {
     return this.http.get<ThongBao[]>(url).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
+        throw error;
+      })
+    );
+  }
+
+  searchUsers(keyword: string): Observable<DoLookupDatasRP> {
+    const url = `https://apihr.hbm.vn:9004/api/hr/employee/DoLookupDatas`;
+    const requestBody = {
+      AccessToken: "eaf0789cc663860acbf99017282eab25",
+      NhanVienInfo: {
+        ID: "38a65e3488e8438e",
+        UserID: "a45bc90fea154dba",
+        Username: "vietdt@hbm.vn",
+        IDKhoLamViec: "08a8f3bec5934"
+      },
+      DLChamCongCondition: {
+        Loai: "RQ_NV",
+        TuKhoa: keyword,
+        KhoDuLieu: "08a8f3bec5934"
+      }
+    };
+
+    console.log('Searching users:', url, requestBody);
+    
+    return this.http.post<DoLookupDatasRP>(url, requestBody).pipe(
+      catchError(error => {
+        console.error('Error searching users:', error);
         throw error;
       })
     );

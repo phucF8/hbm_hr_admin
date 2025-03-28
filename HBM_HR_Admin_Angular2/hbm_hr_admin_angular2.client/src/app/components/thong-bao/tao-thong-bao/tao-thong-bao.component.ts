@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ThongBaoService } from '../../../services/thong-bao.service';
+import { ThongBaoService,DoLookupDatasRP} from '../../../services/thong-bao.service';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -30,6 +30,10 @@ export class TaoThongBaoComponent implements OnInit {
 
   filteredUsers: any[] = [];
   selectedUsers: any[] = [];
+  doLookupDatasRP: DoLookupDatasRP | null = null;
+
+  
+
 
   allUsers = [
     { id: 1, name: 'Nguyễn Văn A' },
@@ -122,13 +126,19 @@ export class TaoThongBaoComponent implements OnInit {
           this.filteredUsers = [];
           return;
     }
-    this.filteredUsers = this.allUsers.filter(user =>
-      user.name.toLowerCase().includes(searchValue.toLowerCase())
-    );
+ 
+    this.thongBaoService.searchUsers(searchValue).subscribe({
+      next: (response) => {
+        this.doLookupDatasRP = response;
+        this.filteredUsers = response.DatasLookup
+      },
+      error: (error) => {
+        console.error('Lỗi đăng nhập:', error);
+        this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác';
+      }
+    });
   }
   
-
-
   // onSearchUser() {
   //   console.log('onSearchUser: ',this.searchQuery);
   //   if (this.searchQuery.trim() === '') {
@@ -141,9 +151,13 @@ export class TaoThongBaoComponent implements OnInit {
   // }
 
   selectUser(user: any) {
-    if (!this.selectedUsers.find(u => u.id === user.id)) {
+    if (!this.selectedUsers.find(u => u.ID === user.ID)) {
       this.selectedUsers.push(user);
     }
+    
+    // Log toàn bộ danh sách selectedUsers sau mỗi lần cập nhật
+    console.log("Current selectedUsers:", this.selectedUsers.map(u => u.id));
+    
     this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
     this.filteredUsers = []; // Ẩn danh sách gợi ý
   }
