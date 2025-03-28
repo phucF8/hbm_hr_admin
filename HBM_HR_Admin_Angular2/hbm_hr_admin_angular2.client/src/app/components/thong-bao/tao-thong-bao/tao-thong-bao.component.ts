@@ -31,7 +31,7 @@ export class TaoThongBaoComponent implements OnInit {
   filteredUsers: any[] = [];
   selectedUsers: any[] = [];
   doLookupDatasRP: DoLookupDatasRP | null = null;
-
+  isUserSearchVisible: boolean = false;
   
 
 
@@ -165,5 +165,11 @@ export class TaoThongBaoComponent implements OnInit {
   removeUser(user: any) {
     this.selectedUsers = this.selectedUsers.filter(u => u.id !== user.id);
   }
+
+  onNotificationTypeChange() {
+    const selectedType = this.thongBaoForm.get('notificationType')?.value;
+    this.isUserSearchVisible = selectedType === '2'; // Kiểm tra nếu là loại 2 thì hiển thị tìm kiếm user
+  }
+
 
 } 

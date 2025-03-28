@@ -61,9 +61,10 @@
               <select 
                 class="form-select" 
                 id="notificationType" 
-                formControlName="notificationType">
+                formControlName="notificationType"
+                (change)="onNotificationTypeChange()">
                 <option *ngFor="let type of notificationTypes" [value]="type.id">
-                  {{type.name}}
+                  {{ type.name }}
                 </option>
               </select>
               <label for="notificationType">Loại thông báo</label>
@@ -103,7 +104,7 @@
 </div> 
 
 
-
+<div [hidden]="!isUserSearchVisible">
 <form [formGroup]="searchUserForm" (ngSubmit)="onSearchUser()" class="needs-validation">
   <div class="row g-4">
     <div class="col-12">
@@ -138,5 +139,6 @@
       {{ user.ID }} {{ user.TenNhanVien }} <button (click)="removeUser(user)">Xóa</button>
     </li>
   </ul>
+</div>
 </div>
 
