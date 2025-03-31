@@ -8,12 +8,14 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { FormsModule } from '@angular/forms';
 import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
+import { PaginationComponent } from './pagination/pagination.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    ThongBaoComponent
+    ThongBaoComponent,
+    PaginationComponent
   ],
   imports: [
     BrowserModule,

@@ -79,12 +79,17 @@
     
     <nav>
       <ul class="pagination mb-0">
-        <li class="page-item"><a class="page-link" href="#">⬅</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">➡</a></li>
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="changePage(currentPage - 1)">⬅</a>
+        </li>
+        <li *ngFor="let page of pages" class="page-item" [class.active]="page === currentPage">
+          <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="changePage(currentPage + 1)">➡</a>
+        </li>
       </ul>
     </nav>
+    
   </div>
 </div>

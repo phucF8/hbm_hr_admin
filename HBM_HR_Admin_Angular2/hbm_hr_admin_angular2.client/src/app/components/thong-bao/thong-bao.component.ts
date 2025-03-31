@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Input, Output, EventEmitter } from '@angular/core';
 import { ThongBaoService, ThongBao } from '../../services/thong-bao.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notification-types';
+
 
 @Component({
   selector: 'app-thong-bao',
@@ -12,10 +14,15 @@ import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notificati
   standalone: false,
 })
 export class ThongBaoComponent implements OnInit {
+  @Input() totalPages: number = 1;
+  @Input() currentPage: number = 1;
+  @Output() pageChange = new EventEmitter<number>();
+
   thongBaoList: ThongBao[] = [];
   selectAll: boolean = false;
   searchText: string = '';
   selectedType: number = 0; // 0: Tất cả
+  pageIndex: number = 1;
   isDebug = environment.isDebug;
   tenNhanVien: string = '';
   notificationTypes = NOTIFICATION_TYPES;
@@ -46,6 +53,12 @@ export class ThongBaoComponent implements OnInit {
         console.error('Error loading notifications:', error);
       }
     });
+  }
+
+  changePage(newPage: number) {
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.pageChange.emit(newPage);
+    }
   }
 
   onTypeChange() {

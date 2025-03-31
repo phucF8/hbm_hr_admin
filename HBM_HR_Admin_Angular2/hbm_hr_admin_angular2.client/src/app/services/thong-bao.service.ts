@@ -62,8 +62,8 @@ export class ThongBaoService {
 
   constructor(private http: HttpClient) { }
 
-  getThongBao(notificationType: number = 0): Observable<ThongBao[]> {
-    const url = `${this.apiUrl}?notificationType=${notificationType}`;
+  getThongBao(pageIndex: number = 1, notificationType: number = 0): Observable<ThongBao[]> {
+    const url = `${this.apiUrl}?pageIndex=${pageIndex}&notificationType=${notificationType}`;
     console.log('Calling API:', url);
     return this.http.get<ThongBao[]>(url).pipe(
       catchError(error => {
