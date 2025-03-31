@@ -112,7 +112,7 @@ export class ThongBaoComponent implements OnInit {
 
   editThongBao(id: string) {
     console.log('📝 Navigating to edit notification:', id);
-    this.router.navigate(['/thong-bao/sua', id]).then(() => {
+    this.router.navigate(['/thong-bao/tbchitiet', id]).then(() => {
       console.log('✅ Navigation completed successfully');
     }).catch(error => {
       console.error('❌ Navigation failed:', error);

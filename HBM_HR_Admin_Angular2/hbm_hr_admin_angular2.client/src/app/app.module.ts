@@ -9,6 +9,7 @@ import { LoginComponent } from './components/login/login.component';
 import { FormsModule } from '@angular/forms';
 import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
+import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.component';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { PaginationComponent } from './components/pagination/pagination.componen
     AppComponent,
     LoginComponent,
     ThongBaoComponent,
-    PaginationComponent
+    PaginationComponent,
+    TbchitietComponent
   ],
   imports: [
     BrowserModule,

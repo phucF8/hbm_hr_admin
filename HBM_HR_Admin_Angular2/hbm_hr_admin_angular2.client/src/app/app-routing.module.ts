@@ -4,6 +4,7 @@ import { LoginComponent } from './components/login/login.component';
 import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
 import { TaoThongBaoComponent } from './components/thong-bao/tao-thong-bao/tao-thong-bao.component';
 import { SuaThongBaoComponent } from './components/thong-bao/sua-thong-bao/sua-thong-bao.component';
+import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.component';
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
@@ -11,6 +12,9 @@ const routes: Routes = [
   { path: 'thongbao', component: ThongBaoComponent, canActivate: [AuthGuard] },
   { path: 'thong-bao/tao-moi', component: TaoThongBaoComponent, canActivate: [AuthGuard] },
   { path: 'thong-bao/sua/:id', component: SuaThongBaoComponent, canActivate: [AuthGuard] },
+
+  { path: 'thong-bao/tbchitiet/:id', component: TbchitietComponent },
+
   { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
   { path: '**', redirectTo: 'thongbao' },
 ];
