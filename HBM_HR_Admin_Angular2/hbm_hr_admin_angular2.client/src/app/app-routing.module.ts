@@ -10,9 +10,9 @@ import { AuthGuard } from './guards/auth.guard';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'thongbao', component: ThongBaoComponent, canActivate: [AuthGuard] },
-  { path: 'thong-bao/tao-moi', component: TaoThongBaoComponent, canActivate: [AuthGuard] },
-  { path: 'thong-bao/sua/:id', component: SuaThongBaoComponent, canActivate: [AuthGuard] },
-
+  
+ 
+  { path: 'thong-bao/tbchitiet', component: TbchitietComponent }, //truong hop tao moi thong bao
   { path: 'thong-bao/tbchitiet/:id', component: TbchitietComponent },
 
   { path: '', redirectTo: 'thongbao', pathMatch: 'full' },

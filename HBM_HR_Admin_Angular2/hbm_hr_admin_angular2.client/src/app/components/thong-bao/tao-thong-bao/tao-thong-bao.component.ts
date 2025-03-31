@@ -38,13 +38,6 @@ export class TaoThongBaoComponent implements OnInit {
   
 
 
-  allUsers = [
-    { id: 1, name: 'Nguyễn Văn A' },
-    { id: 2, name: 'Nguyễn Văn B' },
-    { id: 3, name: 'Trần Thị B' },
-    { id: 4, name: 'Lê Văn C' },
-    { id: 5, name: 'Phạm Thị D' }
-  ];
 
   constructor(
     private fb: FormBuilder,

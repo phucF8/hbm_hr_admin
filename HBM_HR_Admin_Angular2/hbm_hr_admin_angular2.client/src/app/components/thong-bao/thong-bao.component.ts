@@ -156,8 +156,7 @@ export class ThongBaoComponent implements OnInit {
   }
 
   taoThongBao() {
-    console.log('📝 Navigating to /thong-bao/tao-moi');
-    this.router.navigate(['/thong-bao/tao-moi']).then(() => {
+    this.router.navigate(['/thong-bao/tbchitiet']).then(() => {
       console.log('✅ Navigation completed successfully');
     }).catch(error => {
       console.error('❌ Navigation failed:', error);
