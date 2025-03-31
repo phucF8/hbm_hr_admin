@@ -10,7 +10,7 @@ import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
 @Component({
   selector: 'app-sua-thong-bao',
   templateUrl: './sua-thong-bao.component.html',
-  styleUrls: ['./sua-thong-bao.component.css'],
+  //styleUrls: ['./sua-thong-bao.component.css'],
   standalone: true,
   imports: [
     CommonModule, 
@@ -49,14 +49,14 @@ export class SuaThongBaoComponent implements OnInit {
   }
 
   loadNotification() {
-    this.thongBaoService.getThongBao().subscribe({
-      next: (notifications) => {
-        const notification = notifications.find(n => n.id === this.notificationId);
+    this.thongBaoService.getThongBaoByID(this.notificationId).subscribe({
+      next: (notification) => {
         if (notification) {
+          console.log('notification:', notification);
+          console.log('title:', notification.title);
           const formattedDate = notification.sentAt ? notification.sentAt : '';
           console.log('notification.sentAt:', notification.sentAt);
           console.log('Formatted date:', formattedDate);
-
           this.thongBaoForm.patchValue({
             title: notification.title,
             content: notification.content,

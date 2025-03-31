@@ -34,6 +34,16 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(notifications);
         }
 
+        // API GET /api/thongbao/{id} - Lấy 1 danh sách thông báo củ thể
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<Notification>>> GetNotification(string id = "")
+        {
+            _logger.LogInformation($"GetNotification: {id}");
+            var notification = await _repository.GetNotificationByID(id);
+            _logger.LogInformation($"Returning {notification} notifications");
+            return Ok(notification);
+        }
+
         // API POST /api/thongbao - Tạo thông báo mới
         [HttpPost]
         public async Task<ActionResult<Notification>> CreateNotification([FromBody] CreateNotificationRequest request)

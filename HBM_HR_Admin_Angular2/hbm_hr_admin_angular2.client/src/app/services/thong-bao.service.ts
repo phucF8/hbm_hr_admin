@@ -73,6 +73,17 @@ export class ThongBaoService {
     );
   }
 
+  getThongBaoByID(notificationID: string): Observable<ThongBao> {
+    const url = `${this.apiUrl}/${notificationID}`;
+    console.log('Calling API:', url);
+    return this.http.get<ThongBao>(url).pipe(
+      catchError(error => {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      })
+    );
+  }
+
   searchUsers(keyword: string): Observable<DoLookupDatasRP> {
     const url = `https://apihr.hbm.vn:9004/api/hr/employee/DoLookupDatas`;
     const requestBody = {

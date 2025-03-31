@@ -78,6 +78,36 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
+        public async Task<Notification?> GetNotificationByID(string notificationID)
+        {
+            try
+            {
+                _logger.LogInformation($"GetNotificationByID: {notificationID}");
+                using var connection = new SqlConnection(_connectionString);
+                var result = await connection.QueryFirstOrDefaultAsync<Notification>(
+                    "NS_ADTB_GetNotificationById",
+                    new {
+                        NotificationID = notificationID 
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+                if (result != null)
+                {
+                    _logger.LogInformation("Stored procedure returned a record");
+                }
+                else
+                {
+                    _logger.LogInformation("No record found for the given notification ID");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting notification by ID");
+                throw;
+            }
+        }
+
         public async Task DeleteNotification(string notificationId)
         {
             try
