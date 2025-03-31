@@ -1,0 +1,30 @@
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .page-item {
+    margin: 0 5px;
+  }
+  
+  .page-item .page-link {
+    cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid #007bff;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .page-item.active .page-link {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .page-item.disabled .page-link {
+    color: gray;
+    cursor: not-allowed;
+    border-color: gray;
+  }
+  

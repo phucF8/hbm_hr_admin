@@ -14,7 +14,7 @@ import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notificati
   standalone: false,
 })
 export class ThongBaoComponent implements OnInit {
-  @Input() totalPages: number = 1;
+  @Input() totalPages: number = 5;
   @Input() currentPage: number = 1;
   @Output() pageChange = new EventEmitter<number>();
 
@@ -55,10 +55,22 @@ export class ThongBaoComponent implements OnInit {
     });
   }
 
-  changePage(newPage: number) {
-    if (newPage >= 1 && newPage <= this.totalPages) {
-      this.pageChange.emit(newPage);
-    }
+  onPageChange(newPage: number) {
+    console.log('onPageChange:', newPage);
+    this.currentPage = newPage;
+    this.loadData();
+  }
+
+  loadData() {
+    this.thongBaoService.getThongBao(this.currentPage,this.selectedType).subscribe({
+      next: (data) => {
+        console.log('Received notifications:', data);
+        this.thongBaoList = data;
+      },
+      error: (error) => {
+        console.error('Error loading notifications:', error);
+      }
+    });
   }
 
   onTypeChange() {
@@ -67,6 +79,7 @@ export class ThongBaoComponent implements OnInit {
   }
 
   sendAgain() {
+    console.log('sendAgain');
     alert('Gửi lại thông báo đã chọn!');
   }
 
