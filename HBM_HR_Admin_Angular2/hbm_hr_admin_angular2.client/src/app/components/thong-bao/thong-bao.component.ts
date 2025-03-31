@@ -44,7 +44,7 @@ export class ThongBaoComponent implements OnInit {
 
   loadThongBao() {
     console.log('Loading notifications with type:', this.selectedType);
-    this.thongBaoService.getThongBao(this.selectedType).subscribe({
+    this.thongBaoService.getThongBao(1,this.selectedType).subscribe({
       next: (data) => {
         console.log('Received notifications:', data);
         this.thongBaoList = data;
