@@ -140,6 +140,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 _logger.LogInformation($"Deleting multiple notifications: {string.Join(", ", ids)}");
                 await _repository.DeleteMultiNotification(string.Join(",", ids));
                 _logger.LogInformation($"Successfully deleted {ids.Length} notifications");
+                await _repository.DeleteNotificationRecipients_Multi(ids);
                 return NoContent();
             }
             catch (Exception ex)
@@ -188,15 +189,17 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 {
                     return NotFound($"Không tìm thấy thông báo với ID: {id}");
                 }else{
+                    // Delete recipients
+                    await _repository.DeleteNotificationRecipients(notification.ID);        
                     // Insert recipients
-                if (request.Recipients != null && request.Recipients.Any())
-                {
-                    foreach (var recipientId in request.Recipients)
+                    if (request.Recipients != null && request.Recipients.Any())
                     {
-                        //_logger.LogInformation($"InsertNotificationRecipient {request.ID}, {recipientId}, {request.SenderId}");
-                        await _repository.InsertNotificationRecipient(result.ID, recipientId,"SYS");
+                        foreach (var recipientId in request.Recipients)
+                        {
+                            _logger.LogInformation($"InsertNotificationRecipient {result.ID}, {recipientId}, {"SYS"}");
+                            await _repository.InsertNotificationRecipient(result.ID, recipientId,"SYS");
+                        }
                     }
-                }
                 }
 
                 _logger.LogInformation($"Successfully updated notification with ID: {id}");

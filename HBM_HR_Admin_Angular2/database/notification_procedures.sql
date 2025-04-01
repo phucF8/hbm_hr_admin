@@ -40,25 +40,28 @@ BEGIN
 END;
 GO
 
+
+
+
 -- =============================================
 -- Stored Procedure: NS_ADTB_GetNotificationById
 -- Description: Lấy thông tin chi tiết của một thông báo theo ID
 -- Author: HBM HR Admin
 -- Created: 2024-03-19
 -- =============================================
-
+-- Lấy về thông tin của 1 record thông báo có id = ?
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationById')
     DROP PROCEDURE NS_ADTB_GetNotificationById
 GO
 
 CREATE PROCEDURE NS_ADTB_GetNotificationById
-    @NotificationID VARCHAR(50)
+    @NotificationID VARCHAR(36)
 AS
 BEGIN
     SET NOCOUNT ON;
 
     SELECT 
-        tb.NotificationID,
+        tb.ID,
         tb.Title,
         tb.Content,
         tb.SenderID,
@@ -70,11 +73,17 @@ BEGIN
         tb.NgaySua,
         tb.NguoiTao,
         tb.NguoiSua
-    FROM NS_ADTB_ThongBao tb
-    LEFT JOIN NS_NhanVien nv ON tb.SenderID = nv.MaNhanVien
-    WHERE tb.NotificationID = @NotificationID;
+    FROM NS_ADTB_Notifications tb
+    LEFT JOIN NS_NhanViens nv ON tb.SenderID = nv.ID
+    WHERE tb.ID = @NotificationID;
 END
 GO
+
+/*EXEC NS_ADTB_GetNotificationById 
+    @NotificationID = '612dd7be-46cb-408e-8f14-471e2445d77a';*/
+
+
+
 
 -- SỬA THÔNG BÁO
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_UpdateNotification')
@@ -173,7 +182,6 @@ CREATE PROCEDURE InsertNotification
     @Title NVARCHAR(255),
     @Content NVARCHAR(2000),
     @SenderId  VARCHAR(36),
-    @TriggerAction NVARCHAR(50) = NULL,
     @NotificationType TINYINT,
     @SentAt DATETIME = NULL,
     @NguoiTao VARCHAR(36),
@@ -182,10 +190,10 @@ AS
 BEGIN
     SET NOCOUNT ON;
     INSERT INTO [dbo].[NS_ADTB_Notifications] (
-        ID, Title, Content, SenderId, TriggerAction, NotificationType, SentAt, NgayTao, NgaySua, NguoiTao, NguoiSua
+        ID, Title, Content, SenderId, NotificationType, SentAt, NgayTao, NgaySua, NguoiTao, NguoiSua
     )
     VALUES (
-        @ID, @Title, @Content, @SenderId, @TriggerAction, @NotificationType, @SentAt, GETDATE(), GETDATE(), @NguoiTao, @NguoiSua
+        @ID, @Title, @Content, @SenderId, @NotificationType, @SentAt, GETDATE(), GETDATE(), @NguoiTao, @NguoiSua
     );
 END
 GO
@@ -202,3 +210,94 @@ EXEC InsertNotification
     @NguoiTao = 'admin',
     @NguoiSua = 'admin';
 
+
+--khi tạo thông báo theo nhóm, thì tạo bản ghi liên kết giữa thông báo và user
+CREATE PROCEDURE InsertNotificationRecipient
+    @NotificationId NVARCHAR(36),
+    @RecipientId NVARCHAR(36),
+    @NguoiTao VARCHAR(36)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO [dbo].[NS_ADTB_NotificationRecipients] (
+        ID,
+        NotificationId,
+        RecipientId,
+        Status,
+        NgayTao,
+        NgaySua,
+        NguoiTao,
+        NguoiSua
+    )
+    VALUES (
+        NEWID(), -- Tạo ID ngẫu nhiên
+        @NotificationId,
+        @RecipientId,
+        0, -- Trạng thái mặc định là 0 (chưa gửi)
+        GETDATE(),
+        GETDATE(),
+        @NguoiTao,
+        @NguoiTao -- Người sửa ban đầu sẽ là người tạo
+    );
+END;
+
+EXEC InsertNotificationRecipient 
+    @NotificationId = 'some-notification-id',
+    @RecipientId = 'some-user-id',
+    @NguoiTao = 'creator-id';
+
+
+
+
+
+
+
+
+
+--lấy về ds nhóm user đối với thông báo cho nhóm
+CREATE PROCEDURE SelectNotificationRecipients
+    @NotificationId VARCHAR(36)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        nr.NotificationId,
+        nr.RecipientId,
+        nv.TenNhanVien,
+        nr.Status
+    FROM [HBM_HCNSApp].[dbo].[NS_ADTB_NotificationRecipients] nr
+    INNER JOIN [HBM_HCNSApp].[dbo].[NS_NhanViens] nv
+        ON nr.RecipientId = nv.ID
+    WHERE nr.NotificationId = @NotificationId;
+END;
+
+
+--EXEC SelectNotificationRecipients @NotificationId = 'GUID_CUA_NOTIFICATION'
+
+--xóa ds nhóm user đối với thông báo cho nhóm để insert lại sau đó (cho tính năng update)
+CREATE PROCEDURE DeleteNotificationRecipients
+    @NotificationId VARCHAR(36)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM [HBM_HCNSApp].[dbo].[NS_ADTB_NotificationRecipients]
+    WHERE NotificationId = @NotificationId;
+END;
+
+
+--EXEC DeleteNotificationRecipients @NotificationId = 'your-notification-id';
+CREATE TYPE NotificationIdTableType AS TABLE
+(
+    NotificationId VARCHAR(36)
+);
+CREATE PROCEDURE DeleteNotificationRecipients_Multiple
+    @NotificationIds NotificationIdTableType READONLY
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM [HBM_HCNSApp].[dbo].[NS_ADTB_NotificationRecipients]
+    WHERE NotificationId IN (SELECT NotificationId FROM @NotificationIds);
+END;

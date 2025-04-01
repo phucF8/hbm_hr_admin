@@ -1,4 +1,3 @@
-
 public class Notification
 {
     
@@ -24,10 +23,14 @@ public class Notification
 
 public class NotificationRecipient
 {
+    public string ID { get; set; } // Khóa chính
     public string NotificationId { get; set; }
     public string RecipientId { get; set; }
     public string TenNhanVien { get; set; } = string.Empty;
-    public int Status { get; set; }
+    public byte Status { get; set; }
+    public DateTime NgayTao { get; set; }
+    public DateTime NgaySua { get; set; }
+    public string NguoiTao { get; set; }
+    public string NguoiSua { get; set; }
 }
 
-    

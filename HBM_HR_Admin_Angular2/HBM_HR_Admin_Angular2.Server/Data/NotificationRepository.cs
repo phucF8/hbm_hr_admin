@@ -183,6 +183,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         {
             try
             {
+                var sql = $"EXEC InsertNotificationRecipient @NotificationId='{notificationId}', @RecipientId='{recipientId}', @NguoiTao='{creatorId}'";
+                _logger.LogInformation("Executing SQL: {SqlQuery}", sql); // Log câu lệnh SQL
                 var parameters = new[]
                 {
                     new SqlParameter("@NotificationId", SqlDbType.VarChar) { Value = notificationId },
@@ -223,6 +225,53 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
+
+        public async Task DeleteNotificationRecipients(string notificationId)
+        {
+            _logger.LogInformation("DeleteNotificationRecipients - NotificationId: {NotificationId}", notificationId);
+            try
+            {
+                var parameters = new
+                {
+                    NotificationId = notificationId,
+                };
+                using var connection = new SqlConnection(_connectionString);
+                await connection.ExecuteAsync(
+                    "EXEC DeleteNotificationRecipients @NotificationId",
+                    parameters);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting notification recipients for NotificationId: {NotificationId}", notificationId);
+                throw;
+            }
+        }
+
+        public async Task DeleteNotificationRecipients_Multi(IEnumerable<string> notificationIds)
+        {
+            _logger.LogInformation("DeleteNotificationRecipients_Multiple - NotificationIds: {NotificationIds}", string.Join(",", notificationIds));
+            try
+            {
+                using var connection = new SqlConnection(_connectionString);
+                // Tạo DataTable để truyền vào TVP
+                var table = new DataTable();
+                table.Columns.Add("NotificationId", typeof(string));
+                foreach (var id in notificationIds)
+                {
+                    table.Rows.Add(id);
+                }
+                var parameters = new { NotificationIds = table.AsTableValuedParameter("NotificationIdTableType") };
+                await connection.ExecuteAsync("EXEC DeleteNotificationRecipients_Multiple @NotificationIds", parameters);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting notification recipients");
+                throw;
+            }
+        }
+
+
+
 
     }
 } 

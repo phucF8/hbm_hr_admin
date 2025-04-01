@@ -73,7 +73,7 @@ export class TbchitietComponent implements OnInit {
             sentAt: formattedDate
           });
           this.selectedUsers = notification.recipients.map(recipient => ({
-            ID: recipient.notificationId,
+            ID: recipient.recipientId,
             MaNhanVien: recipient.recipientId,  // Nếu recipientId là mã nhân viên
             TenNhanVien: recipient.tenNhanVien,
             TenPhongBan: "", // Nếu cần, hãy lấy từ một nguồn khác
@@ -102,7 +102,7 @@ export class TbchitietComponent implements OnInit {
   
 
   onSubmitUpdate() {
-    console.log('Submit button clicked');
+    console.log('Update thông báo');
     console.log('Form value:', this.thongBaoForm.value);
     console.log('Form valid:', this.thongBaoForm.valid);
     console.log('notification.sentAt:', this.thongBaoForm.value.sentAt);
@@ -117,9 +117,14 @@ export class TbchitietComponent implements OnInit {
         sentAt: formValue.sentAt ? formValue.sentAt : null,
         recipients: this.selectedUsers.map(user => user.ID), // Lấy danh sách ID từ selectedUsers
       };
-      
+      console.log('onSubmitUpdate: ', this.notificationId);
       this.thongBaoService.updateThongBao(notificationData).subscribe({
         next: (response) => {
+          
+          //tức là đã update thành công
+          //xóa tất cả ds user cũ đi
+          //và insert ds user mới
+
           console.log('✅ Notification updated successfully:', response);
           alert('Thông báo đã được cập nhật thành công!');
           this.router.navigate(['/thongbao']);
@@ -234,7 +239,8 @@ export class TbchitietComponent implements OnInit {
   }
 
   removeUser(user: any) {
-    this.selectedUsers = this.selectedUsers.filter(u => u.ID !== user.id);
+    console.log("user: ",user.ID);
+    this.selectedUsers = this.selectedUsers.filter(u => u.ID !== user.ID);
   }
 
   onNotificationTypeChange() {
