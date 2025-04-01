@@ -79,7 +79,9 @@
         <i class="bi bi-trash"></i> <!-- Thay bằng biểu tượng thùng rác -->
       </button>
       <button class="btn btn-primary me-2" (click)="sendAgain()">Gửi lại</button>
-      <button class="btn btn-success" (click)="taoThongBao()">Tạo thông báo</button>
+      <button class="btn btn-success" (click)="taoThongBao()">
+        <i class="bi bi-plus-circle"></i> Tạo thông báo mới
+      </button>
     </div>
 
     <app-pagination [totalPages]="totalPages" [currentPage]="currentPage" (pageChange)="onPageChange($event)">
