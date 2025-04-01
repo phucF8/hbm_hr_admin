@@ -3,6 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError } from 'rxjs';
 
 
+export interface MergedData {
+  ID: string;          // ID từ DoLookupData
+  MaNhanVien: string;  // Mã nhân viên từ DoLookupData
+  TenNhanVien: string; // Tên nhân viên từ DoLookupData
+  TenPhongBan: string; // Phòng ban từ DoLookupData
+  status: number | null; // Trạng thái thông báo từ ThongBaoRecipient
+}
+
 export interface DoLookupData {
   ID: string;
   MaNhanVien: string;
@@ -22,22 +30,31 @@ export interface DoLookupDatasRP {
 
 
 
+export interface ThongBaoRecipient {
+  notificationId: string;
+  recipientId: string;
+  tenNhanVien: string;
+  status: number;
+}
+
 export interface ThongBao {
   id: string;
   title: string;
   content: string;
   senderId: string;
   tenNhanVien: string;
-  triggerAction?: string;
+  triggerAction: string | null;
   notificationType: number;
   status: number;
-  sentAt?: Date;
-  ngayTao: Date;
-  ngaySua: Date;
+  sentAt?: string | null;
+  ngayTao: string;
+  ngaySua: string;
   nguoiTao: string;
   nguoiSua: string;
+  recipients: ThongBaoRecipient[];  // Danh sách người nhận
   selected?: boolean;
 }
+
 
 export interface CreateThongBaoRequest {
   id: string;

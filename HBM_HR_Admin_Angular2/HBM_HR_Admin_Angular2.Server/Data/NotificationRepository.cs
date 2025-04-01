@@ -27,12 +27,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 
                 var parameters = new[]
                 {
-                    //new SqlParameter("@ID", SqlDbType.VarChar) { Value = Guid.NewGuid().ToString() },
                     new SqlParameter("@ID", SqlDbType.VarChar) { Value = notification.ID },
                     new SqlParameter("@Title", SqlDbType.NVarChar) { Value = notification.Title },
                     new SqlParameter("@Content", SqlDbType.NVarChar) { Value = notification.Content },
                     new SqlParameter("@SenderId", SqlDbType.VarChar) { Value = notification.SenderId ?? (object)DBNull.Value },
-                   
                     new SqlParameter("@NotificationType", SqlDbType.TinyInt) { Value = notification.NotificationType },
                     new SqlParameter("@SentAt", SqlDbType.DateTime) { Value = notification.SentAt ?? (object)DBNull.Value },
                     new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = "System" }, // You might want to get this from the current user
@@ -94,6 +92,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 if (result != null)
                 {
                     _logger.LogInformation("Stored procedure returned a record");
+
+
+
+
                 }
                 else
                 {
@@ -198,5 +200,29 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
+
+
+        public async Task<IEnumerable<NotificationRecipient>> SelectNotificationRecipients(string notificationId)
+        {
+            _logger.LogError("SelectNotificationRecipients");
+            try
+            {
+                var parameters = new
+                {
+                    NotificationId =notificationId,
+                };
+                using var connection = new SqlConnection(_connectionString);
+                var result = await connection.QueryAsync<NotificationRecipient>(
+                    "EXEC SelectNotificationRecipients @NotificationId",
+                    parameters);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error inserting notification recipient");
+                throw;
+            }
+        }
+
     }
 } 

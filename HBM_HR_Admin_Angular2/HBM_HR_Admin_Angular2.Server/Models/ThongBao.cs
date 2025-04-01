@@ -1,5 +1,7 @@
+
 public class Notification
-    {
+{
+    
         public string ID { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
@@ -13,6 +15,19 @@ public class Notification
         public DateTime NgaySua { get; set; }
         public string NguoiTao { get; set; }
         public string NguoiSua { get; set; }
-    }
+
+
+         public List<NotificationRecipient> Recipients { get; set; } = new List<NotificationRecipient>();
+
+
+}
+
+public class NotificationRecipient
+{
+    public string NotificationId { get; set; }
+    public string RecipientId { get; set; }
+    public string TenNhanVien { get; set; } = string.Empty;
+    public int Status { get; set; }
+}
 
     

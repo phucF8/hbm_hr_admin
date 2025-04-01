@@ -36,11 +36,23 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API GET /api/thongbao/{id} - Lấy 1 danh sách thông báo củ thể
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<Notification>>> GetNotification(string id = "")
+        public async Task<ActionResult<Notification>> GetNotification(string id)
         {
             _logger.LogInformation($"GetNotification: {id}");
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Notification ID is empty");
+                return BadRequest("Notification ID cannot be empty");
+            }
             var notification = await _repository.GetNotificationByID(id);
-            _logger.LogInformation($"Returning {notification} notifications");
+            if (notification == null)
+            {
+                _logger.LogWarning($"Notification with ID {id} not found");
+                return NotFound($"Notification with ID {id} not found");
+            }
+            var result = await _repository.SelectNotificationRecipients(id);
+            notification.Recipients = result.ToList();
+            _logger.LogInformation($"Returning notification ID: {notification.ID}, Title: {notification.Title}, Recipients count: {result.Count()}");
             return Ok(notification);
         }
 
@@ -175,6 +187,16 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 if (result == null)
                 {
                     return NotFound($"Không tìm thấy thông báo với ID: {id}");
+                }else{
+                    // Insert recipients
+                if (request.Recipients != null && request.Recipients.Any())
+                {
+                    foreach (var recipientId in request.Recipients)
+                    {
+                        //_logger.LogInformation($"InsertNotificationRecipient {request.ID}, {recipientId}, {request.SenderId}");
+                        await _repository.InsertNotificationRecipient(result.ID, recipientId,"SYS");
+                    }
+                }
                 }
 
                 _logger.LogInformation($"Successfully updated notification with ID: {id}");
@@ -206,6 +228,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         public string Content { get; set; }
         public int NotificationType { get; set; }
         public DateTime? SentAt { get; set; }
+        public List<string> Recipients { get; set; } // Danh sách ID người nhận
         
     }
 }

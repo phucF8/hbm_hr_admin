@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ThongBaoService,DoLookupDatasRP} from '../../../services/thong-bao.service';
+import { ThongBaoService,DoLookupDatasRP, MergedData} from '../../../services/thong-bao.service';
 import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
@@ -23,8 +23,8 @@ export class TbchitietComponent implements OnInit {
   errorMessage = '';
   notificationId: string = '';
   
-  filteredUsers: any[] = [];
-  selectedUsers: any[] = [];
+  filteredUsers: MergedData[] = [];
+  selectedUsers: MergedData[] = [];
   doLookupDatasRP: DoLookupDatasRP | null = null;
   isUserSearchVisible: boolean = false;
   isSearching: boolean = false;
@@ -53,6 +53,7 @@ export class TbchitietComponent implements OnInit {
     this.notificationId = this.route.snapshot.paramMap.get('id') || '';
     if (this.notificationId) {
       this.loadNotification();
+      this.isUserSearchVisible = true;//sửa thông báo thì luôn hiện danh sách user - có hợp lý không?
     }
   }
 
@@ -71,6 +72,15 @@ export class TbchitietComponent implements OnInit {
             notificationType: notification.notificationType,
             sentAt: formattedDate
           });
+          this.selectedUsers = notification.recipients.map(recipient => ({
+            ID: recipient.notificationId,
+            MaNhanVien: recipient.recipientId,  // Nếu recipientId là mã nhân viên
+            TenNhanVien: recipient.tenNhanVien,
+            TenPhongBan: "", // Nếu cần, hãy lấy từ một nguồn khác
+            status: recipient.status
+          })) as MergedData[];
+          
+
         } else {
           this.errorMessage = 'Không tìm thấy thông báo';
         }
@@ -101,13 +111,14 @@ export class TbchitietComponent implements OnInit {
       this.errorMessage = '';
       
       const formValue = this.thongBaoForm.value;
-      const updateRequest = {
-        ...formValue,
+      const notificationData = {
         id: this.notificationId,
-        sentAt: formValue.sentAt ? formValue.sentAt : null
+        ...formValue,
+        sentAt: formValue.sentAt ? formValue.sentAt : null,
+        recipients: this.selectedUsers.map(user => user.ID), // Lấy danh sách ID từ selectedUsers
       };
       
-      this.thongBaoService.updateThongBao(updateRequest).subscribe({
+      this.thongBaoService.updateThongBao(notificationData).subscribe({
         next: (response) => {
           console.log('✅ Notification updated successfully:', response);
           alert('Thông báo đã được cập nhật thành công!');
@@ -193,7 +204,14 @@ export class TbchitietComponent implements OnInit {
         .subscribe({
             next: (response) => {
                 this.doLookupDatasRP = response;
-                this.filteredUsers = response?.DatasLookup || []; // Tránh lỗi null
+                this.filteredUsers = (response?.DatasLookup || []).map(user => ({
+                  ID: user.ID,
+                  MaNhanVien: user.MaNhanVien,
+                  TenNhanVien: user.TenNhanVien,
+                  TenPhongBan: user.TenPhongBan,
+                  status: 1 // Gán giá trị mặc định vì DoLookupData không có "status"
+                })) as MergedData[];
+                
             },
             error: (error) => {
                 console.error('Lỗi tìm kiếm người dùng:', error);
@@ -203,33 +221,20 @@ export class TbchitietComponent implements OnInit {
         });
   }
 
-
-  
-  // onSearchUser() {
-  //   console.log('onSearchUser: ',this.searchQuery);
-  //   if (this.searchQuery.trim() === '') {
-  //     this.filteredUsers = [];
-  //     return;
-  //   }
-  //   this.filteredUsers = this.allUsers.filter(user =>
-  //     user.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-  //   );
-  // }
-
   selectUser(user: any) {
     if (!this.selectedUsers.find(u => u.ID === user.ID)) {
       this.selectedUsers.push(user);
     }
     
     // Log toàn bộ danh sách selectedUsers sau mỗi lần cập nhật
-    console.log("Current selectedUsers:", this.selectedUsers.map(u => u.id));
+    console.log("Current selectedUsers:", this.selectedUsers.map(u => u.ID));
     
     this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
     this.filteredUsers = []; // Ẩn danh sách gợi ý
   }
 
   removeUser(user: any) {
-    this.selectedUsers = this.selectedUsers.filter(u => u.id !== user.id);
+    this.selectedUsers = this.selectedUsers.filter(u => u.ID !== user.id);
   }
 
   onNotificationTypeChange() {
