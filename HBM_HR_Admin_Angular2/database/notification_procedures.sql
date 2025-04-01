@@ -43,6 +43,53 @@ GO
 
 
 
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationsWithPaging')
+    DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging
+GO
+
+CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
+    @PageNumber INT,
+    @PageSize INT,
+    @NotificationType INT,  -- 0: Lấy tất cả, >0: Lọc theo loại thông báo
+    @SentStatus INT = NULL  -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Đảm bảo @PageNumber không bị lỗi OFFSET -1
+    IF @PageNumber < 1 SET @PageNumber = 1;
+
+    SELECT
+        [ID],
+        [Title],
+        [Content],
+        [SenderId],
+        [TenNhanVien],        
+        [NotificationType],
+        [SentAt],
+        [ReceivedCount],
+        [TotalRecipients],
+        [NgayTao]
+    FROM [HBM_HCNSApp].[dbo].[v_NotificationsWithRecipients]
+    WHERE 
+        (@NotificationType = 0 OR NotificationType = @NotificationType)  
+        AND (@SentStatus IS NULL OR 
+             (@SentStatus = 1 AND SentAt IS NOT NULL) OR 
+             (@SentStatus = 0 AND SentAt IS NULL))
+    ORDER BY NgayTao DESC
+    OFFSET (@PageNumber - 1) * @PageSize ROWS
+    FETCH NEXT @PageSize ROWS ONLY;
+END;
+GO
+
+
+
+
+
+
+
+
+
 -- =============================================
 -- Stored Procedure: NS_ADTB_GetNotificationById
 -- Description: Lấy thông tin chi tiết của một thông báo theo ID
@@ -301,3 +348,87 @@ BEGIN
     DELETE FROM [HBM_HCNSApp].[dbo].[NS_ADTB_NotificationRecipients]
     WHERE NotificationId IN (SELECT NotificationId FROM @NotificationIds);
 END;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+IF EXISTS (SELECT * FROM sys.views WHERE name = 'v_NotificationsWithRecipients')
+    DROP VIEW v_NotificationsWithRecipients;
+GO
+
+CREATE VIEW v_NotificationsWithRecipients AS
+SELECT
+    n.ID,
+    n.Title,
+    n.Content,
+    n.SenderId,
+    n.SentAt,
+    n.NotificationType,
+    n.NgayTao,
+    nv.TenNhanVien,
+    COUNT(r.ID) AS TotalRecipients,
+    SUM(CASE WHEN r.Status > 0 THEN 1 ELSE 0 END) AS ReceivedCount
+FROM NS_ADTB_Notifications n
+LEFT JOIN NS_NhanViens nv ON n.SenderId = nv.ID
+LEFT JOIN NS_ADTB_NotificationRecipients r ON n.ID = r.NotificationId
+GROUP BY
+    n.ID,
+    n.Title,
+    n.Content,
+    n.SenderId,
+    n.SentAt,
+    n.NotificationType,
+    n.NgayTao,
+    nv.TenNhanVien;
+

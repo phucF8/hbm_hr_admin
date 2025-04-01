@@ -37,23 +37,39 @@ export interface ThongBaoRecipient {
   status: number;
 }
 
+// export interface ThongBao {
+//   id: string;
+//   title: string;
+//   content: string;
+//   senderId: string;
+//   tenNhanVien: string;
+//   triggerAction: string | null;
+//   notificationType: number;
+//   status: number;
+//   sentAt?: string | null;
+//   ngayTao: string;
+//   ngaySua: string;
+//   nguoiTao: string;
+//   nguoiSua: string;
+//   recipients: ThongBaoRecipient[];  // Danh sách người nhận
+//   selected?: boolean;
+// }
+
 export interface ThongBao {
   id: string;
   title: string;
   content: string;
   senderId: string;
   tenNhanVien: string;
-  triggerAction: string | null;
   notificationType: number;
-  status: number;
   sentAt?: string | null;
+  receivedCount: number;
+  totalRecipients: number;
   ngayTao: string;
-  ngaySua: string;
-  nguoiTao: string;
-  nguoiSua: string;
   recipients: ThongBaoRecipient[];  // Danh sách người nhận
   selected?: boolean;
 }
+
 
 
 export interface CreateThongBaoRequest {

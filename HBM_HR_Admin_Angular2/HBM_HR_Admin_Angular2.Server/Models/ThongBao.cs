@@ -18,6 +18,11 @@ public class Notification
 
          public List<NotificationRecipient> Recipients { get; set; } = new List<NotificationRecipient>();
 
+         // Total number of recipients (provided in the response)
+         public int TotalRecipients { get; set; }
+
+         // Number of recipients who have received the notification (provided in the response)
+         public int ReceivedCount { get; set; }
 
 }
 
