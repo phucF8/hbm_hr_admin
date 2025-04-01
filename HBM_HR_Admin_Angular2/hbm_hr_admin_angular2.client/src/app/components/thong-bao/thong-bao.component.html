@@ -2,14 +2,15 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <div class="container mt-4">
+  <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="flex-grow-1 me-3">
-      <input type="text" class="form-control" placeholder="🔍 Tìm kiếm theo tiêu đề" [(ngModel)]="searchText">
+      <input type="text" class="form-control" placeholder="Tìm kiếm theo tiêu đề" [(ngModel)]="searchText">
     </div>
     <div class="text-end">
       <div class="dropdown">
         <span class="fw-bold dropdown-toggle" style="cursor: pointer;" data-bs-toggle="dropdown" aria-expanded="false">
-          👤 {{tenNhanVien}}
+          <i class="bi bi-person-circle"></i> {{tenNhanVien}}
         </span>
         <ul class="dropdown-menu dropdown-menu-end">
           <li><button class="dropdown-item" (click)="logout()">Đăng xuất</button></li>
@@ -17,24 +18,19 @@
       </div>
     </div>
   </div>
-  
+
+  <!-- Notification Type -->
   <div class="mb-3 d-flex align-items-center gap-3">
     <div>
-      <span class="fw-bold">📂 Lọc theo trạng thái: </span>
-      <span class="badge bg-danger">❌ Send fail</span>
-      <span class="badge bg-success">✅ Send succ</span>
-      <span class="badge bg-secondary">Đã đọc</span>
-    </div>
-    
-    <div>
-      <span class="fw-bold">📋 Loại thông báo: </span>
+      <span class="fw-bold"><i class="bi bi-card-list"></i> Loại thông báo: </span>
       <select class="form-select d-inline-block w-auto" [(ngModel)]="selectedType" (change)="onTypeChange()">
         <option [value]="0">Tất cả (0)</option>
         <option *ngFor="let type of notificationTypes" [value]="type.id">{{type.name}}{{isDebug ? ' (' + type.id + ')' : ''}}</option>
       </select>
     </div>
   </div>
-  
+
+  <!-- Table -->
   <div class="table-responsive">
     <table class="table table-bordered table-hover">
       <thead class="table-dark">
@@ -66,20 +62,23 @@
           <td>{{ tb.receivedCount }}/{{ tb.totalRecipients }}</td>
           <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
           <td>
-            <button class="btn btn-warning btn-sm" (click)="editThongBao(tb.id)">📝 Sửa</button>
+            <button class="btn btn-warning btn-sm" (click)="editThongBao(tb.id)">
+              <i class="bi bi-pencil-square"></i> Sửa
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
-  
+
+  <!-- Actions and Pagination -->
   <div class="d-flex justify-content-between mt-3">
     <div>
       <button class="btn btn-danger me-2" (click)="deleteMultiSelected()">
-        <i class="bi bi-trash"></i> <!-- Thay bằng biểu tượng thùng rác -->
+        <i class="bi bi-trash"></i> Xóa
       </button>
       <button class="btn btn-primary me-2" (click)="sendAgain()">
-        <i class="bi bi-arrow-repeat"></i> <!-- Biểu tượng gửi lại -->
+        <i class="bi bi-arrow-repeat"></i> Gửi lại
       </button>
       <button class="btn btn-success" (click)="taoThongBao()">
         <i class="bi bi-plus-circle"></i> Tạo thông báo mới
