@@ -165,6 +165,9 @@ export class ThongBaoComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('Dialog closed', result);
+      if (result){
+        this.loadListThongBao();
+      }
     });
   }
 

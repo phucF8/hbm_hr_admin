@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ThongBaoService,DoLookupDatasRP, MergedData} from '../../../services/thong-bao.service';
 import { AuthService } from '../../../services/auth.service';
@@ -35,6 +36,7 @@ export class TbchitietDialogComponent {
 
 
   constructor(
+    private dialogRef: MatDialogRef<TbchitietDialogComponent>,
     private fb: FormBuilder,
     private thongBaoService: ThongBaoService,
     private authService: AuthService,
@@ -108,7 +110,7 @@ export class TbchitietDialogComponent {
   }
 
   onCancel() {
-    this.router.navigate(['/thongbao']);
+    this.dialogRef.close();
   }
 
   onSubmit() {
@@ -175,9 +177,11 @@ export class TbchitietDialogComponent {
         this.isSubmitting = false;
         return;
       }
+      const formValue = this.thongBaoForm.value;
       const notificationData = {
         id: uuidv4(), // Tạo ID ngẫu nhiên
-        ...this.thongBaoForm.value,
+        ...formValue,
+        sentAt: formValue.sentAt ? formValue.sentAt : null,
         senderId: currentUser.ID,
         recipients: this.selectedUsers.map(user => user.ID), // Lấy danh sách ID từ selectedUsers
       };
@@ -186,7 +190,7 @@ export class TbchitietDialogComponent {
         next: (response) => {
           console.log('✅ Notification created successfully:', response);
           alert('Thông báo đã được tạo thành công!');
-          this.router.navigate(['/thong-bao']);
+          this.dialogRef.close(true); // Đóng dialog và trả về true
         },
         error: (error) => {
           console.error('❌ Error creating notification:', error);
