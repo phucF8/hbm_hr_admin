@@ -7,6 +7,9 @@ import { AuthService } from '../../services/auth.service';
 import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notification-types';
 import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
 
+import { MatDialog } from '@angular/material/dialog';
+import { TbchitietComponent } from '../thong-bao/tbchitiet/tbchitiet.component';
+
 @Component({
   selector: 'app-thong-bao',
   templateUrl: './thong-bao.component.html',
@@ -28,6 +31,7 @@ export class ThongBaoComponent implements OnInit {
   notificationTypes = NOTIFICATION_TYPES;
 
   constructor(
+    private dialog: MatDialog,
     private thongBaoService: ThongBaoService,
     private router: Router,
     private authService: AuthService
@@ -149,6 +153,17 @@ export class ThongBaoComponent implements OnInit {
       console.log('✅ Navigation completed successfully');
     }).catch(error => {
       console.error('❌ Navigation failed:', error);
+    });
+  }
+
+  taoThongBaoDialog() {
+    const dialogRef = this.dialog.open(TbchitietComponent, {
+      width: '600px', // Điều chỉnh kích thước hộp thoại
+      data: { isNew: true } // Gửi dữ liệu nếu cần
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Dialog closed', result);
     });
   }
 
