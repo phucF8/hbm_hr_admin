@@ -59,23 +59,41 @@ BEGIN
     -- Đảm bảo @PageNumber không bị lỗi OFFSET -1
     IF @PageNumber < 1 SET @PageNumber = 1;
 
-    SELECT
-        [ID],
-        [Title],
-        [Content],
-        [SenderId],
-        [TenNhanVien],        
-        [NotificationType],
-        [SentAt],
-        [ReceivedCount],
-        [TotalRecipients],
-        [NgayTao]
-    FROM [HBM_HCNSApp].[dbo].[v_NotificationsWithRecipients]
-    WHERE 
-        (@NotificationType = 0 OR NotificationType = @NotificationType)  
-        AND (@SentStatus IS NULL OR 
-             (@SentStatus = 1 AND SentAt IS NOT NULL) OR 
-             (@SentStatus = 0 AND SentAt IS NULL))
+    -- Truy vấn dữ liệu và tính tổng số trang
+    WITH CTE AS (
+        SELECT 
+            [ID],
+            [Title],
+            [Content],
+            [SenderId],
+            [TenNhanVien],        
+            [NotificationType],
+            [SentAt],
+            [ReceivedCount],
+            [TotalRecipients],
+            [NgayTao],
+            COUNT(*) OVER () AS TotalCount  -- Đếm tổng số bản ghi
+        FROM [HBM_HCNSApp].[dbo].[v_NotificationsWithRecipients]
+        WHERE 
+            (@NotificationType = 0 OR NotificationType = @NotificationType)  
+            AND (@SentStatus IS NULL OR 
+                 (@SentStatus = 1 AND SentAt IS NOT NULL) OR 
+                 (@SentStatus = 0 AND SentAt IS NULL))
+    )
+    SELECT 
+        ID,
+        Title,
+        Content,
+        SenderId,
+        TenNhanVien,
+        NotificationType,
+        SentAt,
+        ReceivedCount,
+        TotalRecipients,
+        NgayTao,
+        TotalCount,
+        CEILING(CAST(TotalCount AS FLOAT) / @PageSize) AS TotalPages  -- Tính tổng số trang
+    FROM CTE
     ORDER BY NgayTao DESC
     OFFSET (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY;

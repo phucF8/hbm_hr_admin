@@ -95,10 +95,10 @@ export class ThongBaoService {
 
   constructor(private http: HttpClient) { }
 
-  getThongBao(pageIndex: number = 1, notificationType: number = 0): Observable<ThongBao[]> {
+  getListThongBao(pageIndex: number = 1, notificationType: number = 0): Observable<{ items: ThongBao[], totalCount: number }> {
     const url = `${this.apiUrl}?pageIndex=${pageIndex}&notificationType=${notificationType}`;
     console.log('Calling API:', url);
-    return this.http.get<ThongBao[]>(url).pipe(
+    return this.http.get<{ items: ThongBao[], totalCount: number }>(url).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
         throw error;

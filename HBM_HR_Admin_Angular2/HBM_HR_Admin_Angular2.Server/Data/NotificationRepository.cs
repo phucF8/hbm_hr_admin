@@ -51,7 +51,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task<IEnumerable<Notification>> GetNotificationsWithPaging(int pageIndex, int pageSize, int notificationType)
+        public async Task<IEnumerable<Notification>> GetNotificationsWithPaging0(int pageIndex, int pageSize, int notificationType)
         {
             try
             {
@@ -75,6 +75,69 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
+
+        public async Task<(List<Notification> Notifications, int TotalCount)> GetNotificationsWithPaging1(int pageIndex, int pageSize, int notificationType)
+        {
+            try
+            {
+                _logger.LogInformation($"Calling stored procedure with notificationType: {notificationType}");
+                using var connection = new SqlConnection(_connectionString);
+
+                var result = await connection.QueryAsync<Notification>(
+                    "NS_ADTB_GetNotificationsWithPaging",
+                    new { 
+                        PageNumber = pageIndex, 
+                        PageSize = pageSize, 
+                        NotificationType = notificationType 
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                // Lấy TotalCount từ phần tử đầu tiên (giả sử tất cả phần tử có TotalCount giống nhau)
+                int totalCount = result.Any() ? result.First().TotalCount : 0;
+
+                _logger.LogInformation($"Stored procedure returned {result.Count()} records, TotalCount: {totalCount}");
+
+                return (result.ToList(), totalCount);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting notifications with paging");
+                throw;
+            }
+        }
+
+
+        public async Task<PagedResult<Notification>> GetNotificationsWithPaging(int pageIndex, int pageSize, int notificationType)
+        {
+            try
+            {
+                _logger.LogInformation($"Calling stored procedure with notificationType: {notificationType}");
+                using var connection = new SqlConnection(_connectionString);
+                var result = await connection.QueryAsync<Notification>(
+                    "NS_ADTB_GetNotificationsWithPaging",
+                    new { 
+                        PageNumber = pageIndex, 
+                        PageSize = pageSize, 
+                        NotificationType = notificationType 
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+                int totalCount = result.Any() ? result.First().TotalCount : 0;
+                _logger.LogInformation($"Stored procedure returned {result.Count()} records, TotalCount: {totalCount}");
+                return new PagedResult<Notification>
+                {
+                    Items = result.ToList(),
+                    TotalCount = totalCount
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting notifications with paging");
+                throw;
+            }
+        }
+
 
         public async Task<Notification?> GetNotificationByID(string notificationID)
         {
@@ -178,7 +241,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
     
-    
         public async Task InsertNotificationRecipient(string notificationId, string recipientId, string creatorId)
         {
             try
@@ -202,7 +264,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
-
 
         public async Task<IEnumerable<NotificationRecipient>> SelectNotificationRecipients(string notificationId)
         {

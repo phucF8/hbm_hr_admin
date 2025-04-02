@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notification-types';
-
+import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
 
 @Component({
   selector: 'app-thong-bao',
@@ -34,7 +34,7 @@ export class ThongBaoComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadThongBao();
+    this.loadListThongBao();
     // Get current user info
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
@@ -42,30 +42,19 @@ export class ThongBaoComponent implements OnInit {
     }
   }
 
-  loadThongBao() {
-    console.log('Loading notifications with type:', this.selectedType);
-    this.thongBaoService.getThongBao(this.pageIndex,this.selectedType).subscribe({
-      next: (data) => {
-        console.log('Received notifications:', data);
-        this.thongBaoList = data;
-      },
-      error: (error) => {
-        console.error('Error loading notifications:', error);
-      }
-    });
-  }
-
   onPageChange(newPage: number) {
     console.log('onPageChange:', newPage);
     this.currentPage = newPage;
-    this.loadData();
+    this.loadListThongBao();
   }
 
-  loadData() {
-    this.thongBaoService.getThongBao(this.currentPage,this.selectedType).subscribe({
+  loadListThongBao() {
+    console.log('Loading notifications for page:', this.currentPage, 'and type:', this.selectedType);
+    this.thongBaoService.getListThongBao(this.currentPage, this.selectedType).subscribe({
       next: (data) => {
         console.log('Received notifications:', data);
-        this.thongBaoList = data;
+        this.thongBaoList = data.items; // Gán danh sách thông báo từ `items`
+        this.totalPages = Math.ceil(data.totalCount / ITEMS_PER_PAGE); // Sử dụng constant
       },
       error: (error) => {
         console.error('Error loading notifications:', error);
@@ -75,7 +64,7 @@ export class ThongBaoComponent implements OnInit {
 
   onTypeChange() {
     console.log('Type changed to:', this.selectedType);
-    this.loadThongBao();
+    this.loadListThongBao();
   }
 
   sendAgain() {
@@ -100,7 +89,7 @@ export class ThongBaoComponent implements OnInit {
       Promise.all(deletePromises)
         .then(() => {
           console.log('Successfully deleted selected notifications');
-          this.loadThongBao(); // Reload the list
+          this.loadListThongBao(); // Reload the list
           alert('Đã xóa thành công các thông báo đã chọn!');
         })
         .catch(error => {
@@ -145,7 +134,7 @@ export class ThongBaoComponent implements OnInit {
         next: () => {
           console.log('✅ Successfully deleted selected notifications');
           alert('Đã xóa các thông báo đã chọn thành công!');
-          this.loadThongBao(); // Reload the list
+          this.loadListThongBao(); // Reload the list
         },
         error: (error) => {
           console.error('❌ Error deleting notifications:', error);

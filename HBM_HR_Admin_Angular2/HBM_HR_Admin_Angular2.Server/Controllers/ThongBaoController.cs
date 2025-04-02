@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Models;
 using Microsoft.Extensions.Logging;
+using HBM_HR_Admin_Angular2.Server.Helpers;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
@@ -10,29 +11,37 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
     [ApiController]
     public class ThongBaoController : ControllerBase
     {
-        // private readonly ApplicationDbContext _context;
         private readonly NotificationRepository _repository;
         private readonly ILogger<ThongBaoController> _logger;
 
         public ThongBaoController(NotificationRepository repository, ILogger<ThongBaoController> logger)
         {
-            // _context = context;
             _repository = repository;
             _logger = logger;
         }
 
         // API GET /api/thongbao - Lấy danh sách thông báo
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Notification>>> GetNotifications(
+        public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
             [FromQuery] int pageIndex = 1, 
-            [FromQuery] int pageSize = 20,
+            [FromQuery] int pageSize = AppSettings.DefaultPageSize, // Use the constant here
             [FromQuery] int notificationType = 0)
         {
             _logger.LogInformation($"Received request with notificationType: {notificationType}");
+
             var notifications = await _repository.GetNotificationsWithPaging(pageIndex, pageSize, notificationType);
-            _logger.LogInformation($"Returning {notifications.Count()} notifications");
+
+            if (notifications.Items.Count == 0)
+            {
+                _logger.LogInformation("No notifications found.");
+                return NotFound("No notifications available.");
+            }
+
+            _logger.LogInformation($"Returning {notifications.Items.Count} notifications, TotalCount: {notifications.TotalCount}");
+
             return Ok(notifications);
         }
+
 
         // API GET /api/thongbao/{id} - Lấy 1 danh sách thông báo củ thể
         [HttpGet("{id}")]

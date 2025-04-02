@@ -1,6 +1,5 @@
 public class Notification
 {
-    
         public string ID { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
@@ -14,8 +13,8 @@ public class Notification
         public DateTime NgaySua { get; set; }
         public string NguoiTao { get; set; }
         public string NguoiSua { get; set; }
-
-
+        public int TotalCount { get; set; }
+        
          public List<NotificationRecipient> Recipients { get; set; } = new List<NotificationRecipient>();
 
          // Total number of recipients (provided in the response)
@@ -25,6 +24,13 @@ public class Notification
          public int ReceivedCount { get; set; }
 
 }
+
+public class PagedResult<T>
+{
+    public List<T> Items { get; set; } = new();
+    public int TotalCount { get; set; }
+}
+
 
 public class NotificationRecipient
 {
