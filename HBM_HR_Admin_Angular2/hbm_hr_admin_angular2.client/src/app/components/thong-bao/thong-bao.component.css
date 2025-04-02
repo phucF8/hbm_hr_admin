@@ -29,7 +29,7 @@ table {
   .container {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Chiều cao toàn màn hình */
+    height: 99vh; /* Chiều cao toàn màn hình */
   }
 
   /* Phần nội dung bảng chiếm hết chiều cao còn lại */

@@ -1,1 +1,62 @@
-/* You can add global styles to this file, and also import other style files */
+/* * {
+    margin: 0px;
+    padding: 0px;
+    border: solid 1px red;
+    display: block;
+  } */
+
+  /* html {
+    margin: 0px;
+    padding: 0px;
+  } */
+
+  /* body {
+    margin: 0px;
+    padding: 0px;
+  } */
+
+  app-root {
+    margin: 0px;
+    padding: 0px;
+    display: contents;
+  }
+
+  app-thong-bao {
+    margin: 00px;
+    padding: 0px;
+    /* display: block; */
+    /* border: solid 1px blue; */
+  }
+
+  /* link {
+    margin: 0px;
+    padding: 0px;
+    display: none;
+  } */
+
+  /* router-outlet {
+    margin: 0px;
+    padding: 0px;
+    display: none;
+  }
+
+  style {
+    margin: 0px;
+    padding: 0px;
+    display: none;
+  }
+
+  
+  script {
+    margin: 0px;
+    padding: 0px;
+    display: none;
+  }
+  title {
+    margin: 0px;
+    padding: 0px;
+    display: none;
+  }*/
+  
+
+  
