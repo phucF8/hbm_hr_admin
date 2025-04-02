@@ -1,19 +1,27 @@
 <nav>
-    <ul class="pagination mb-0">
-      <!-- Nút "Trước" -->
-      <li class="page-item" [class.disabled]="currentPage === 1">
-        <a class="page-link" (click)="changePage(currentPage - 1)">⬅</a>
-      </li>
-  
-      <!-- Danh sách các trang -->
-      <li *ngFor="let page of pages" class="page-item" [class.active]="page === currentPage">
-        <a class="page-link" (click)="changePage(+page)">{{ page }}</a>
-      </li>
-  
-      <!-- Nút "Tiếp" -->
-      <li class="page-item" [class.disabled]="currentPage === totalPages">
-        <a class="page-link" (click)="changePage(currentPage + 1)">➡</a>
-      </li>
-    </ul>
-  </nav>
-  
+  <ul class="pagination mb-0">
+    <!-- Nút "Previous" -->
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <a class="page-link" (click)="changePage(currentPage - 1)">
+        <i class="fas fa-chevron-left"></i> <!-- Biểu tượng mũi tên trái -->
+      </a>
+    </li>
+
+    <!-- Danh sách các trang -->
+    <li *ngFor="let page of pages" class="page-item" [class.active]="page === currentPage">
+      <a 
+        class="page-link" 
+        (click)="changePage(page)" 
+        [class.disabled]="page === '...'">
+        {{ page }}
+      </a>
+    </li>
+
+    <!-- Nút "Next" -->
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <a class="page-link" (click)="changePage(currentPage + 1)">
+        <i class="fas fa-chevron-right"></i> <!-- Biểu tượng mũi tên phải -->
+      </a>
+    </li>
+  </ul>
+</nav>

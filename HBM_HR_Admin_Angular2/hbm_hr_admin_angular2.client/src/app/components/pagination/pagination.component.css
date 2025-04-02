@@ -21,3 +21,13 @@ button[disabled] {
 button:hover:not([disabled]) {
   background-color: #ddd;
 }
+
+/* Đảm bảo con trỏ chuột luôn là mũi tên khi trỏ vào các số trang */
+.page-link {
+  cursor: pointer;
+}
+
+/* Vô hiệu hóa con trỏ khi trang bị disabled */
+.page-item.disabled .page-link {
+  cursor: not-allowed;
+}

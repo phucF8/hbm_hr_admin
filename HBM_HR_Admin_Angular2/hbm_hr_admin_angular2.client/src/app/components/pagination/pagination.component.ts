@@ -41,11 +41,16 @@ export class PaginationComponent {
     return pages;
   }
 
-  changePage(newPage: number) {
-    console.log('newPage',newPage);
-    //if (newPage >= 1 && newPage <= this.totalPages) {
-      this.pageChange.emit(newPage);
-    //}
+  changePage(newPage: number | string) {
+    if (newPage === '...') {
+      // Không làm gì nếu nhấn vào dấu "..."
+      return;
+    }
+
+    if (typeof newPage === 'number' && newPage >= 1 && newPage <= this.totalPages) {
+      this.currentPage = newPage; // Cập nhật trang hiện tại
+      this.pageChange.emit(this.currentPage); // Phát sự kiện thay đổi trang
+    }
   }
   
 }

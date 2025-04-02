@@ -14,7 +14,7 @@ import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
   standalone: false,
 })
 export class ThongBaoComponent implements OnInit {
-  @Input() totalPages: number = 5;
+  @Input() totalPages: number = 0;
   @Input() currentPage: number = 1;
   @Output() pageChange = new EventEmitter<number>();
 
@@ -55,7 +55,6 @@ export class ThongBaoComponent implements OnInit {
         console.log('Received notifications:', data);
         this.thongBaoList = data.items; // Gán danh sách thông báo từ `items`
         this.totalPages = Math.ceil(data.totalCount / ITEMS_PER_PAGE); // Sử dụng constant
-        this.totalPages = 100;
       },
       error: (error) => {
         console.error('Error loading notifications:', error);
