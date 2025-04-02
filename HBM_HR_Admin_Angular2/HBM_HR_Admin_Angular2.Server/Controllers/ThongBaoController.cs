@@ -25,7 +25,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Notification>>> GetNotifications(
             [FromQuery] int pageIndex = 1, 
-            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageSize = 20,
             [FromQuery] int notificationType = 0)
         {
             _logger.LogInformation($"Received request with notificationType: {notificationType}");

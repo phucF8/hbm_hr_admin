@@ -1,7 +1,7 @@
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 0px;
   }
   
   th, td {
@@ -24,4 +24,30 @@ table {
   button:hover {
     opacity: 0.8;
   }
-  
+
+  /* Đặt container chính thành flexbox */
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Chiều cao toàn màn hình */
+  }
+
+  /* Phần nội dung bảng chiếm hết chiều cao còn lại */
+  .table-wrapper {
+    flex-grow: 1; /* Chiếm hết không gian còn lại */
+    overflow-y: auto; /* Bật scroll dọc */
+  }
+
+  /* Cố định header của bảng */
+  .sticky-header-table thead th {
+    position: sticky;
+    top: 0; /* Cố định ở đầu bảng */
+    z-index: 2; /* Đảm bảo header nằm trên nội dung */
+    background-color: #343a40; /* Màu nền header */
+    color: white; /* Màu chữ header */
+  }
+
+  /* Căn phải phần chứa tên nhân viên */
+  .text-end {
+    text-align: right; /* Căn phải nội dung */
+  }
