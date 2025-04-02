@@ -9,6 +9,7 @@ import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
 
 import { MatDialog } from '@angular/material/dialog';
 import { TbchitietComponent } from '../thong-bao/tbchitiet/tbchitiet.component';
+import { TbchitietDialogComponent } from './tbchitiet-dialog/tbchitiet-dialog.component';
 
 @Component({
   selector: 'app-thong-bao',
@@ -157,7 +158,7 @@ export class ThongBaoComponent implements OnInit {
   }
 
   taoThongBaoDialog() {
-    const dialogRef = this.dialog.open(TbchitietComponent, {
+    const dialogRef = this.dialog.open(TbchitietDialogComponent, {
       width: '600px', // Điều chỉnh kích thước hộp thoại
       data: { isNew: true } // Gửi dữ liệu nếu cần
     });

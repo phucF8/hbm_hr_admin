@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.component';
+import { TbchitietDialogComponent } from './components/thong-bao/tbchitiet-dialog/tbchitiet-dialog.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.c
     LoginComponent,
     ThongBaoComponent,
     PaginationComponent,
-    TbchitietComponent
+    TbchitietComponent,
+    TbchitietDialogComponent
   ],
   imports: [
     BrowserModule,
