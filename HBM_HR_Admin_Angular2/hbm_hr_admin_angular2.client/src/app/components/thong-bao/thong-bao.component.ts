@@ -159,7 +159,7 @@ export class ThongBaoComponent implements OnInit {
 
   taoThongBaoDialog() {
     const dialogRef = this.dialog.open(TbchitietDialogComponent, {
-      width: '600px', // Điều chỉnh kích thước hộp thoại
+      width: '1000px', // Điều chỉnh kích thước hộp thoại
       data: { isNew: true } // Gửi dữ liệu nếu cần
     });
 
