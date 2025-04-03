@@ -1,0 +1,15 @@
+/* Căn giữa container */
+.login-container {
+  background-color: #f8f9fa; /* Màu nền sáng */
+}
+
+/* Card styling */
+.card {
+  border-radius: 12px;
+  border: none;
+}
+
+/* Button styling */
+button {
+  cursor: pointer;
+}

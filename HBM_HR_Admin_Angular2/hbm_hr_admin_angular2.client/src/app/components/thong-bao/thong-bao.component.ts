@@ -39,11 +39,13 @@ export class ThongBaoComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('Loading Thông báo ');
     this.loadListThongBao();
     // Get current user info
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.tenNhanVien = currentUser.TenNhanVien;
+      console.log('Loading Thông báo ',currentUser.TenNhanVien);
     }
   }
 
