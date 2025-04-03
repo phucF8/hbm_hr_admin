@@ -23,7 +23,7 @@ export class TbchitietComponent implements OnInit {
   errorMessage = '';
   notificationId: string = '';
   
-  filteredUsers: MergedData[] = [];
+  filteredUsers: MergedData[] | null = null;
   selectedUsers: MergedData[] = [];
   doLookupDatasRP: DoLookupDatasRP | null = null;
   isUserSearchVisible: boolean = false;
@@ -199,31 +199,30 @@ export class TbchitietComponent implements OnInit {
     const searchValue = this.searchUserForm.get('search')?.value?.trim();
     console.log('Từ khóa tìm kiếm:', searchValue);
     if (!searchValue) {
-        this.filteredUsers = [];
-        return;
+      this.filteredUsers = null; // Đặt về null nếu không có từ khóa tìm kiếm
+      return;
     }
     this.isSearching = true;
     this.filteredUsers = []; // Reset trước khi tìm kiếm
     this.thongBaoService.searchUsers(searchValue)
-        .pipe(finalize(() => this.isSearching = false)) // Đảm bảo luôn thực hiện
-        .subscribe({
-            next: (response) => {
-                this.doLookupDatasRP = response;
-                this.filteredUsers = (response?.DatasLookup || []).map(user => ({
-                  ID: user.ID,
-                  MaNhanVien: user.MaNhanVien,
-                  TenNhanVien: user.TenNhanVien,
-                  TenPhongBan: user.TenPhongBan,
-                  status: 1 // Gán giá trị mặc định vì DoLookupData không có "status"
-                })) as MergedData[];
-                
-            },
-            error: (error) => {
-                console.error('Lỗi tìm kiếm người dùng:', error);
-                this.errorMessage = 'Đã xảy ra lỗi khi tìm kiếm, vui lòng thử lại';
-                this.filteredUsers = []; // Tránh giữ kết quả sai
-            }
-        });
+      .pipe(finalize(() => this.isSearching = false)) // Đảm bảo luôn thực hiện
+      .subscribe({
+        next: (response) => {
+          this.doLookupDatasRP = response;
+          this.filteredUsers = (response?.DatasLookup || []).map(user => ({
+            ID: user.ID,
+            MaNhanVien: user.MaNhanVien,
+            TenNhanVien: user.TenNhanVien,
+            TenPhongBan: user.TenPhongBan,
+            status: 1 // Gán giá trị mặc định vì DoLookupData không có "status"
+          })) as MergedData[];
+        },
+        error: (error) => {
+          console.error('Lỗi tìm kiếm người dùng:', error);
+          this.errorMessage = 'Đã xảy ra lỗi khi tìm kiếm, vui lòng thử lại';
+          this.filteredUsers = []; // Tránh giữ kết quả sai
+        }
+      });
   }
 
   selectUser(user: any) {
@@ -254,4 +253,4 @@ export class TbchitietComponent implements OnInit {
 
 
 
-} 
+}

@@ -1,1 +1,17 @@
-<router-outlet></router-outlet>
+<header >
+    <!--Tên Nhân Viên-->
+    <div class="d-flex justify-content-end">
+        <div class="dropdown bg-employee rounded d-inline-block p-2 m-2" style="background-color: white;">
+          <span class="fw-bold dropdown-toggle" style="cursor: pointer;" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle"></i> {{tenNhanVien}}
+          </span>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><button class="dropdown-item" (click)="logout()">Đăng xuất</button></li>
+          </ul>
+        </div>
+      </div>
+      
+</header>
+<main>
+  <router-outlet></router-outlet>
+</main>
