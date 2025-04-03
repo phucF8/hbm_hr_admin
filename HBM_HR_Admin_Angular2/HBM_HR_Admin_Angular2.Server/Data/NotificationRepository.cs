@@ -24,7 +24,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             try
             {
                 _logger.LogInformation($"Creating new notification: {notification.Title}");
-                
+
                 var parameters = new[]
                 {
                     new SqlParameter("@ID", SqlDbType.VarChar) { Value = notification.ID },
@@ -59,10 +59,11 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 using var connection = new SqlConnection(_connectionString);
                 var result = await connection.QueryAsync<Notification>(
                     "NS_ADTB_GetNotificationsWithPaging",
-                    new { 
-                        PageNumber = pageIndex, 
-                        PageSize = pageSize, 
-                        NotificationType = notificationType 
+                    new
+                    {
+                        PageNumber = pageIndex,
+                        PageSize = pageSize,
+                        NotificationType = notificationType
                     },
                     commandType: CommandType.StoredProcedure
                 );
@@ -85,10 +86,11 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
                 var result = await connection.QueryAsync<Notification>(
                     "NS_ADTB_GetNotificationsWithPaging",
-                    new { 
-                        PageNumber = pageIndex, 
-                        PageSize = pageSize, 
-                        NotificationType = notificationType 
+                    new
+                    {
+                        PageNumber = pageIndex,
+                        PageSize = pageSize,
+                        NotificationType = notificationType
                     },
                     commandType: CommandType.StoredProcedure
                 );
@@ -116,10 +118,11 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 using var connection = new SqlConnection(_connectionString);
                 var result = await connection.QueryAsync<Notification>(
                     "NS_ADTB_GetNotificationsWithPaging",
-                    new { 
-                        PageNumber = pageIndex, 
-                        PageSize = pageSize, 
-                        NotificationType = notificationType 
+                    new
+                    {
+                        PageNumber = pageIndex,
+                        PageSize = pageSize,
+                        NotificationType = notificationType
                     },
                     commandType: CommandType.StoredProcedure
                 );
@@ -147,8 +150,9 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 using var connection = new SqlConnection(_connectionString);
                 var result = await connection.QueryFirstOrDefaultAsync<Notification>(
                     "NS_ADTB_GetNotificationById",
-                    new {
-                        NotificationID = notificationID 
+                    new
+                    {
+                        NotificationID = notificationID
                     },
                     commandType: CommandType.StoredProcedure
                 );
@@ -221,7 +225,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 using var connection = new SqlConnection(_connectionString);
                 await connection.ExecuteAsync(
                     "NS_ADTB_UpdateNotification",
-                    new { 
+                    new
+                    {
                         ID = notification.ID,
                         Title = notification.Title,
                         Content = notification.Content,
@@ -240,7 +245,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
-    
+
         public async Task InsertNotificationRecipient(string notificationId, string recipientId, string creatorId)
         {
             try
@@ -272,7 +277,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             {
                 var parameters = new
                 {
-                    NotificationId =notificationId,
+                    NotificationId = notificationId,
                 };
                 using var connection = new SqlConnection(_connectionString);
                 var result = await connection.QueryAsync<NotificationRecipient>(
@@ -331,8 +336,35 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
+        internal async Task<IEnumerable<DeviceTokenData>> GetDeviceTokenByEmployeeId(string iDNhanVien)
+        {
+            //từ iDNhanVien lấy ra deviceToken
+            try
+            {
+                var parameters = new
+                {
+                    IDNhanVien = iDNhanVien,
+                };
+                using var connection = new SqlConnection(_connectionString);
+                var result = await connection.QueryAsync<DeviceTokenData>(
+                    "EXEC GetDeviceTokenByEmployeeId @IDNhanVien",
+                    parameters);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting device token by employee ID");
+                throw;
+            }
 
 
-
+        }
     }
-} 
+
+    public class DeviceTokenData
+    {
+        public string DeviceToken { get; set; }
+        public string DeviceName { get; set; }
+    }
+
+}

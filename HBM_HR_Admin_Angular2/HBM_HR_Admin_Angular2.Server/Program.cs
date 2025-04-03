@@ -1,3 +1,5 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using HBM_HR_Admin_Angular2.Server.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +19,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<NotificationRepository>();
 
+// Đăng ký dịch vụ FirebaseNotificationService
+builder.Services.AddSingleton<FirebaseNotificationService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

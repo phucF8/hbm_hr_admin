@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using HBM_HR_Admin_Angular2.Server.Data;
-using HBM_HR_Admin_Angular2.Server.Models;
-using Microsoft.Extensions.Logging;
 using HBM_HR_Admin_Angular2.Server.Helpers;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
@@ -11,11 +8,13 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
     [ApiController]
     public class ThongBaoController : ControllerBase
     {
+        private readonly FirebaseNotificationService _firebaseService;
         private readonly NotificationRepository _repository;
         private readonly ILogger<ThongBaoController> _logger;
 
-        public ThongBaoController(NotificationRepository repository, ILogger<ThongBaoController> logger)
+        public ThongBaoController(FirebaseNotificationService firebaseService, NotificationRepository repository, ILogger<ThongBaoController> logger)
         {
+            _firebaseService = firebaseService;
             _repository = repository;
             _logger = logger;
         }
@@ -23,7 +22,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         // API GET /api/thongbao - Lấy danh sách thông báo
         [HttpGet]
         public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
-            [FromQuery] int pageIndex = 1, 
+            [FromQuery] int pageIndex = 1,
             [FromQuery] int pageSize = AppSettings.DefaultPageSize, // Use the constant here
             [FromQuery] int notificationType = 0)
         {
@@ -72,7 +71,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             try
             {
                 _logger.LogInformation($"Creating new notification: {request.Title}");
-                
+
                 // Validate request
                 if (string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Content))
                 {
@@ -86,7 +85,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 {
                     return BadRequest("Nội dung phải có ít nhất 10 ký tự");
                 }
-                
+
                 // Create new notification
                 var notification = new Notification
                 {
@@ -97,28 +96,28 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     SentAt = request.SentAt,
                     SenderId = request.SenderId,
                 };
-                
+
                 // Save notification to database
                 var result = await _repository.CreateNotification(notification);
                 _logger.LogInformation($"Successfully created notification with ID: {result}");
-                
+
                 // Insert recipients
                 if (request.Recipients != null && request.Recipients.Any())
                 {
                     foreach (var recipientId in request.Recipients)
                     {
                         _logger.LogInformation($"InsertNotificationRecipient {request.ID}, {recipientId}, {request.SenderId}");
-                        await _repository.InsertNotificationRecipient(result.ID, recipientId,request.SenderId);
+                        await _repository.InsertNotificationRecipient(result.ID, recipientId, request.SenderId);
                     }
                 }
-                
+
                 return CreatedAtAction(nameof(GetNotifications), new { id = result.ID }, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating notification");
                 return StatusCode(500, "Đã xảy ra lỗi khi tạo thông báo");
-            }   
+            }
         }
 
 
@@ -166,7 +165,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             try
             {
                 _logger.LogInformation($"Updating notification with ID: {id}");
-                
+
                 // Validate request
                 if (string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Content))
                 {
@@ -193,20 +192,22 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 };
 
                 var result = await _repository.UpdateNotification(notification);
-                
+
                 if (result == null)
                 {
                     return NotFound($"Không tìm thấy thông báo với ID: {id}");
-                }else{
+                }
+                else
+                {
                     // Delete recipients
-                    await _repository.DeleteNotificationRecipients(notification.ID);        
+                    await _repository.DeleteNotificationRecipients(notification.ID);
                     // Insert recipients
                     if (request.Recipients != null && request.Recipients.Any())
                     {
                         foreach (var recipientId in request.Recipients)
                         {
                             _logger.LogInformation($"InsertNotificationRecipient {result.ID}, {recipientId}, {"SYS"}");
-                            await _repository.InsertNotificationRecipient(result.ID, recipientId,"SYS");
+                            await _repository.InsertNotificationRecipient(result.ID, recipientId, "SYS");
                         }
                     }
                 }
@@ -221,26 +222,70 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi khi cập nhật thông báo");
             }
         }
+    
+    
+    
+        // API POST /api/thongbao/test - Gửi thông báo thử nghiệm
+        [HttpPost("test")]
+        public async Task<IActionResult> SendNotification([FromBody] TestSendNotificationRequest request)
+        {
+            if (string.IsNullOrEmpty(request.IDNhanVien))
+            {
+                return BadRequest("ID nhân viên là bắt buộc");
+            }
+            //lay token tu database
+            var deviceTokens = await _repository.GetDeviceTokenByEmployeeId(request.IDNhanVien);
+            if (deviceTokens == null || !deviceTokens.Any())
+            {
+                return NotFound("Không tìm thấy token cho nhân viên này");
+            }
+            // Gửi thông báo đến tất cả các token
+            foreach (var deviceToken in deviceTokens)
+            {
+                var result = await _firebaseService.SendNotificationAsync(
+                    deviceToken.DeviceToken, 
+                    request.Title, request.Body, 
+                    request.Data);
+                if (!result)
+                {
+                    _logger.LogError($"Send failed: {deviceToken.DeviceToken}");
+                }else{
+                    _logger.LogInformation($"Send Success: {deviceToken.DeviceToken}");
+                }
+            }
+            return Ok(new { Message = "Notification sent done" });
+        }
     }
 
-    public class CreateNotificationRequest
-    {
-        public string ID { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public int NotificationType { get; set; }
-        public string SenderId { get; set; }
-        public DateTime? SentAt { get; set; }
-        public List<string> Recipients { get; set; } // Danh sách ID người nhận
-    }
 
-    public class UpdateNotificationRequest
-    {
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public int NotificationType { get; set; }
-        public DateTime? SentAt { get; set; }
-        public List<string> Recipients { get; set; } // Danh sách ID người nhận
-        
-    }
 }
+
+public class CreateNotificationRequest
+{
+    public string ID { get; set; }
+    public string Title { get; set; }
+    public string Content { get; set; }
+    public int NotificationType { get; set; }
+    public string SenderId { get; set; }
+    public DateTime? SentAt { get; set; }
+    public List<string> Recipients { get; set; } // Danh sách ID người nhận
+}
+
+public class UpdateNotificationRequest
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+    public int NotificationType { get; set; }
+    public DateTime? SentAt { get; set; }
+    public List<string> Recipients { get; set; } // Danh sách ID người nhận
+
+}
+
+public class TestSendNotificationRequest
+{
+    public string IDNhanVien { get; set; }
+    public string Title { get; set; }
+    public string Body { get; set; }
+    public Dictionary<String,String> Data { get; set; } // Dữ liệu bổ sung nếu cần
+}
+
