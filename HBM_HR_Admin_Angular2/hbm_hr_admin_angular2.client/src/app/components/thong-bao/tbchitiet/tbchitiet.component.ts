@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ThongBaoService,DoLookupDatasRP, MergedData} from '../../../services/thong-bao.service';
+import { ThongBaoService, DoLookupDatasRP, MergedData,TestSendNotificationRequest} from '../../../services/thong-bao.service';
 import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
@@ -12,7 +12,6 @@ import { v4 as uuidv4 } from 'uuid';
   templateUrl: './tbchitiet.component.html',
   styleUrls: ['./tbchitiet.component.css'],
   standalone: false,
-  
   providers: [ThongBaoService]
 })
 export class TbchitietComponent implements OnInit {
@@ -29,8 +28,6 @@ export class TbchitietComponent implements OnInit {
   isUserSearchVisible: boolean = false;
   isSearching: boolean = false;
 
-
-
   constructor(
     private fb: FormBuilder,
     private thongBaoService: ThongBaoService,
@@ -45,7 +42,7 @@ export class TbchitietComponent implements OnInit {
       sentAt: ['']
     });
     this.searchUserForm = this.fb.group({
-      search: ['',Validators.required]
+      search: ['', Validators.required]
     });
   }
 
@@ -53,7 +50,7 @@ export class TbchitietComponent implements OnInit {
     this.notificationId = this.route.snapshot.paramMap.get('id') || '';
     if (this.notificationId) {
       this.loadNotification();
-      this.isUserSearchVisible = true;//sửa thông báo thì luôn hiện danh sách user - có hợp lý không?
+      this.isUserSearchVisible = true; // sửa thông báo thì luôn hiện danh sách user - có hợp lý không?
     }
   }
 
@@ -74,13 +71,11 @@ export class TbchitietComponent implements OnInit {
           });
           this.selectedUsers = notification.recipients.map(recipient => ({
             ID: recipient.recipientId,
-            MaNhanVien: recipient.recipientId,  // Nếu recipientId là mã nhân viên
+            MaNhanVien: recipient.recipientId, // Nếu recipientId là mã nhân viên
             TenNhanVien: recipient.tenNhanVien,
             TenPhongBan: "", // Nếu cần, hãy lấy từ một nguồn khác
             status: recipient.status
           })) as MergedData[];
-          
-
         } else {
           this.errorMessage = 'Không tìm thấy thông báo';
         }
@@ -99,7 +94,6 @@ export class TbchitietComponent implements OnInit {
       this.onSubmitUpdate();
     }
   }
-  
 
   onSubmitUpdate() {
     console.log('Update thông báo');
@@ -120,11 +114,6 @@ export class TbchitietComponent implements OnInit {
       console.log('onSubmitUpdate: ', this.notificationId);
       this.thongBaoService.updateThongBao(notificationData).subscribe({
         next: (response) => {
-          
-          //tức là đã update thành công
-          //xóa tất cả ds user cũ đi
-          //và insert ds user mới
-
           console.log('✅ Notification updated successfully:', response);
           alert('Thông báo đã được cập nhật thành công!');
           this.router.navigate(['/thongbao']);
@@ -150,7 +139,6 @@ export class TbchitietComponent implements OnInit {
   onCancel() {
     this.router.navigate(['/thongbao']);
   }
-
 
   onSubmitCreateNew() {
     if (this.thongBaoForm.valid) {
@@ -181,6 +169,53 @@ export class TbchitietComponent implements OnInit {
         },
         complete: () => {
           console.log('Request completed');
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      console.error('❌ Form is invalid');
+      Object.keys(this.thongBaoForm.controls).forEach(key => {
+        const control = this.thongBaoForm.get(key);
+        if (control?.errors) {
+          console.error(`${key} errors:`, control.errors);
+        }
+      });
+    }
+  }
+
+  responseData: any;
+  loading: boolean = false;
+
+
+  onSend() {
+    if (this.thongBaoForm.valid) {
+      this.isSubmitting = true;
+      this.errorMessage = '';
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        this.errorMessage = 'Không tìm thấy thông tin người dùng';
+        this.isSubmitting = false;
+        return;
+      }
+      const request: TestSendNotificationRequest = {
+        IDNhanViens: this.selectedUsers.map(user => user.ID).join(','),
+        Title: this.thongBaoForm.get('title')?.value,
+        Body: this.thongBaoForm.get('content')?.value,
+        Data: {} // Nếu cần thêm dữ liệu bổ sung, hãy thêm vào đây
+      };
+      console.log('Send notification request:', request);
+      this.thongBaoService.sendThongBao(request).subscribe({
+        next: (response) => {
+          console.log('✅ Notification sent successfully:', response);
+          this.loading = false;
+          this.responseData = response;
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('❌ Error sending notification:', error);
+          this.errorMessage = error.error || 'Đã xảy ra lỗi khi gửi thông báo';
+        },
+        complete: () => {
           this.isSubmitting = false;
         }
       });
@@ -238,7 +273,7 @@ export class TbchitietComponent implements OnInit {
   }
 
   removeUser(user: any) {
-    console.log("user: ",user.ID);
+    console.log("user: ", user.ID);
     this.selectedUsers = this.selectedUsers.filter(u => u.ID !== user.ID);
   }
 
@@ -246,11 +281,4 @@ export class TbchitietComponent implements OnInit {
     const selectedType = this.thongBaoForm.get('notificationType')?.value;
     this.isUserSearchVisible = selectedType === '2'; // Kiểm tra nếu là loại 2 thì hiển thị tìm kiếm user
   }
-
-
-
-
-
-
-
 }

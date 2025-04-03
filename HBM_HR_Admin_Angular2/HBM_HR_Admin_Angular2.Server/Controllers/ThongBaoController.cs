@@ -222,41 +222,81 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi khi cập nhật thông báo");
             }
         }
-    
-    
-    
-        // API POST /api/thongbao/test - Gửi thông báo thử nghiệm
-        [HttpPost("test")]
+
+
+
+        // API POST /api/thongbao/send - Gửi thông báo thử nghiệm
+        [HttpPost("send")]
         public async Task<IActionResult> SendNotification([FromBody] TestSendNotificationRequest request)
         {
-            if (string.IsNullOrEmpty(request.IDNhanVien))
+            int successCount = 0;
+            int totalCount = 0;
+            var userStats = new Dictionary<string, (int success, int total)>(); // Lưu thống kê theo user
+
+            // Validate request
+            if (request == null || string.IsNullOrWhiteSpace(request.IDNhanViens))
             {
                 return BadRequest("ID nhân viên là bắt buộc");
             }
-            //lay token tu database
-            var deviceTokens = await _repository.GetDeviceTokenByEmployeeId(request.IDNhanVien);
-            if (deviceTokens == null || !deviceTokens.Any())
-            {
-                return NotFound("Không tìm thấy token cho nhân viên này");
-            }
-            // Gửi thông báo đến tất cả các token
-            foreach (var deviceToken in deviceTokens)
-            {
-                var result = await _firebaseService.SendNotificationAsync(
-                    deviceToken.DeviceToken, 
-                    request.Title, request.Body, 
-                    request.Data);
-                if (!result)
-                {
-                    _logger.LogError($"Send failed: {deviceToken.DeviceToken}");
-                }else{
-                    _logger.LogInformation($"Send Success: {deviceToken.DeviceToken}");
-                }
-            }
-            return Ok(new { Message = "Notification sent done" });
-        }
-    }
 
+            foreach (var id in request.IDNhanViens.Split(','))
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return BadRequest("ID nhân viên không hợp lệ");
+                }
+
+                // Lấy token từ database
+                var deviceTokens = await _repository.GetDeviceTokenByEmployeeId(id);
+                if (deviceTokens == null || !deviceTokens.Any())
+                {
+                    _logger.LogWarning($"Không tìm thấy token cho nhân viên {id}");
+                    continue; // Không xử lý nếu không có token
+                }
+
+                int userSuccessCount = 0;
+                int userTotalCount = deviceTokens.Count();
+
+                // Gửi thông báo đến tất cả các token
+                foreach (var deviceToken in deviceTokens)
+                {
+                    var result = await _firebaseService.SendNotificationAsync(
+                        deviceToken.DeviceToken,
+                        request.Title, request.Body,
+                        request.Data);
+
+                    if (result)
+                    {
+                        userSuccessCount++;
+                    }
+                }
+                // Lưu thống kê cho user
+                userStats[id] = (userSuccessCount, userTotalCount);
+                // Cập nhật tổng số thành công và tổng số token
+                successCount += userSuccessCount;
+                totalCount += userTotalCount;
+            }
+
+            // Tính tổng kết thành công và thất bại cho các user
+            var summary = userStats.Select(userStat => new
+            {
+                UserId = userStat.Key,
+                Success = userStat.Value.success,
+                TotalTokens = userStat.Value.total,
+                Status = userStat.Value.success > 0 ? "Success" : "Fail"
+            });
+
+            return Ok(new
+            {
+                Message = "Notification sent done",
+                SuccessCount = successCount,
+                TotalCount = totalCount,
+                SuccessRate = totalCount > 0 ? (double)successCount / totalCount * 100 : 0,
+                UserStats = summary
+            });
+        }
+
+    }
 
 }
 
@@ -283,9 +323,11 @@ public class UpdateNotificationRequest
 
 public class TestSendNotificationRequest
 {
-    public string IDNhanVien { get; set; }
+    public string IDNhanViens { get; set; } // Chuỗi các ID nhân viên cách nhau bằng dấu ','
     public string Title { get; set; }
     public string Body { get; set; }
-    public Dictionary<String,String> Data { get; set; } // Dữ liệu bổ sung nếu cần
+    public Dictionary<string, string> Data { get; set; } // Dữ liệu bổ sung nếu cần
 }
+
+
 

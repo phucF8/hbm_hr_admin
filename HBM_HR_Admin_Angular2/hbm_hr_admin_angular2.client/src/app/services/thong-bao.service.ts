@@ -37,23 +37,30 @@ export interface ThongBaoRecipient {
   status: number;
 }
 
-// export interface ThongBao {
-//   id: string;
-//   title: string;
-//   content: string;
-//   senderId: string;
-//   tenNhanVien: string;
-//   triggerAction: string | null;
-//   notificationType: number;
-//   status: number;
-//   sentAt?: string | null;
-//   ngayTao: string;
-//   ngaySua: string;
-//   nguoiTao: string;
-//   nguoiSua: string;
-//   recipients: ThongBaoRecipient[];  // Danh sách người nhận
-//   selected?: boolean;
-// }
+export interface TestSendNotificationRequest {
+  IDNhanViens: string;  // Chuỗi chứa các ID nhân viên, cách nhau bởi dấu ","
+  Title: string;        // Tiêu đề thông báo
+  Body: string;         // Nội dung thông báo
+  Data: { [key: string]: string };  // Dữ liệu bổ sung nếu cần
+
+}
+
+
+interface UserStat {
+  userId: string;
+  success: number;
+  totalTokens: number;
+  status: string;
+}
+
+interface NotificationResponse {
+  message: string;
+  successCount: number;
+  totalCount: number;
+  successRate: number;
+  userStats: UserStat[];
+}
+
 
 export interface ThongBao {
   id: string;
@@ -184,6 +191,17 @@ export class ThongBaoService {
     return this.http.put<ThongBao>(`${this.apiUrl}/${request.id}`, request).pipe(
       catchError(error => {
         console.error('Error updating notification:', error);
+        throw error;
+      })
+    );
+  }
+
+  sendThongBao(request: TestSendNotificationRequest): Observable<NotificationResponse> {
+    const url = `${this.apiUrl}/send`;
+    console.log('Sending notification:', request);
+    return this.http.post<NotificationResponse>(url, request).pipe(
+      catchError(error => {
+        console.error('Error sending notification:', error);
         throw error;
       })
     );

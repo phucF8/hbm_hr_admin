@@ -86,18 +86,23 @@
               </div>
             </div>
 
-            <div class="d-flex gap-2 mt-4">
-              <button type="submit" class="btn btn-primary px-4" [disabled]="!thongBaoForm.valid || isSubmitting">
-                <span *ngIf="!isSubmitting">
-                  <i class="fas fa-save me-1"></i> Lưu
-                </span>
-                <span *ngIf="isSubmitting">
-                  <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                  Đang lưu...
-                </span>
-              </button>
-              <button type="button" class="btn btn-outline-secondary px-4" (click)="onCancel()" [disabled]="isSubmitting">
-                <i class="fas fa-times me-1"></i> Hủy
+            <div class="d-flex justify-content-between gap-2 mt-4">
+              <div>
+                <button type="submit" class="btn btn-primary px-4 me-2" [disabled]="!thongBaoForm.valid || isSubmitting">
+                  <span *ngIf="!isSubmitting">
+                    <i class="fas fa-save me-1"></i> Lưu
+                  </span>
+                  <span *ngIf="isSubmitting">
+                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    Đang lưu...
+                  </span>
+                </button>
+                <button type="button" class="btn btn-outline-secondary px-4" (click)="onCancel()" [disabled]="isSubmitting">
+                  <i class="fas fa-times me-1"></i> Hủy
+                </button>
+              </div>
+              <button type="button" class="btn btn-success px-4" (click)="onSend()" [disabled]="!thongBaoForm.valid || isSubmitting">
+                <i class="fas fa-paper-plane me-1"></i> Gửi
               </button>
             </div>
           </form>
@@ -158,3 +163,50 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div *ngIf="loading">Đang gửi thông báo...</div>
+
+<div *ngIf="responseData">
+  <h2>{{ responseData.message }}</h2>
+  <p><strong>Tổng số thông báo thành công:</strong> {{ responseData.successCount }} / {{ responseData.totalCount }}</p>
+  <p><strong>Tỷ lệ thành công:</strong> {{ responseData.successRate }}%</p>
+
+  <h3>Thống kê theo người dùng:</h3>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>ID Nhân viên</th>
+        <th>Thành công</th>
+        <th>Tổng số token</th>
+        <th>Trạng thái</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let userStat of responseData.userStats">
+        <td>{{ userStat.userId }}</td>
+        <td>{{ userStat.success }}</td>
+        <td>{{ userStat.totalTokens }}</td>
+        <td>{{ userStat.status }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div *ngIf="errorMessage" style="color: red;">
+  {{ errorMessage }}
+</div>
