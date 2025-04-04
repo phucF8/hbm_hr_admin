@@ -25,6 +25,7 @@
                     id="title" 
                     formControlName="title"
                     placeholder="Nhập tiêu đề"
+                    [readonly]="status === 1"
                     [class.is-invalid]="thongBaoForm.get('title')?.invalid && thongBaoForm.get('title')?.touched">
                   <label for="title">Tiêu đề</label>
                   <div class="invalid-feedback">
@@ -46,6 +47,7 @@
                     style="height: 150px"
                     formControlName="content"
                     placeholder="Nhập nội dung"
+                    [readonly]="status === 1"
                     [class.is-invalid]="thongBaoForm.get('content')?.invalid && thongBaoForm.get('content')?.touched"></textarea>
                   <label for="content">Nội dung</label>
                   <div class="invalid-feedback">
@@ -80,6 +82,8 @@
                     type="datetime-local" 
                     class="form-control" 
                     id="sentAt" 
+                    [readonly]="status === 1"
+                    [class.is-invalid]="thongBaoForm.get('sentAt')?.invalid && thongBaoForm.get('sentAt')?.touched"
                     formControlName="sentAt">
                   <label for="sentAt">Thời gian gửi</label>
                 </div>
@@ -88,7 +92,9 @@
 
             <div class="d-flex justify-content-between gap-2 mt-4">
               <div>
-                <button type="submit" class="btn btn-primary px-4 me-2" [disabled]="!thongBaoForm.valid || isSubmitting">
+                <button type="submit" class="btn btn-primary px-4 me-2" 
+                [hidden]="status === 1"
+                [disabled]="!thongBaoForm.valid || isSubmitting">
                   <span *ngIf="!isSubmitting">
                     <i class="fas fa-save me-1"></i> Lưu
                   </span>

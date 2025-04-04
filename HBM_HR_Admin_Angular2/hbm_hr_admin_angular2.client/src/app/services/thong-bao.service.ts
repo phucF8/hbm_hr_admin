@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError } from 'rxjs';
+import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao interface
 
 
 export interface MergedData {
@@ -38,6 +39,7 @@ export interface ThongBaoRecipient {
 }
 
 export interface TestSendNotificationRequest {
+  NotificationID: string; // ID thông báo
   IDNhanViens: string;  // Chuỗi chứa các ID nhân viên, cách nhau bởi dấu ","
   Title: string;        // Tiêu đề thông báo
   Body: string;         // Nội dung thông báo
@@ -60,23 +62,6 @@ interface NotificationResponse {
   successRate: number;
   userStats: UserStat[];
 }
-
-
-export interface ThongBao {
-  id: string;
-  title: string;
-  content: string;
-  senderId: string;
-  tenNhanVien: string;
-  notificationType: number;
-  sentAt?: string | null;
-  receivedCount: number;
-  totalRecipients: number;
-  ngayTao: string;
-  recipients: ThongBaoRecipient[];  // Danh sách người nhận
-  selected?: boolean;
-}
-
 
 
 export interface CreateThongBaoRequest {

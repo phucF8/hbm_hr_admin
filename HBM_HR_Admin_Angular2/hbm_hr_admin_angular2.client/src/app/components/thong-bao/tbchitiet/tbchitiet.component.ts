@@ -27,6 +27,7 @@ export class TbchitietComponent implements OnInit {
   doLookupDatasRP: DoLookupDatasRP | null = null;
   isUserSearchVisible: boolean = false;
   isSearching: boolean = false;
+  status: number = 0; // Trạng thái mặc định là 0 (Chưa gửi)
 
   constructor(
     private fb: FormBuilder,
@@ -58,11 +59,14 @@ export class TbchitietComponent implements OnInit {
     this.thongBaoService.getThongBaoByID(this.notificationId).subscribe({
       next: (notification) => {
         if (notification) {
-          console.log('notification:', notification);
-          console.log('title:', notification.title);
           const formattedDate = notification.sentAt ? notification.sentAt : '';
-          console.log('notification.sentAt:', notification.sentAt);
-          console.log('Formatted date:', formattedDate);
+          console.log('Thông báo > trạng thái:', notification.status);
+          this.status = notification.status; // Lưu trạng thái thông báo
+          if (this.status === 1) {
+            this.thongBaoForm.get('notificationType')?.disable();
+          } else {
+            this.thongBaoForm.get('notificationType')?.enable();
+          }
           this.thongBaoForm.patchValue({
             title: notification.title,
             content: notification.content,
@@ -198,6 +202,7 @@ export class TbchitietComponent implements OnInit {
         return;
       }
       const request: TestSendNotificationRequest = {
+        NotificationID: this.notificationId,
         IDNhanViens: this.selectedUsers.map(user => user.ID).join(','),
         Title: this.thongBaoForm.get('title')?.value,
         Body: this.thongBaoForm.get('content')?.value,

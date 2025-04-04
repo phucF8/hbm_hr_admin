@@ -288,6 +288,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 Status = userStat.Value.success > 0 ? "Success" : "Fail"
             });
 
+            await _repository.UpdateNotificationStatus(request.NotificationID);
+
             return Ok(new
             {
                 Message = "Notification sent done",
@@ -397,6 +399,7 @@ public class UpdateNotificationRequest
 
 public class TestSendNotificationRequest
 {
+    public string NotificationID { get; set; } // ID thông báo
     public string IDNhanViens { get; set; } // Chuỗi các ID nhân viên cách nhau bằng dấu ','
     public string Title { get; set; }
     public string Body { get; set; }

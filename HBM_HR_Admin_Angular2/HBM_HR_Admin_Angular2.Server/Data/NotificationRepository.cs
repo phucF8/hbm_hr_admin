@@ -356,9 +356,29 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 _logger.LogError(ex, "Error getting device token by employee ID");
                 throw;
             }
-
-
         }
+
+
+        internal Task UpdateNotificationStatus(string notificationId)
+        {
+            try
+            {
+                var parameters = new
+                {
+                    NotificationId = notificationId,
+                };
+                using var connection = new SqlConnection(_connectionString);
+                return connection.ExecuteAsync(
+                    "EXEC UpdateNotificationStatus @NotificationId",
+                    parameters);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating notification status");
+                throw;
+            }
+        }
+
     }
 
     public class DeviceTokenData

@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Input, Output, EventEmitter } from '@angular/core';
-import { ThongBaoService, ThongBao } from '../../services/thong-bao.service';
+import { ThongBaoService } from '../../services/thong-bao.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notification-types';
 import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
-
 import { MatDialog } from '@angular/material/dialog';
-import { TbchitietComponent } from '../thong-bao/tbchitiet/tbchitiet.component';
 import { TbchitietDialogComponent } from './tbchitiet-dialog/tbchitiet-dialog.component';
+import { ThongBao } from '../../models/thong-bao.model'; // Import the ThongBao interface
 
 @Component({
   selector: 'app-thong-bao',
