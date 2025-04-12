@@ -141,7 +141,10 @@
                 </div>
                 <ul *ngIf="filteredUsers !== null && filteredUsers.length > 0" class="list-group">
                   <li *ngFor="let user of filteredUsers" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>{{ user.MaNhanVien }} - {{ user.TenNhanVien }}</span>
+                    <span>
+                      {{ user.MaNhanVien }} - {{ user.TenNhanVien }}
+                      <i *ngIf="user.status == 1" class="fas fa-check-circle text-success ms-2"></i>
+                    </span>
                     <button class="btn btn-sm btn-outline-success" (click)="selectUser(user)">Chọn</button>
                   </li>
                 </ul>
@@ -152,7 +155,10 @@
                 
                 <ul *ngIf="selectedUsers.length > 0" class="list-group">
                   <li *ngFor="let user of selectedUsers" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>{{ user.MaNhanVien }} - {{ user.TenNhanVien }}</span>
+                    <span>
+                      {{ user.MaNhanVien }} - {{ user.TenNhanVien }}
+                      <i *ngIf="user.status == 1" class="fas fa-check-circle text-success ms-2"></i>
+                    </span>
                     <button 
                       class="btn btn-sm btn-outline-danger" 
                       (click)="removeUser(user)" 
