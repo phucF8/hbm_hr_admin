@@ -27,17 +27,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             [FromQuery] int notificationType = 0)
         {
             _logger.LogInformation($"Received request with notificationType: {notificationType}");
-
             var notifications = await _repository.GetNotificationsWithPaging(pageIndex, pageSize, notificationType);
-
-            if (notifications.Items.Count == 0)
-            {
-                _logger.LogInformation("No notifications found.");
-                return NotFound("No notifications available.");
-            }
-
             _logger.LogInformation($"Returning {notifications.Items.Count} notifications, TotalCount: {notifications.TotalCount}");
-
             return Ok(notifications);
         }
 
@@ -371,6 +362,60 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             });
         }
 
+
+
+
+
+
+
+
+
+
+        // API POST /api/thongbao/test - Gửi thông báo thử nghiệm (phiên bản 0)
+        [HttpPost("test")]
+        public async Task<IActionResult> TestNotification([FromBody] TestNotificationRequest request)
+        {
+            var userStats = new Dictionary<string, (int success, int total)>(); // Lưu thống kê theo user
+            {
+                String IDNhanVien = request.IDNhanVien;
+                if (string.IsNullOrWhiteSpace(IDNhanVien))
+                {
+                    return BadRequest("ID nhân viên không hợp lệ");
+                }
+                // Lấy token từ database
+                var deviceTokens = await _repository.GetDeviceTokenByEmployeeId(IDNhanVien);
+                if (deviceTokens == null || !deviceTokens.Any())
+                {
+                    _logger.LogWarning($"Không tìm thấy token cho nhân viên {IDNhanVien}");
+
+                }
+                foreach (var deviceToken in deviceTokens)
+                {
+                    var result = await _firebaseService.TestNotificationAsync( 
+                        deviceToken.DeviceToken,
+                        request.Title,
+                        request.Body,
+                        request.Badge
+                        );
+                    if (result)
+                    {
+                    }
+                }
+            }
+            // Tính tổng kết thành công và thất bại cho các user
+            var summary = userStats.Select(userStat => new
+            {
+                UserId = userStat.Key,
+                Success = userStat.Value.success,
+                TotalTokens = userStat.Value.total,
+                Status = userStat.Value.success > 0 ? "Success" : "Fail"
+            });
+            return Ok(new
+            {
+                Message = "Notification sent done",
+                UserStats = summary
+            });
+        }
     }
 
 
@@ -406,5 +451,13 @@ public class TestSendNotificationRequest
     public Dictionary<string, string> Data { get; set; } // Dữ liệu bổ sung nếu cần
 }
 
+public class TestNotificationRequest
+{
+    public string IDNhanVien { get; set; } // Chuỗi các ID nhân viên cách nhau bằng dấu ','
+    public string Title { get; set; }
+    public string Body { get; set; }
+    public Dictionary<string, string> Data { get; set; } // Dữ liệu bổ sung nếu cần
+     public int Badge { get; set; }
+}
 
 

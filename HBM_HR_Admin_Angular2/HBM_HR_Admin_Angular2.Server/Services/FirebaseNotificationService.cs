@@ -33,9 +33,13 @@ public class FirebaseNotificationService
                 Notification = new FirebaseAdmin.Messaging.Notification
                 {
                     Title = title,
-                    Body = body
+                    Body = body,
+                    // Badge is not supported directly in Notification, consider adding it to Data if needed
                 },
-                Data = data != null ? (System.Collections.Generic.Dictionary<string, string>)data : null
+                Data = data != null ? (System.Collections.Generic.Dictionary<string, string>)data : new System.Collections.Generic.Dictionary<string, string>
+                {
+                    { "badge", "3" } // Add badge as part of the data payload
+                }
             };
 
             string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
@@ -92,6 +96,45 @@ public class FirebaseNotificationService
             return false;
         }
     }
+
+
+
+    public async Task<bool> TestNotificationAsync(string deviceToken, string title, string body, int badge)
+    {
+        try
+        {
+            var message = new Message()
+            {
+                Token = deviceToken,
+                Notification = new FirebaseAdmin.Messaging.Notification
+                {
+                    Title = title,
+                    Body = body
+                },
+                Apns = new ApnsConfig
+                {
+                    Aps = new Aps
+                    {
+                        Badge = badge,
+                        ContentAvailable = true,
+                        Sound = "default"
+                    }
+                },
+                Data = new Dictionary<string, string> {
+                    { "custom_key", "value" }
+                }
+            };
+            string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+            _logger.LogInformation($"Successfully sent message: {response}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error sending FCM notification: {ex.Message}");
+            return false;
+        }
+    }
+
 
 
 
