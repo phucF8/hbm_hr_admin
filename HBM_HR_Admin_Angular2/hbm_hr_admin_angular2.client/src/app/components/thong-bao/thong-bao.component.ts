@@ -113,6 +113,10 @@ export class ThongBaoComponent implements OnInit {
       console.error('❌ Navigation failed:', error);
     });
   }
+
+  viewThongBao(id: string) {
+    this.editThongBao(id); // Reuse the edit function for viewing
+  }
   
   // Hàm chọn tất cả checkbox
   toggleSelectAll() {

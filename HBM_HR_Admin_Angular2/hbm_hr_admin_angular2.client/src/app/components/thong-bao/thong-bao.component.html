@@ -74,13 +74,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let tb of thongBaoList">
+        <tr *ngFor="let tb of thongBaoList" [ngClass]="{'table-success': tb.status == 1}">
           <td>
             <input type="checkbox" [(ngModel)]="tb.selected">
           </td>
           <td>
             {{ tb.title }}
-            <div *ngIf="isDebug" class="text-muted small">{{ tb.id }}</div>
+            <div *ngIf="isDebug" class="text-muted small">{{ tb.status }}</div>
           </td>
           <td>{{ tb.content }}</td>
           <td>{{ tb.tenNhanVien }}</td>
@@ -88,8 +88,11 @@
           <td>{{ tb.receivedCount }}/{{ tb.totalRecipients }}</td>
           <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
           <td>
-            <button class="btn btn-warning btn-sm" (click)="editThongBao(tb.id)">
-              <i class="bi bi-pencil-square"></i> Sửa
+            <button 
+              class="btn btn-warning btn-sm" 
+              (click)="(tb.status === 1)  ? viewThongBao(tb.id) : editThongBao(tb.id)">
+              <i class="bi" [ngClass]="(tb.status === 1)  ? 'bi-eye' : 'bi-pencil-square'"></i>
+              {{ (tb.status === 1)  ? 'Xem' : 'Sửa' }}
             </button>
           </td>
         </tr>

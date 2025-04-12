@@ -1,48 +1,4 @@
 --DANH SÁCH THÔNG BÁO
-
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationsWithPaging')
-    DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging
-GO
-
-CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
-    @PageNumber INT,
-    @PageSize INT,
-    @NotificationType INT,  -- 0: Lấy tất cả, >0: Lọc theo loại thông báo
-    @SentStatus INT = NULL  -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT 
-        n.ID,
-        n.Title,
-        n.Content,
-        n.SenderId,
-        nv.TenNhanVien,
-        n.TriggerAction,
-        n.NotificationType,
-        n.Status,
-        n.SentAt,
-        n.NgayTao,
-        n.NgaySua,
-        n.NguoiTao,
-        n.NguoiSua
-    FROM [dbo].[NS_ADTB_Notifications] n
-    LEFT JOIN [dbo].[NS_NhanViens] nv ON n.SenderId = nv.ID
-    WHERE 
-        (@NotificationType = 0 OR n.NotificationType = @NotificationType)
-        AND (@SentStatus IS NULL OR 
-             (@SentStatus = 1 AND n.SentAt IS NOT NULL) OR 
-             (@SentStatus = 0 AND n.SentAt IS NULL))
-    ORDER BY n.NgayTao DESC
-    OFFSET (@PageNumber - 1) * @PageSize ROWS
-    FETCH NEXT @PageSize ROWS ONLY;
-END;
-GO
-
-
-
-
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationsWithPaging')
     DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging
 GO
@@ -68,6 +24,7 @@ BEGIN
             [SenderId],
             [TenNhanVien],        
             [NotificationType],
+			[Status],
             [SentAt],
             [ReceivedCount],
             [TotalRecipients],
@@ -87,6 +44,7 @@ BEGIN
         SenderId,
         TenNhanVien,
         NotificationType,
+		Status,
         SentAt,
         ReceivedCount,
         TotalRecipients,
@@ -100,11 +58,10 @@ BEGIN
 END;
 GO
 
-
-
-
-
-
+EXEC NS_ADTB_GetNotificationsWithPaging 
+	@PageNumber = 1, 
+	@PageSize = 10, 
+	@NotificationType = 0;
 
 
 
@@ -433,6 +390,7 @@ SELECT
     n.SenderId,
     n.SentAt,
     n.NotificationType,
+	n.Status,
     n.NgayTao,
     nv.TenNhanVien,
     COUNT(r.ID) AS TotalRecipients,
@@ -447,6 +405,64 @@ GROUP BY
     n.SenderId,
     n.SentAt,
     n.NotificationType,
+	n.Status,
     n.NgayTao,
     nv.TenNhanVien;
 
+
+
+
+
+
+
+
+
+
+
+
+
+-- lấy DeviceToken từ IDNhanVien
+CREATE PROCEDURE GetDeviceTokenByEmployeeId
+    @IDNhanVien VARCHAR(36)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        DeviceToken, 
+        DeviceName
+    FROM dbo.NS_NhanVien_DeviceTokens
+    WHERE IDNhanVien = @IDNhanVien;
+END;
+GO
+
+EXEC GetDeviceTokenByEmployeeId @IDNhanVien = '123e4567-e89b-12d3-a456-426614174000';
+
+
+
+
+
+-- update trạng thái sau khi gửi thông báo
+CREATE PROCEDURE [dbo].[UpdateNotificationStatus]
+    @NotificationId NVARCHAR(36)
+AS
+BEGIN
+    -- Cập nhật bảng NS_ADTB_Notifications, thay đổi Status = 1 (Đã gửi)
+    UPDATE [dbo].[NS_ADTB_Notifications]
+    SET [Status] = 1, 
+        [SentAt] = GETDATE(),  -- Cập nhật thời gian gửi
+        [NgaySua] = GETDATE(),  -- Cập nhật thời gian chỉnh sửa
+        [NguoiSua] = 'SYSTEM'   -- Thay thế nếu cần
+    WHERE [ID] = @NotificationId;
+
+    -- Cập nhật bảng NS_ADTB_NotificationRecipients, thay đổi Status = 1 (Đã nhận)
+    UPDATE [dbo].[NS_ADTB_NotificationRecipients]
+    SET [Status] = 1, 
+        [NgaySua] = GETDATE(),  -- Cập nhật thời gian chỉnh sửa
+        [NguoiSua] = 'SYSTEM'   -- Thay thế nếu cần
+    WHERE [NotificationId] = @NotificationId;
+    
+END
+GO
+
+EXEC UpdateNotificationStatus @NotificationId = '60914bbc-928b-4ec0-b346-af5732be1998';
