@@ -338,7 +338,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         internal async Task<IEnumerable<DeviceTokenData>> GetDeviceTokenByEmployeeId(string iDNhanVien)
         {
-            //từ iDNhanVien lấy ra deviceToken
             try
             {
                 var parameters = new
@@ -346,6 +345,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     IDNhanVien = iDNhanVien,
                 };
                 using var connection = new SqlConnection(_connectionString);
+                await connection.OpenAsync(); // 👈 THÊM DÒNG NÀY
                 var result = await connection.QueryAsync<DeviceTokenData>(
                     "EXEC GetDeviceTokenByEmployeeId @IDNhanVien",
                     parameters);
@@ -358,8 +358,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-
-        internal Task UpdateNotificationStatus(string notificationId)
+        internal async Task UpdateNotificationStatus(string notificationId)
         {
             try
             {
@@ -368,7 +367,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     NotificationId = notificationId,
                 };
                 using var connection = new SqlConnection(_connectionString);
-                return connection.ExecuteAsync(
+                await connection.OpenAsync(); // 👈 thêm dòng này
+                await connection.ExecuteAsync(
                     "EXEC UpdateNotificationStatus @NotificationId",
                     parameters);
             }
@@ -378,6 +378,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
+
 
     }
 

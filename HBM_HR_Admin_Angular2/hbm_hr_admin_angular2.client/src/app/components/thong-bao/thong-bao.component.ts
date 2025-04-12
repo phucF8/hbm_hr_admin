@@ -185,4 +185,21 @@ export class ThongBaoComponent implements OnInit {
       console.error('❌ Error during logout:', error);
     });
   }
+
+  deleteThongBao(id: string): void {
+    if (confirm(`Bạn có chắc chắn muốn xóa thông báo này?`)) {
+      console.log("Deleting notification with ID:", id);
+      this.thongBaoService.deleteThongBao(id).subscribe({
+        next: () => {
+          console.log('Successfully deleted notification with ID:', id);
+          this.loadListThongBao(); // Reload the list
+          alert('Đã xóa thành công thông báo!');
+        },
+        error: (error) => {
+          console.error('Error deleting notification:', error);
+          alert('Đã xảy ra lỗi khi xóa thông báo!');
+        }
+      });
+    }
+  }
 }

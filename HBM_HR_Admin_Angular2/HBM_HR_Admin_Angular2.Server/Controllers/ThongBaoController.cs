@@ -223,54 +223,38 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             int successCount = 0;
             int totalCount = 0;
             var userStats = new Dictionary<string, (int success, int total)>(); // Lưu thống kê theo user
-
-            // Validate request
             if (request == null || string.IsNullOrWhiteSpace(request.IDNhanViens))
             {
                 return BadRequest("ID nhân viên là bắt buộc");
             }
-
             foreach (var id in request.IDNhanViens.Split(','))
             {
                 if (string.IsNullOrWhiteSpace(id))
                 {
                     return BadRequest("ID nhân viên không hợp lệ");
                 }
-
-                // Lấy token từ database
                 var deviceTokens = await _repository.GetDeviceTokenByEmployeeId(id);
                 if (deviceTokens == null || !deviceTokens.Any())
                 {
                     _logger.LogWarning($"Không tìm thấy token cho nhân viên {id}");
                     continue; // Không xử lý nếu không có token
                 }
-
                 int userSuccessCount = 0;
                 int userTotalCount = deviceTokens.Count();
-
-                // Tạo danh sách các device token
                 var tokens = deviceTokens.Select(dt => dt.DeviceToken).ToList();
-
-                // Gửi thông báo đến tất cả các token cùng một lúc
                 var result = await _firebaseService.SendNotificationAsync(
                     tokens,
                     request.Title,
                     request.Body,
                     request.Data);
-
                 if (result)
                 {
                     userSuccessCount = userTotalCount;
                 }
-
-                // Lưu thống kê cho user
                 userStats[id] = (userSuccessCount, userTotalCount);
-                // Cập nhật tổng số thành công và tổng số token
                 successCount += userSuccessCount;
                 totalCount += userTotalCount;
             }
-
-            // Tính tổng kết thành công và thất bại cho các user
             var summary = userStats.Select(userStat => new
             {
                 UserId = userStat.Key,
@@ -278,9 +262,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 TotalTokens = userStat.Value.total,
                 Status = userStat.Value.success > 0 ? "Success" : "Fail"
             });
-
             await _repository.UpdateNotificationStatus(request.NotificationID);
-
             return Ok(new
             {
                 Message = "Notification sent done",
