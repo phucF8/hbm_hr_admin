@@ -214,6 +214,17 @@ export class TbchitietComponent implements OnInit {
           console.log('✅ Notification sent successfully:', response);
           this.loading = false;
           this.responseData = response;
+          this.status = 1; // Cập nhật trạng thái thành công
+
+          if (this.responseData && this.responseData.userStats) {
+            this.responseData.userStats.forEach((userStat: any) => {
+              const matchedUser = this.selectedUsers.find(user => user.ID === userStat.userId);
+              if (matchedUser) {
+                matchedUser.status = 1; // Gán status = 1 nếu tìm thấy user trùng khớp
+              }
+            });
+          }
+
         },
         error: (error) => {
           this.loading = false;
@@ -254,7 +265,7 @@ export class TbchitietComponent implements OnInit {
             MaNhanVien: user.MaNhanVien,
             TenNhanVien: user.TenNhanVien,
             TenPhongBan: user.TenPhongBan,
-            status: 1 // Gán giá trị mặc định vì DoLookupData không có "status"
+            status: 0 // Gán giá trị mặc định vì DoLookupData không có "status"
           })) as MergedData[];
         },
         error: (error) => {
