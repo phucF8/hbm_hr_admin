@@ -5,7 +5,7 @@
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <!-- Bên trái: Ô tìm kiếm và Ô chọn loại thông báo -->
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-items-center gap-3 mb-3">
       <!-- Ô tìm kiếm -->
       <div class="input-group" style="max-width: 500px; width: 500px;">
         <span class="input-group-text">
@@ -26,14 +26,12 @@
           </option>
         </select>
       </div>
-    </div>
-  </div>
 
-  <div class="mb-3">
-    <button class="btn btn-secondary" (click)="toggleAdvancedSearch()">
-      <i class="bi" [ngClass]="showAdvancedSearch ? 'bi-eye-slash' : 'bi-eye'"></i>
-      {{ showAdvancedSearch ? 'Ẩn tìm kiếm nâng cao' : 'Hiện tìm kiếm nâng cao' }}
-    </button>
+      <!-- Nút tìm kiếm nâng cao -->
+      <button class="btn btn-secondary" (click)="toggleAdvancedSearch()">
+        <i class="bi bi-search"></i> <!-- Icon tìm kiếm -->
+      </button>
+    </div>
   </div>
 
   <div class="overlay" *ngIf="showAdvancedSearch">
