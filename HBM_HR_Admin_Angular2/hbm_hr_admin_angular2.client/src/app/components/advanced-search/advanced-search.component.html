@@ -1,109 +1,112 @@
-<div class="container py-4">
+<div class="container" style="background-color: transparent; padding: 0;corner-radius: 5px;">
   <div class="card shadow-sm">
     <div class="card-header bg-primary text-white py-3">
-      <h3 class="mb-0">Tìm kiếm nâng cao</h3>
+      <h6 class="mb-0">Tìm kiếm</h6>
     </div>
     <div class="card-body p-4">
-      <!-- Nhóm tìm kiếm theo ngày -->
+      <!-- Nhóm tìm kiếm theo ngày tạo -->
       <div class="card mb-4">
-        <div class="card-header bg-light">
-          <h5 class="mb-0">Tìm kiếm theo ngày</h5>
+        <div class="card-header bg-light" style="text-align: left;">
+          <h6 class="mb-0">Theo ngày tạo</h6>
         </div>
-        <div class="card-body">
+        <div class="card-body p-1">
           <div class="row g-3">
             <div class="col-md-6">
               <div class="form-floating">
                 <input type="date" id="createdFrom" class="form-control" placeholder="Từ ngày tạo">
-                <label for="createdFrom">Từ ngày tạo</label>
+                <label for="createdFrom">Từ ngày</label>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-floating">
                 <input type="date" id="createdTo" class="form-control" placeholder="Đến ngày tạo">
-                <label for="createdTo">Đến ngày tạo</label>
+                <label for="createdTo">Đến ngày</label>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="form-floating">
-                <input type="date" id="sentFrom" class="form-control" placeholder="Từ ngày gửi">
-                <label for="sentFrom">Từ ngày gửi</label>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-floating">
-                <input type="date" id="sentTo" class="form-control" placeholder="Đến ngày gửi">
-                <label for="sentTo">Đến ngày gửi</label>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
+
+    <!-- Nhóm tìm kiếm theo ngày gửi -->
+    <div class="card mb-4">
+      <div class="card-header bg-light" style="text-align: left;">
+        <h6 class="mb-0">Theo ngày gửi</h6>
+      </div>
+      <div class="card-body p-1">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" id="createdFrom" class="form-control" placeholder="Từ ngày tạo">
+              <label for="createdFrom">Từ ngày</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" id="createdTo" class="form-control" placeholder="Đến ngày tạo">
+              <label for="createdTo">Đến ngày</label>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
 
       <!-- Nhóm tìm kiếm theo trạng thái -->
-      <div class="card mb-4">
-        <div class="card-header bg-light">
-          <h5 class="mb-0">Tìm kiếm theo trạng thái</h5>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select id="status" class="form-select">
+              <option [value]="null">Tất cả</option>
+              <option [value]="0">Chưa gửi</option>
+              <option [value]="1">Đã gửi</option>
+              <option [value]="2">Đã gửi lại</option>
+            </select>
+            <label for="status">Trạng thái</label>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <div class="form-floating">
-                <select id="status" class="form-select">
-                  <option [value]="null">Tất cả</option>
-                  <option [value]="0">Chưa gửi</option>
-                  <option [value]="1">Đã gửi</option>
-                  <option [value]="2">Đã gửi lại</option>
-                </select>
-                <label for="status">Trạng thái</label>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-floating">
-                <select id="source" class="form-select">
-                  <option [value]="null">Tất cả</option>
-                </select>
-                <label for="source">Nguồn thông báo</label>
-              </div>
-            </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select id="source" class="form-select">
+              <option [value]="null">Tất cả</option>
+            </select>
+            <label for="source">Nguồn thông báo</label>
           </div>
         </div>
       </div>
+        
+      
 
       <!-- Nhóm tìm kiếm theo loại thông báo -->
-      <div class="card mb-4">
-        <div class="card-header bg-light">
-          <h5 class="mb-0">Tìm kiếm theo loại thông báo</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select id="mainType" class="form-select">
+              <option [value]="null">Tất cả</option>
+              <option [value]="1">Chủ động</option>
+              <option [value]="2">Tự động</option>
+            </select>
+            <label for="mainType">Loại thông báo</label>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <div class="form-floating">
-                <select id="mainType" class="form-select">
-                  <option [value]="null">Tất cả</option>
-                  <option [value]="1">Chủ động</option>
-                  <option [value]="2">Tự động</option>
-                </select>
-                <label for="mainType">Loại thông báo</label>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-floating">
-                <select id="subType" class="form-select">
-                  <option [value]="null">Tất cả</option>
-                  <option [value]="1">Loại đề xuất</option>
-                  <option [value]="2">Loại đặt phòng họp</option>
-                  <option [value]="3">Loại đặt xe</option>
-                  <option [value]="4">Loại giải trình</option>
-                </select>
-                <label for="subType">Loại thông báo con</label>
-              </div>
-            </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select id="subType" class="form-select">
+              <option [value]="null">Tất cả</option>
+              <option [value]="1">Loại đề xuất</option>
+              <option [value]="2">Loại đặt phòng họp</option>
+              <option [value]="3">Loại đặt xe</option>
+              <option [value]="4">Loại giải trình</option>
+            </select>
+            <label for="subType">Loại thông báo con</label>
           </div>
         </div>
       </div>
+        
+      
 
       <!-- Nút hành động -->
-      <div class="d-flex justify-content-end gap-2">
+      <div class="d-flex justify-content-end gap-2 mt-3">
         <button class="btn btn-primary">Tìm kiếm</button>
         <button class="btn btn-secondary">Đặt lại</button>
       </div>
