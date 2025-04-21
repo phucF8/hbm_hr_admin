@@ -216,5 +216,22 @@ export class ThongBaoComponent implements OnInit {
     // Thêm logic đóng popup, hoặc xử lý UI tại đây
   }
   
+  sortByDate(field: string, direction: 'asc' | 'desc') {
+    // if (!this.data || !Array.isArray(this.data)) {
+    //   return;
+    // }
+  
+    // this.data.sort((a: any, b: any) => {
+    //   const dateA = new Date(a[field]).getTime();
+    //   const dateB = new Date(b[field]).getTime();
+  
+    //   if (direction === 'asc') {
+    //     return dateA - dateB;
+    //   } else {
+    //     return dateB - dateA;
+    //   }
+    // });
+  }
+  
 
 }
