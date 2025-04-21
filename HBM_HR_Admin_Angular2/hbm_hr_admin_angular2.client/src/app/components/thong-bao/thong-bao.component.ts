@@ -202,4 +202,11 @@ export class ThongBaoComponent implements OnInit {
       });
     }
   }
+
+  showAdvancedSearch: boolean = false;
+
+  toggleAdvancedSearch(): void {
+    this.showAdvancedSearch = !this.showAdvancedSearch;
+  }
+
 }

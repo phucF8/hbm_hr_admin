@@ -29,11 +29,19 @@
     </div>
   </div>
 
+  <div class="mb-3">
+    <button class="btn btn-secondary" (click)="toggleAdvancedSearch()">
+      <i class="bi" [ngClass]="showAdvancedSearch ? 'bi-eye-slash' : 'bi-eye'"></i>
+      {{ showAdvancedSearch ? 'Ẩn tìm kiếm nâng cao' : 'Hiện tìm kiếm nâng cao' }}
+    </button>
+  </div>
 
-<!-- Advanced Search -->
-<app-advanced-search></app-advanced-search>
-
-
+  <div class="overlay" *ngIf="showAdvancedSearch">
+    <div class="overlay-content">
+      <button class="btn-close" (click)="toggleAdvancedSearch()">&times;</button>
+      <app-advanced-search></app-advanced-search>
+    </div>
+  </div>
 
   <!-- Action Buttons and Pagination -->
   <div class="mb-3 d-flex justify-content-between align-items-center">
