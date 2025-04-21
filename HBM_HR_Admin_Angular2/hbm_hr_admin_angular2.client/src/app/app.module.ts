@@ -11,6 +11,7 @@ import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.component';
 import { TbchitietDialogComponent } from './components/thong-bao/tbchitiet-dialog/tbchitiet-dialog.component';
+import { AdvancedSearchComponent } from './components/advanced-search/advanced-search.component';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { TbchitietDialogComponent } from './components/thong-bao/tbchitiet-dialo
     ThongBaoComponent,
     PaginationComponent,
     TbchitietComponent,
-    TbchitietDialogComponent
+    TbchitietDialogComponent,
+    AdvancedSearchComponent
   ],
   imports: [
     BrowserModule,
