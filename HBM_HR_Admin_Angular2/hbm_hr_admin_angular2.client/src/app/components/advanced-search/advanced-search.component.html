@@ -1,7 +1,8 @@
 <div class="container" style="background-color: transparent; padding: 0;corner-radius: 5px;">
   <div class="card shadow-sm">
-    <div class="card-header bg-primary text-white py-3">
+    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
       <h6 class="mb-0">Tìm kiếm</h6>
+      <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="closePopup()"></button>
     </div>
     <div class="card-body p-4">
       <!-- Nhóm tìm kiếm theo ngày tạo -->
@@ -23,34 +24,32 @@
                 <label for="createdTo">Đến ngày</label>
               </div>
             </div>
-            
           </div>
         </div>
       </div>
 
-    <!-- Nhóm tìm kiếm theo ngày gửi -->
-    <div class="card mb-4">
-      <div class="card-header bg-light" style="text-align: left;">
-        <h6 class="mb-0">Theo ngày gửi</h6>
-      </div>
-      <div class="card-body p-1">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="form-floating">
-              <input type="date" id="createdFrom" class="form-control" placeholder="Từ ngày tạo">
-              <label for="createdFrom">Từ ngày</label>
+      <!-- Nhóm tìm kiếm theo ngày gửi -->
+      <div class="card mb-4">
+        <div class="card-header bg-light" style="text-align: left;">
+          <h6 class="mb-0">Theo ngày gửi</h6>
+        </div>
+        <div class="card-body p-1">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="date" id="createdFrom" class="form-control" placeholder="Từ ngày tạo">
+                <label for="createdFrom">Từ ngày</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="date" id="createdTo" class="form-control" placeholder="Đến ngày tạo">
+                <label for="createdTo">Đến ngày</label>
+              </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="form-floating">
-              <input type="date" id="createdTo" class="form-control" placeholder="Đến ngày tạo">
-              <label for="createdTo">Đến ngày</label>
-            </div>
-          </div>
-          
         </div>
       </div>
-    </div>
 
       <!-- Nhóm tìm kiếm theo trạng thái -->
       <div class="row g-3 mb-3">
@@ -74,8 +73,6 @@
           </div>
         </div>
       </div>
-        
-      
 
       <!-- Nhóm tìm kiếm theo loại thông báo -->
       <div class="row g-3">
@@ -102,8 +99,6 @@
           </div>
         </div>
       </div>
-        
-      
 
       <!-- Nút hành động -->
       <div class="d-flex justify-content-end gap-2 mt-3">

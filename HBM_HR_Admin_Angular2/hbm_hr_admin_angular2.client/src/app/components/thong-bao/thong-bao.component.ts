@@ -209,4 +209,12 @@ export class ThongBaoComponent implements OnInit {
     this.showAdvancedSearch = !this.showAdvancedSearch;
   }
 
+
+  handleClosePopup(): void {
+    console.log('ThongBaoComponent: handleClosePopup được gọi');
+    this.showAdvancedSearch = false;
+    // Thêm logic đóng popup, hoặc xử lý UI tại đây
+  }
+  
+
 }
