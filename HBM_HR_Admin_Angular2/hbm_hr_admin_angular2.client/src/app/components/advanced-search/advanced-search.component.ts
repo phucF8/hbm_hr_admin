@@ -24,6 +24,10 @@ export class AdvancedSearchComponent {
   ngayGuiDen?: string;
   trangThai?: number | null = null;
 
+  constructor() {
+    // Khởi tạo các biến nếu cần thiết  
+    console.log('AdvancedSearchComponent initialized');
+  }
 
   closePopup(): void {
     this.closePopupEvent.emit(); // Phát sự kiện để thông báo cho ThongBaoComponent

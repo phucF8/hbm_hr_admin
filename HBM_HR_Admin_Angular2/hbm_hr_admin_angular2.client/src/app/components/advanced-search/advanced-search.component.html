@@ -54,7 +54,7 @@
       <!-- Nhóm tìm kiếm theo trạng thái -->
       <div class="row g-3 mb-3">
         
-        <div class="col-md-6">
+        <div class="col-md-6" *ngIf="trangThai !== undefined">
           <div class="form-floating">
             <select id="status" class="form-select" [(ngModel)]="trangThai" name="trangThai">
               <option [ngValue]="null">Tất cả</option>
