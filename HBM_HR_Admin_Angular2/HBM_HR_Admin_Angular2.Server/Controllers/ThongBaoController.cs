@@ -21,7 +21,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API GET /api/thongbao - Lấy danh sách thông báo
         [HttpGet]
-public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
+        public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
     [FromQuery] int pageIndex = 1,
     [FromQuery] int pageSize = AppSettings.DefaultPageSize,
     [FromQuery] int notificationType = 0,
@@ -32,12 +32,12 @@ public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
     [FromQuery] string? ngayGuiTu = null,
     [FromQuery] string? ngayGuiDen = null,
     [FromQuery] int? trangThai = null)
-{
-    var notifications = await _repository.GetNotificationsWithPaging(
-        pageIndex, pageSize, notificationType, sortBy, searchText, ngayTaoTu, ngayTaoDen, ngayGuiTu, ngayGuiDen, trangThai);
+        {
+            var notifications = await _repository.GetNotificationsWithPaging(
+                pageIndex, pageSize, notificationType, sortBy, searchText, ngayTaoTu, ngayTaoDen, ngayGuiTu, ngayGuiDen, trangThai);
 
-    return Ok(notifications);
-}
+            return Ok(notifications);
+        }
 
 
         // API GET /api/thongbao/{id} - Lấy 1 danh sách thông báo củ thể
@@ -68,38 +68,38 @@ public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
         {
             try
             {
-                _logger.LogInformation($"Creating new notification: {request.Title}");
-
-                // Validate request
                 if (string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Content))
-                {
                     return BadRequest("Tiêu đề và nội dung không được để trống");
-                }
                 if (request.Title.Length < 3)
-                {
                     return BadRequest("Tiêu đề phải có ít nhất 3 ký tự");
-                }
                 if (request.Content.Length < 10)
-                {
                     return BadRequest("Nội dung phải có ít nhất 10 ký tự");
+                DateTime? sentAt = null;
+
+                if (!string.IsNullOrWhiteSpace(request.SentAt))
+                {
+                    if (DateTime.TryParse(request.SentAt, out var parsedDate))
+                    {
+                        sentAt = parsedDate;
+                    }
+                    else
+                    {
+                        return BadRequest($"Ngày gửi không hợp lệ {request.SentAt}");
+                    }
                 }
 
-                // Create new notification
                 var notification = new Notification
                 {
                     ID = request.ID,
                     Title = request.Title,
                     Content = request.Content,
                     NotificationType = request.NotificationType,
-                    SentAt = request.SentAt,
+                    SentAt = sentAt,
                     SenderId = request.SenderId,
                 };
 
-                // Save notification to database
                 var result = await _repository.CreateNotification(notification);
                 _logger.LogInformation($"Successfully created notification with ID: {result}");
-
-                // Insert recipients
                 if (request.Recipients != null && request.Recipients.Any())
                 {
                     foreach (var recipientId in request.Recipients)
@@ -108,13 +108,12 @@ public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
                         await _repository.InsertNotificationRecipient(result.ID, recipientId, request.SenderId);
                     }
                 }
-
                 return CreatedAtAction(nameof(GetNotifications), new { id = result.ID }, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating notification");
-                return StatusCode(500, "Đã xảy ra lỗi khi tạo thông báo");
+                return StatusCode(500, $"Đã xảy ra lỗi khi tạo thông báo: {ex.Message}");
             }
         }
 
@@ -380,7 +379,7 @@ public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
                 }
                 foreach (var deviceToken in deviceTokens)
                 {
-                    var result = await _firebaseService.TestNotificationAsync( 
+                    var result = await _firebaseService.TestNotificationAsync(
                         deviceToken.DeviceToken,
                         request.Title,
                         request.Body,
@@ -417,7 +416,7 @@ public class CreateNotificationRequest
     public string Content { get; set; }
     public int NotificationType { get; set; }
     public string SenderId { get; set; }
-    public DateTime? SentAt { get; set; }
+    public string? SentAt { get; set; }
     public List<string> Recipients { get; set; } // Danh sách ID người nhận
 }
 
@@ -446,7 +445,7 @@ public class TestNotificationRequest
     public string Title { get; set; }
     public string Body { get; set; }
     public Dictionary<string, string> Data { get; set; } // Dữ liệu bổ sung nếu cần
-     public int Badge { get; set; }
+    public int Badge { get; set; }
 }
 
 

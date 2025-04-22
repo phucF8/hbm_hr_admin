@@ -160,10 +160,8 @@ export class TbchitietComponent implements OnInit {
         senderId: currentUser.ID,
         recipients: this.selectedUsers.map(user => user.ID), // Lấy danh sách ID từ selectedUsers
       };
-      
       this.thongBaoService.createThongBao(notificationData).subscribe({
         next: (response) => {
-          console.log('✅ Notification created successfully:', response);
           alert('Thông báo đã được tạo thành công!');
           this.router.navigate(['/thong-bao']);
         },
@@ -215,7 +213,6 @@ export class TbchitietComponent implements OnInit {
           this.loading = false;
           this.responseData = response;
           this.status = 1; // Cập nhật trạng thái thành công
-
           if (this.responseData && this.responseData.userStats) {
             this.responseData.userStats.forEach((userStat: any) => {
               const matchedUser = this.selectedUsers.find(user => user.ID === userStat.userId);
@@ -224,7 +221,6 @@ export class TbchitietComponent implements OnInit {
               }
             });
           }
-
         },
         error: (error) => {
           this.loading = false;
