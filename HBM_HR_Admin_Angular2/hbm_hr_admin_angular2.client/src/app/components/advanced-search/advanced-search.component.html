@@ -14,19 +14,20 @@
           <div class="row g-3">
             <div class="col-md-6">
               <div class="form-floating">
-                <input type="date" id="createdFrom" class="form-control" placeholder="Từ ngày tạo">
+                <input type="date" id="createdFrom" class="form-control" [(ngModel)]="ngayTaoTu" placeholder="Từ ngày tạo" name="createdFrom">
                 <label for="createdFrom">Từ ngày</label>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-floating">
-                <input type="date" id="createdTo" class="form-control" placeholder="Đến ngày tạo">
+                <input type="date" id="createdTo" class="form-control" [(ngModel)]="ngayTaoDen" placeholder="Đến ngày tạo" name="createdTo">
                 <label for="createdTo">Đến ngày</label>
               </div>
             </div>
           </div>
         </div>
       </div>
+      
 
       <!-- Nhóm tìm kiếm theo ngày gửi -->
       <div class="card mb-4">
@@ -37,19 +38,20 @@
           <div class="row g-3">
             <div class="col-md-6">
               <div class="form-floating">
-                <input type="date" id="createdFrom" class="form-control" placeholder="Từ ngày tạo">
-                <label for="createdFrom">Từ ngày</label>
+                <input type="date" id="sendFrom" class="form-control" [(ngModel)]="ngayGuiTu" placeholder="Từ ngày gửi" name="sendFrom">
+                <label for="sendFrom">Từ ngày</label>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-floating">
-                <input type="date" id="createdTo" class="form-control" placeholder="Đến ngày tạo">
-                <label for="createdTo">Đến ngày</label>
+                <input type="date" id="sendTo" class="form-control" [(ngModel)]="ngayGuiDen" placeholder="Đến ngày gửi" name="sendTo">
+                <label for="sendTo">Đến ngày</label>
               </div>
             </div>
           </div>
         </div>
       </div>
+      
 
       <!-- Nhóm tìm kiếm theo trạng thái -->
       <div class="row g-3 mb-3">

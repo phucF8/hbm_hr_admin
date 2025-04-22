@@ -25,7 +25,6 @@ export class AdvancedSearchComponent {
   trangThai?: number | null = null;
 
   constructor() {
-    // Khởi tạo các biến nếu cần thiết  
     console.log('AdvancedSearchComponent initialized');
   }
 
