@@ -54,19 +54,34 @@ export class ThongBaoComponent implements OnInit {
     this.loadListThongBao();
   }
 
-  loadListThongBao() {
+  loadListThongBao(
+    ngayTaoTu?: string,
+    ngayTaoDen?: string,
+    ngayGuiTu?: string,
+    ngayGuiDen?: string,
+    trangThai?: number | null
+  ) {
     console.log('Loading notifications for page:', this.currentPage, 'and type:', this.selectedType);
-    this.thongBaoService.getListThongBao(this.currentPage, this.selectedType).subscribe({
+    this.thongBaoService.getListThongBao(
+      this.currentPage,
+      this.selectedType,
+      ngayTaoTu,
+      ngayTaoDen,
+      ngayGuiTu,
+      ngayGuiDen,
+      trangThai
+    ).subscribe({
       next: (data) => {
         console.log('Received notifications:', data);
-        this.thongBaoList = data.items; // Gán danh sách thông báo từ `items`
-        this.totalPages = Math.ceil(data.totalCount / ITEMS_PER_PAGE); // Sử dụng constant
+        this.thongBaoList = data.items;
+        this.totalPages = Math.ceil(data.totalCount / ITEMS_PER_PAGE);
       },
       error: (error) => {
         console.error('Error loading notifications:', error);
       }
     });
   }
+  
 
   onTypeChange() {
     console.log('Type changed to:', this.selectedType);
@@ -219,6 +234,19 @@ export class ThongBaoComponent implements OnInit {
     console.log('ThongBaoComponent: handleClosePopup được gọi');
     this.showAdvancedSearch = false;
     // Thêm logic đóng popup, hoặc xử lý UI tại đây
+  }
+
+  handleSearchPopup(
+    data: {
+      ngayTaoTu?: string;
+      ngayTaoDen?: string;
+      ngayGuiTu?: string;
+      ngayGuiDen?: string;
+      trangThai?: number | null;
+    }): void {
+    console.log('ThongBaoComponent: handleSearchPopup được gọi');
+    this.loadListThongBao(data.ngayTaoTu, data.ngayTaoDen, data.ngayGuiTu, data.ngayGuiDen, data.trangThai);
+    this.showAdvancedSearch = false; // Đóng popup sau khi tìm kiếm
   }
   
   sortByDate(field: string, direction: 'asc' | 'desc') {

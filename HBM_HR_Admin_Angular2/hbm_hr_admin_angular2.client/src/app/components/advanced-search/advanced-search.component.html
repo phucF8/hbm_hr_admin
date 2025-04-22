@@ -53,17 +53,18 @@
 
       <!-- Nhóm tìm kiếm theo trạng thái -->
       <div class="row g-3 mb-3">
+        
         <div class="col-md-6">
           <div class="form-floating">
-            <select id="status" class="form-select">
-              <option [value]="null">Tất cả</option>
-              <option [value]="0">Chưa gửi</option>
-              <option [value]="1">Đã gửi</option>
-              <option [value]="2">Đã gửi lại</option>
+            <select id="status" class="form-select" [(ngModel)]="trangThai" name="trangThai">
+              <option [ngValue]="null">Tất cả</option>
+              <option [ngValue]="0">Chưa gửi</option>
+              <option [ngValue]="1">Đã gửi</option>
             </select>
             <label for="status">Trạng thái</label>
           </div>
         </div>
+
         <div class="col-md-6">
           <div class="form-floating">
             <select id="source" class="form-select">
@@ -102,7 +103,7 @@
 
       <!-- Nút hành động -->
       <div class="d-flex justify-content-end gap-2 mt-3">
-        <button class="btn btn-primary">Tìm kiếm</button>
+        <button class="btn btn-primary" (click)="timKiem()">Tìm kiếm</button>
         <button class="btn btn-secondary">Đặt lại</button>
       </div>
     </div>

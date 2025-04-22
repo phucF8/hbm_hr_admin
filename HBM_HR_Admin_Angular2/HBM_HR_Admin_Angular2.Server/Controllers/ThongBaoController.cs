@@ -21,16 +21,27 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API GET /api/thongbao - Lấy danh sách thông báo
         [HttpGet]
-        public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
-            [FromQuery] int pageIndex = 1,
-            [FromQuery] int pageSize = AppSettings.DefaultPageSize, // Use the constant here
-            [FromQuery] int notificationType = 0)
-        {
-            _logger.LogInformation($"Received request with notificationType: {notificationType}");
-            var notifications = await _repository.GetNotificationsWithPaging(pageIndex, pageSize, notificationType);
-            _logger.LogInformation($"Returning {notifications.Items.Count} notifications, TotalCount: {notifications.TotalCount}");
-            return Ok(notifications);
-        }
+public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
+    [FromQuery] int pageIndex = 1,
+    [FromQuery] int pageSize = AppSettings.DefaultPageSize,
+    [FromQuery] int notificationType = 0,
+    [FromQuery] string? ngayTaoTu = null,
+    [FromQuery] string? ngayTaoDen = null,
+    [FromQuery] string? ngayGuiTu = null,
+    [FromQuery] string? ngayGuiDen = null,
+    [FromQuery] int? trangThai = null)
+{
+    _logger.LogInformation("GetNotifications called with: " +
+        $"pageIndex={pageIndex}, pageSize={pageSize}, notificationType={notificationType}, " +
+        $"ngayTaoTu={ngayTaoTu}, ngayTaoDen={ngayTaoDen}, ngayGuiTu={ngayGuiTu}, ngayGuiDen={ngayGuiDen}, trangThai={trangThai}");
+
+    var notifications = await _repository.GetNotificationsWithPaging(
+        pageIndex, pageSize, notificationType, ngayTaoTu, ngayTaoDen, ngayGuiTu, ngayGuiDen, trangThai);
+
+    _logger.LogInformation($"Returning {notifications.Items.Count} notifications, TotalCount: {notifications.TotalCount}");
+    return Ok(notifications);
+}
+
 
 
         // API GET /api/thongbao/{id} - Lấy 1 danh sách thông báo củ thể

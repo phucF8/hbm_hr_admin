@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError } from 'rxjs';
 import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao interface
 
@@ -84,20 +84,45 @@ export interface UpdateThongBaoRequest extends CreateThongBaoRequest {
 })
 export class ThongBaoService {
   private apiUrl = 'https://localhost:7046/api/thongbao';
-
   constructor(private http: HttpClient) { }
-
-  getListThongBao(pageIndex: number = 1, notificationType: number = 0): Observable<{ items: ThongBao[], totalCount: number }> {
-    const url = `${this.apiUrl}?pageIndex=${pageIndex}&notificationType=${notificationType}`;
-    console.log('Calling API:', url);
-    return this.http.get<{ items: ThongBao[], totalCount: number }>(url).pipe(
+  
+  getListThongBao(
+    pageIndex: number = 1,
+    notificationType: number = 0,
+    ngayTaoTu?: string,
+    ngayTaoDen?: string,
+    ngayGuiTu?: string,
+    ngayGuiDen?: string,
+    trangThai?: number | null // null: tất cả, 1: đã gửi, 0: chưa gửi
+  ): Observable<{ items: ThongBao[], totalCount: number }> {
+    let params = new HttpParams()
+      .set('pageIndex', pageIndex.toString())
+      .set('notificationType', notificationType.toString());
+    if (ngayTaoTu) {
+      params = params.set('ngayTaoTu', ngayTaoTu);
+    }
+    if (ngayTaoDen) {
+      params = params.set('ngayTaoDen', ngayTaoDen);
+    }
+    if (ngayGuiTu) {
+      params = params.set('ngayGuiTu', ngayGuiTu);
+    }
+    if (ngayGuiDen) {
+      params = params.set('ngayGuiDen', ngayGuiDen);
+    }
+    if (trangThai !== null && trangThai !== undefined) {
+      params = params.set('trangThai', trangThai.toString());
+    }
+    const url = `${this.apiUrl}`;
+    console.log('Calling API:', url, params.toString());
+    return this.http.get<{ items: ThongBao[], totalCount: number }>(url, { params }).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
         throw error;
       })
     );
   }
-
+  
   getThongBaoByID(notificationID: string): Observable<ThongBao> {
     const url = `${this.apiUrl}/${notificationID}`;
     console.log('Calling API:', url);
