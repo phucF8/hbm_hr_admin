@@ -1,4 +1,4 @@
--- DANH SÁCH THÔNG BÁO
+-- DANH SÁCH THÔNG BÁO (CÓ TÌM KIẾM & SẮP XẾP)
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationsWithPaging')
     DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging
 GO
@@ -7,6 +7,8 @@ CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @PageNumber INT,
     @PageSize INT,
     @NotificationType INT,         -- 0: Lấy tất cả, >0: Lọc theo loại thông báo
+    @SortBy NVARCHAR(50) = 'NgayTao',  -- Tên cột để sắp xếp
+    @SearchText NVARCHAR(255) = '',    -- Tìm kiếm tiêu đề hoặc nội dung
     @SentStatus INT = NULL,        -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
     @FromDate DATE = NULL,         -- Ngày tạo: từ ngày (bao gồm)
     @ToDate DATE = NULL,           -- Ngày tạo: đến ngày (bao gồm)
@@ -17,6 +19,15 @@ BEGIN
     SET NOCOUNT ON;
 
     IF @PageNumber < 1 SET @PageNumber = 1;
+
+    -- Sắp xếp an toàn: chỉ cho phép sort theo những cột cụ thể
+    DECLARE @SortColumn NVARCHAR(50) = 
+        CASE LOWER(@SortBy)
+            WHEN 'ngaytao' THEN 'NgayTao'
+            WHEN 'sentat' THEN 'SentAt'
+            WHEN 'title' THEN 'Title'
+            ELSE 'NgayTao' -- mặc định
+        END;
 
     WITH CTE AS (
         SELECT 
@@ -34,12 +45,17 @@ BEGIN
             COUNT(*) OVER () AS TotalCount
         FROM [HBM_HCNSApp].[dbo].[v_NotificationsWithRecipients]
         WHERE 
-            (@NotificationType = 0 OR NotificationType = @NotificationType)  
+            (@NotificationType = 0 OR NotificationType = @NotificationType)
             AND (@SentStatus IS NULL OR Status = @SentStatus)
             AND (@FromDate IS NULL OR NgayTao >= @FromDate)
             AND (@ToDate IS NULL OR NgayTao <= @ToDate)
             AND (@FromSentDate IS NULL OR SentAt >= @FromSentDate)
             AND (@ToSentDate IS NULL OR SentAt <= @ToSentDate)
+            AND (
+                @SearchText = '' OR 
+                Title LIKE '%' + @SearchText + '%' OR 
+                Content LIKE '%' + @SearchText + '%'
+            )
     )
     SELECT 
         ID,
@@ -56,22 +72,29 @@ BEGIN
         TotalCount,
         CEILING(CAST(TotalCount AS FLOAT) / @PageSize) AS TotalPages
     FROM CTE
-    ORDER BY NgayTao DESC
+    ORDER BY 
+        CASE WHEN @SortColumn = 'NgayTao' THEN NgayTao END DESC,
+        CASE WHEN @SortColumn = 'SentAt' THEN SentAt END DESC,
+        CASE WHEN @SortColumn = 'Title' THEN Title END ASC
     OFFSET (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY;
 END;
 GO
 
 
-EXEC NS_ADTB_GetNotificationsWithPaging 
+
+EXEC NS_ADTB_GetNotificationsWithPaging
     @PageNumber = 1,
     @PageSize = 10,
     @NotificationType = 0,
-    @SentStatus = 0,
-    @FromDate = '2025-03-01',
-    @ToDate = '2025-04-22',
-    @FromSentDate = '2025-03-10',
-    @ToSentDate = '2025-04-20'
+    @SortBy = N'ngayTao',        -- hoặc 'sentAt', 'title'
+    @SearchText = N'công văn',   -- từ khóa tìm kiếm, để '' nếu không cần
+    @SentStatus = NULL,          -- NULL: tất cả, 1: đã gửi, 0: chưa gửi
+    @FromDate = '2024-01-01',
+    @ToDate = '2025-04-30',
+    @FromSentDate = NULL,
+    @ToSentDate = NULL;
+
 
 
 

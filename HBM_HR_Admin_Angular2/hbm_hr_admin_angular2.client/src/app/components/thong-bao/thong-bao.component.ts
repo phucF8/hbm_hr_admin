@@ -29,6 +29,7 @@ export class ThongBaoComponent implements OnInit {
   isDebug = environment.isDebug;
   tenNhanVien: string = '';
   notificationTypes = NOTIFICATION_TYPES;
+  sortBy: string = 'NgayTao'; //mặc định sắp xếp theo ngày tạo mới nhất
 
   constructor(
     private dialog: MatDialog,
@@ -54,6 +55,16 @@ export class ThongBaoComponent implements OnInit {
     this.loadListThongBao();
   }
 
+  onSortChange(sortBy: string) {
+    this.sortBy = sortBy;
+    this.loadListThongBao(); // Reload the list after sorting
+  }
+
+  onSearchTextChange() {  
+    console.log('onSearchTextChange:', this.searchText);
+    this.loadListThongBao(); // Reload the list after search text change
+  }
+
   loadListThongBao(
     ngayTaoTu?: string,
     ngayTaoDen?: string,
@@ -65,11 +76,13 @@ export class ThongBaoComponent implements OnInit {
     this.thongBaoService.getListThongBao(
       this.currentPage,
       this.selectedType,
+      this.sortBy,
+      this.searchText,
       ngayTaoTu,
       ngayTaoDen,
       ngayGuiTu,
       ngayGuiDen,
-      trangThai
+      trangThai,
     ).subscribe({
       next: (data) => {
         console.log('Received notifications:', data);

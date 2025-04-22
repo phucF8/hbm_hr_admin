@@ -89,6 +89,8 @@ export class ThongBaoService {
   getListThongBao(
     pageIndex: number = 1,
     notificationType: number = 0,
+    sortBy: string = 'ngayTao',
+    searchText: string = '',
     ngayTaoTu?: string,
     ngayTaoDen?: string,
     ngayGuiTu?: string,
@@ -97,22 +99,19 @@ export class ThongBaoService {
   ): Observable<{ items: ThongBao[], totalCount: number }> {
     let params = new HttpParams()
       .set('pageIndex', pageIndex.toString())
-      .set('notificationType', notificationType.toString());
-    if (ngayTaoTu) {
+      .set('notificationType', notificationType.toString())
+      .set('sortBy', sortBy)
+      .set('searchText', searchText);
+    if (ngayTaoTu) 
       params = params.set('ngayTaoTu', ngayTaoTu);
-    }
-    if (ngayTaoDen) {
+    if (ngayTaoDen) 
       params = params.set('ngayTaoDen', ngayTaoDen);
-    }
-    if (ngayGuiTu) {
+    if (ngayGuiTu)
       params = params.set('ngayGuiTu', ngayGuiTu);
-    }
-    if (ngayGuiDen) {
+    if (ngayGuiDen)
       params = params.set('ngayGuiDen', ngayGuiDen);
-    }
-    if (trangThai !== null && trangThai !== undefined) {
+    if (trangThai !== null && trangThai !== undefined) 
       params = params.set('trangThai', trangThai.toString());
-    }
     const url = `${this.apiUrl}`;
     console.log('Calling API:', url, params.toString());
     return this.http.get<{ items: ThongBao[], totalCount: number }>(url, { params }).pipe(
@@ -122,6 +121,7 @@ export class ThongBaoService {
       })
     );
   }
+  
   
   getThongBaoByID(notificationID: string): Observable<ThongBao> {
     const url = `${this.apiUrl}/${notificationID}`;

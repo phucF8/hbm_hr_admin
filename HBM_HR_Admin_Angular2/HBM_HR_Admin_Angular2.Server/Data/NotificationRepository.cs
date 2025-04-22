@@ -110,10 +110,12 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         }
 
 
-        public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
+public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
     int pageIndex,
     int pageSize,
     int notificationType,
+    string? sortBy,
+    string? searchText,
     string? ngayTaoTu,
     string? ngayTaoDen,
     string? ngayGuiTu,
@@ -123,23 +125,24 @@ namespace HBM_HR_Admin_Angular2.Server.Data
     try
     {
         _logger.LogInformation("Calling stored procedure with filters: " +
-            $"notificationType={notificationType}, ngayTaoTu={ngayTaoTu}, ngayTaoDen={ngayTaoDen}, " +
-            $"ngayGuiTu={ngayGuiTu}, ngayGuiDen={ngayGuiDen}, trangThai={trangThai}");
+            $"notificationType={notificationType}, sortBy={sortBy}, searchText={searchText}, ngayTaoTu={ngayTaoTu}, " +
+            $"ngayTaoDen={ngayTaoDen}, ngayGuiTu={ngayGuiTu}, ngayGuiDen={ngayGuiDen}, trangThai={trangThai}");
 
         using var connection = new SqlConnection(_connectionString);
 
-       var parameters = new
-{
-    PageNumber = pageIndex,
-    PageSize = pageSize,
-    NotificationType = notificationType,
-    FromDate = string.IsNullOrWhiteSpace(ngayTaoTu) ? (DateTime?)null : DateTime.Parse(ngayTaoTu),
-    ToDate = string.IsNullOrWhiteSpace(ngayTaoDen) ? (DateTime?)null : DateTime.Parse(ngayTaoDen),
-    FromSentDate = string.IsNullOrWhiteSpace(ngayGuiTu) ? (DateTime?)null : DateTime.Parse(ngayGuiTu),
-    ToSentDate = string.IsNullOrWhiteSpace(ngayGuiDen) ? (DateTime?)null : DateTime.Parse(ngayGuiDen),
-    SentStatus = trangThai
-};
-
+        var parameters = new
+        {
+            PageNumber = pageIndex,
+            PageSize = pageSize,
+            NotificationType = notificationType,
+            SortBy = sortBy,
+            SearchText = searchText,
+            FromDate = string.IsNullOrWhiteSpace(ngayTaoTu) ? (DateTime?)null : DateTime.Parse(ngayTaoTu),
+            ToDate = string.IsNullOrWhiteSpace(ngayTaoDen) ? (DateTime?)null : DateTime.Parse(ngayTaoDen),
+            FromSentDate = string.IsNullOrWhiteSpace(ngayGuiTu) ? (DateTime?)null : DateTime.Parse(ngayGuiTu),
+            ToSentDate = string.IsNullOrWhiteSpace(ngayGuiDen) ? (DateTime?)null : DateTime.Parse(ngayGuiDen),
+            SentStatus = trangThai
+        };
 
         var result = await connection.QueryAsync<Notification>(
             "NS_ADTB_GetNotificationsWithPaging",
@@ -147,8 +150,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             commandType: CommandType.StoredProcedure);
 
         int totalCount = result.Any() ? result.First().TotalCount : 0;
-
-        _logger.LogInformation($"Stored procedure returned {result.Count()} records, TotalCount: {totalCount}");
 
         return new PagedResult<Notification>
         {
@@ -162,7 +163,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         throw;
     }
 }
-
 
 
         public async Task<Notification?> GetNotificationByID(string notificationID)

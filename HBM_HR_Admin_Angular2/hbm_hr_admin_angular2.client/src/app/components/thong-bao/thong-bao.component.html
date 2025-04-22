@@ -11,7 +11,14 @@
         <span class="input-group-text">
           <i class="bi bi-search"></i>
         </span>
-        <input type="text" class="form-control" placeholder="Tìm kiếm theo tiêu đề" [(ngModel)]="searchText">
+        <input
+  type="text"
+  class="form-control"
+  placeholder="Tìm kiếm theo tiêu đề"
+  [(ngModel)]="searchText"
+  (keyup.enter)="onSearchTextChange()"
+/>
+        
       </div>
 
       <!-- Ô chọn loại thông báo -->
@@ -33,16 +40,17 @@
       </button>
     </div>
 
-    <!-- Sắp xếp theo ngày tạo hoặc ngày gửi -->
-    <div class="input-group" style="max-width: 230px;">
-      <span class="input-group-text">
-        <i class="bi bi-funnel"></i>
-      </span>
-      <select class="form-select" >
-        <option value="createdDate">Ngày tạo mới nhất</option>
-        <option value="sentDate">Ngày gửi mới nhất</option>
-      </select>
-    </div>
+    <!-- Thêm FormsModule trong AppModule để dùng ngModel -->
+<div class="input-group" style="max-width: 230px;">
+  <span class="input-group-text">
+    <i class="bi bi-funnel"></i>
+  </span>
+  <select class="form-select" [(ngModel)]="sortBy" (change)="onSortChange(sortBy)">
+    <option value="NgayTao">Ngày tạo mới nhất</option>
+    <option value="SentAt">Ngày gửi mới nhất</option>
+  </select>
+</div>
+
 
 
     <button class="btn btn-secondary" (click)="toggleAdvancedSearch()">
