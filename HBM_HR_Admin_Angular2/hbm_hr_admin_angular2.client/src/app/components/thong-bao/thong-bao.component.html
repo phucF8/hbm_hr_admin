@@ -33,7 +33,7 @@
       </button>
     </div>
 
-    <!-- Nút tìm kiếm nâng cao -->
+    <!-- Sắp xếp theo ngày tạo hoặc ngày gửi -->
     <div class="input-group" style="max-width: 230px;">
       <span class="input-group-text">
         <i class="bi bi-funnel"></i>
@@ -45,8 +45,13 @@
     </div>
 
 
-  </div>
+    <button class="btn btn-secondary" (click)="toggleAdvancedSearch()">
+      <i class="bi bi-file-earmark-excel"></i> <!-- Icon Excel -->
+    </button>
 
+
+
+  </div>
   <div class="overlay" *ngIf="showAdvancedSearch">
     <div class="overlay-content" style="background-color: aqua; padding: 0;">
       <button class="btn-close" (click)="toggleAdvancedSearch()">&times;</button>
@@ -96,7 +101,7 @@
       <tbody>
         <tr *ngFor="let tb of thongBaoList" [ngClass]="{'table-success': tb.status == 1}">
           <td>
-            <input type="checkbox" [(ngModel)]="tb.selected">
+            <input type="checkbox" [(ngModel)]="tb.selected" [disabled]="tb.status === 1">
           </td>
           <td>
             {{ tb.title }}
@@ -115,10 +120,12 @@
               {{ (tb.status === 1) ? 'Xem' : 'Sửa' }}
             </button>
             <button 
+              *ngIf="tb.status !== 1"
               class="btn btn-danger btn-sm ms-2" 
               (click)="deleteThongBao(tb.id)">
               <i class="bi bi-trash"></i> Xóa
             </button>
+
           </td>
         </tr>
       </tbody>

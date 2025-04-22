@@ -120,7 +120,12 @@ export class ThongBaoComponent implements OnInit {
   
   // Hàm chọn tất cả checkbox
   toggleSelectAll() {
-    this.thongBaoList.forEach(tb => tb.selected = this.selectAll);
+    this.thongBaoList.forEach(tb => {
+      if (tb.status !== 1) {
+        tb.selected = this.selectAll;
+      }
+    });
+    
   }
 
   getNotificationTypeName(typeId: number): string {
