@@ -1,4 +1,4 @@
---DANH SÁCH THÔNG BÁO
+-- DANH SÁCH THÔNG BÁO
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationsWithPaging')
     DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging
 GO
@@ -6,16 +6,18 @@ GO
 CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @PageNumber INT,
     @PageSize INT,
-    @NotificationType INT,  -- 0: Lấy tất cả, >0: Lọc theo loại thông báo
-    @SentStatus INT = NULL  -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
+    @NotificationType INT,         -- 0: Lấy tất cả, >0: Lọc theo loại thông báo
+    @SentStatus INT = NULL,        -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
+    @FromDate DATE = NULL,         -- Ngày tạo: từ ngày (bao gồm)
+    @ToDate DATE = NULL,           -- Ngày tạo: đến ngày (bao gồm)
+    @FromSentDate DATE = NULL,     -- Ngày gửi: từ ngày (bao gồm)
+    @ToSentDate DATE = NULL        -- Ngày gửi: đến ngày (bao gồm)
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Đảm bảo @PageNumber không bị lỗi OFFSET -1
     IF @PageNumber < 1 SET @PageNumber = 1;
 
-    -- Truy vấn dữ liệu và tính tổng số trang
     WITH CTE AS (
         SELECT 
             [ID],
@@ -24,18 +26,20 @@ BEGIN
             [SenderId],
             [TenNhanVien],        
             [NotificationType],
-			[Status],
+            [Status],
             [SentAt],
             [ReceivedCount],
             [TotalRecipients],
             [NgayTao],
-            COUNT(*) OVER () AS TotalCount  -- Đếm tổng số bản ghi
+            COUNT(*) OVER () AS TotalCount
         FROM [HBM_HCNSApp].[dbo].[v_NotificationsWithRecipients]
         WHERE 
             (@NotificationType = 0 OR NotificationType = @NotificationType)  
-            AND (@SentStatus IS NULL OR 
-                 (@SentStatus = 1 AND SentAt IS NOT NULL) OR 
-                 (@SentStatus = 0 AND SentAt IS NULL))
+            AND (@SentStatus IS NULL OR Status = @SentStatus)
+            AND (@FromDate IS NULL OR NgayTao >= @FromDate)
+            AND (@ToDate IS NULL OR NgayTao <= @ToDate)
+            AND (@FromSentDate IS NULL OR SentAt >= @FromSentDate)
+            AND (@ToSentDate IS NULL OR SentAt <= @ToSentDate)
     )
     SELECT 
         ID,
@@ -44,13 +48,13 @@ BEGIN
         SenderId,
         TenNhanVien,
         NotificationType,
-		Status,
+        Status,
         SentAt,
         ReceivedCount,
         TotalRecipients,
         NgayTao,
         TotalCount,
-        CEILING(CAST(TotalCount AS FLOAT) / @PageSize) AS TotalPages  -- Tính tổng số trang
+        CEILING(CAST(TotalCount AS FLOAT) / @PageSize) AS TotalPages
     FROM CTE
     ORDER BY NgayTao DESC
     OFFSET (@PageNumber - 1) * @PageSize ROWS
@@ -58,10 +62,18 @@ BEGIN
 END;
 GO
 
+
 EXEC NS_ADTB_GetNotificationsWithPaging 
-	@PageNumber = 1, 
-	@PageSize = 10, 
-	@NotificationType = 0;
+    @PageNumber = 1,
+    @PageSize = 10,
+    @NotificationType = 0,
+    @SentStatus = 0,
+    @FromDate = '2025-03-01',
+    @ToDate = '2025-04-22',
+    @FromSentDate = '2025-03-10',
+    @ToSentDate = '2025-04-20'
+
+
 
 
 
