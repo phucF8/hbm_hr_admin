@@ -1,27 +1,47 @@
-<nav>
-  <ul class="pagination mb-0">
-    <!-- Nút "Previous" -->
-    <li class="page-item" [class.disabled]="currentPage === 1">
-      <a class="page-link" (click)="changePage(currentPage - 1)">
-        <i class="fas fa-chevron-left"></i> <!-- Biểu tượng mũi tên trái -->
-      </a>
-    </li>
+<div class="pagination">
+  <!-- Nút "Previous" (về trang đầu) -->
+  <div 
+    class="pagination-item cursor-pointer"
+    [class.opacity-50]="currentPage === 1"
+    [class.pointer-events-none]="currentPage === 1"
+    (click)="changePage(1)">
+    «
+  </div>
 
-    <!-- Danh sách các trang -->
-    <li *ngFor="let page of pages" class="page-item" [class.active]="page === currentPage">
-      <a 
-        class="page-link" 
-        (click)="changePage(page)" 
-        [class.disabled]="page === '...'">
-        {{ page }}
-      </a>
-    </li>
+  <!-- Nút "Previous" (về trang trước) -->
+  <div 
+    class="pagination-item cursor-pointer"
+    [class.opacity-50]="currentPage === 1"
+    [class.pointer-events-none]="currentPage === 1"
+    (click)="changePage(currentPage - 1)">
+    ‹
+  </div>
 
-    <!-- Nút "Next" -->
-    <li class="page-item" [class.disabled]="currentPage === totalPages">
-      <a class="page-link" (click)="changePage(currentPage + 1)">
-        <i class="fas fa-chevron-right"></i> <!-- Biểu tượng mũi tên phải -->
-      </a>
-    </li>
-  </ul>
-</nav>
+  <!-- Danh sách các trang -->
+  <div 
+    *ngFor="let page of pages"
+    class="pagination-item cursor-pointer"
+    [class.active]="page === currentPage"
+    [class.pointer-events-none]="page === '...'"
+    (click)="changePage(page)">
+    {{ page }}
+  </div>
+
+  <!-- Nút "Next" (về trang sau) -->
+  <div 
+    class="pagination-item cursor-pointer"
+    [class.opacity-50]="currentPage === totalPages"
+    [class.pointer-events-none]="currentPage === totalPages"
+    (click)="changePage(currentPage + 1)">
+    ›
+  </div>
+
+  <!-- Nút "Next" (về trang cuối) -->
+  <div 
+    class="pagination-item cursor-pointer"
+    [class.opacity-50]="currentPage === totalPages"
+    [class.pointer-events-none]="currentPage === totalPages"
+    (click)="changePage(totalPages)">
+    »
+  </div>
+</div>
