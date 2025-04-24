@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError } from 'rxjs';
 import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao interface
+import { environment } from '../../environments/environment'; 
 
 
 export interface MergedData {
@@ -83,7 +84,9 @@ export interface UpdateThongBaoRequest extends CreateThongBaoRequest {
   providedIn: 'root'
 })
 export class ThongBaoService {
-  private apiUrl = 'https://localhost:7046/api/thongbao';
+
+  private apiUrl = `${environment.apiUrl}/thongbao`;  // Lấy apiUrl từ environment
+  
   constructor(private http: HttpClient) { }
   
   getListThongBao(

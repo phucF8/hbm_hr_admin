@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TbchitietDialogComponent } from './tbchitiet-dialog/tbchitiet-dialog.component';
 import { ThongBao } from '../../models/thong-bao.model'; // Import the ThongBao interface
 
+
 @Component({
   selector: 'app-thong-bao',
   templateUrl: './thong-bao.component.html',

@@ -37,7 +37,6 @@ export class AppComponent implements OnInit {
     }
 
   ngOnInit() {
-    this.getForecasts();
     console.log('APP  đã được khởi tạo!');
 
     this.isLoggedIn = this.authService.isLoggedIn();
@@ -50,17 +49,6 @@ export class AppComponent implements OnInit {
     this.authService.logout();
     this.isLoggedIn = false;
     this.router.navigate(['/login']);
-  }
-
-  getForecasts() {
-    this.http.get<WeatherForecast[]>('/weatherforecast').subscribe(
-      (result) => {
-        this.forecasts = result;
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
   }
 
   title = 'hbm_hr_admin_angular2.client';
