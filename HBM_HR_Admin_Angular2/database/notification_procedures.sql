@@ -24,7 +24,6 @@ BEGIN
     DECLARE @SortColumn NVARCHAR(50) = 
         CASE LOWER(@SortBy)
             WHEN 'ngaytao' THEN 'NgayTao'
-            WHEN 'sentat' THEN 'SentAt'
             WHEN 'title' THEN 'Title'
             ELSE 'NgayTao' -- mặc định
         END;
@@ -34,11 +33,9 @@ BEGIN
             [ID],
             [Title],
             [Content],
-            [SenderId],
             [TenNhanVien],        
             [NotificationType],
             [Status],
-            [SentAt],
             [ReceivedCount],
             [TotalRecipients],
             [NgayTao],
@@ -49,8 +46,6 @@ BEGIN
             AND (@SentStatus IS NULL OR Status = @SentStatus)
             AND (@FromDate IS NULL OR NgayTao >= @FromDate)
             AND (@ToDate IS NULL OR NgayTao <= @ToDate)
-            AND (@FromSentDate IS NULL OR SentAt >= @FromSentDate)
-            AND (@ToSentDate IS NULL OR SentAt <= @ToSentDate)
             AND (
                 @SearchText = '' OR 
                 Title LIKE '%' + @SearchText + '%' OR 
@@ -61,11 +56,9 @@ BEGIN
         ID,
         Title,
         Content,
-        SenderId,
         TenNhanVien,
         NotificationType,
         Status,
-        SentAt,
         ReceivedCount,
         TotalRecipients,
         NgayTao,
@@ -73,9 +66,7 @@ BEGIN
         CEILING(CAST(TotalCount AS FLOAT) / @PageSize) AS TotalPages
     FROM CTE
     ORDER BY 
-        CASE WHEN @SortColumn = 'NgayTao' THEN NgayTao END DESC,
-        CASE WHEN @SortColumn = 'SentAt' THEN SentAt END DESC,
-        CASE WHEN @SortColumn = 'Title' THEN Title END ASC
+        CASE WHEN @SortColumn = 'NgayTao' THEN NgayTao END DESC
     OFFSET (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY;
 END;
@@ -422,8 +413,6 @@ SELECT
     n.ID,
     n.Title,
     n.Content,
-    n.SenderId,
-    n.SentAt,
     n.NotificationType,
 	n.Status,
     n.NgayTao,
@@ -431,14 +420,12 @@ SELECT
     COUNT(r.ID) AS TotalRecipients,
     SUM(CASE WHEN r.Status > 0 THEN 1 ELSE 0 END) AS ReceivedCount
 FROM NS_ADTB_Notifications n
-LEFT JOIN NS_NhanViens nv ON n.SenderId = nv.ID
-LEFT JOIN NS_ADTB_NotificationRecipients r ON n.ID = r.NotificationId
+LEFT JOIN NS_NhanViens nv ON n.NguoiTao = nv.ID
+LEFT JOIN NS_ADTB_NotificationRecipients r ON n.ID = r.IDThongBao
 GROUP BY
     n.ID,
     n.Title,
     n.Content,
-    n.SenderId,
-    n.SentAt,
     n.NotificationType,
 	n.Status,
     n.NgayTao,

@@ -76,18 +76,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     return BadRequest("Nội dung phải có ít nhất 10 ký tự");
                 DateTime? sentAt = null;
 
-                if (!string.IsNullOrWhiteSpace(request.SentAt))
-                {
-                    if (DateTime.TryParse(request.SentAt, out var parsedDate))
-                    {
-                        sentAt = parsedDate;
-                    }
-                    else
-                    {
-                        return BadRequest($"Ngày gửi không hợp lệ {request.SentAt}");
-                    }
-                }
-
                 var notification = new Notification
                 {
                     ID = request.ID,
@@ -95,7 +83,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     Content = request.Content,
                     NotificationType = request.NotificationType,
                     SentAt = sentAt,
-                    SenderId = request.SenderId,
                 };
 
                 var result = await _repository.CreateNotification(notification);
@@ -104,8 +91,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 {
                     foreach (var recipientId in request.Recipients)
                     {
-                        _logger.LogInformation($"InsertNotificationRecipient {request.ID}, {recipientId}, {request.SenderId}");
-                        await _repository.InsertNotificationRecipient(result.ID, recipientId, request.SenderId);
+                        _logger.LogInformation($"InsertNotificationRecipient {request.ID}, {recipientId}");
+                        await _repository.InsertNotificationRecipient(result.ID, recipientId);
                     }
                 }
                 return CreatedAtAction(nameof(GetNotifications), new { id = result.ID }, result);
@@ -204,7 +191,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                         foreach (var recipientId in request.Recipients)
                         {
                             _logger.LogInformation($"InsertNotificationRecipient {result.ID}, {recipientId}, {"SYS"}");
-                            await _repository.InsertNotificationRecipient(result.ID, recipientId, "SYS");
+                            await _repository.InsertNotificationRecipient(result.ID, recipientId);
                         }
                     }
                 }
@@ -415,8 +402,6 @@ public class CreateNotificationRequest
     public string Title { get; set; }
     public string Content { get; set; }
     public int NotificationType { get; set; }
-    public string SenderId { get; set; }
-    public string? SentAt { get; set; }
     public List<string> Recipients { get; set; } // Danh sách ID người nhận
 }
 

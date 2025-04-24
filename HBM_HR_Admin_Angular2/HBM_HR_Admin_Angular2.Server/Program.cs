@@ -8,11 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Thêm dịch vụ CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactAdminHBM",
+
+    options.AddPolicy("AllowAngular",
     policy => policy.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader());
-
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -40,9 +40,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
 // Áp dụng CORS
-app.UseCors("AllowReactAdminHBM");
+app.UseCors("AllowAngular");
 
 app.UseAuthorization();
 

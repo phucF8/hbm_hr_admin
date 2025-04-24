@@ -30,7 +30,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     new SqlParameter("@ID", SqlDbType.VarChar) { Value = notification.ID },
                     new SqlParameter("@Title", SqlDbType.NVarChar) { Value = notification.Title },
                     new SqlParameter("@Content", SqlDbType.NVarChar) { Value = notification.Content },
-                    new SqlParameter("@SenderId", SqlDbType.VarChar) { Value = notification.SenderId ?? (object)DBNull.Value },
                     new SqlParameter("@NotificationType", SqlDbType.TinyInt) { Value = notification.NotificationType },
                     new SqlParameter("@SentAt", SqlDbType.DateTime) { Value = notification.SentAt ?? (object)DBNull.Value },
                     new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = "System" }, // You might want to get this from the current user
@@ -269,17 +268,16 @@ public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
             }
         }
 
-        public async Task InsertNotificationRecipient(string notificationId, string recipientId, string creatorId)
+        public async Task InsertNotificationRecipient(string notificationId, string recipientId)
         {
             try
             {
-                var sql = $"EXEC InsertNotificationRecipient @NotificationId='{notificationId}', @RecipientId='{recipientId}', @NguoiTao='{creatorId}'";
+                var sql = $"EXEC InsertNotificationRecipient @NotificationId='{notificationId}', @RecipientId='{recipientId}'";
                 _logger.LogInformation("Executing SQL: {SqlQuery}", sql); // Log câu lệnh SQL
                 var parameters = new[]
                 {
                     new SqlParameter("@NotificationId", SqlDbType.VarChar) { Value = notificationId },
                     new SqlParameter("@RecipientId", SqlDbType.VarChar) { Value = recipientId },
-                    new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = creatorId }
                 };
 
                 await _context.Database.ExecuteSqlRawAsync(
