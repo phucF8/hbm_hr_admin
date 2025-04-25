@@ -86,7 +86,7 @@ body {
 }
 
 .btn {
-  padding: 6px 12px;
+  padding: 10px 12px;
   margin-right: 8px;
   background-color: #7367f0;
   color: white;
@@ -95,7 +95,7 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .btn i {
@@ -129,7 +129,58 @@ body {
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 4px 8px;
-  font-size: 12px;
+  font-size: 16px;
+}
+
+.form-control {
+  border: 1px solid #ccc;     /* Viền mỏng, màu xám nhạt */
+  padding: 10px;              /* Padding đều các hướng */
+  text-align: left;          /* Căn phải nội dung */
+  width: 500px;               /* Chiều rộng */
+  border-radius: 5px;         /* Bo góc nhẹ cho đẹp */
+  box-sizing: border-box;     /* Đảm bảo padding không làm vượt chiều rộng */
+}
+
+.search-container {
+  display: flex;
+  justify-content: flex-end;  /* Căn phần tử về bên phải */
+  gap: 10px;                  /* Khoảng cách giữa input và button */
+  margin-bottom: 1rem;        /* Nếu bạn muốn cách dưới */
+}
+
+/* Global styles (hoặc trong component styles nếu bạn dùng Angular View Encapsulation) */
+.overlay[hidden] {
+  display: none !important; /* đảm bảo ẩn hoàn toàn */
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* nền mờ */
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-content {
+  background-color: aqua;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.btn-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 table {
