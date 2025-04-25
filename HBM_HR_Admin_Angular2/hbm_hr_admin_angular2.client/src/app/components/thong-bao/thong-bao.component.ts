@@ -38,6 +38,9 @@ export class ThongBaoComponent implements OnInit {
   ngayGuiDen?: string;
   trangThai?: number | null = null; // null: tất cả, 1: đã gửi, 0: chưa gửi
 
+  showCreatePopup: boolean = false;
+  showAdvancedSearch: boolean = false;
+
   constructor(
     private dialog: MatDialog,
     private thongBaoService: ThongBaoService,
@@ -237,7 +240,7 @@ export class ThongBaoComponent implements OnInit {
     }
   }
 
-  showAdvancedSearch: boolean = false;
+  
 
   toggleAdvancedSearch(): void {
     this.showAdvancedSearch = !this.showAdvancedSearch;
@@ -247,6 +250,7 @@ export class ThongBaoComponent implements OnInit {
   handleClosePopup(): void {
     console.log('ThongBaoComponent: handleClosePopup được gọi');
     this.showAdvancedSearch = false;
+    this.showCreatePopup = false; // Đóng popup tạo mới
     // Thêm logic đóng popup, hoặc xử lý UI tại đây
   }
 
@@ -282,6 +286,16 @@ export class ThongBaoComponent implements OnInit {
     //     return dateB - dateA;
     //   }
     // });
+  }
+
+  
+  handleCreate(data: any) {
+    // Xử lý dữ liệu tạo mới
+    console.log('Created:', data);
+  }
+
+  toggleCreatePopup() {
+    this.showCreatePopup = !this.showCreatePopup;
   }
   
 

@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   isLoggedIn: boolean = false;
   tenNhanVien: string = '';
   public forecasts: WeatherForecast[] = [];
+  showCreatePopup = false;
 
   constructor(
     private http: HttpClient,

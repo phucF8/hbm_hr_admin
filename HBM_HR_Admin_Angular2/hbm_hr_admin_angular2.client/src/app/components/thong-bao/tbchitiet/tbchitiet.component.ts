@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ThongBaoService, DoLookupDatasRP, MergedData,TestSendNotificationRequest} from '../../../services/thong-bao.service';
@@ -28,6 +28,8 @@ export class TbchitietComponent implements OnInit {
   isUserSearchVisible: boolean = false;
   isSearching: boolean = false;
   status: number = 0; // Trạng thái mặc định là 0 (Chưa gửi)
+
+  @Output() closePopupEvent = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -144,6 +146,10 @@ export class TbchitietComponent implements OnInit {
     this.router.navigate(['/thongbao']);
   }
 
+  closePopup(): void {
+    this.closePopupEvent.emit(); // Phát sự kiện để thông báo cho ThongBaoComponent
+  }
+
   onSubmitCreateNew() {
     if (this.thongBaoForm.valid) {
       this.isSubmitting = true;
@@ -176,12 +182,17 @@ export class TbchitietComponent implements OnInit {
       });
     } else {
       console.error('❌ Form is invalid');
-      Object.keys(this.thongBaoForm.controls).forEach(key => {
+      for (const key of Object.keys(this.thongBaoForm.controls)) {
         const control = this.thongBaoForm.get(key);
         if (control?.errors) {
           console.error(`${key} errors:`, control.errors);
+          const errorMessages = Object.entries(control.errors)
+            .map(([errorKey, errorValue]) => `${errorKey}: ${JSON.stringify(errorValue)}`)
+            .join(', ');
+          alert(`${key} errors: ${errorMessages}`);
+          break; // Dừng đúng cách
         }
-      });
+      }
     }
   }
 

@@ -68,6 +68,15 @@
                     <button class="btn btn-secondary" (click)="toggleAdvancedSearch()">
                       <i class="bi bi-search"></i>
                     </button>
+
+
+                    <!-- Button mở popup tạo mới -->
+                    <button class="btn btn-primary" (click)="toggleCreatePopup()">
+                        <i class="bi bi-plus-circle"></i> Tạo mới
+                    </button>
+
+
+
                   </div>
             </div>
 
@@ -81,6 +90,20 @@
             
                 </div>
             </div>
+
+            <!-- Popup Tạo mới -->
+            <div class="overlay" [hidden]="!showCreatePopup">
+                <div class="overlay-content" style="background-color: transparent; padding: 0;width: 100%">
+                <!-- <button class="btn-close" (click)="toggleCreatePopup()">&times;</button> -->
+                <chitiet-thong-bao
+                    (closePopupEvent)="handleClosePopup()"
+                    (createEvent)="handleCreate($event)">
+                </chitiet-thong-bao>
+                </div>
+            </div>
+            
+
+
 
             <table>
                 <thead>

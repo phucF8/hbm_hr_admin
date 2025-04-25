@@ -1,0 +1,144 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+body {
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+.container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+.header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+.section {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+.section-title {
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+.info-row {
+    display: flex;
+    margin-bottom: 10px;
+}
+.info-label {
+    width: 120px;
+    color: #666;
+}
+.info-value {
+    color: #4169E1;
+}
+.form-row {
+    display: flex;
+    margin-bottom: 15px;
+    gap: 20px;
+}
+.form-group {
+    flex: 1;
+}
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+.required:after {
+    content: " (*)";
+    color: red;
+}
+.form-control {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+.form-control:focus {
+    outline: none;
+    border-color: #4169E1;
+}
+.form-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+.form-select select {
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    appearance: none;
+}
+.form-select:after {
+    content: "▼";
+    position: absolute;
+    right: 10px;
+    color: #666;
+    pointer-events: none;
+    font-size: 12px;
+}
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+.attachment {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.attachment-icon {
+    color: #4169E1;
+}
+.attachment-text {
+    color: #4169E1;
+}
+.id-value {
+    text-align: right;
+    color: #888;
+    font-style: italic;
+    padding-right: 10px;
+}
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-cancel {
+    background-color: #f0ad4e;
+    color: white;
+}
+.btn-save {
+    background-color: #5cb85c;
+    color: white;
+}
+.btn-submit {
+    background-color: #6c7ae0;
+    color: white;
+}

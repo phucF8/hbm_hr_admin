@@ -1,47 +1,41 @@
-<div class="container py-4">
-  <div class="card shadow-sm">
-    <div class="card-header bg-primary text-white py-3">
-      <h3 class="mb-0 d-flex align-items-center">
-        {{ notificationId ? 'Sửa Thông Báo' : 'Tạo Thông Báo' }}
-      </h3>
-    </div>
-    <div class="card-body p-4">
-      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ errorMessage }}
-        <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Close"></button>
-      </div>
 
-      <!-- Sử dụng flexbox để chia cột -->
-      <div class="row">
-        <!-- Cột bên trái: form nhập nội dung thông báo -->
-        <div class="col-lg-6">
-          <form [formGroup]="thongBaoForm" (ngSubmit)="onSubmit()" class="needs-validation">
-            <div class="row g-4">
-              <div class="col-12">
-                <div class="form-floating">
-                  <input 
+    <div class="container">
+        <div class="header">TẠO THÔNG BÁO</div>
+        <form [formGroup]="thongBaoForm" (ngSubmit)="onSubmit()" class="needs-validation">
+        <div class="section">
+            <div class="section-title">THÔNG TIN NGƯỜI TẠO THÔNG BÁO</div>
+            <!-- <div class="id-value">Mã đề xuất: </div> -->
+            <div class="info-row">
+                <div class="info-label">› Người tạo</div>
+                <div class="info-value">NGUYỄN HỒNG PHÚC 00000278 | Chuyên viên Lập trình</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">› Ngày tạo</div>
+                <div class="info-value">25/04/2025 13:44</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label required">Tiêu đề</label>
+                    <input 
                     type="text" 
                     class="form-control" 
                     id="title" 
                     formControlName="title"
-                    placeholder="Nhập tiêu đề"
+                    placeholder="Tiêu đề"
                     [readonly]="status === 1"
                     [class.is-invalid]="thongBaoForm.get('title')?.invalid && thongBaoForm.get('title')?.touched">
-                  <label for="title">Tiêu đề</label>
-                  <div class="invalid-feedback">
-                    <div *ngIf="thongBaoForm.get('title')?.errors?.['required']">
-                      Vui lòng nhập tiêu đề
-                    </div>
-                    <div *ngIf="thongBaoForm.get('title')?.errors?.['minlength']">
-                      Tiêu đề phải có ít nhất 3 ký tự
-                    </div>
-                  </div>
                 </div>
-              </div>
-
-              <div class="col-12">
-                <div class="form-floating">
-                  <textarea 
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nội dung ngắn</label>
+                    <textarea 
                     class="form-control" 
                     id="content" 
                     style="height: 150px"
@@ -49,180 +43,22 @@
                     placeholder="Nhập nội dung"
                     [readonly]="status === 1"
                     [class.is-invalid]="thongBaoForm.get('content')?.invalid && thongBaoForm.get('content')?.touched"></textarea>
-                  <label for="content">Nội dung</label>
-                  <div class="invalid-feedback">
-                    <div *ngIf="thongBaoForm.get('content')?.errors?.['required']">
-                      Vui lòng nhập nội dung
-                    </div>
-                    <div *ngIf="thongBaoForm.get('content')?.errors?.['minlength']">
-                      Nội dung phải có ít nhất 10 ký tự
-                    </div>
-                  </div>
                 </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-floating">
-                  <select 
-                    class="form-select" 
-                    id="notificationType" 
-                    formControlName="notificationType"
-                    (change)="onNotificationTypeChange()">
-                    <option *ngFor="let type of notificationTypes" [value]="type.id">
-                      {{ type.name }}
-                    </option>
-                  </select>
-                  <label for="notificationType">Loại thông báo</label>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-floating">
-                  <input 
-                    type="datetime-local" 
-                    class="form-control" 
-                    id="sentAt" 
-                    [readonly]="status === 1"
-                    [class.is-invalid]="thongBaoForm.get('sentAt')?.invalid && thongBaoForm.get('sentAt')?.touched"
-                    formControlName="sentAt">
-                  <label for="sentAt">Thời gian gửi</label>
-                </div>
-              </div>
             </div>
-
-            <div class="d-flex justify-content-between gap-2 mt-4">
-              <div>
-                <button type="submit" class="btn btn-primary px-4 me-2" 
-                [hidden]="status === 1"
-                [disabled]="!thongBaoForm.valid || isSubmitting">
-                  <span *ngIf="!isSubmitting">
-                    <i class="fas fa-save me-1"></i> Lưu
-                  </span>
-                  <span *ngIf="isSubmitting">
-                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                    Đang lưu...
-                  </span>
-                </button>
-                <button type="button" class="btn btn-outline-secondary px-4" (click)="onCancel()" [disabled]="isSubmitting">
-                  <i class="fas fa-times me-1"></i> Hủy
-                </button>
-              </div>
-              <button type="button" class="btn btn-success px-4" (click)="onSend()" [disabled]="!thongBaoForm.valid || isSubmitting">
-                <i class="fas fa-paper-plane me-1"></i> Gửi
-              </button>
-            </div>
-          </form>
         </div>
-
-        <!-- Cột bên phải: tìm kiếm nhân sự -->
-        <div class="col-lg-6" style="margin-top: 0px; padding-top: 0px;">
-          <div class="container" [hidden]="!isUserSearchVisible" style="padding: 0px; margin: 0px;">
-            <div class="card shadow-sm">
-              <div class="card-header bg-light text-dark py-2">
-                <h6 class="mb-0 text-muted">Danh sách người nhận thông báo</h6>
-              </div>
-              <div class="card-body p-4">
-                <form [formGroup]="searchUserForm" (ngSubmit)="onSearchUser()" class="needs-validation">
-                  <div class="input-group mb-3" *ngIf="status !== 1">
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      id="search" 
-                      formControlName="search" 
-                      placeholder="Tìm kiếm theo tên nhân sự..." 
-                      autofocus>
-                    <button type="submit" class="btn btn-primary">
-                      <i class="fas fa-search"></i> <!-- Biểu tượng tìm kiếm -->
-                    </button>
-                  </div>
-                </form>
-                <div *ngIf="isSearching" class="text-center py-2">
-                  <div class="spinner-border text-primary" role="status"></div>
-                </div>
-                <ul *ngIf="filteredUsers !== null && filteredUsers.length > 0" class="list-group">
-                  <li *ngFor="let user of filteredUsers" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>
-                      {{ user.MaNhanVien }} - {{ user.TenNhanVien }}
-                    </span>
-                    <button class="btn btn-sm btn-outline-success" (click)="selectUser(user)">Chọn</button>
-                  </li>
-                </ul>
-                <p *ngIf="!isSearching && filteredUsers !== null && filteredUsers.length === 0" class="text-muted">
-                  Không tìm thấy người dùng nào.
-                </p>
-                <h6 class="mb-2 text-muted" style="text-align: left; margin-top: 16px;">Người dùng đã chọn:</h6>
-                
-                <ul *ngIf="selectedUsers.length > 0" class="list-group">
-                  <li *ngFor="let user of selectedUsers" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>
-                      {{ user.MaNhanVien }} - {{ user.TenNhanVien }}
-                      <i *ngIf="user.status == 1" class="fas fa-check-circle text-success ms-2"></i>
-                    </span>
-                    <button 
-                      class="btn btn-sm btn-outline-danger" 
-                      (click)="removeUser(user)" 
-                      *ngIf="status !== 1">
-                      Xóa
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        
+        <div class="button-group">
+            <button type="button" class="btn btn-cancel" (click)="closePopup()">
+                <span>⊝</span> Đóng
+            </button>
+            <button class="btn btn-save">
+                <span>⊕</span> Lưu nháp
+            </button>
+            <button type="submit" class="btn btn-submit">
+                <span>✉</span> Tạo/Gửi Thông báo
+            </button>
         </div>
-      </div>
+    
+        </form>
+
     </div>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div *ngIf="loading">Đang gửi thông báo...</div>
-
-<div *ngIf="responseData">
-  <h2>{{ responseData.message }}</h2>
-  <p><strong>Tổng số thông báo thành công:</strong> {{ responseData.successCount }} / {{ responseData.totalCount }}</p>
-  <p><strong>Tỷ lệ thành công:</strong> {{ responseData.successRate }}%</p>
-
-  <h3>Thống kê theo người dùng:</h3>
-  <table border="1">
-    <thead>
-      <tr>
-        <th>ID Nhân viên</th>
-        <th>Thành công</th>
-        <th>Tổng số token</th>
-        <th>Trạng thái</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let userStat of responseData.userStats">
-        <td>{{ userStat.userId }}</td>
-        <td>{{ userStat.success }}</td>
-        <td>{{ userStat.totalTokens }}</td>
-        <td>{{ userStat.status }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div *ngIf="errorMessage" style="color: red;">
-  {{ errorMessage }}
-</div>
