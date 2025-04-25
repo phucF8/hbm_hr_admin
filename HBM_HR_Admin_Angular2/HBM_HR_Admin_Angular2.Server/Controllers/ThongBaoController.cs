@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Helpers;
+using HBM_HR_Admin_Angular2.Server.Models;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
@@ -74,17 +75,14 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     return BadRequest("Tiêu đề phải có ít nhất 3 ký tự");
                 if (request.Content.Length < 10)
                     return BadRequest("Nội dung phải có ít nhất 10 ký tự");
-                DateTime? sentAt = null;
-
                 var notification = new Notification
                 {
                     ID = request.ID,
                     Title = request.Title,
                     Content = request.Content,
                     NotificationType = request.NotificationType,
-                    SentAt = sentAt,
+                    NguoiTao = request.NguoiTao
                 };
-
                 var result = await _repository.CreateNotification(notification);
                 _logger.LogInformation($"Successfully created notification with ID: {result}");
                 if (request.Recipients != null && request.Recipients.Any())
@@ -103,7 +101,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return StatusCode(500, $"Đã xảy ra lỗi khi tạo thông báo: {ex.Message}");
             }
         }
-
 
         // API DELETE /api/thongbao/{id} - Xóa thông báo
         [HttpDelete("{id}")]
@@ -172,7 +169,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     Title = request.Title,
                     Content = request.Content,
                     NotificationType = request.NotificationType,
-                    SentAt = request.SentAt
                 };
 
                 var result = await _repository.UpdateNotification(notification);
@@ -197,7 +193,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 }
 
                 _logger.LogInformation($"Successfully updated notification with ID: {id}");
-                _logger.LogInformation($"Successfully updated notification with ID: {request.SentAt}");
                 return Ok(result);
             }
             catch (Exception ex)
@@ -396,41 +391,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
 }
 
-public class CreateNotificationRequest
-{
-    public string ID { get; set; }
-    public string Title { get; set; }
-    public string Content { get; set; }
-    public int NotificationType { get; set; }
-    public List<string> Recipients { get; set; } // Danh sách ID người nhận
-}
 
-public class UpdateNotificationRequest
-{
-    public string Title { get; set; }
-    public string Content { get; set; }
-    public int NotificationType { get; set; }
-    public DateTime? SentAt { get; set; }
-    public List<string> Recipients { get; set; } // Danh sách ID người nhận
-
-}
-
-public class TestSendNotificationRequest
-{
-    public string NotificationID { get; set; } // ID thông báo
-    public string IDNhanViens { get; set; } // Chuỗi các ID nhân viên cách nhau bằng dấu ','
-    public string Title { get; set; }
-    public string Body { get; set; }
-    public Dictionary<string, string> Data { get; set; } // Dữ liệu bổ sung nếu cần
-}
-
-public class TestNotificationRequest
-{
-    public string IDNhanVien { get; set; } // Chuỗi các ID nhân viên cách nhau bằng dấu ','
-    public string Title { get; set; }
-    public string Body { get; set; }
-    public Dictionary<string, string> Data { get; set; } // Dữ liệu bổ sung nếu cần
-    public int Badge { get; set; }
-}
 
 

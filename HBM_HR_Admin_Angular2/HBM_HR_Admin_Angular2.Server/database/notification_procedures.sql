@@ -229,34 +229,33 @@ CREATE PROCEDURE InsertNotification
     @ID VARCHAR(36),
     @Title NVARCHAR(255),
     @Content NVARCHAR(2000),
-    @SenderId  VARCHAR(36),
     @NotificationType TINYINT,
-    @SentAt DATETIME = NULL,
-    @NguoiTao VARCHAR(36),
-    @NguoiSua VARCHAR(36)
+    @NguoiTao VARCHAR(36)
 AS
 BEGIN
     SET NOCOUNT ON;
     INSERT INTO [dbo].[NS_ADTB_Notifications] (
-        ID, Title, Content, SenderId, NotificationType, SentAt, NgayTao, NgaySua, NguoiTao, NguoiSua
+        ID, Title, Content, NguoiTao, NotificationType, NgayTao
     )
     VALUES (
-        @ID, @Title, @Content, @SenderId, @NotificationType, @SentAt, GETDATE(), GETDATE(), @NguoiTao, @NguoiSua
+        @ID, @Title, @Content, @NguoiTao, @NotificationType, GETDATE()
     );
 END
 GO
 
+-- TEST PROCEDURE InsertNotification
+DECLARE @ID UNIQUEIDENTIFIER = NEWID();
+DECLARE @Title NVARCHAR(255) = N'Thông báo kiểm tra';
+DECLARE @Content NVARCHAR(2000) = N'Nội dung của thông báo kiểm tra';
+DECLARE @NotificationType TINYINT = 1;  -- Ví dụ: 1 = Chung, 2 = Cá nhân, v.v.
+DECLARE @NguoiTao VARCHAR(36) = 'user-123';
 
 EXEC InsertNotification
-    @ID = 'TEST123',
-    @Title = N'Thông báo kiểm tra',
-    @Content = N'Nội dung thông báo kiểm tra',
-    @SenderId = 'TEST123',
-    @TriggerAction = 'TestAction',
-    @NotificationType = 1,
-    @SentAt = null,
-    @NguoiTao = 'admin',
-    @NguoiSua = 'admin';
+    @ID = @ID,
+    @Title = @Title,
+    @Content = @Content,
+    @NotificationType = @NotificationType,
+    @NguoiTao = @NguoiTao;
 
 
 --khi tạo thông báo theo nhóm, thì tạo bản ghi liên kết giữa thông báo và user

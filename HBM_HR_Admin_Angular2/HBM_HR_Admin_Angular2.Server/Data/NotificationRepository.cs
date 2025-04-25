@@ -31,13 +31,11 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     new SqlParameter("@Title", SqlDbType.NVarChar) { Value = notification.Title },
                     new SqlParameter("@Content", SqlDbType.NVarChar) { Value = notification.Content },
                     new SqlParameter("@NotificationType", SqlDbType.TinyInt) { Value = notification.NotificationType },
-                    new SqlParameter("@SentAt", SqlDbType.DateTime) { Value = notification.SentAt ?? (object)DBNull.Value },
-                    new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = "System" }, // You might want to get this from the current user
-                    new SqlParameter("@NguoiSua", SqlDbType.VarChar) { Value = "System" }  // You might want to get this from the current user
+                    new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = "System" } // You might want to get this from the current user
                 };
 
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC InsertNotification @ID, @Title, @Content, @SenderId, @NotificationType, @SentAt, @NguoiTao, @NguoiSua",
+                    "EXEC InsertNotification @ID, @Title, @Content, @NotificationType, @NguoiTao",
                     parameters);
 
                 _logger.LogInformation($"Successfully created notification with ID: {notification.ID}");
@@ -243,7 +241,6 @@ public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
         {
             try
             {
-                _logger.LogInformation($"Updating notification with ID: {notification.SentAt}");
                 using var connection = new SqlConnection(_connectionString);
                 await connection.ExecuteAsync(
                     "NS_ADTB_UpdateNotification",
@@ -253,7 +250,6 @@ public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
                         Title = notification.Title,
                         Content = notification.Content,
                         NotificationType = notification.NotificationType,
-                        SentAt = notification.SentAt,
                         NguoiSua = "System" // You might want to get this from the current user
                     },
                     commandType: CommandType.StoredProcedure

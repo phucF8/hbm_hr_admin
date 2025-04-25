@@ -42,7 +42,6 @@ export class TbchitietComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(3)]],
       content: ['', [Validators.required, Validators.minLength(10)]],
       notificationType: [1, Validators.required],
-      sentAt: ['']
     });
     this.searchUserForm = this.fb.group({
       search: ['', Validators.required]
@@ -163,7 +162,7 @@ export class TbchitietComponent implements OnInit {
       const notificationData = {
         id: uuidv4(), // Tạo ID ngẫu nhiên
         ...this.thongBaoForm.value,
-        senderId: currentUser.ID,
+        nguoiTao: currentUser.ID,
         recipients: this.selectedUsers.map(user => user.ID), // Lấy danh sách ID từ selectedUsers
       };
       this.thongBaoService.createThongBao(notificationData).subscribe({
