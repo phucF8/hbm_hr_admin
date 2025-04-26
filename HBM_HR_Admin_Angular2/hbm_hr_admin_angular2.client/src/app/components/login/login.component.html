@@ -1,44 +1,60 @@
-<div class="login-container d-flex justify-content-center align-items-center vh-100">
-  <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
-    <h3 class="text-center mb-4">Đăng nhập</h3>
-    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-      {{ errorMessage }}
+<!-- Font Awesome CDN mới nhất -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div class="login-background">
+    <div class="login-container">
+        <div class="login-form">
+            <img src="images/logo_hbm_final.jpg" alt="Logo" class="logo-image" width="60%" />
+            <h2 class="form-title">Đăng nhập</h2>
+            <p class="welcome-message">Chào mừng trở lại. Đăng nhập để làm việc</p>
+            
+            <form (ngSubmit)="onSubmit()">
+                <div class="input-group">
+                    <label class="input-label">Tài khoản</label>
+                    <div class="input-container">
+                        <div class="input-icon">
+                          <i class="far fa-user icon-blue"></i>
+                        </div>
+                        <input 
+                          type="text" 
+                          id="username" 
+                          [(ngModel)]="username" 
+                          name="username" 
+                          class="form-input" 
+                          placeholder="Tên đăng nhập" 
+                          required />
+
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Mật khẩu</label>
+                    <div class="input-container">
+                        <div class="input-icon">
+                          <i class="fa fa-lock icon-blue"></i>
+                        </div>
+                        <input 
+                        [type]="showPassword ? 'text' : 'password'" 
+                        id="password" 
+                        [(ngModel)]="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Mật khẩu" 
+                        required />
+
+                        <button 
+                          type="button" 
+                          class="password-toggle" 
+                          (click)="togglePassword()">
+                          <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">Đăng nhập</button>
+            </form>
+        </div>
+        
+        
     </div>
-    <form (ngSubmit)="onSubmit()">
-      <!-- Ô nhập tên đăng nhập -->
-      <div class="form-floating mb-3">
-        <input 
-          type="text" 
-          id="username" 
-          [(ngModel)]="username" 
-          name="username" 
-          class="form-control" 
-          placeholder="Tên đăng nhập" 
-          required />
-        <label for="username">Tên đăng nhập</label>
-      </div>
-
-      <!-- Ô nhập mật khẩu -->
-      <div class="form-floating mb-3 position-relative">
-        <input 
-          [type]="showPassword ? 'text' : 'password'" 
-          id="password" 
-          [(ngModel)]="password" 
-          name="password" 
-          class="form-control" 
-          placeholder="Mật khẩu" 
-          required />
-        <label for="password">Mật khẩu</label>
-        <button 
-          type="button" 
-          class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y me-2" 
-          (click)="togglePassword()">
-          <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-        </button>
-      </div>
-
-      <!-- Nút đăng nhập -->
-      <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
-    </form>
-  </div>
 </div>

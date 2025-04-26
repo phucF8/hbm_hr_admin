@@ -1,16 +1,57 @@
 <header *ngIf="isLoggedIn">
-    <!--Tên Nhân Viên-->
-    <div class="d-flex justify-content-end">
-      <div class="dropdown bg-employee rounded d-inline-block p-2 m-2" style="background-color: white;">
-        <span class="fw-bold dropdown-toggle" style="cursor: pointer;" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-person-circle"></i> {{tenNhanVien}}
-        </span>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li><button class="dropdown-item" (click)="logout()">Đăng xuất</button></li>
-        </ul>
+  <div class="header">
+    <div class="logo"></div>
+    <div class="nav-item">
+        <i>👤</i>
+        <select>
+            <option>Admin</option>
+        </select>
+    </div>
+    <!-- <div class="nav-item">
+        <i>📅</i>
+        <select>
+            <option>Hành chính</option>
+        </select>
+    </div>
+    <div class="nav-item">
+        <i>📝</i>
+        <select>
+            <option>Request</option>
+        </select>
+    </div>
+    <div class="nav-item">
+        <i>📊</i>
+        <select>
+            <option>TĐ&ĐT</option>
+        </select>
+    </div>
+    <div class="nav-item">
+        <i>⚙️</i>
+        <select>
+            <option>Ô TRỊ</option>
+        </select>
+    </div> -->
+
+    <div style="width: 100%;" ></div>
+
+    <div class="dropdown-container">
+      <div class="dropdown-header">
+          <div class="user-name" (click)="togglePopup()">{{tenNhanVien}}</div>
+      </div>
+      
+      <div class="dropdown-menu" *ngIf="isPopupVisible">
+          <a href="#" class="dropdown-item logout" (click)="logout()">
+              <i>🚪</i> Đăng xuất
+          </a>
       </div>
     </div>
-  </header>
-  <main>
+
+    
+    
+  
+</div>  
+</header>
+  <main >
+    
     <router-outlet></router-outlet>
   </main>

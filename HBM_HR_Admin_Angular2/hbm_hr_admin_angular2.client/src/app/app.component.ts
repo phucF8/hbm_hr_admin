@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   tenNhanVien: string = '';
   public forecasts: WeatherForecast[] = [];
   showCreatePopup = false;
+  isPopupVisible = false;
 
   constructor(
     private http: HttpClient,
@@ -50,6 +51,10 @@ export class AppComponent implements OnInit {
     this.authService.logout();
     this.isLoggedIn = false;
     this.router.navigate(['/login']);
+  }
+
+  togglePopup() {
+    this.isPopupVisible = !this.isPopupVisible;
   }
 
   title = 'hbm_hr_admin_angular2.client';

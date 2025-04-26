@@ -1,48 +1,10 @@
 
-    <div class="header">
-        <div class="logo"></div>
-        <div class="nav-item">
-            <i>👤</i>
-            <select>
-                <option>Nhân Sự</option>
-            </select>
-        </div>
-        <div class="nav-item">
-            <i>📅</i>
-            <select>
-                <option>Hành chính</option>
-            </select>
-        </div>
-        <div class="nav-item">
-            <i>📝</i>
-            <select>
-                <option>Request</option>
-            </select>
-        </div>
-        <div class="nav-item">
-            <i>📊</i>
-            <select>
-                <option>TĐ&ĐT</option>
-            </select>
-        </div>
-        <div class="nav-item">
-            <i>⚙️</i>
-            <select>
-                <option>Ô TRỊ</option>
-            </select>
-        </div>
-        <div class="user-info">
-            <i>🔔</i>
-            <div class="user-avatar"></div>
-            <span>Phúc - S001</span>
-            <i>▼</i>
-        </div>
-    </div>
+    
 
     <div class="tabs">
-        <div class="tab active">REQUEST</div>
-        <div class="tab">QUY TRÌNH</div>
-        <div class="tab">TẠO/PHÊ DUYỆT REQUEST</div>
+        <div class="tab active">Thông báo</div>
+        <!-- <div class="tab">QUY TRÌNH</div>
+        <div class="tab">TẠO/PHÊ DUYỆT REQUEST</div> -->
     </div>
 
     <div class="action-buttons">
@@ -74,15 +36,12 @@
                     <button class="btn btn-primary" (click)="toggleCreatePopup()">
                         <i class="bi bi-plus-circle"></i> Tạo mới
                     </button>
-
-
-
                   </div>
             </div>
 
             <div class="overlay" [hidden]="!showAdvancedSearch">
-                <div class="overlay-content" style="background-color: aqua; padding: 0;">
-                  <button class="btn-close" (click)="toggleAdvancedSearch()">&times;</button>
+                <div class="overlay-content"  style="background-color: transparent; padding: 0;width: 100%">
+                  <!-- <button class="btn-close" (click)="toggleAdvancedSearch()">&times;</button> -->
                   <app-advanced-search
                     (closePopupEvent)="handleClosePopup()"
                     (searchPopupEvent)="handleSearchPopup($event)">
