@@ -71,3 +71,11 @@ button:hover {
 ::placeholder {
     color: #bdbdbd;
 }
+
+.buttons-wrapper {
+    display: flex;
+    justify-content: flex-end; /* Đẩy toàn bộ nút sang phải */
+    gap: 8px; /* khoảng cách giữa các nút */
+    margin-top: 16px; /* tùy chỉnh nếu cần khoảng cách với phần trên */
+}
+

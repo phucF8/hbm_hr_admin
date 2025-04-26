@@ -8,10 +8,15 @@
     </div>
 
     <div class="action-buttons">
-        <button class="btn"><i>🔍</i> Tìm kiếm (F3)</button>
-        <button class="btn" (click)="taoThongBao()">
+        <button class="btn">
+          <i class="bi bi-search"></i>Tìm kiếm</button>
+        <!-- Button mở popup tạo mới -->
+        <button class="btn btn-primary" (click)="toggleCreatePopup()">
+          <i class="bi bi-plus-circle"></i> Tạo mới
+        </button>
+        <!-- <button class="btn" (click)="taoThongBao()">
             <i class="bi bi-plus-circle"></i> Tạo thông báo
-          </button>
+          </button> -->
         <button class="btn" (click)="toggleAdvancedSearch()"><i class="bi bi-file-earmark-excel"></i> Xuất File</button>
     </div>
 
@@ -30,12 +35,7 @@
                     <button class="btn btn-secondary" (click)="toggleAdvancedSearch()">
                       <i class="bi bi-search"></i>
                     </button>
-
-
-                    <!-- Button mở popup tạo mới -->
-                    <button class="btn btn-primary" (click)="toggleCreatePopup()">
-                        <i class="bi bi-plus-circle"></i> Tạo mới
-                    </button>
+                    
                   </div>
             </div>
 
