@@ -6,14 +6,14 @@ GO
 CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @PageNumber INT,
     @PageSize INT,
-    @NotificationType INT,         -- 0: Lấy tất cả, >0: Lọc theo loại thông báo
+    @NotificationType INT,         -- 0: Lấy tất cả, 1 tự động, 2 chủ động
     @SortBy NVARCHAR(50) = 'NgayTao',  -- Tên cột để sắp xếp
     @SearchText NVARCHAR(255) = '',    -- Tìm kiếm tiêu đề hoặc nội dung
     @SentStatus INT = NULL,        -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
     @FromDate DATE = NULL,         -- Ngày tạo: từ ngày (bao gồm)
     @ToDate DATE = NULL,           -- Ngày tạo: đến ngày (bao gồm)
     @FromSentDate DATE = NULL,     -- Ngày gửi: từ ngày (bao gồm)
-    @ToSentDate DATE = NULL        -- Ngày gửi: đến ngày (bao gồm)
+    @ToSentDate DATE = NULL,        -- Ngày gửi: đến ngày (bao gồm)
 AS
 BEGIN
     SET NOCOUNT ON;

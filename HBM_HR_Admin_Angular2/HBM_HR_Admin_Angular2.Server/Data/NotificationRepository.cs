@@ -121,12 +121,7 @@ public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
 {
     try
     {
-        _logger.LogInformation("Calling stored procedure with filters: " +
-            $"notificationType={notificationType}, sortBy={sortBy}, searchText={searchText}, ngayTaoTu={ngayTaoTu}, " +
-            $"ngayTaoDen={ngayTaoDen}, ngayGuiTu={ngayGuiTu}, ngayGuiDen={ngayGuiDen}, trangThai={trangThai}");
-
         using var connection = new SqlConnection(_connectionString);
-
         var parameters = new
         {
             PageNumber = pageIndex,

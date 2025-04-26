@@ -3,43 +3,30 @@
         <div class="form-group">
             <label for="time">Thời gian</label>
             <div class="date-container">
-                <input type="date" placeholder="Từ ngày" id="from-date">
-                <input type="date" placeholder="Đến ngày" id="to-date">
+                <input type="date" placeholder="Từ ngày" id="from-date" [(ngModel)]="ngayTaoTu">
+                <input type="date" placeholder="Đến ngày" id="to-date" [(ngModel)]="ngayTaoDen">
             </div>
         </div>
         
         <div class="form-group">
-            <label for="proposer-id">Mã người đề xuất</label>
-            <input type="text" id="proposer-id" placeholder="Mã người đề xuất">
+            <label for="request-group">Nhóm thông báo</label>
+            <select id="mainType">
+              <option [value]="null">Tất cả</option>
+              <option [value]="1">Đề xuất</option>
+              <option [value]="2">Giải trình</option>
+              <option [value]="3">Đặt xe</option>
+              <option [value]="4">Đặt phòng họp</option>
+              <option [value]="5">KPIs</option>
+            </select>
         </div>
-        
-        <div class="form-group">
-            <label for="proposer-name">Tên người đề xuất</label>
-            <input type="text" id="proposer-name" placeholder="Tên người đề xuất">
-        </div>
-        
-        <div class="form-group">
-            <label for="proposal-id">Mã đề xuất</label>
-            <input type="text" id="proposal-id" placeholder="Mã đề xuất">
-        </div>
-        
-        <div class="form-group">
-            <label for="title">Tiêu đề</label>
-            <input type="text" id="title" placeholder="Tiêu đề request">
-        </div>
-        
+
         <div class="form-group">
             <label for="request-group">Loại thông báo</label>
-            <select id="mainType">
+            <select id="mainType" [(ngModel)]="loaiThongBao">
               <option [value]="null">Tất cả</option>
               <option [value]="1">Tự động</option>
               <option [value]="2">Chủ động</option>
             </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="request-details">Chi tiết request</label>
-            <textarea id="request-details" rows="4" placeholder="Thông tin chi tiết về request"></textarea>
         </div>
         
         <div class="buttons-wrapper">

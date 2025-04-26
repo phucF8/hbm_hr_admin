@@ -91,18 +91,17 @@ export class ThongBaoService {
   
   getListThongBao(
     pageIndex: number = 1,
-    notificationType: number = 0,
     sortBy: string = 'ngayTao',
     searchText: string = '',
     ngayTaoTu?: string,
     ngayTaoDen?: string,
     ngayGuiTu?: string,
     ngayGuiDen?: string,
-    trangThai?: number | null // null: tất cả, 1: đã gửi, 0: chưa gửi
+    trangThai?: number | null, // null: tất cả, 1: đã gửi, 0: chưa gửi
+    loaiThongBao?: number | null // null: tất cả, 1: tự động, 2: chủ động 
   ): Observable<{ items: ThongBao[], totalCount: number }> {
     let params = new HttpParams()
       .set('pageIndex', pageIndex.toString())
-      .set('notificationType', notificationType.toString())
       .set('sortBy', sortBy)
       .set('searchText', searchText);
     if (ngayTaoTu) 
@@ -115,6 +114,8 @@ export class ThongBaoService {
       params = params.set('ngayGuiDen', ngayGuiDen);
     if (trangThai !== null && trangThai !== undefined) 
       params = params.set('trangThai', trangThai.toString());
+    if (loaiThongBao !== null && loaiThongBao !== undefined) 
+      params = params.set('notificationType', loaiThongBao.toString());
     const url = `${this.apiUrl}`;
     console.log('Calling API:', url, params.toString());
     return this.http.get<{ items: ThongBao[], totalCount: number }>(url, { params }).pipe(

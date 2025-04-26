@@ -25,7 +25,6 @@ export class ThongBaoComponent implements OnInit {
   thongBaoList: ThongBao[] = [];
   selectAll: boolean = false;
   searchText: string = '';
-  selectedType: number = 0; // 0: Tất cả
   pageIndex: number = 1;
   isDebug = environment.isDebug;
   tenNhanVien: string = '';
@@ -37,6 +36,8 @@ export class ThongBaoComponent implements OnInit {
   ngayGuiTu?: string;
   ngayGuiDen?: string;
   trangThai?: number | null = null; // null: tất cả, 1: đã gửi, 0: chưa gửi
+  loaiThongBao?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
+  
 
   showCreatePopup: boolean = false;
   showAdvancedSearch: boolean = false;
@@ -75,12 +76,11 @@ export class ThongBaoComponent implements OnInit {
     ngayTaoDen?: string,
     ngayGuiTu?: string,
     ngayGuiDen?: string,
-    trangThai?: number | null
+    trangThai?: number | null,
   ) {
-    console.log('Loading notifications for page:', this.currentPage, 'and type:', this.selectedType);
+    console.log('Danh sachs thong bao');
     this.thongBaoService.getListThongBao(
       this.currentPage,
-      this.selectedType,
       this.sortBy,
       this.searchText,
       ngayTaoTu,
@@ -88,6 +88,7 @@ export class ThongBaoComponent implements OnInit {
       ngayGuiTu,
       ngayGuiDen,
       trangThai,
+      this.loaiThongBao,
     ).subscribe({
       next: (data) => {
         console.log('Received notifications:', data);
@@ -100,7 +101,6 @@ export class ThongBaoComponent implements OnInit {
     });
   }
   
-
   onTypeChange() {
     this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
   }
@@ -261,12 +261,14 @@ export class ThongBaoComponent implements OnInit {
       ngayGuiTu?: string;
       ngayGuiDen?: string;
       trangThai?: number | null;
+    loaiThongBao?: number | null;
     }): void {
       this.ngayTaoTu = data.ngayTaoTu;
       this.ngayTaoDen = data.ngayTaoDen;  
       this.ngayGuiTu = data.ngayGuiTu;
       this.ngayGuiDen = data.ngayGuiDen;
       this.trangThai = data.trangThai;
+      this.loaiThongBao = data.loaiThongBao;
       this.loadListThongBao(data.ngayTaoTu, data.ngayTaoDen, data.ngayGuiTu, data.ngayGuiDen, data.trangThai);
       this.showAdvancedSearch = false; // Đóng popup sau khi tìm kiếm
   }

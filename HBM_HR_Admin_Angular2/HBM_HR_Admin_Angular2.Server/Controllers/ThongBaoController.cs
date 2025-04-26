@@ -35,7 +35,16 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
     [FromQuery] int? trangThai = null)
         {
             var notifications = await _repository.GetNotificationsWithPaging(
-                pageIndex, pageSize, notificationType, sortBy, searchText, ngayTaoTu, ngayTaoDen, ngayGuiTu, ngayGuiDen, trangThai);
+                pageIndex, 
+                pageSize, 
+                notificationType, 
+                sortBy, 
+                searchText, 
+                ngayTaoTu, 
+                ngayTaoDen, 
+                ngayGuiTu, 
+                ngayGuiDen, 
+                trangThai);
 
             return Ok(notifications);
         }
@@ -201,8 +210,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi khi cập nhật thông báo");
             }
         }
-
-
 
         // API POST /api/thongbao/send - Gửi thông báo thử nghiệm
         [HttpPost("send")]

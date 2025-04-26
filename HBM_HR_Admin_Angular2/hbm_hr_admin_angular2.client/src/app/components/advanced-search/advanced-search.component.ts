@@ -15,6 +15,7 @@ export class AdvancedSearchComponent {
     ngayGuiTu?: string;
     ngayGuiDen?: string;
     trangThai?: number | null;
+    loaiThongBao?: number | null; // null: tất cả, 1: tự động, 2: chủ động
   }>(
     
   );
@@ -25,6 +26,7 @@ export class AdvancedSearchComponent {
   ngayGuiTu?: string;
   ngayGuiDen?: string;
   trangThai?: number | null = null;
+  loaiThongBao?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
 
   constructor() {
     console.log('AdvancedSearchComponent initialized');
@@ -41,7 +43,8 @@ export class AdvancedSearchComponent {
       ngayTaoDen: this.ngayTaoDen,
       ngayGuiTu: this.ngayGuiTu,
       ngayGuiDen: this.ngayGuiDen,
-      trangThai: this.trangThai
+      trangThai: this.trangThai,
+      loaiThongBao: this.loaiThongBao,
     });
 
 
