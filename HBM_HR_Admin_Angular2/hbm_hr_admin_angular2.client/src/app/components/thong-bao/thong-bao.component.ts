@@ -267,8 +267,8 @@ export class ThongBaoComponent implements OnInit {
       this.ngayGuiTu = data.ngayGuiTu;
       this.ngayGuiDen = data.ngayGuiDen;
       this.trangThai = data.trangThai;
-    this.loadListThongBao(data.ngayTaoTu, data.ngayTaoDen, data.ngayGuiTu, data.ngayGuiDen, data.trangThai);
-    this.showAdvancedSearch = false; // Đóng popup sau khi tìm kiếm
+      this.loadListThongBao(data.ngayTaoTu, data.ngayTaoDen, data.ngayGuiTu, data.ngayGuiDen, data.trangThai);
+      this.showAdvancedSearch = false; // Đóng popup sau khi tìm kiếm
   }
   
   sortByDate(field: string, direction: 'asc' | 'desc') {

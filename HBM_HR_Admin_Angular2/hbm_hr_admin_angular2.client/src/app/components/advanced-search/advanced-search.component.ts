@@ -15,7 +15,9 @@ export class AdvancedSearchComponent {
     ngayGuiTu?: string;
     ngayGuiDen?: string;
     trangThai?: number | null;
-  }>();
+  }>(
+    
+  );
 
   // Biến lọc thông báo
   ngayTaoTu?: string;
