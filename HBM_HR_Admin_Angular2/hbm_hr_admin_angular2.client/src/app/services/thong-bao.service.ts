@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError } from 'rxjs';
 import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao interface
 import { environment } from '../../environments/environment'; 
+import { DebugUtils } from '@app/utils/debug-utils';
 
 
 export interface MergedData {
@@ -116,9 +117,12 @@ export class ThongBaoService {
       params = params.set('trangThai', trangThai.toString());
     if (loaiThongBao !== null && loaiThongBao !== undefined) 
       params = params.set('notificationType', loaiThongBao.toString());
-    const url = `${this.apiUrl}`;
-    console.log('Calling API:', url, params.toString());
-    return this.http.get<{ items: ThongBao[], totalCount: number }>(url, { params }).pipe(
+
+
+    DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
+
+
+    return this.http.get<{ items: ThongBao[], totalCount: number }>(this.apiUrl, { params }).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
         throw error;

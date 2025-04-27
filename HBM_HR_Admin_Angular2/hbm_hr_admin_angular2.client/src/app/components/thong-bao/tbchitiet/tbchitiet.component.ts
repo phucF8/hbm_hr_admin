@@ -29,7 +29,14 @@ export class TbchitietComponent implements OnInit {
   isSearching: boolean = false;
   status: number = 0; // Trạng thái mặc định là 0 (Chưa gửi)
 
-  @Output() closePopupEvent = new EventEmitter<void>();
+  tenNhanVien: string = '';
+  currentDateTime: string = '';
+
+
+
+  @Output() closePopupEvent = new EventEmitter<{
+    response: boolean;  // Thông báo cho ThongBaoComponent
+  }>();
 
   constructor(
     private fb: FormBuilder,
@@ -38,10 +45,14 @@ export class TbchitietComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
+    this.authService.currentUser$.subscribe((status) => {
+      if (status?.Status === 'SUCCESS') {
+        this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';
+      }
+    });
     this.thongBaoForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       content: ['', [Validators.required, Validators.minLength(10)]],
-      notificationType: [1, Validators.required],
     });
     this.searchUserForm = this.fb.group({
       search: ['', Validators.required]
@@ -129,6 +140,9 @@ export class TbchitietComponent implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
+          this.closePopupEvent.emit({
+            response: true // cần update màn hình danh sách
+          });
         }
       });
     } else {
@@ -162,6 +176,7 @@ export class TbchitietComponent implements OnInit {
       const notificationData = {
         id: uuidv4(), // Tạo ID ngẫu nhiên
         ...this.thongBaoForm.value,
+        notificationType: 2,
         nguoiTao: currentUser.ID,
         recipients: this.selectedUsers.map(user => user.ID), // Lấy danh sách ID từ selectedUsers
       };
@@ -177,6 +192,9 @@ export class TbchitietComponent implements OnInit {
         complete: () => {
           console.log('Request completed');
           this.isSubmitting = false;
+          this.closePopupEvent.emit({
+            response: true // cần update màn hình danh sách
+          });
         }
       });
     } else {

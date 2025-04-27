@@ -247,10 +247,17 @@ export class ThongBaoComponent implements OnInit {
   }
 
 
-  handleClosePopup(): void {
+  handleClosePopup(
+    data: {
+      response: boolean;
+    }
+  ): void {
     console.log('ThongBaoComponent: handleClosePopup được gọi');
     this.showAdvancedSearch = false;
     this.showCreatePopup = false; // Đóng popup tạo mới
+    if (data.response == true){
+      this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
+    }
     // Thêm logic đóng popup, hoặc xử lý UI tại đây
   }
 

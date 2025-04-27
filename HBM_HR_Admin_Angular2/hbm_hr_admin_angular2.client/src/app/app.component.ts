@@ -28,8 +28,6 @@ export class AppComponent implements OnInit {
     private authService: AuthService, 
     private router: Router) {
       this.authService.currentUser$.subscribe((status) => {
-        //this.isLoggedIn = status;
-        console.log('isLoggedIn:', status);
         if (status?.Status == 'SUCCESS') {
           this.isLoggedIn = true;
           this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';

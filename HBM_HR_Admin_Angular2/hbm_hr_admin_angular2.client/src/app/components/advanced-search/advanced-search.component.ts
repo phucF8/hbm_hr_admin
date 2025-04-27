@@ -8,7 +8,9 @@ import { Component, EventEmitter, Output, ViewChild, AfterViewInit } from '@angu
 })
 export class AdvancedSearchComponent {
 
-  @Output() closePopupEvent = new EventEmitter<void>();
+  @Output() closePopupEvent = new EventEmitter<{
+    response: boolean;
+  }>();
   @Output() searchPopupEvent = new EventEmitter<{
     ngayTaoTu?: string;
     ngayTaoDen?: string;
@@ -33,7 +35,9 @@ export class AdvancedSearchComponent {
   }
 
   closePopup(): void {
-    this.closePopupEvent.emit(); // Phát sự kiện để thông báo cho ThongBaoComponent
+    this.closePopupEvent.emit({
+      response: false,
+    }); // Phát sự kiện để thông báo cho ThongBaoComponent
   }
 
   // Phương thức tìm kiếm
