@@ -1,7 +1,6 @@
-
-    <div class="container">
-        <div class="header">TẠO THÔNG BÁO</div>
-        <form [formGroup]="thongBaoForm" (ngSubmit)="onSubmit()" class="needs-validation">
+<div class="container">
+    <div class="header">TẠO THÔNG BÁO</div>
+    <form [formGroup]="thongBaoForm" (ngSubmit)="onSubmit()" class="needs-validation">
         <div class="section">
             <div class="section-title">THÔNG TIN NGƯỜI TẠO THÔNG BÁO</div>
             <!-- <div class="id-value">Mã đề xuất: </div> -->
@@ -11,42 +10,34 @@
             </div>
             <div class="info-row">
                 <div class="info-label">› Ngày tạo</div>
-                <div class="info-value"><p>{{ ngayTao | date: 'dd/MM/yyyy HH:mm' }}</p></div>
+                <div class="info-value">
+                    <p>{{ ngayTao | date: 'dd/MM/yyyy HH:mm' }}</p>
+                </div>
             </div>
         </div>
-        
+
         <div class="section">
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label required">Tiêu đề</label>
-                    <input 
-                    type="text" 
-                    class="form-control" 
-                    id="title" 
-                    formControlName="title"
-                    placeholder="Tiêu đề"
-                    [readonly]="status === 1"
-                    [class.is-invalid]="thongBaoForm.get('title')?.invalid && thongBaoForm.get('title')?.touched">
+                    <input type="text" class="form-control" id="title" formControlName="title" placeholder="Tiêu đề"
+                        [readonly]="status === 1"
+                        [class.is-invalid]="thongBaoForm.get('title')?.invalid && thongBaoForm.get('title')?.touched">
                 </div>
             </div>
         </div>
-        
+
         <div class="section">
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">Nội dung ngắn</label>
-                    <textarea 
-                    class="form-control" 
-                    id="content" 
-                    style="height: 150px"
-                    formControlName="content"
-                    placeholder="Nhập nội dung"
-                    [readonly]="status === 1"
-                    [class.is-invalid]="thongBaoForm.get('content')?.invalid && thongBaoForm.get('content')?.touched"></textarea>
+                    <textarea class="form-control" id="content" style="height: 150px" formControlName="content"
+                        placeholder="Nhập nội dung" [readonly]="status === 1"
+                        [class.is-invalid]="thongBaoForm.get('content')?.invalid && thongBaoForm.get('content')?.touched"></textarea>
                 </div>
             </div>
         </div>
-        
+
         <div class="button-group">
             <button type="button" class="btn btn-cancel" (click)="closePopup()">
                 <span>⊝</span> Đóng
@@ -55,10 +46,84 @@
                 <span>✉</span> Tạo/Gửi Thông báo
             </button>
         </div>
-    
-        </form>
 
-    </div>
+    </form>
+
+</div>
 
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container">
+    <h1>THÀNH VIÊN NHẬN THÔNG BÁO</h1>
+    <form [formGroup]="searchUserForm" (ngSubmit)="onSearchUser()">
+        <div class="search-container">
+            <button class="dropdown-btn">VPTĐ</button>
+
+            <div class="search-wrapper">
+                <input type="text" class="search-input" id="search" formControlName="search" placeholder="Nhập từ khóa, ấn enter tìm kiếm..." autofocus>
+                <div *ngIf="isSearching" class="text-center py-2">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+        
+                <div class="popup-container" *ngIf="filteredUsers !== null && filteredUsers.length > 0">
+                    <ul class="employee-list">
+                        <li class="employee-item" *ngFor="let user of filteredUsers" (click)="selectUser(user)">
+                            <div class="avatar">
+                                <img src="/api/placeholder/40/40" alt="{{ user.TenNhanVien }}">
+                            </div>
+                            <div class="employee-info">
+                                <div class="employee-name">{{ user.TenNhanVien }}</div>
+                                <div class="location-info">
+                                    <span class="location-icon">⌖</span>
+                                    <span>{{ user.TenPhongBan }}</span>
+                                </div>
+                                <div class="employee-detail">{{ user.MaNhanVien }} | {{ user.TenPhongBan }}</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> <!-- Biểu tượng tìm kiếm -->
+            </button>
+        </div>
+
+        
+        <ul *ngIf="selectedUsers.length > 0" class="list-group">
+            <li class="member-item" *ngFor="let user of selectedUsers">
+                <div class="avatar">
+                    <img src="/api/placeholder/40/40" alt="{{user.TenNhanVien}}">
+                </div>
+                <div class="member-info">
+                    <div class="member-name">{{user.TenNhanVien}}</div>
+                    <div class="member-detail">{{user.MaNhanVien}} | {{user.TenPhongBan}}</div>
+                </div>
+                <button class="remove-btn" *ngIf="status !== 1" (click)="removeUser(user)">⊗</button>
+            </li>
+        </ul>
+
+    </form>
+</div>
