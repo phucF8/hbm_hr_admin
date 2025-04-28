@@ -1,10 +1,11 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ThongBaoService, DoLookupDatasRP, MergedData,TestSendNotificationRequest} from '../../../services/thong-bao.service';
 import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
+import { LoadingService } from '@app/services/loading.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
@@ -15,12 +16,12 @@ import { v4 as uuidv4 } from 'uuid';
   providers: [ThongBaoService]
 })
 export class TbchitietComponent implements OnInit {
+  @Input() notificationId: string = '';  // Nhận notificationId từ component cha
   thongBaoForm: FormGroup;
   searchUserForm: FormGroup;
   notificationTypes = NOTIFICATION_TYPES;
   isSubmitting = false;
   errorMessage = '';
-  notificationId: string = '';
   
   filteredUsers: MergedData[] | null = null;
   selectedUsers: MergedData[] = [];
@@ -29,8 +30,8 @@ export class TbchitietComponent implements OnInit {
   isSearching: boolean = false;
   status: number = 0; // Trạng thái mặc định là 0 (Chưa gửi)
 
-  tenNhanVien: string = '';
-  currentDateTime: string = '';
+  tenNguoiTao: string = '';
+  ngayTao: string = '';
 
 
 
@@ -41,13 +42,14 @@ export class TbchitietComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private thongBaoService: ThongBaoService,
+    private loadingService: LoadingService,
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
   ) {
     this.authService.currentUser$.subscribe((status) => {
       if (status?.Status === 'SUCCESS') {
-        this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';
+        this.tenNguoiTao = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';
       }
     });
     this.thongBaoForm = this.fb.group({
@@ -60,7 +62,6 @@ export class TbchitietComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.notificationId = this.route.snapshot.paramMap.get('id') || '';
     if (this.notificationId) {
       this.loadNotification();
       this.isUserSearchVisible = true; // sửa thông báo thì luôn hiện danh sách user - có hợp lý không?
@@ -68,8 +69,10 @@ export class TbchitietComponent implements OnInit {
   }
 
   loadNotification() {
+    this.loadingService.show();
     this.thongBaoService.getThongBaoByID(this.notificationId).subscribe({
       next: (notification) => {
+        this.loadingService.hide();
         if (notification) {
           const formattedDate = notification.sentAt ? notification.sentAt : '';
           console.log('Thông báo > trạng thái:', notification.status);
@@ -79,6 +82,8 @@ export class TbchitietComponent implements OnInit {
           } else {
             this.thongBaoForm.get('notificationType')?.enable();
           }
+          this.tenNguoiTao = notification.tenNhanVien;
+          this.ngayTao = notification.ngayTao;
           this.thongBaoForm.patchValue({
             title: notification.title,
             content: notification.content,
@@ -97,6 +102,7 @@ export class TbchitietComponent implements OnInit {
         }
       },
       error: (error) => {
+        this.loadingService.hide();
         console.error('Error loading notification:', error);
         this.errorMessage = 'Đã xảy ra lỗi khi tải thông báo';
       }

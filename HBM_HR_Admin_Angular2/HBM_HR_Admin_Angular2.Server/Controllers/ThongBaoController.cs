@@ -54,21 +54,17 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Notification>> GetNotification(string id)
         {
-            _logger.LogInformation($"GetNotification: {id}");
             if (string.IsNullOrWhiteSpace(id))
             {
-                _logger.LogWarning("Notification ID is empty");
                 return BadRequest("Notification ID cannot be empty");
             }
             var notification = await _repository.GetNotificationByID(id);
             if (notification == null)
             {
-                _logger.LogWarning($"Notification with ID {id} not found");
                 return NotFound($"Notification with ID {id} not found");
             }
             var result = await _repository.SelectNotificationRecipients(id);
             notification.Recipients = result.ToList();
-            _logger.LogInformation($"Returning notification ID: {notification.ID}, Title: {notification.Title}, Recipients count: {result.Count()}");
             return Ok(notification);
         }
 

@@ -133,10 +133,11 @@ export class ThongBaoService {
   
   getThongBaoByID(notificationID: string): Observable<ThongBao> {
     const url = `${this.apiUrl}/${notificationID}`;
-    console.log('Calling API:', url);
+    DebugUtils.openStringInNewWindow(`${url}`);
     return this.http.get<ThongBao>(url).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
+        DebugUtils.openStringInNewWindow(`${error.message}`);
         throw error;
       })
     );

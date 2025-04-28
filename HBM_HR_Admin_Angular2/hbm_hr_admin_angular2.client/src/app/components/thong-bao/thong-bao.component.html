@@ -11,7 +11,7 @@
         <button class="btn">
           <i class="bi bi-search"></i>Tìm kiếm</button>
         <!-- Button mở popup tạo mới -->
-        <button class="btn btn-primary" (click)="toggleCreatePopup()">
+        <button class="btn btn-primary" (click)="openTaoThongBaoPopup()">
           <i class="bi bi-plus-circle"></i> Tạo mới
         </button>
         <!-- <button class="btn" (click)="taoThongBao()">
@@ -50,11 +50,11 @@
                 </div>
             </div>
 
-            <!-- Popup Tạo mới -->
-            <div class="overlay" [hidden]="!showCreatePopup">
+            <!-- hộp thoại tạo thông báo mới hoặc xem chi tiết thông báo -->
+            <div class="overlay" *ngIf="showThongBaoPopup">
                 <div class="overlay-content" style="background-color: transparent; padding: 0;width: 60%">
-                <!-- <button class="btn-close" (click)="toggleCreatePopup()">&times;</button> -->
                 <chitiet-thong-bao
+                    [notificationId]="notificationId"
                     (closePopupEvent)="handleClosePopup($event)"
                     (createEvent)="handleCreate($event)">
                 </chitiet-thong-bao>

@@ -161,7 +161,6 @@ public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
         {
             try
             {
-                _logger.LogInformation($"GetNotificationByID: {notificationID}");
                 using var connection = new SqlConnection(_connectionString);
                 var result = await connection.QueryFirstOrDefaultAsync<Notification>(
                     "NS_ADTB_GetNotificationById",
@@ -174,10 +173,6 @@ public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
                 if (result != null)
                 {
                     _logger.LogInformation("Stored procedure returned a record");
-
-
-
-
                 }
                 else
                 {
@@ -284,7 +279,6 @@ public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
 
         public async Task<IEnumerable<NotificationRecipient>> SelectNotificationRecipients(string notificationId)
         {
-            _logger.LogError("SelectNotificationRecipients");
             try
             {
                 var parameters = new

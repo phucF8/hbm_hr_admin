@@ -7,11 +7,11 @@
             <!-- <div class="id-value">Mã đề xuất: </div> -->
             <div class="info-row">
                 <div class="info-label">› Người tạo</div>
-                <div class="info-value">{{tenNhanVien}}</div>
+                <div class="info-value">{{tenNguoiTao}}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">› Ngày tạo</div>
-                <div class="info-value">{{ currentDateTime }}</div>
+                <div class="info-value"><p>{{ ngayTao | date: 'dd/MM/yyyy HH:mm' }}</p></div>
             </div>
         </div>
         

@@ -4,6 +4,7 @@ import { ThongBaoService } from '../../services/thong-bao.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
+import { LoadingService } from '@app/services/loading.service';
 import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notification-types';
 import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
 import { MatDialog } from '@angular/material/dialog';
@@ -39,12 +40,14 @@ export class ThongBaoComponent implements OnInit {
   loaiThongBao?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
   
 
-  showCreatePopup: boolean = false;
+  notificationId: string = '';
+  showThongBaoPopup: boolean = false;
   showAdvancedSearch: boolean = false;
 
   constructor(
     private dialog: MatDialog,
     private thongBaoService: ThongBaoService,
+    private loadingService: LoadingService,
     private router: Router,
     private authService: AuthService
   ) {}
@@ -78,7 +81,7 @@ export class ThongBaoComponent implements OnInit {
     ngayGuiDen?: string,
     trangThai?: number | null,
   ) {
-    console.log('Danh sachs thong bao');
+    this.loadingService.show();
     this.thongBaoService.getListThongBao(
       this.currentPage,
       this.sortBy,
@@ -94,9 +97,11 @@ export class ThongBaoComponent implements OnInit {
         console.log('Received notifications:', data);
         this.thongBaoList = data.items;
         this.totalPages = Math.ceil(data.totalCount / ITEMS_PER_PAGE);
+        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading notifications:', error);
+        this.loadingService.hide();  
       }
     });
   }
@@ -147,7 +152,9 @@ export class ThongBaoComponent implements OnInit {
   }
 
   viewThongBao(id: string) {
-    this.editThongBao(id); // Reuse the edit function for viewing
+    //this.editThongBao(id); // Reuse the edit function for viewing
+    this.showThongBaoPopup = true;
+    this.notificationId = id;
   }
   
   // Hàm chọn tất cả checkbox
@@ -254,7 +261,7 @@ export class ThongBaoComponent implements OnInit {
   ): void {
     console.log('ThongBaoComponent: handleClosePopup được gọi');
     this.showAdvancedSearch = false;
-    this.showCreatePopup = false; // Đóng popup tạo mới
+    this.showThongBaoPopup = false; // Đóng popup tạo mới
     if (data.response == true){
       this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
     }
@@ -303,8 +310,9 @@ export class ThongBaoComponent implements OnInit {
     console.log('Created:', data);
   }
 
-  toggleCreatePopup() {
-    this.showCreatePopup = !this.showCreatePopup;
+  openTaoThongBaoPopup() {
+    this.notificationId = '';
+    this.showThongBaoPopup = true;
   }
   
 

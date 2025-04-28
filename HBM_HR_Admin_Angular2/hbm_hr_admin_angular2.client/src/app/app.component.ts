@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from './services/auth.service'; // Đảm bảo đường dẫn đúng
 import { Router } from '@angular/router';
+import { LoadingService } from '@app/services/loading.service';
+import { Observable } from 'rxjs';
 
 interface WeatherForecast {
   date: string;
@@ -23,9 +25,12 @@ export class AppComponent implements OnInit {
   showCreatePopup = false;
   isPopupVisible = false;
 
+  isLoading: Observable<boolean>;
+
   constructor(
     private http: HttpClient,
     private authService: AuthService, 
+    private loadingService: LoadingService,
     private router: Router) {
       this.authService.currentUser$.subscribe((status) => {
         if (status?.Status == 'SUCCESS') {
@@ -34,11 +39,12 @@ export class AppComponent implements OnInit {
         }
         return status;
       });
+      this.isLoading = this.loadingService.isLoading$;
     }
+
 
   ngOnInit() {
     console.log('APP  đã được khởi tạo!');
-
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
       this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';

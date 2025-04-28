@@ -112,23 +112,21 @@ BEGIN
         tb.ID,
         tb.Title,
         tb.Content,
-        tb.SenderID,
         nv.TenNhanVien,
         tb.NotificationType,
         tb.Status,
-        tb.SentAt,
         tb.NgayTao,
         tb.NgaySua,
         tb.NguoiTao,
         tb.NguoiSua
     FROM NS_ADTB_Notifications tb
-    LEFT JOIN NS_NhanViens nv ON tb.SenderID = nv.ID
+    LEFT JOIN NS_NhanViens nv ON tb.NguoiTao = nv.ID
     WHERE tb.ID = @NotificationID;
 END
 GO
 
-/*EXEC NS_ADTB_GetNotificationById 
-    @NotificationID = '612dd7be-46cb-408e-8f14-471e2445d77a';*/
+EXEC NS_ADTB_GetNotificationById 
+    @NotificationID = '9d4be878907c4de1';
 
 
 
@@ -302,6 +300,9 @@ EXEC InsertNotificationRecipient
 
 
 --lấy về ds nhóm user đối với thông báo cho nhóm
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'SelectNotificationRecipients')
+    DROP PROCEDURE SelectNotificationRecipients;
+GO
 CREATE PROCEDURE SelectNotificationRecipients
     @NotificationId VARCHAR(36)
 AS
@@ -309,18 +310,17 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT 
-        nr.NotificationId,
-        nr.RecipientId,
+        nr.IDThongBao,
+        nr.NguoiNhan,
         nv.TenNhanVien,
         nr.Status
     FROM [HBM_HCNSApp].[dbo].[NS_ADTB_NotificationRecipients] nr
     INNER JOIN [HBM_HCNSApp].[dbo].[NS_NhanViens] nv
-        ON nr.RecipientId = nv.ID
-    WHERE nr.NotificationId = @NotificationId;
+        ON nr.NguoiNhan = nv.ID
+    WHERE nr.IDThongBao = @NotificationId;
 END;
 
-
---EXEC SelectNotificationRecipients @NotificationId = 'GUID_CUA_NOTIFICATION'
+EXEC SelectNotificationRecipients @NotificationId = 'GUID_CUA_NOTIFICATION'
 
 --xóa ds nhóm user đối với thông báo cho nhóm để insert lại sau đó (cho tính năng update)
 CREATE PROCEDURE DeleteNotificationRecipients
