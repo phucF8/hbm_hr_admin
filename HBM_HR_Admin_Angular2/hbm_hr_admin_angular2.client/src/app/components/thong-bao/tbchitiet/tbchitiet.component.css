@@ -40,9 +40,10 @@ body {
     color: #333;
 }
 .section {
-    margin-bottom: 30px;
+    margin-bottom: 8px;
     border-bottom: 1px solid #eee;
-    padding-bottom: 20px;
+    border-bottom: 1px solid black;
+    padding-bottom: 8px;
 }
 .section-title {
     font-weight: bold;
