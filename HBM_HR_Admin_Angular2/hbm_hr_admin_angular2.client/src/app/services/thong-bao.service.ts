@@ -12,6 +12,7 @@ export interface MergedData {
   TenNhanVien: string; // Tên nhân viên từ DoLookupData
   TenPhongBan: string; // Phòng ban từ DoLookupData
   status: number | null; // Trạng thái thông báo từ ThongBaoRecipient
+  ngayTao: string;
 }
 
 export interface DoLookupData {
@@ -136,7 +137,6 @@ export class ThongBaoService {
     DebugUtils.openStringInNewWindow(`${url}`);
     return this.http.get<ThongBao>(url).pipe(
       catchError(error => {
-        console.error('Error fetching notifications:', error);
         DebugUtils.openStringInNewWindow(`${error.message}`);
         throw error;
       })

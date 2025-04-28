@@ -74,8 +74,6 @@ export class TbchitietComponent implements OnInit {
       next: (notification) => {
         this.loadingService.hide();
         if (notification) {
-          const formattedDate = notification.sentAt ? notification.sentAt : '';
-          console.log('Thông báo > trạng thái:', notification.status);
           this.status = notification.status; // Lưu trạng thái thông báo
           if (this.status === 1) {
             this.thongBaoForm.get('notificationType')?.disable();
@@ -88,14 +86,14 @@ export class TbchitietComponent implements OnInit {
             title: notification.title,
             content: notification.content,
             notificationType: notification.notificationType,
-            sentAt: formattedDate
           });
           this.selectedUsers = notification.recipients.map(recipient => ({
             ID: recipient.recipientId,
             MaNhanVien: recipient.recipientId, // Nếu recipientId là mã nhân viên
             TenNhanVien: recipient.tenNhanVien,
-            TenPhongBan: "", // Nếu cần, hãy lấy từ một nguồn khác
-            status: recipient.status
+            TenPhongBan: 'TÊN PHÒNG BAN', // Nếu cần, hãy lấy từ một nguồn khác
+            status: recipient.status,
+            ngayTao: recipient.ngayTao,
           })) as MergedData[];
         } else {
           this.errorMessage = 'Không tìm thấy thông báo';

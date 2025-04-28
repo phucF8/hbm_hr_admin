@@ -86,7 +86,7 @@
                         <input type="text" class="search-input" id="search" formControlName="search" placeholder="Nhập từ khóa, ấn enter tìm kiếm..." autofocus>
                     </div>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search"></i> <!-- Biểu tượng tìm kiếm -->
+                        <i class="bi bi-search"></i><!-- Biểu tượng tìm kiếm -->
                     </button>
                 </div>
         
@@ -100,7 +100,12 @@
                             <div class="member-name">{{user.TenNhanVien}}</div>
                             <div class="member-detail">{{user.MaNhanVien}} | {{user.TenPhongBan}}</div>
                         </div>
-                        <button class="remove-btn" *ngIf="status !== 1" (click)="removeUser(user)">⊗</button>
+                        <button class="remove-btn" *ngIf="user.status === 0" (click)="removeUser(user)">⊗</button>
+                        <div class="info-row" *ngIf="user.status === 1">
+                                <div class="info-value">
+                                    <p>{{ user.ngayTao | date: 'dd/MM/yyyy HH:mm' }}</p>
+                                </div>
+                        </div>
                     </li>
                 </ul>
         

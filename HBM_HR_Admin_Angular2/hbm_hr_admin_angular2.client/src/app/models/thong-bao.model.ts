@@ -3,6 +3,7 @@ export interface ThongBaoRecipient {
   recipientId: string;
   tenNhanVien: string;
   status: number;
+  ngayTao: string;
 }
 
 export interface ThongBao {
@@ -13,7 +14,6 @@ export interface ThongBao {
   tenNhanVien: string;
   notificationType: number;
   status: number;
-  sentAt?: string | null;
   receivedCount: number;
   totalRecipients: number;
   ngayTao: string;
