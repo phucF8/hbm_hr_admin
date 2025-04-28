@@ -283,6 +283,7 @@ export class ThongBaoComponent implements OnInit {
       this.loaiThongBao = data.loaiThongBao;
       this.loadListThongBao(data.ngayTaoTu, data.ngayTaoDen, data.ngayGuiTu, data.ngayGuiDen, data.trangThai);
       this.showSearchPopup = false; // Đóng popup sau khi tìm kiếm
+      document.body.classList.remove('no-scroll');
   }
   
   sortByDate(field: string, direction: 'asc' | 'desc') {

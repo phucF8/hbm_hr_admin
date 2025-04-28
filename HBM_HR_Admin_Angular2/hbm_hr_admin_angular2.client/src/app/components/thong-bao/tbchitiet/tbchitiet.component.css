@@ -13,14 +13,7 @@ body {
     width: 100%; /* hoặc 100%, tùy layout */
 }
 
-.container {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin: 0 auto;
-    max-width: 1200px;
-}
+
 
 
 .popup-container {
@@ -174,14 +167,7 @@ body {
     padding: 20px;
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-}
+
 
 h1 {
     font-size: 16px;
@@ -299,12 +285,7 @@ body {
     padding: 0;
 }
 
-.container {
-    max-width: 100%;
-    margin: 0;
-    background-color: #fff;
-    border: 1px solid #ddd;
-}
+
 
 .header {
     display: flex;
@@ -412,3 +393,26 @@ body {
 .page-item:nth-child(3) {
     background-color: #6666cc;
 }
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.container_popup {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-y: auto;
+    height: 90vh; /* thay vì 500px */
+}
+
