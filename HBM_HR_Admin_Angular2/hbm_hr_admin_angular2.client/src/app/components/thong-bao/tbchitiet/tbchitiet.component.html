@@ -1,5 +1,7 @@
 <div class="container_popup">
-    <div class="header">TẠO THÔNG BÁO</div>
+    <div class="header">
+        {{ notificationId ? 'THÔNG BÁO CHI TIẾT' : 'TẠO THÔNG BÁO' }}
+    </div>
     <form [formGroup]="thongBaoForm" (ngSubmit)="onSubmit()" class="needs-validation">
         <div class="section">
             <div class="section-title">THÔNG TIN NGƯỜI TẠO THÔNG BÁO</div>
@@ -57,7 +59,7 @@
         <div class="container">
             <h1>THÀNH VIÊN NHẬN THÔNG BÁO</h1>
             <form [formGroup]="searchUserForm" (ngSubmit)="onSearchUser()">
-                <div class="search-container">
+                <div class="search-container" *ngIf="!notificationId">
                     <button class="dropdown-btn">VPTĐ</button>
         
                     <div class="search-wrapper">
@@ -157,7 +159,7 @@
             <button type="button" class="btn btn-cancel" (click)="closePopup()">
                 <span>⊝</span> Đóng
             </button>
-            <button type="submit" class="btn btn-submit">
+            <button type="submit" class="btn btn-submit"  *ngIf="!notificationId" >
                 <span>✉</span> Tạo/Gửi Thông báo
             </button>
         </div>

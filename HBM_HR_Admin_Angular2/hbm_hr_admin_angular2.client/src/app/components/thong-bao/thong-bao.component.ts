@@ -152,7 +152,7 @@ export class ThongBaoComponent implements OnInit {
   }
 
   viewThongBao(id: string) {
-    //this.editThongBao(id); // Reuse the edit function for viewing
+    document.body.classList.add('no-scroll');
     this.showThongBaoPopup = true;
     this.notificationId = id;
   }
