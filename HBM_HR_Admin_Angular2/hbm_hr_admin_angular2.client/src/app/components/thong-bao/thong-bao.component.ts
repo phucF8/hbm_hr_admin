@@ -42,7 +42,7 @@ export class ThongBaoComponent implements OnInit {
 
   notificationId: string = '';
   showThongBaoPopup: boolean = false;
-  showAdvancedSearch: boolean = false;
+  showSearchPopup: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -247,20 +247,18 @@ export class ThongBaoComponent implements OnInit {
     }
   }
 
-  
-
-  toggleAdvancedSearch(): void {
-    this.showAdvancedSearch = !this.showAdvancedSearch;
+  openSearchPopup(): void {
+    this.showSearchPopup = true;
+    document.body.classList.add('no-scroll');
   }
-
 
   handleClosePopup(
     data: {
       response: boolean;
     }
   ): void {
-    console.log('ThongBaoComponent: handleClosePopup được gọi');
-    this.showAdvancedSearch = false;
+    document.body.classList.remove('no-scroll');
+    this.showSearchPopup = false;
     this.showThongBaoPopup = false; // Đóng popup tạo mới
     if (data.response == true){
       this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
@@ -284,7 +282,7 @@ export class ThongBaoComponent implements OnInit {
       this.trangThai = data.trangThai;
       this.loaiThongBao = data.loaiThongBao;
       this.loadListThongBao(data.ngayTaoTu, data.ngayTaoDen, data.ngayGuiTu, data.ngayGuiDen, data.trangThai);
-      this.showAdvancedSearch = false; // Đóng popup sau khi tìm kiếm
+      this.showSearchPopup = false; // Đóng popup sau khi tìm kiếm
   }
   
   sortByDate(field: string, direction: 'asc' | 'desc') {
@@ -313,6 +311,7 @@ export class ThongBaoComponent implements OnInit {
   openTaoThongBaoPopup() {
     this.notificationId = '';
     this.showThongBaoPopup = true;
+    document.body.classList.add('no-scroll');
   }
   
 

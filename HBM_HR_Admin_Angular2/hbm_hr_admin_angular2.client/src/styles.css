@@ -148,6 +148,11 @@ body {
   margin-bottom: 1rem;        /* Nếu bạn muốn cách dưới */
 }
 
+
+.no-scroll {
+  overflow: hidden;
+}
+
 /* Global styles (hoặc trong component styles nếu bạn dùng Angular View Encapsulation) */
 .overlay[hidden] {
   display: none !important; /* đảm bảo ẩn hoàn toàn */

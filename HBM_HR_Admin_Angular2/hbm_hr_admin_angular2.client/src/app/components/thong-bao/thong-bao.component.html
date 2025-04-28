@@ -17,7 +17,7 @@
         <!-- <button class="btn" (click)="taoThongBao()">
             <i class="bi bi-plus-circle"></i> Tạo thông báo
           </button> -->
-        <button class="btn" (click)="toggleAdvancedSearch()"><i class="bi bi-file-earmark-excel"></i> Xuất File</button>
+        <button class="btn" (click)="openSearchPopup()"><i class="bi bi-file-earmark-excel"></i> Xuất File</button>
     </div>
 
     <div class="content">
@@ -32,16 +32,15 @@
                       [(ngModel)]="searchText"
                       (keyup.enter)="onSearchTextChange()" />
                       
-                    <button class="btn btn-secondary" (click)="toggleAdvancedSearch()">
+                    <button class="btn btn-secondary" (click)="openSearchPopup()">
                       <i class="bi bi-search"></i>
                     </button>
                     
                   </div>
             </div>
 
-            <div class="overlay" [hidden]="!showAdvancedSearch">
+            <div class="overlay" [hidden]="!showSearchPopup">
                 <div class="overlay-content"  style="background-color: transparent; padding: 0;width: 60%">
-                  <!-- <button class="btn-close" (click)="toggleAdvancedSearch()">&times;</button> -->
                   <app-advanced-search
                     (closePopupEvent)="handleClosePopup($event)"
                     (searchPopupEvent)="handleSearchPopup($event)">
