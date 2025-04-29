@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Input, Output} from '@angular/core';
+import { Component, EventEmitter, OnInit, Input, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ThongBaoService, DoLookupDatasRP, MergedData,TestSendNotificationRequest} from '../../../services/thong-bao.service';
@@ -7,6 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
 import { LoadingService } from '@app/services/loading.service';
 import { v4 as uuidv4 } from 'uuid';
+import { DebugUtils } from '@app/utils/debug-utils';
 
 @Component({
   selector: 'chitiet-thong-bao',
@@ -33,7 +34,21 @@ export class TbchitietComponent implements OnInit {
   tenNguoiTao: string = '';
   ngayTao: string = '';
 
+  showDonVisPopup = false;
+  sampleItems = Array.from({ length: 10 }, (_, i) => `VPTĐ${i + 1}`);
 
+  @ViewChild('popup') popupRef!: ElementRef;
+	@ViewChild('button') buttonRef!: ElementRef;
+
+  @HostListener('document:click', ['$event'])
+	onDocumentClick(event: MouseEvent) {
+		const target = event.target as HTMLElement;
+		const clickedInsidePopup = this.popupRef?.nativeElement.contains(target);
+		const clickedOnButton = this.buttonRef?.nativeElement.contains(target);
+		if (!clickedInsidePopup && !clickedOnButton) {
+			this.showDonVisPopup = false;
+		}
+	}
 
   @Output() closePopupEvent = new EventEmitter<{
     response: boolean;  // Thông báo cho ThongBaoComponent
@@ -325,4 +340,9 @@ export class TbchitietComponent implements OnInit {
     const selectedType = this.thongBaoForm.get('notificationType')?.value;
     this.isUserSearchVisible = selectedType === '2'; // Kiểm tra nếu là loại 2 thì hiển thị tìm kiếm user
   }
+
+  openDonVisPopup() {
+		this.showDonVisPopup = !this.showDonVisPopup;
+	}
+
 }

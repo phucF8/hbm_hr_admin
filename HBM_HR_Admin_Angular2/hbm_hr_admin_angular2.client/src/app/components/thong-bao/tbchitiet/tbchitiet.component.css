@@ -416,3 +416,58 @@ body {
     max-height: 90vh; /* thay vì 500px */
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+.dropdown-wrapper {
+	position: relative; /* Để popup định vị theo nút */
+	display: inline-block;
+}
+
+.custom-popup {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    overflow-y: auto;
+	margin-top: 4px;
+	background-color: white;
+	border: 1px solid #ccc;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	width: fit-content;
+	padding: 10px;
+}
+
+.grid-container {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr); /* 4 cột */
+	gap: 10px;
+}
+
+.grid-item {
+	background-color: #f2f2f2;
+	padding: 8px;
+	text-align: center;
+	border-radius: 4px;
+}
+
+.location-tag {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+}
