@@ -10,6 +10,8 @@ import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
 import { MatDialog } from '@angular/material/dialog';
 import { TbchitietDialogComponent } from './tbchitiet-dialog/tbchitiet-dialog.component';
 import { ThongBao } from '../../models/thong-bao.model'; // Import the ThongBao interface
+import { ToastrService } from 'ngx-toastr';
+import { DebugUtils } from '@app/utils/debug-utils';
 
 
 @Component({
@@ -50,7 +52,8 @@ export class ThongBaoComponent implements OnInit {
     private thongBaoService: ThongBaoService,
     private loadingService: LoadingService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastr: ToastrService,
   ) {}
 
   ngOnInit(): void {
@@ -300,6 +303,14 @@ export class ThongBaoComponent implements OnInit {
     // });
   }
 
+  xuatFile(): void {
+    this.toastr.success('Đăng ký thành công!', 'Thành công', {
+      positionClass: 'toast-top-center',
+      timeOut: 5000, // 5s
+      progressBar: true
+    });
+  }
+  
   
   handleCreate(data: any) {
     // Xử lý dữ liệu tạo mới

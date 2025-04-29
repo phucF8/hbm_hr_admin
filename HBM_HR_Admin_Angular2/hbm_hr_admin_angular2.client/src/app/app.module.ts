@@ -12,6 +12,8 @@ import { PaginationComponent } from './components/pagination/pagination.componen
 import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.component';
 import { TbchitietDialogComponent } from './components/thong-bao/tbchitiet-dialog/tbchitiet-dialog.component';
 import { AdvancedSearchComponent } from './components/advanced-search/advanced-search.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
 
 @NgModule({
@@ -29,7 +31,9 @@ import { AdvancedSearchComponent } from './components/advanced-search/advanced-s
     HttpClientModule,
     AppRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BrowserAnimationsModule, // bắt buộc
+    ToastrModule.forRoot(),  // cấu hình tùy chọn ở đây
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { EncryptionService } from '../../services/encryption.service';
+import { DebugUtils } from '@app/utils/debug-utils';
+import { LoadingService } from '@app/services/loading.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -18,15 +21,15 @@ export class LoginComponent implements OnInit {
   errorMessage: string = '';
 
   constructor(
+    private toastr: ToastrService,
     private http: HttpClient, 
     private router: Router,
     private authService: AuthService,
+    private loadingService: LoadingService,
     private encryptionService: EncryptionService
   ) { }
 
   ngOnInit() {
-    console.log('LoginComponent: ngOnInit started');
-    // Kiểm tra nếu đã có thông tin đăng nhập
     if (this.authService.isLoggedIn()) {
       console.log('LoginComponent: Đã tìm thấy thông tin đăng nhập, chuyển hướng đến trang thông báo');
       this.router.navigate(['/thongbao']).then(() => {
@@ -52,17 +55,24 @@ export class LoginComponent implements OnInit {
     }
     // Encrypt password before sending
     const encryptedPassword = this.encryptionService.encrypt(this.password);
-
+    this.loadingService.show();
     this.authService.login(this.username, encryptedPassword).subscribe({
       next: (response) => {
-        console.log('Đăng nhập thành công:', response);
-        localStorage.setItem('currentUser', JSON.stringify(response));
-        this.router.navigate(['/thongbao']); 
+        this.loadingService.hide();
+        if (response.Status == 'SUCCESS'){
+          this.router.navigate(['/thongbao']); 
+        }else{
+          this.toastr.error('Đã có lỗi xảy ra.', 'Lỗi');
+        }
+        
       },
       error: (error) => {
-        console.error('Lỗi đăng nhập:', error);
+        this.loadingService.hide();
         this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác';
       }
     });
   }
+
+  
+
 }

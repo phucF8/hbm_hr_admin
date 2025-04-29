@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { API_CONSTANTS } from '../constants/api.constants';
+import { DebugUtils } from '@app/utils/debug-utils';
 
 export interface NhanVienInfo {
   Username: string;
@@ -31,6 +32,7 @@ export interface UserInfo {
 
 export interface LoginResponse {
   Status: string;
+  Message: string;
   DataSets: {
     Table: UserInfo[];
     Table1: Array<{
@@ -83,11 +85,9 @@ export class AuthService {
         Password: password
       }
     };
-    console.log('Login attempt:', { username, password });
     return this.http.post<LoginResponse>(`${this.apiUrl}/DoCheckLogin`, request).pipe(
       tap(response => {
         if (response.Status === 'SUCCESS') {
-          // Lưu thông tin user và token vào localStorage
           localStorage.setItem('currentUser', JSON.stringify(response));
           this.currentUserSubject.next(response);
         }
