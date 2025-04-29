@@ -11,21 +11,21 @@
         <div class="form-group">
             <label for="request-group">Nhóm thông báo</label>
             <select id="mainType" [(ngModel)]="loaiThongBao">
-              <option [value]="null">Tất cả</option>
-              <option [value]="'RQ'">Đề xuất</option>
-              <option [value]="'GT'">Giải trình</option>
-              <option [value]="'XE'">Đặt xe</option>
-              <option [value]="'ROOM'">Đặt phòng họp</option>
-              <option [value]="'KPI'">KPIs</option>
+              <option [ngValue]="null">Tất cả</option>
+              <option [ngValue]="'RQ'">Đề xuất</option>
+              <option [ngValue]="'GT'">Giải trình</option>
+              <option [ngValue]="'XE'">Đặt xe</option>
+              <option [ngValue]="'ROOM'">Đặt phòng họp</option>
+              <option [ngValue]="'KPI'">KPIs</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="request-group">Loại thông báo</label>
             <select id="mainType" [(ngModel)]="notificationType">
-              <option [value]="null">Tất cả</option>
-              <option [value]="1">Tự động</option>
-              <option [value]="2">Chủ động</option>
+              <option [ngValue]="null">Tất cả</option>
+              <option [ngValue]="1">Tự động</option>
+              <option [ngValue]="2">Chủ động</option>
             </select>
         </div>
         

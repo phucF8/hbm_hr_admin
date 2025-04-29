@@ -101,7 +101,7 @@ export class ThongBaoService {
     ngayGuiDen?: string,
     trangThai?: number | null, // null: tất cả, 1: đã gửi, 0: chưa gửi
     notificationType?: number | null, // null: tất cả, 1: tự động, 2: chủ động 
-    loaiThongBao?: string | null  //vd: RQ,GT, ...
+    loaiThongBao?: string | null  //vd:loaiThongBao?: string | null  //vd: RQ,GT, ...
   ): Observable<{ items: ThongBao[], totalCount: number }> {
     let params = new HttpParams()
     if (pageIndex) 
@@ -120,7 +120,7 @@ export class ThongBaoService {
       params = params.set('trangThai', trangThai.toString());
     if (notificationType !== null && notificationType !== undefined) 
       params = params.set('notificationType', notificationType.toString());
-    if (loaiThongBao !== null && loaiThongBao !== undefined) 
+    if (loaiThongBao) 
       params = params.set('loaiThongBao', loaiThongBao);
     if (searchText) 
       params = params.set('searchText', searchText);
