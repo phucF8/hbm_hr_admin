@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output, ViewChild, AfterViewInit } from '@angular/core';
+import { DebugUtils } from '@app/utils/debug-utils';
 
 @Component({
   selector: 'app-advanced-search',
@@ -11,16 +12,16 @@ export class AdvancedSearchComponent{
   @Output() closePopupEvent = new EventEmitter<{
     response: boolean;
   }>();
+  
   @Output() searchPopupEvent = new EventEmitter<{
     ngayTaoTu?: string;
     ngayTaoDen?: string;
     ngayGuiTu?: string;
     ngayGuiDen?: string;
     trangThai?: number | null;
-    loaiThongBao?: number | null; // null: tất cả, 1: tự động, 2: chủ động
-  }>(
-    
-  );
+    notificationType?: number | null; // null: tất cả, 1: tự động, 2: chủ động
+    loaiThongBao?: string | null;
+  }>();
 
   // Biến lọc thông báo
   ngayTaoTu?: string;
@@ -28,7 +29,8 @@ export class AdvancedSearchComponent{
   ngayGuiTu?: string;
   ngayGuiDen?: string;
   trangThai?: number | null = null;
-  loaiThongBao?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
+  notificationType?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
+  loaiThongBao?: string | null = null;
 
   constructor() {
     console.log('AdvancedSearchComponent initialized');
@@ -49,6 +51,7 @@ export class AdvancedSearchComponent{
       ngayGuiTu: this.ngayGuiTu,
       ngayGuiDen: this.ngayGuiDen,
       trangThai: this.trangThai,
+      notificationType: this.notificationType,
       loaiThongBao: this.loaiThongBao,
     });
 

@@ -26,6 +26,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
     [FromQuery] int pageIndex = 1,
     [FromQuery] int pageSize = AppSettings.DefaultPageSize,
     [FromQuery] int notificationType = 0,
+    [FromQuery] string? loaiThongBao = null,
     [FromQuery] string? sortBy = "ngayTao",
     [FromQuery] string? searchText = "",
     [FromQuery] string? ngayTaoTu = null,
@@ -37,7 +38,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             var notifications = await _repository.GetNotificationsWithPaging(
                 pageIndex, 
                 pageSize, 
-                notificationType, 
+                notificationType,
+                loaiThongBao, 
                 sortBy, 
                 searchText, 
                 ngayTaoTu, 

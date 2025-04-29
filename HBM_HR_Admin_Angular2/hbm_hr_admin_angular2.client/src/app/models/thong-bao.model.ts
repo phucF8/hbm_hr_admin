@@ -13,6 +13,7 @@ export interface ThongBao {
   senderId: string;
   tenNhanVien: string;
   notificationType: number;
+  loaiThongBao: string;
   status: number;
   receivedCount: number;
   totalRecipients: number;

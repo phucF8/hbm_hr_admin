@@ -4,8 +4,8 @@ public class Notification
         public string Title { get; set; }
         public string Content { get; set; }
         public string TenNhanVien { get; set; }
-        public string? TriggerAction { get; set; }
         public int NotificationType { get; set; }
+        public string LoaiThongBao { get; set; }
         public byte Status { get; set; }
         public DateTime NgayTao { get; set; }
         public DateTime NgaySua { get; set; }

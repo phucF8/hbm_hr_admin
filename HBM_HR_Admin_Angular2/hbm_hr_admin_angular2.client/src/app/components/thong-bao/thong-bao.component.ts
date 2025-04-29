@@ -37,7 +37,8 @@ export class ThongBaoComponent implements OnInit {
   ngayGuiTu?: string;
   ngayGuiDen?: string;
   trangThai?: number | null = null; // null: tất cả, 1: đã gửi, 0: chưa gửi
-  loaiThongBao?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
+  notificationType?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
+  loaiThongBao?: string | null = null; 
   
 
   notificationId: string = '';
@@ -53,7 +54,7 @@ export class ThongBaoComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
+    this.loadListThongBao();
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.tenNhanVien = currentUser.TenNhanVien;
@@ -62,39 +63,33 @@ export class ThongBaoComponent implements OnInit {
 
   onPageChange(newPage: number) {
     this.currentPage = newPage;
-    this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
+    this.loadListThongBao();
   }
 
   onSortChange(sortBy: string) {
     this.sortBy = sortBy;
-    this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
+    this.loadListThongBao();
   }
 
   onSearchTextChange() {  
-    this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
+    this.loadListThongBao();
   }
 
-  loadListThongBao(
-    ngayTaoTu?: string,
-    ngayTaoDen?: string,
-    ngayGuiTu?: string,
-    ngayGuiDen?: string,
-    trangThai?: number | null,
-  ) {
+  loadListThongBao() {
     this.loadingService.show();
     this.thongBaoService.getListThongBao(
       this.currentPage,
       this.sortBy,
       this.searchText,
-      ngayTaoTu,
-      ngayTaoDen,
-      ngayGuiTu,
-      ngayGuiDen,
-      trangThai,
+      this.ngayTaoTu,
+      this.ngayTaoDen,
+      this.ngayGuiTu,
+      this.ngayGuiDen,
+      this.trangThai,
+      this.notificationType,
       this.loaiThongBao,
     ).subscribe({
       next: (data) => {
-        console.log('Received notifications:', data);
         this.thongBaoList = data.items;
         this.totalPages = Math.ceil(data.totalCount / ITEMS_PER_PAGE);
         this.loadingService.hide();
@@ -107,7 +102,7 @@ export class ThongBaoComponent implements OnInit {
   }
   
   onTypeChange() {
-    this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
+    this.loadListThongBao();
   }
 
   sendAgain() {
@@ -261,7 +256,7 @@ export class ThongBaoComponent implements OnInit {
     this.showSearchPopup = false;
     this.showThongBaoPopup = false; // Đóng popup tạo mới
     if (data.response == true){
-      this.loadListThongBao(this.ngayTaoTu, this.ngayTaoDen, this.ngayGuiTu, this.ngayGuiDen, this.trangThai);
+      this.loadListThongBao();
     }
     // Thêm logic đóng popup, hoặc xử lý UI tại đây
   }
@@ -273,15 +268,17 @@ export class ThongBaoComponent implements OnInit {
       ngayGuiTu?: string;
       ngayGuiDen?: string;
       trangThai?: number | null;
-    loaiThongBao?: number | null;
+      notificationType?: number | null; //1 tự động 2 chủ động
+      loaiThongBao?: string | null;  //vd RQ, GT, ...
     }): void {
       this.ngayTaoTu = data.ngayTaoTu;
       this.ngayTaoDen = data.ngayTaoDen;  
       this.ngayGuiTu = data.ngayGuiTu;
       this.ngayGuiDen = data.ngayGuiDen;
       this.trangThai = data.trangThai;
+      this.notificationType = data.notificationType;
       this.loaiThongBao = data.loaiThongBao;
-      this.loadListThongBao(data.ngayTaoTu, data.ngayTaoDen, data.ngayGuiTu, data.ngayGuiDen, data.trangThai);
+      this.loadListThongBao();
       this.showSearchPopup = false; // Đóng popup sau khi tìm kiếm
       document.body.classList.remove('no-scroll');
   }

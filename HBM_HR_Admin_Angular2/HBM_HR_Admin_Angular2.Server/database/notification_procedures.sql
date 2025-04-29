@@ -7,13 +7,14 @@ CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @PageNumber INT,
     @PageSize INT,
     @NotificationType INT,         -- 0: Lấy tất cả, 1 tự động, 2 chủ động
+    @LoaiThongBao VARCHAR(8),
     @SortBy NVARCHAR(50) = 'NgayTao',  -- Tên cột để sắp xếp
     @SearchText NVARCHAR(255) = '',    -- Tìm kiếm tiêu đề hoặc nội dung
     @SentStatus INT = NULL,        -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
     @FromDate DATE = NULL,         -- Ngày tạo: từ ngày (bao gồm)
     @ToDate DATE = NULL,           -- Ngày tạo: đến ngày (bao gồm)
     @FromSentDate DATE = NULL,     -- Ngày gửi: từ ngày (bao gồm)
-    @ToSentDate DATE = NULL,        -- Ngày gửi: đến ngày (bao gồm)
+    @ToSentDate DATE = NULL       -- Ngày gửi: đến ngày (bao gồm)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -35,6 +36,7 @@ BEGIN
             [Content],
             [TenNhanVien],        
             [NotificationType],
+            [LoaiThongBao],
             [Status],
             [ReceivedCount],
             [TotalRecipients],
@@ -43,6 +45,7 @@ BEGIN
         FROM [HBM_HCNSApp].[dbo].[v_NotificationsWithRecipients]
         WHERE 
             (@NotificationType = 0 OR NotificationType = @NotificationType)
+            AND ((@LoaiThongBao IS NULL OR LoaiThongBao = @LoaiThongBao))
             AND (@SentStatus IS NULL OR Status = @SentStatus)
             AND (@FromDate IS NULL OR NgayTao >= @FromDate)
             AND (@ToDate IS NULL OR NgayTao <= @ToDate)
@@ -58,6 +61,7 @@ BEGIN
         Content,
         TenNhanVien,
         NotificationType,
+        LoaiThongBao,
         Status,
         ReceivedCount,
         TotalRecipients,
@@ -114,6 +118,7 @@ BEGIN
         tb.Content,
         nv.TenNhanVien,
         tb.NotificationType,
+        tb.LoaiThongBao,
         tb.Status,
         tb.NgayTao,
         tb.NgaySua,
@@ -413,6 +418,7 @@ SELECT
     n.Title,
     n.Content,
     n.NotificationType,
+    n.LoaiThongBao,
 	n.Status,
     n.NgayTao,
     nv.TenNhanVien,
@@ -426,6 +432,7 @@ GROUP BY
     n.Title,
     n.Content,
     n.NotificationType,
+    n.LoaiThongBao,
 	n.Status,
     n.NgayTao,
     nv.TenNhanVien;

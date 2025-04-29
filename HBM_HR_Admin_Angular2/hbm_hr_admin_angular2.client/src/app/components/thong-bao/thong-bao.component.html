@@ -67,11 +67,11 @@
                         <th>Tiêu đề</th>
                         <th>Nội dung</th>
                         <th>Người gửi</th>
-                        <th>Ngày giờ gửi</th>
-                        <th>Send succ / sum</th>
-                        <th>Loại thông báo</th>
+                        <th>Ngày tạo</th>
+                        <th>Hoàn THÀNH</th>
+                        <th>Loại</th>
+                        <th>Nhóm</th>
                         <th>Hành động</th>
-
                     </tr>
                 </thead>
                 <tbody>
@@ -84,9 +84,10 @@
                       </td>
                       <td>{{ tb.content }}</td>
                       <td>{{ tb.tenNhanVien }}</td>
-                      <td>{{ tb.sentAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td>{{ tb.ngayTao | date:'dd/MM/yyyy HH:mm' }}</td>
                       <td>{{ tb.receivedCount }}/{{ tb.totalRecipients }}</td>
                       <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
+                      <td>{{ tb.loaiThongBao}}</td>
                       <td>
                         <button 
                           class="btn btn-warning btn-sm" 

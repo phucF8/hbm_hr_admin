@@ -10,19 +10,19 @@
         
         <div class="form-group">
             <label for="request-group">Nhóm thông báo</label>
-            <select id="mainType">
+            <select id="mainType" [(ngModel)]="loaiThongBao">
               <option [value]="null">Tất cả</option>
-              <option [value]="1">Đề xuất</option>
-              <option [value]="2">Giải trình</option>
-              <option [value]="3">Đặt xe</option>
-              <option [value]="4">Đặt phòng họp</option>
-              <option [value]="5">KPIs</option>
+              <option [value]="'RQ'">Đề xuất</option>
+              <option [value]="'GT'">Giải trình</option>
+              <option [value]="'XE'">Đặt xe</option>
+              <option [value]="'ROOM'">Đặt phòng họp</option>
+              <option [value]="'KPI'">KPIs</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="request-group">Loại thông báo</label>
-            <select id="mainType" [(ngModel)]="loaiThongBao">
+            <select id="mainType" [(ngModel)]="notificationType">
               <option [value]="null">Tất cả</option>
               <option [value]="1">Tự động</option>
               <option [value]="2">Chủ động</option>

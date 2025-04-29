@@ -100,12 +100,14 @@ export class ThongBaoService {
     ngayGuiTu?: string,
     ngayGuiDen?: string,
     trangThai?: number | null, // null: tất cả, 1: đã gửi, 0: chưa gửi
-    loaiThongBao?: number | null // null: tất cả, 1: tự động, 2: chủ động 
+    notificationType?: number | null, // null: tất cả, 1: tự động, 2: chủ động 
+    loaiThongBao?: string | null  //vd: RQ,GT, ...
   ): Observable<{ items: ThongBao[], totalCount: number }> {
     let params = new HttpParams()
-      .set('pageIndex', pageIndex.toString())
-      .set('sortBy', sortBy)
-      .set('searchText', searchText);
+    if (pageIndex) 
+        params = params.set('pageIndex', pageIndex);
+    if (sortBy) 
+      params = params.set('sortBy', sortBy);
     if (ngayTaoTu) 
       params = params.set('ngayTaoTu', ngayTaoTu);
     if (ngayTaoDen) 
@@ -116,12 +118,14 @@ export class ThongBaoService {
       params = params.set('ngayGuiDen', ngayGuiDen);
     if (trangThai !== null && trangThai !== undefined) 
       params = params.set('trangThai', trangThai.toString());
+    if (notificationType !== null && notificationType !== undefined) 
+      params = params.set('notificationType', notificationType.toString());
     if (loaiThongBao !== null && loaiThongBao !== undefined) 
-      params = params.set('notificationType', loaiThongBao.toString());
-
-
+      params = params.set('loaiThongBao', loaiThongBao);
+    if (searchText) 
+      params = params.set('searchText', searchText);
+    
     DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
-
 
     return this.http.get<{ items: ThongBao[], totalCount: number }>(this.apiUrl, { params }).pipe(
       catchError(error => {
