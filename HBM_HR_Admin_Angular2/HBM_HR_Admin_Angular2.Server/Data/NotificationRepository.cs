@@ -106,58 +106,56 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-
-public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
-    int pageIndex,
-    int pageSize,
-    int notificationType,
-    string? loaiThongBao,
-    string? sortBy,
-    string? searchText,
-    string? ngayTaoTu,
-    string? ngayTaoDen,
-    string? ngayGuiTu,
-    string? ngayGuiDen,
-    int? trangThai)
-{
-    try
-    {
-        using var connection = new SqlConnection(_connectionString);
-        var parameters = new
+        public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
+            int pageIndex,
+            int pageSize,
+            int notificationType,
+            string? loaiThongBao,
+            string? sortBy,
+            string? searchText,
+            string? ngayTaoTu,
+            string? ngayTaoDen,
+            string? ngayGuiTu,
+            string? ngayGuiDen,
+            int? trangThai)
         {
-            PageNumber = pageIndex,
-            PageSize = pageSize,
-            NotificationType = notificationType,
-            LoaiThongBao = loaiThongBao,
-            SortBy = sortBy,
-            SearchText = searchText,
-            FromDate = string.IsNullOrWhiteSpace(ngayTaoTu) ? (DateTime?)null : DateTime.Parse(ngayTaoTu),
-            ToDate = string.IsNullOrWhiteSpace(ngayTaoDen) ? (DateTime?)null : DateTime.Parse(ngayTaoDen),
-            FromSentDate = string.IsNullOrWhiteSpace(ngayGuiTu) ? (DateTime?)null : DateTime.Parse(ngayGuiTu),
-            ToSentDate = string.IsNullOrWhiteSpace(ngayGuiDen) ? (DateTime?)null : DateTime.Parse(ngayGuiDen),
-            SentStatus = trangThai
-        };
+            try
+            {
+                using var connection = new SqlConnection(_connectionString);
+                var parameters = new
+                {
+                    PageNumber = pageIndex,
+                    PageSize = pageSize,
+                    NotificationType = notificationType,
+                    LoaiThongBao = loaiThongBao,
+                    SortBy = sortBy,
+                    SearchText = searchText,
+                    FromDate = string.IsNullOrWhiteSpace(ngayTaoTu) ? (DateTime?)null : DateTime.Parse(ngayTaoTu),
+                    ToDate = string.IsNullOrWhiteSpace(ngayTaoDen) ? (DateTime?)null : DateTime.Parse(ngayTaoDen),
+                    FromSentDate = string.IsNullOrWhiteSpace(ngayGuiTu) ? (DateTime?)null : DateTime.Parse(ngayGuiTu),
+                    ToSentDate = string.IsNullOrWhiteSpace(ngayGuiDen) ? (DateTime?)null : DateTime.Parse(ngayGuiDen),
+                    SentStatus = trangThai
+                };
 
-        var result = await connection.QueryAsync<Notification>(
-            "NS_ADTB_GetNotificationsWithPaging",
-            parameters,
-            commandType: CommandType.StoredProcedure);
+                var result = await connection.QueryAsync<Notification>(
+                    "NS_ADTB_GetNotificationsWithPaging",
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
 
-        int totalCount = result.Any() ? result.First().TotalCount : 0;
+                int totalCount = result.Any() ? result.First().TotalCount : 0;
 
-        return new PagedResult<Notification>
-        {
-            Items = result.ToList(),
-            TotalCount = totalCount
-        };
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error getting notifications with paging");
-        throw;
-    }
-}
-
+                return new PagedResult<Notification>
+                {
+                    Items = result.ToList(),
+                    TotalCount = totalCount
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting notifications with paging");
+                throw;
+            }
+        }
 
         public async Task<Notification?> GetNotificationByID(string notificationID)
         {

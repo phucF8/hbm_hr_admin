@@ -1,59 +1,60 @@
+
 <header *ngIf="isLoggedIn">
-  <div class="header">
-    <img src="images/hbm_favicon.png" alt="Logo" class="" />
-    <div class="nav-item">
-        <i>👤</i>
-        <select>
-            <option>Admin</option>
-        </select>
-    </div>
-    <!-- <div class="nav-item">
-        <i>📅</i>
-        <select>
-            <option>Hành chính</option>
-        </select>
-    </div>
-    <div class="nav-item">
-        <i>📝</i>
-        <select>
-            <option>Request</option>
-        </select>
-    </div>
-    <div class="nav-item">
-        <i>📊</i>
-        <select>
-            <option>TĐ&ĐT</option>
-        </select>
-    </div>
-    <div class="nav-item">
-        <i>⚙️</i>
-        <select>
-            <option>Ô TRỊ</option>
-        </select>
-    </div> -->
-
-    <div style="width: 100%;" ></div>
-
-    <div class="dropdown-container">
-      <div class="dropdown-header">
-          <div class="user-name" (click)="togglePopup()">{{tenNhanVien}}</div>
+    <div class="header">
+      <img src="images/hbm_favicon.png" alt="Logo" class="" />
+      <div class="nav-item">
+          <i>👤</i>
+          <select>
+              <option>Admin</option>
+          </select>
       </div>
-      
-      <div class="dropdown-menu" *ngIf="isPopupVisible">
-          <a href="#" class="dropdown-item logout" (click)="logout()">
-              <i>🚪</i> Đăng xuất
-          </a>
+      <!-- <div class="nav-item">
+          <i>📅</i>
+          <select>
+              <option>Hành chính</option>
+          </select>
       </div>
-    </div>
-
-    
-    
+      <div class="nav-item">
+          <i>📝</i>
+          <select>
+              <option>Request</option>
+          </select>
+      </div>
+      <div class="nav-item">
+          <i>📊</i>
+          <select>
+              <option>TĐ&ĐT</option>
+          </select>
+      </div>
+      <div class="nav-item">
+          <i>⚙️</i>
+          <select>
+              <option>Ô TRỊ</option>
+          </select>
+      </div> -->
   
-</div>  
-</header>
-  <main >
-    <div *ngIf="isLoading | async" class="loading-overlay">
-      <div class="spinner"></div>
-    </div>
-    <router-outlet></router-outlet>
-  </main>
+      <div style="width: 100%;" ></div>
+  
+      <div class="dropdown-container">
+        <div class="dropdown-header">
+            <div class="user-name" (click)="togglePopup()">{{tenNhanVien}}</div>
+        </div>
+        
+        <div class="dropdown-menu" *ngIf="isPopupVisible">
+            <a href="#" class="dropdown-item logout" (click)="logout()">
+                <i>🚪</i> Đăng xuất
+            </a>
+        </div>
+      </div>
+  
+      
+      
+    
+  </div>  
+  </header>
+    <main >
+      <div *ngIf="isLoading | async" class="loading-overlay">
+        <div class="spinner"></div>
+      </div>
+      <router-outlet></router-outlet>
+    </main>

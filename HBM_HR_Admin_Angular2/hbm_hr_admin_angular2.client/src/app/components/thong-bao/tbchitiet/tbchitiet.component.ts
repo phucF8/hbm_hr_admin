@@ -7,6 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
 import { LoadingService } from '@app/services/loading.service';
 import { v4 as uuidv4 } from 'uuid';
+import { DonVi } from '@app/models/donvi';
 import { DebugUtils } from '@app/utils/debug-utils';
 
 @Component({
@@ -35,7 +36,20 @@ export class TbchitietComponent implements OnInit {
   ngayTao: string = '';
 
   showDonVisPopup = false;
-  sampleItems = Array.from({ length: 10 }, (_, i) => `VPTĐ${i + 1}`);
+
+  selectedDonVi: DonVi | null = null;
+  donvis: DonVi[] = [
+  { id: '385ae8c687d347e4', ma: 'GOL', tenKho: 'GẠCH' },
+  { id: 'F98431BCF2404EFC', ma: 'HBMVT', tenKho: 'VPVT' },
+  { id: '08a8f3bec5934', ma: 'S001', tenKho: 'VPTÐ' },
+  { id: 'd2f012837f434794', ma: 'S002', tenKho: 'THÉP' },
+  { id: '2d74d08d99734470', ma: 'S004', tenKho: 'VPYB' },
+  { id: '7d1e43e2b0fc4f54', ma: 'S005', tenKho: 'Ô TÔ' },
+  { id: '9e9a1bda336343b5', ma: 'S006', tenKho: 'XMMB' },
+  { id: 'f4424e5a354b4548', ma: 'S008', tenKho: 'HBYB' },
+  { id: '056fef14cbb64105', ma: 'S009', tenKho: 'XMMN' },
+  { id: '9513b33e7e58492e', ma: 'VLXD', tenKho: 'VLXD' },
+  ];
 
   @ViewChild('popup') popupRef!: ElementRef;
 	@ViewChild('button') buttonRef!: ElementRef;
@@ -76,10 +90,17 @@ export class TbchitietComponent implements OnInit {
     });
   }
 
+  selectDonVi(item: DonVi): void {
+    this.selectedDonVi = item;
+    this.showDonVisPopup = false;
+  }
+
   ngOnInit(): void {
     if (this.notificationId) {
       this.loadNotification();
       this.isUserSearchVisible = true; // sửa thông báo thì luôn hiện danh sách user - có hợp lý không?
+    }else{
+        this.selectedDonVi = this.donvis.find(d => d.tenKho === 'VPTÐ') || null;
     }
   }
 

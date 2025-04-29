@@ -14,6 +14,7 @@ import { TbchitietDialogComponent } from './components/thong-bao/tbchitiet-dialo
 import { AdvancedSearchComponent } from './components/advanced-search/advanced-search.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { ToastTestComponent } from './toast-test/toast-test.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { ToastrModule } from 'ngx-toastr';
     PaginationComponent,
     TbchitietComponent,
     TbchitietDialogComponent,
-    AdvancedSearchComponent
+    AdvancedSearchComponent,
+    ToastTestComponent
   ],
   imports: [
     BrowserModule,
@@ -33,7 +35,9 @@ import { ToastrModule } from 'ngx-toastr';
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule, // bắt buộc
-    ToastrModule.forRoot(),  // cấu hình tùy chọn ở đây
+    ToastrModule.forRoot({
+      positionClass: 'toast-top-right'  // 👈 Thêm dòng này
+    }),  // cấu hình tùy chọn ở đây
   ],
   providers: [],
   bootstrap: [AppComponent]

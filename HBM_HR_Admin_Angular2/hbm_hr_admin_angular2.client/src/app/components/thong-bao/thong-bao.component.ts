@@ -304,7 +304,7 @@ export class ThongBaoComponent implements OnInit {
   }
 
   xuatFile(): void {
-    this.toastr.success('Đăng ký thành công!', 'Thành công', {
+    this.toastr.success('...', 'Xuất file', {
       positionClass: 'toast-top-center',
       timeOut: 5000, // 5s
       progressBar: true

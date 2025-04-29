@@ -35,7 +35,6 @@ body {
 .section {
     margin-bottom: 8px;
     border-bottom: 1px solid #eee;
-    border-bottom: 1px solid black;
     padding-bottom: 8px;
 }
 .section-title {
@@ -191,7 +190,11 @@ h1 {
     font-weight: bold;
     display: flex;
     align-items: center;
+
+    white-space: nowrap;       /* Không cho xuống dòng */
+   
 }
+
 
 .dropdown-btn::after {
     content: "▼";
@@ -471,3 +474,8 @@ body {
     align-items: center;
     font-size: 10px;
 }
+
+.location-tag.selected {
+    background-color: red;
+    color: white;
+  }

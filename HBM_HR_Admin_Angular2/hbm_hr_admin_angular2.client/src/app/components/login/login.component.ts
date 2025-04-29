@@ -62,9 +62,11 @@ export class LoginComponent implements OnInit {
         if (response.Status == 'SUCCESS'){
           this.router.navigate(['/thongbao']); 
         }else{
-          this.toastr.error('Đã có lỗi xảy ra.', 'Lỗi');
+          //this.toastr.error('Đã có lỗi xảy ra.', 'Lỗi');
+          this.toastr.error('ERROR', response.Message, {
+            positionClass: 'toast-top-center'
+          });
         }
-        
       },
       error: (error) => {
         this.loadingService.hide();
@@ -72,7 +74,5 @@ export class LoginComponent implements OnInit {
       }
     });
   }
-
-  
 
 }

@@ -62,11 +62,11 @@
                 <div class="search-container" *ngIf="!notificationId">
 
                     <div>
-                        <button class="dropdown-btn" (click)="openDonVisPopup()" #button>VPTĐ</button>
+                        <button class="dropdown-btn" (click)="openDonVisPopup()" #button>{{selectedDonVi?.tenKho}}</button>
                         <!-- Popup hiển thị danh sách -->
                         <div  *ngIf="showDonVisPopup"  class="custom-popup" #popup>
                             <div class="grid-container">
-                                <button class="location-tag" *ngFor="let item of sampleItems">{{ item }}</button>
+                                <button class="location-tag" *ngFor="let item of donvis" [ngClass]="{ 'selected': selectedDonVi?.id === item.id }"  (click)="selectDonVi(item)">{{ item.tenKho }}</button>
                             </div>
                         </div>
                     </div>
