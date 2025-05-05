@@ -14,7 +14,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { ToastTestComponent } from './toast-test/toast-test.component';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
-
+import { XuatFileComponent } from './components/xuat-file/xuat-file.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [
@@ -25,6 +29,7 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
     TbchitietComponent,
     AdvancedSearchComponent,
     ToastTestComponent,
+    XuatFileComponent,
   ],
   imports: [
     BrowserModule,
@@ -35,7 +40,11 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
     BrowserAnimationsModule, // bắt buộc
     ToastrModule.forRoot({
       positionClass: 'toast-top-right'  // 👈 Thêm dòng này
-    }),  // cấu hình tùy chọn ở đây
+    }),
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatRadioModule
   ],
   providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
   bootstrap: [AppComponent]

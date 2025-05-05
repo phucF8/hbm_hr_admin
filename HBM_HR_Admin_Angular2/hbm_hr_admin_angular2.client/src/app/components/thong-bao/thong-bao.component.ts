@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ThongBao } from '../../models/thong-bao.model'; // Import the ThongBao interface
 import { ToastrService } from 'ngx-toastr';
 import { DebugUtils } from '@app/utils/debug-utils';
+import { XuatFileComponent } from '../xuat-file/xuat-file.component';
 
 
 @Component({
@@ -294,6 +295,19 @@ export class ThongBaoComponent implements OnInit {
       positionClass: 'toast-top-center',
       timeOut: 5000, // 5s
       progressBar: true
+    });
+  }
+
+  openXuatFile() {
+    const dialogRef = this.dialog.open(XuatFileComponent, {
+      width: '400px',
+      data: {} // nếu muốn truyền gì đó
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // this.exportExcel(result);  // result chứa các thông số lọc
+      }
     });
   }
   

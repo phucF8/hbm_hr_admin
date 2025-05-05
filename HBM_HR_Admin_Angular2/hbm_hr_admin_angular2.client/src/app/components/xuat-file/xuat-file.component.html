@@ -1,0 +1,52 @@
+<div class="form-container">
+  <form [formGroup]="xuatFileForm" (ngSubmit)="onSubmit()" class="needs-validation">
+
+    
+    <div class="header">CHỌN PHẠM VI XUẤT FILE</div>
+      
+        <div class="form-group">
+          <label>
+            <input type="radio" formControlName="exportOption" value="current">
+            Xuất trang hiện tại (Trang {{currentPage}})
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="radio" formControlName="exportOption" value="range">
+            Xuất từ trang đến trang
+          </label>
+          <div *ngIf="xuatFileForm.get('exportOption')?.value === 'range'" class="info-row">
+            <div class="date-container">
+              <input type="number" placeholder="Từ trang" id="from-page" [(ngModel)]="fromPage" min="1" placeholder="Từ trang">
+              <input type="number" placeholder="Đến trang" id="to-page" [(ngModel)]="toPage"  min="1" placeholder="Đến trang">
+          </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="radio" formControlName="exportOption" value="list">
+            Xuất các trang cụ thể
+          </label>
+
+          <div *ngIf="xuatFileForm.get('exportOption')?.value === 'list'" class="info-row">
+            <div class="info-value">
+              <input type="text" class="form-control" formControlName="pageList" placeholder="1,3,5">
+            </div>
+          </div>
+        </div>
+
+
+
+    <div class="buttons-wrapper">
+      <button type="button" class="btn btn-cancel" (click)="onCancel()">
+        <span>⊝</span> Đóng
+      </button>
+      <button type="submit" class="btn btn-submit">
+        <span>⬇</span> Xuất File
+      </button>
+    </div>
+
+  </form>
+</div>
