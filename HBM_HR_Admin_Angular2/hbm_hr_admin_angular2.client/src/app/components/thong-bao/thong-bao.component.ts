@@ -290,8 +290,48 @@ export class ThongBaoComponent implements OnInit {
     // });
   }
 
-  xuatFile(): void {
-    this.toastr.success('...', 'Xuất file', {
+  exportCurrentPage(data: any) {
+    console.log('Xuất trang hiện tại: ', data.currentPage);
+    // Xử lý xuất file cho trang hiện tại, ví dụ:
+    // Tạo tệp Excel với dữ liệu của trang hiện tại.
+  }
+
+  exportPageRange(fromPage: number, toPage: number) {
+    console.log('Xuất từ trang', fromPage, 'đến trang', toPage);
+    // Xử lý xuất file từ trang từ `fromPage` đến `toPage`, ví dụ:
+    // Tạo tệp Excel với các trang trong phạm vi này.
+  }
+
+  exportSpecificPages(pageList: string) {
+    const pages = pageList.split(',').map(page => parseInt(page.trim(), 10));
+    console.log('Xuất các trang:', pages);
+    // Xử lý xuất file với danh sách các trang đã chọn, ví dụ:
+    // Tạo tệp Excel với các trang cụ thể trong danh sách `pages`.
+  }
+
+  xuatFile(data: any): void {
+    console.log('Dữ liệu xuất file:', data);
+
+  switch (data.exportOption) {
+    case 'current':
+      this.exportCurrentPage(data);
+      break;
+    case 'range':
+      this.exportPageRange(data.fromPage, data.toPage);
+      break;
+    case 'list':
+      this.exportSpecificPages(data.pageList);
+      break;
+    default:
+      console.error('Chọn phương thức xuất không hợp lệ');
+  }
+
+
+
+
+
+
+    this.toastr.success('...', `${data.fromPage} - ${data.toPage}`, {
       positionClass: 'toast-top-center',
       timeOut: 5000, // 5s
       progressBar: true
@@ -306,7 +346,8 @@ export class ThongBaoComponent implements OnInit {
   
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // this.exportExcel(result);  // result chứa các thông số lọc
+        
+        this.xuatFile(result);
       }
     });
   }

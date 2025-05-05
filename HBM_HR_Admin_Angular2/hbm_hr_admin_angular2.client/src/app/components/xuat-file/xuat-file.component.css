@@ -92,3 +92,15 @@ button:hover {
     gap: 8px; /* khoảng cách giữa các nút */
     margin-top: 16px; /* tùy chỉnh nếu cần khoảng cách với phần trên */
 }
+
+.error-message {
+    color: #d9534f; /* Màu đỏ Bootstrap danger */
+    font-size: 0.875rem; /* Nhỏ hơn text bình thường một chút */
+    margin-top: 4px;
+    margin-left: 4px;
+  }
+  
+  .error-message::before {
+    content: "⚠ "; /* Thêm icon cảnh báo */
+  }
+  
