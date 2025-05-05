@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
 import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.component';
-import { TbchitietDialogComponent } from './components/thong-bao/tbchitiet-dialog/tbchitiet-dialog.component';
 import { AdvancedSearchComponent } from './components/advanced-search/advanced-search.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
@@ -24,7 +23,6 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
     ThongBaoComponent,
     PaginationComponent,
     TbchitietComponent,
-    TbchitietDialogComponent,
     AdvancedSearchComponent,
     ToastTestComponent,
   ],

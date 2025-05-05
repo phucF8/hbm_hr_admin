@@ -7,7 +7,6 @@ import { LoadingService } from '@app/services/loading.service';
 import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notification-types';
 import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
 import { MatDialog } from '@angular/material/dialog';
-import { TbchitietDialogComponent } from './tbchitiet-dialog/tbchitiet-dialog.component';
 import { ThongBao } from '../../models/thong-bao.model'; // Import the ThongBao interface
 import { ToastrService } from 'ngx-toastr';
 import { DebugUtils } from '@app/utils/debug-utils';
@@ -203,19 +202,7 @@ export class ThongBaoComponent implements OnInit {
     });
   }
 
-  taoThongBaoDialog() {
-    const dialogRef = this.dialog.open(TbchitietDialogComponent, {
-      width: '1000px', // Điều chỉnh kích thước hộp thoại
-      data: { isNew: true } // Gửi dữ liệu nếu cần
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Dialog closed', result);
-      if (result){
-        this.loadListThongBao();
-      }
-    });
-  }
+  
 
   logout() {
     console.log('🚪 Logging out user');
