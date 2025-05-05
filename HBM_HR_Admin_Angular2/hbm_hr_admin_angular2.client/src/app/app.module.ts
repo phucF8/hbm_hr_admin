@@ -2,7 +2,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
@@ -15,6 +14,7 @@ import { AdvancedSearchComponent } from './components/advanced-search/advanced-s
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { ToastTestComponent } from './toast-test/toast-test.component';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 
 @NgModule({
@@ -26,7 +26,7 @@ import { ToastTestComponent } from './toast-test/toast-test.component';
     TbchitietComponent,
     TbchitietDialogComponent,
     AdvancedSearchComponent,
-    ToastTestComponent
+    ToastTestComponent,
   ],
   imports: [
     BrowserModule,
@@ -39,7 +39,7 @@ import { ToastTestComponent } from './toast-test/toast-test.component';
       positionClass: 'toast-top-right'  // 👈 Thêm dòng này
     }),  // cấu hình tùy chọn ở đây
   ],
-  providers: [],
+  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

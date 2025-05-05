@@ -37,12 +37,12 @@
   
       <div class="dropdown-container">
         <div class="dropdown-header">
-            <div class="user-name" (click)="togglePopup()">{{tenNhanVien}}</div>
+            <div class="user-name" (click)="togglePopup()" #button>{{tenNhanVien}}</div>
         </div>
         
-        <div class="dropdown-menu" *ngIf="isPopupVisible">
+        <div class="dropdown-menu" *ngIf="showSignoutPopup">
             <a href="#" class="dropdown-item logout" (click)="logout()">
-                <i>🚪</i> Đăng xuất
+                <i class="bi bi-box-arrow-right"></i> Đăng xuất
             </a>
         </div>
       </div>

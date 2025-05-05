@@ -127,7 +127,8 @@ export class TbchitietComponent implements OnInit {
             ID: recipient.recipientId,
             MaNhanVien: recipient.recipientId, // Nếu recipientId là mã nhân viên
             TenNhanVien: recipient.tenNhanVien,
-            TenPhongBan: 'TÊN PHÒNG BAN', // Nếu cần, hãy lấy từ một nguồn khác
+            tenChucDanh: recipient.tenChucDanh,
+            TenPhongBan: recipient.tenPhongBan, // Nếu cần, hãy lấy từ một nguồn khác
             status: recipient.status,
             ngayTao: recipient.ngayTao,
           })) as MergedData[];

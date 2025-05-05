@@ -2,6 +2,8 @@ export interface ThongBaoRecipient {
   notificationId: string;
   recipientId: string;
   tenNhanVien: string;
+  tenChucDanh: string;
+  tenPhongBan: string;
   status: number;
   ngayTao: string;
 }

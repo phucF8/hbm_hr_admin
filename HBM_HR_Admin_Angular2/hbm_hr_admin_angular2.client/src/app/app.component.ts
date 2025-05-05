@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Input, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { AuthService } from './services/auth.service'; // Đảm bảo đường dẫn đúng
 import { Router } from '@angular/router';
 import { LoadingService } from '@app/services/loading.service';
@@ -23,9 +23,23 @@ export class AppComponent implements OnInit {
   tenNhanVien: string = '';
   public forecasts: WeatherForecast[] = [];
   showCreatePopup = false;
-  isPopupVisible = false;
+  showSignoutPopup = false;
 
   isLoading: Observable<boolean>;
+
+
+  @ViewChild('popup') popupRef!: ElementRef;
+	@ViewChild('button') buttonRef!: ElementRef;
+
+  @HostListener('document:click', ['$event'])
+	onDocumentClick(event: MouseEvent) {
+		const target = event.target as HTMLElement;
+		const clickedInsidePopup = this.popupRef?.nativeElement.contains(target);
+		const clickedOnButton = this.buttonRef?.nativeElement.contains(target);
+		if (!clickedInsidePopup && !clickedOnButton) {
+			this.showSignoutPopup = false;
+		}
+	}
 
   constructor(
     private http: HttpClient,
@@ -58,7 +72,7 @@ export class AppComponent implements OnInit {
   }
 
   togglePopup() {
-    this.isPopupVisible = !this.isPopupVisible;
+    this.showSignoutPopup = !this.showSignoutPopup;
   }
 
   title = 'hbm_hr_admin_angular2.client';
