@@ -123,7 +123,8 @@ BEGIN
         tb.NgayTao,
         tb.NgaySua,
         tb.NguoiTao,
-        tb.NguoiSua
+        tb.NguoiSua,
+        tb.IDThamChieu
     FROM NS_ADTB_Notifications tb
     LEFT JOIN NS_NhanViens nv ON tb.NguoiTao = nv.ID
     WHERE tb.ID = @NotificationID;

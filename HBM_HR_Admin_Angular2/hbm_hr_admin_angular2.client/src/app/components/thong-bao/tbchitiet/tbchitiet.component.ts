@@ -31,6 +31,7 @@ export class TbchitietComponent implements OnInit {
   isUserSearchVisible: boolean = false;
   isSearching: boolean = false;
   status: number = 0; // Trạng thái mặc định là 0 (Chưa gửi)
+  idThamChieu: string = '';
 
   tenNguoiTao: string = '';
   ngayTao: string = '';
@@ -110,6 +111,7 @@ export class TbchitietComponent implements OnInit {
       next: (notification) => {
         this.loadingService.hide();
         if (notification) {
+          this.idThamChieu = notification.idThamChieu || '';
           this.status = notification.status; // Lưu trạng thái thông báo
           if (this.status === 1) {
             this.thongBaoForm.get('notificationType')?.disable();
@@ -366,5 +368,11 @@ export class TbchitietComponent implements OnInit {
   openDonVisPopup() {
 		this.showDonVisPopup = !this.showDonVisPopup;
 	}
+
+  goToDetail() {
+    DebugUtils.openStringInNewWindow(`${this.idThamChieu}`);
+    const link = `https://workhub.hbm.vn/HC/GiaiTrinhLink?rq=${this.idThamChieu}`;
+    window.open(link, '_blank'); // mở link ở tab mới
+  }
 
 }

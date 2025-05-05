@@ -16,6 +16,7 @@ export interface ThongBao {
   tenNhanVien: string;
   notificationType: number;
   loaiThongBao: string;
+  idThamChieu: string;
   status: number;
   receivedCount: number;
   totalRecipients: number;

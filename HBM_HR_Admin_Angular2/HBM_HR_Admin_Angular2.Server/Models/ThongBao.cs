@@ -6,6 +6,7 @@ public class Notification
         public string TenNhanVien { get; set; }
         public int NotificationType { get; set; }
         public string LoaiThongBao { get; set; }
+        public string IDThamChieu { get; set; }
         public byte Status { get; set; }
         public DateTime NgayTao { get; set; }
         public DateTime NgaySua { get; set; }

@@ -25,6 +25,9 @@
                     <input type="text" class="form-control" id="title" formControlName="title" placeholder="Tiêu đề"
                         [readonly]="status === 1"
                         [class.is-invalid]="thongBaoForm.get('title')?.invalid && thongBaoForm.get('title')?.touched">
+                        <a *ngIf="idThamChieu !== ''" class="link-right" (click)="goToDetail()">
+                            Xem chi tiết
+                        </a>
                 </div>
             </div>
         </div>
@@ -40,6 +43,9 @@
             </div>
         </div>
 
+        <div class="section">
+        
+        </div>
 
 
 
