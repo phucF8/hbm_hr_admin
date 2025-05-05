@@ -11,6 +11,11 @@ import { ThongBao } from '../../models/thong-bao.model'; // Import the ThongBao 
 import { ToastrService } from 'ngx-toastr';
 import { DebugUtils } from '@app/utils/debug-utils';
 import { XuatFileComponent } from '../xuat-file/xuat-file.component';
+import * as FileSaver from 'file-saver';
+import { Observable, forkJoin } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { exportToExcel } from '@app/utils/excel-export.util'; // Import your utility function for exporting to Excel
+
 
 
 @Component({
@@ -39,8 +44,8 @@ export class ThongBaoComponent implements OnInit {
   ngayGuiDen?: string;
   trangThai?: number | null = null; // null: tất cả, 1: đã gửi, 0: chưa gửi
   notificationType?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
-  loaiThongBao?: string | null = null; 
-  
+  loaiThongBao?: string | null = null;
+
 
   notificationId: string = '';
   showThongBaoPopup: boolean = false;
@@ -53,7 +58,7 @@ export class ThongBaoComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private toastr: ToastrService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadListThongBao();
@@ -73,7 +78,7 @@ export class ThongBaoComponent implements OnInit {
     this.loadListThongBao();
   }
 
-  onSearchTextChange() {  
+  onSearchTextChange() {
     this.loadListThongBao();
   }
 
@@ -98,11 +103,41 @@ export class ThongBaoComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading notifications:', error);
-        this.loadingService.hide();  
+        this.loadingService.hide();
       }
     });
   }
-  
+
+  loadListThongBaoForPages(selectedPages: number[]): Observable<any[]> {
+    this.loadingService.show();
+    const requests = selectedPages.map(page => 
+      this.thongBaoService.getListThongBao(
+        page,
+        this.sortBy,
+        this.searchText,
+        this.ngayTaoTu,
+        this.ngayTaoDen,
+        this.ngayGuiTu,
+        this.ngayGuiDen,
+        this.trangThai,
+        this.notificationType,
+        this.loaiThongBao
+      )
+    );
+    return forkJoin(requests).pipe(
+      map(results => {
+        const allItems = results.flatMap(res => res.items);
+        this.loadingService.hide();
+        return allItems;
+      }),
+      catchError(error => {
+        console.error('Error loading notifications for selected pages:', error);
+        this.loadingService.hide();
+        throw error;
+      })
+    );
+  }
+
   onTypeChange() {
     this.loadListThongBao();
   }
@@ -124,7 +159,7 @@ export class ThongBaoComponent implements OnInit {
         console.log("Deleting notification with ID:", tb.id);
         return this.thongBaoService.deleteThongBao(tb.id).toPromise();
       });
-      
+
 
       Promise.all(deletePromises)
         .then(() => {
@@ -153,7 +188,7 @@ export class ThongBaoComponent implements OnInit {
     this.showThongBaoPopup = true;
     this.notificationId = id;
   }
-  
+
   // Hàm chọn tất cả checkbox
   toggleSelectAll() {
     this.thongBaoList.forEach(tb => {
@@ -161,7 +196,7 @@ export class ThongBaoComponent implements OnInit {
         tb.selected = this.selectAll;
       }
     });
-    
+
   }
 
   getNotificationTypeName(typeId: number): string {
@@ -203,7 +238,7 @@ export class ThongBaoComponent implements OnInit {
     });
   }
 
-  
+
 
   logout() {
     console.log('🚪 Logging out user');
@@ -245,7 +280,7 @@ export class ThongBaoComponent implements OnInit {
     document.body.classList.remove('no-scroll');
     this.showSearchPopup = false;
     this.showThongBaoPopup = false; // Đóng popup tạo mới
-    if (data.response == true){
+    if (data.response == true) {
       this.loadListThongBao();
     }
     // Thêm logic đóng popup, hoặc xử lý UI tại đây
@@ -261,27 +296,27 @@ export class ThongBaoComponent implements OnInit {
       notificationType?: number | null; //1 tự động 2 chủ động
       loaiThongBao?: string | null;  //vd RQ, GT, ...
     }): void {
-      this.ngayTaoTu = data.ngayTaoTu;
-      this.ngayTaoDen = data.ngayTaoDen;  
-      this.ngayGuiTu = data.ngayGuiTu;
-      this.ngayGuiDen = data.ngayGuiDen;
-      this.trangThai = data.trangThai;
-      this.notificationType = data.notificationType;
-      this.loaiThongBao = data.loaiThongBao;
-      this.loadListThongBao();
-      this.showSearchPopup = false; // Đóng popup sau khi tìm kiếm
-      document.body.classList.remove('no-scroll');
+    this.ngayTaoTu = data.ngayTaoTu;
+    this.ngayTaoDen = data.ngayTaoDen;
+    this.ngayGuiTu = data.ngayGuiTu;
+    this.ngayGuiDen = data.ngayGuiDen;
+    this.trangThai = data.trangThai;
+    this.notificationType = data.notificationType;
+    this.loaiThongBao = data.loaiThongBao;
+    this.loadListThongBao();
+    this.showSearchPopup = false; // Đóng popup sau khi tìm kiếm
+    document.body.classList.remove('no-scroll');
   }
-  
+
   sortByDate(field: string, direction: 'asc' | 'desc') {
     // if (!this.data || !Array.isArray(this.data)) {
     //   return;
     // }
-  
+
     // this.data.sort((a: any, b: any) => {
     //   const dateA = new Date(a[field]).getTime();
     //   const dateB = new Date(b[field]).getTime();
-  
+
     //   if (direction === 'asc') {
     //     return dateA - dateB;
     //   } else {
@@ -290,46 +325,61 @@ export class ThongBaoComponent implements OnInit {
     // });
   }
 
+  formatDate(dateString: string): string {
+    const d = new Date(dateString);
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
   exportCurrentPage(data: any) {
-    console.log('Xuất trang hiện tại: ', data.currentPage);
-    // Xử lý xuất file cho trang hiện tại, ví dụ:
-    // Tạo tệp Excel với dữ liệu của trang hiện tại.
+    const selectedPages = [data.currentPage]; // Chỉ xuất trang hiện tại
+    this.loadListThongBaoForPages(selectedPages).subscribe(data => {
+      exportToExcel(data); // Xuất dữ liệu đã tải về
+    });
   }
 
   exportPageRange(fromPage: number, toPage: number) {
-    console.log('Xuất từ trang', fromPage, 'đến trang', toPage);
-    // Xử lý xuất file từ trang từ `fromPage` đến `toPage`, ví dụ:
-    // Tạo tệp Excel với các trang trong phạm vi này.
+    if (fromPage > toPage) {
+      console.error('Trang bắt đầu không thể lớn hơn trang kết thúc.');
+      return;
+    }
+    const selectedPages = [];
+    for (let page = fromPage; page <= toPage; page++) {
+      selectedPages.push(page);
+    }
+    this.loadListThongBaoForPages(selectedPages).subscribe(data => {
+      exportToExcel(data);
+    });
   }
 
   exportSpecificPages(pageList: string) {
     const pages = pageList.split(',').map(page => parseInt(page.trim(), 10));
-    console.log('Xuất các trang:', pages);
-    // Xử lý xuất file với danh sách các trang đã chọn, ví dụ:
-    // Tạo tệp Excel với các trang cụ thể trong danh sách `pages`.
+    const selectedPages = pages; // Chỉ xuất trang hiện tại
+    this.loadListThongBaoForPages(selectedPages).subscribe(data => {
+      exportToExcel(data); // Xuất dữ liệu đã tải về
+    });
   }
 
   xuatFile(data: any): void {
-    console.log('Dữ liệu xuất file:', data);
-
-  switch (data.exportOption) {
-    case 'current':
-      this.exportCurrentPage(data);
-      break;
-    case 'range':
-      this.exportPageRange(data.fromPage, data.toPage);
-      break;
-    case 'list':
-      this.exportSpecificPages(data.pageList);
-      break;
-    default:
-      console.error('Chọn phương thức xuất không hợp lệ');
-  }
-
-
-
-
-
+    switch (data.exportOption) {
+      case 'current':
+        const dataTest = [
+          { id: 1, name: 'Nguyen Van A', age: 30 },
+          { id: 2, name: 'Tran Thi B', age: 25 }
+        ];
+        this.exportCurrentPage(dataTest);
+        break;
+      case 'range':
+        this.exportPageRange(data.fromPage, data.toPage);
+        break;
+      case 'list':
+        this.exportSpecificPages(data.pageList);
+        break;
+      default:
+        console.error('Chọn phương thức xuất không hợp lệ');
+    }
 
     this.toastr.success('...', `${data.fromPage} - ${data.toPage}`, {
       positionClass: 'toast-top-center',
@@ -343,16 +393,15 @@ export class ThongBaoComponent implements OnInit {
       width: '400px',
       data: {} // nếu muốn truyền gì đó
     });
-  
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        
         this.xuatFile(result);
       }
     });
   }
-  
-  
+
+
   handleCreate(data: any) {
     // Xử lý dữ liệu tạo mới
     console.log('Created:', data);
@@ -363,6 +412,6 @@ export class ThongBaoComponent implements OnInit {
     this.showThongBaoPopup = true;
     document.body.classList.add('no-scroll');
   }
-  
+
 
 }
