@@ -76,12 +76,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Content))
-                    return BadRequest("Tiêu đề và nội dung không được để trống");
-                if (request.Title.Length < 3)
-                    return BadRequest("Tiêu đề phải có ít nhất 3 ký tự");
-                if (request.Content.Length < 10)
-                    return BadRequest("Nội dung phải có ít nhất 10 ký tự");
                 var notification = new Notification
                 {
                     ID = request.ID,
@@ -113,9 +107,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         {
             try
             {
-                _logger.LogInformation($"Deleting notification with ID: {id}");
                 await _repository.DeleteNotification(id);
-                _logger.LogInformation($"Successfully deleted notification with ID: {id}");
                 return NoContent();
             }
             catch (Exception ex)

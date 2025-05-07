@@ -4,6 +4,7 @@ import { AuthService } from './services/auth.service'; // Đảm bảo đường
 import { Router } from '@angular/router';
 import { LoadingService } from '@app/services/loading.service';
 import { Observable } from 'rxjs';
+import { DebugUtils } from './utils/debug-utils';
 
 interface WeatherForecast {
   date: string;
@@ -58,7 +59,6 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit() {
-    console.log('APP  đã được khởi tạo!');
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
       this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';

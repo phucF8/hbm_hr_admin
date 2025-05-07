@@ -138,7 +138,6 @@ export class ThongBaoService {
   
   getThongBaoByID(notificationID: string): Observable<ThongBao> {
     const url = `${this.apiUrl}/${notificationID}`;
-    DebugUtils.openStringInNewWindow(`${url}`);
     return this.http.get<ThongBao>(url).pipe(
       catchError(error => {
         DebugUtils.openStringInNewWindow(`${error.message}`);
@@ -148,15 +147,28 @@ export class ThongBaoService {
   }
 
   searchUsers(keyword: string, khoDuLieu: string): Observable<DoLookupDatasRP> {
+    const currentUserStr = localStorage.getItem('currentUser');
+    let nhanVienInfo = {
+      ID: '',
+      UserID: '',
+      Username: '',
+      IDKhoLamViec: ''
+    };
+    if (currentUserStr) {
+      const currentUser = JSON.parse(currentUserStr);
+      nhanVienInfo = {
+        ID: currentUser.DataSets.Table[0].ID,
+        UserID: currentUser.DataSets.Table[0].UserID,
+        Username: currentUser.DataSets.Table[0].Username,
+        IDKhoLamViec: currentUser.DataSets.Table[0].IDKhoLamViec
+      };
+    } else {
+      console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!');
+    }
     const url = `https://apihr.hbm.vn:9004/api/hr/employee/DoLookupDatas`;
     const requestBody = {
       AccessToken: "eaf0789cc663860acbf99017282eab25",
-      NhanVienInfo: {
-        ID: "38a65e3488e8438e",
-        UserID: "a45bc90fea154dba",
-        Username: "vietdt@hbm.vn",
-        IDKhoLamViec: "08a8f3bec5934"
-      },
+      NhanVienInfo: nhanVienInfo,
       DLChamCongCondition: {
         Loai: "RQ_NV",
         TuKhoa: keyword,
@@ -170,6 +182,7 @@ export class ThongBaoService {
       })
     );
   }
+  
 
   createThongBao(request: CreateThongBaoRequest): Observable<ThongBao> {
     DebugUtils.openStringInNewWindow(`${JSON.stringify(request)}`);

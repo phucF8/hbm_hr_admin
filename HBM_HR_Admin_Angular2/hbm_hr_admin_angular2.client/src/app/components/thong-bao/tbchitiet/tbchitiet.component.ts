@@ -85,7 +85,7 @@ export class TbchitietComponent implements OnInit {
     });
     this.thongBaoForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      content: ['', [Validators.required, Validators.minLength(10)]],
+      content: ['', [Validators.required, Validators.minLength(3)]],
     });
     this.searchUserForm = this.fb.group({
       search: ['', Validators.required]
@@ -101,8 +101,14 @@ export class TbchitietComponent implements OnInit {
     if (this.notificationId) {
       this.loadNotification();
       this.isUserSearchVisible = true; // sửa thông báo thì luôn hiện danh sách user - có hợp lý không?
-    }else{
-        this.selectedDonVi = this.donvis.find(d => d.tenKho === 'VPTÐ') || null;
+    }
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (currentUserStr) {
+      const currentUser = JSON.parse(currentUserStr);
+      var idKhoLamViec = currentUser.DataSets.Table[0].IDKhoLamViec;
+      this.selectedDonVi = this.donvis.find(d => d.id === idKhoLamViec ) || null;
+    } else {
+      console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!');
     }
   }
 
@@ -136,9 +142,6 @@ export class TbchitietComponent implements OnInit {
             notificationType: notification.notificationType,
           });
 
-
-          DebugUtils.openStringInNewWindow(`${notification.recipients[0].ngayTao}`);
-
           this.selectedUsers = notification.recipients.map(recipient => (
             {
             ID: recipient.recipientId,
@@ -171,10 +174,6 @@ export class TbchitietComponent implements OnInit {
   }
 
   onSubmitUpdate() {
-    console.log('Update thông báo');
-    console.log('Form value:', this.thongBaoForm.value);
-    console.log('Form valid:', this.thongBaoForm.valid);
-    console.log('notification.sentAt:', this.thongBaoForm.value.sentAt);
     if (this.thongBaoForm.valid) {
       this.isSubmitting = true;
       this.errorMessage = '';
