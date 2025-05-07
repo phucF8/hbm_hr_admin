@@ -325,6 +325,27 @@ export class ThongBaoComponent implements OnInit {
     // });
   }
 
+  openedMenuId: string | null = null;
+
+  toggleMenu(tb: any) {
+    if (this.openedMenuId === tb.id) {
+      // Nếu menu này đang mở -> đóng lại
+      this.openedMenuId = null;
+    } else {
+      // Đóng tất cả và mở menu mới
+      this.openedMenuId = tb.id;
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const clickedInside = (event.target as HTMLElement).closest('.dropdown-wrapper');
+    if (!clickedInside) {
+      this.openedMenuId = null;
+    }
+  }
+
+
   formatDate(dateString: string): string {
     const d = new Date(dateString);
     const day = d.getDate().toString().padStart(2, '0');

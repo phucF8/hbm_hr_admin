@@ -59,21 +59,21 @@
 
 
             <table>
-                <thead>
-                    <tr>
-                        <th>
-                          <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
-                        </th>
-                        <th>Tiêu đề</th>
-                        <th>Nội dung</th>
-                        <th>Người gửi</th>
-                        <th>Ngày tạo</th>
-                        <th>Hoàn THÀNH</th>
-                        <th>Loại</th>
-                        <th>Nhóm</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
+              <thead>
+                  <tr>
+                      <th style="width: 40px;">
+                        <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
+                      </th>
+                      <th style="width: 150px;">Tiêu đề</th>
+                      <th style="width: 300px;">Nội dung</th>
+                      <th style="width: 120px;">Người gửi</th>
+                      <th style="width: 150px;">Ngày tạo</th>
+                      <th style="width: 100px;">Hoàn thành</th>
+                      <th style="width: 120px;">Loại</th>
+                      <th style="width: 120px;">Nhóm</th>
+                      <th style="width: 100px;">Hành động</th>
+                  </tr>
+              </thead>
                 <tbody>
                     <tr *ngFor="let tb of thongBaoList" [ngClass]="{'table-success': tb.status == 1}">
                       <td>
@@ -89,24 +89,30 @@
                       <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
                       <td>{{ tb.loaiThongBao}}</td>
                       <td>
-                        <button 
-                          class="btn btn-warning btn-sm" 
-                          (click)="(tb.status === 1) ? viewThongBao(tb.id) : editThongBao(tb.id)">
-                          <i class="bi" [ngClass]="(tb.status === 1) ? 'bi-eye' : 'bi-pencil-square'"></i>
-                          {{ (tb.status === 1) ? 'Xem' : 'Sửa' }}
-                        </button>
-                        <button 
-                          *ngIf="tb.status !== 1"
-                          class="btn btn-danger btn-sm ms-2" 
-                          (click)="deleteThongBao(tb.id)">
-                          <i class="bi bi-trash"></i> Xóa
-                        </button>
-            
+                        <div class="dropdown-wrapper" (click)="toggleMenu(tb)">
+                          <div class="dropdown-button">
+                            <div class="arrow-down"></div>
+                          </div>
+                          <div class="popup-menu" *ngIf="openedMenuId === tb.id">
+                            <div class="menu-item view"  *ngIf="tb.status === 1" (click)="viewThongBao(tb.id)">
+                              <i>🔍</i>
+                              <div class="menu-text">Xem</div>
+                            </div>
+                            <div class="menu-item edit" *ngIf="tb.status !== 1" (click)="editThongBao(tb.id)">
+                              <i>✏️</i>
+                              <div class="menu-text">Sửa</div>
+                            </div>
+                            <div class="menu-item delete" *ngIf="tb.status !== 1" (click)="deleteThongBao(tb.id)">
+                              <i>🗑️</i>
+                              <div class="menu-text">Xóa</div>
+                            </div>
+                          </div>
+                        </div>
                       </td>
+                      
                     </tr>
                 </tbody>
             </table>
-            
 
             <!-- Pagination section -->
             <app-pagination [totalPages]="totalPages" [currentPage]="currentPage" (pageChange)="onPageChange($event)">

@@ -1,0 +1,114 @@
+.dropdown-button {
+    width: 28px;
+    height: 28px;
+    background-color: #6c63ff; /* Màu xanh tím như trong ảnh */
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 5px;
+    position: relative;
+    left: 120px;
+}
+
+.arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid white; /* Mũi tên trắng hướng xuống */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+    margin: 0;
+}
+
+.popup-container {
+    position: relative;
+    display: inline-block;
+}
+
+.popup-menu {
+    position: absolute;
+    width: 150px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.header {
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    color: #ff0000;
+    font-weight: bold;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.menu-item {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.menu-item:hover {
+    background-color: #f0f0f0;
+}
+
+.menu-item i {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+    color: #5c6bc0;
+}
+
+.menu-item.view i {
+    color: #5c6bc0;
+}
+
+.menu-item.print i {
+    color: #26a69a;
+}
+
+.menu-item.export i {
+    color: #42a5f5;
+}
+
+.menu-item.copy i {
+    color: #ec407a;
+}
+
+.menu-item.edit i {
+    color: #7cb342;
+}
+
+.menu-text {
+    flex: 1;
+}
+
+.dropdown-icon {
+    background-color: #f1f3f4;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.separator {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 4px 0;
+}
