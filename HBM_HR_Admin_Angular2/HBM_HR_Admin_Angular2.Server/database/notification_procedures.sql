@@ -262,18 +262,21 @@ EXEC InsertNotification
     @NguoiTao = @NguoiTao;
 
 
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'InsertNotificationRecipient')
+    DROP PROCEDURE InsertNotificationRecipient;
+GO
 --khi tạo thông báo theo nhóm, thì tạo bản ghi liên kết giữa thông báo và user
 CREATE PROCEDURE InsertNotificationRecipient
     @NotificationId NVARCHAR(36),
-    @RecipientId NVARCHAR(36),
+    @NguoiNhan NVARCHAR(36),
     @NguoiTao VARCHAR(36)
 AS
 BEGIN
     SET NOCOUNT ON;
     INSERT INTO [dbo].[NS_ADTB_NotificationRecipients] (
         ID,
-        NotificationId,
-        RecipientId,
+        IDThongBao,
+        NguoiNhan,
         Status,
         NgayTao,
         NgaySua,
@@ -283,7 +286,7 @@ BEGIN
     VALUES (
         NEWID(), -- Tạo ID ngẫu nhiên
         @NotificationId,
-        @RecipientId,
+        @NguoiNhan,
         0, -- Trạng thái mặc định là 0 (chưa gửi)
         GETDATE(),
         GETDATE(),

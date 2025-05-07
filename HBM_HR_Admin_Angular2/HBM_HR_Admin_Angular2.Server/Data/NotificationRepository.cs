@@ -23,22 +23,19 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         {
             try
             {
-                _logger.LogInformation($"Creating new notification: {notification.Title}");
-
                 var parameters = new[]
                 {
                     new SqlParameter("@ID", SqlDbType.VarChar) { Value = notification.ID },
                     new SqlParameter("@Title", SqlDbType.NVarChar) { Value = notification.Title },
                     new SqlParameter("@Content", SqlDbType.NVarChar) { Value = notification.Content },
                     new SqlParameter("@NotificationType", SqlDbType.TinyInt) { Value = notification.NotificationType },
-                    new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = "System" } // You might want to get this from the current user
+                    new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = notification.NguoiTao } // You might want to get this from the current user
                 };
-
+                 _logger.LogInformation($"Tạo thông báo mới bởi: {notification.NguoiTao}");
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC InsertNotification @ID, @Title, @Content, @NotificationType, @NguoiTao",
                     parameters);
-
-                _logger.LogInformation($"Successfully created notification with ID: {notification.ID}");
+               
                 return notification;
             }
             catch (Exception ex)
@@ -254,18 +251,16 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task InsertNotificationRecipient(string notificationId, string recipientId)
+        public async Task InsertNotificationRecipient(string notificationId, string recipientId, string nguoiTao)
         {
             try
             {
-                var sql = $"EXEC InsertNotificationRecipient @NotificationId='{notificationId}', @RecipientId='{recipientId}'";
-                _logger.LogInformation("Executing SQL: {SqlQuery}", sql); // Log câu lệnh SQL
                 var parameters = new[]
                 {
                     new SqlParameter("@NotificationId", SqlDbType.VarChar) { Value = notificationId },
                     new SqlParameter("@RecipientId", SqlDbType.VarChar) { Value = recipientId },
+                    new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = nguoiTao },
                 };
-
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC InsertNotificationRecipient @NotificationId, @RecipientId, @NguoiTao",
                     parameters);

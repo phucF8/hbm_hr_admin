@@ -247,6 +247,7 @@ export class TbchitietComponent implements OnInit {
         error: (error) => {
           console.error('❌ Error creating notification:', error);
           this.errorMessage = error.error || 'Đã xảy ra lỗi khi tạo thông báo';
+          alert(this.errorMessage);
         },
         complete: () => {
           console.log('Request completed');

@@ -172,9 +172,10 @@ export class ThongBaoService {
   }
 
   createThongBao(request: CreateThongBaoRequest): Observable<ThongBao> {
-    console.log('Creating new notification:', request);
+    DebugUtils.openStringInNewWindow(`${JSON.stringify(request)}`);
     return this.http.post<ThongBao>(this.apiUrl, request).pipe(
       catchError(error => {
+        DebugUtils.openStringInNewWindow(`${error.message}`);
         console.error('Error creating notification:', error);
         throw error;
       })

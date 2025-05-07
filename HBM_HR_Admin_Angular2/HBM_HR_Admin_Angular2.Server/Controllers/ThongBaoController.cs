@@ -91,13 +91,11 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     NguoiTao = request.NguoiTao
                 };
                 var result = await _repository.CreateNotification(notification);
-                _logger.LogInformation($"Successfully created notification with ID: {result}");
                 if (request.Recipients != null && request.Recipients.Any())
                 {
                     foreach (var recipientId in request.Recipients)
                     {
-                        _logger.LogInformation($"InsertNotificationRecipient {request.ID}, {recipientId}");
-                        await _repository.InsertNotificationRecipient(result.ID, recipientId);
+                        await _repository.InsertNotificationRecipient(result.ID, recipientId, request.NguoiTao);
                     }
                 }
                 return CreatedAtAction(nameof(GetNotifications), new { id = result.ID }, result);
@@ -152,24 +150,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         {
             try
             {
-                _logger.LogInformation($"Updating notification with ID: {id}");
-
-                // Validate request
-                if (string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Content))
-                {
-                    return BadRequest("Tiêu đề và nội dung không được để trống");
-                }
-
-                if (request.Title.Length < 3)
-                {
-                    return BadRequest("Tiêu đề phải có ít nhất 3 ký tự");
-                }
-
-                if (request.Content.Length < 10)
-                {
-                    return BadRequest("Nội dung phải có ít nhất 10 ký tự");
-                }
-
                 var notification = new Notification
                 {
                     ID = id,
@@ -177,9 +157,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     Content = request.Content,
                     NotificationType = request.NotificationType,
                 };
-
                 var result = await _repository.UpdateNotification(notification);
-
                 if (result == null)
                 {
                     return NotFound($"Không tìm thấy thông báo với ID: {id}");
@@ -194,7 +172,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                         foreach (var recipientId in request.Recipients)
                         {
                             _logger.LogInformation($"InsertNotificationRecipient {result.ID}, {recipientId}, {"SYS"}");
-                            await _repository.InsertNotificationRecipient(result.ID, recipientId);
+                            await _repository.InsertNotificationRecipient(result.ID, recipientId,"");
                         }
                     }
                 }
