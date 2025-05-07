@@ -68,7 +68,9 @@
                 <div class="search-container" *ngIf="!notificationId">
 
                     <div>
-                        <button class="dropdown-btn" (click)="openDonVisPopup()" #button>{{selectedDonVi?.tenKho}}</button>
+                        <button type="button" class="dropdown-btn" (click)="openDonVisPopup()" #button>
+                            {{ selectedDonVi?.tenKho }}
+                        </button>
                         <!-- Popup hiển thị danh sách -->
                         <div  *ngIf="showDonVisPopup"  class="custom-popup" #popup>
                             <div class="grid-container">
@@ -81,7 +83,20 @@
                         <div *ngIf="isSearching" class="text-center py-2">
                             <div class="spinner-border text-primary" role="status"></div>
                         </div>
-                        <div class="popup-container" *ngIf="filteredUsers !== null && filteredUsers.length > 0">
+                        
+                        <input
+                            #searchInput
+                            type="text"
+                            class="search-input"
+                            id="search"
+                            formControlName="search"
+                            placeholder="Nhập từ khóa, ấn enter tìm kiếm..."
+                            autocomplete="off"
+                            autofocus
+                            (focus)="isFocused = true"
+                            (blur)="onBlurInput(searchInput.value)">
+                        
+                        <div class="popup-container" *ngIf="filteredUsers !== null && filteredUsers.length > 0 && isFocused">
                             <ul class="employee-list">
                                 <li class="employee-item" *ngFor="let user of filteredUsers" (click)="selectUser(user)">
                                     <div class="avatar">
@@ -98,7 +113,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <input type="text" class="search-input" id="search" formControlName="search" placeholder="Nhập từ khóa, ấn enter tìm kiếm..." autofocus>
+                    
                     </div>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search"></i><!-- Biểu tượng tìm kiếm -->

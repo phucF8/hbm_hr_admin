@@ -37,6 +37,7 @@ export class TbchitietComponent implements OnInit {
   ngayTao: string = '';
 
   showDonVisPopup = false;
+  isFocused = false;
 
   selectedDonVi: DonVi | null = null;
   donvis: DonVi[] = [
@@ -105,6 +106,15 @@ export class TbchitietComponent implements OnInit {
     }
   }
 
+  onBlurInput(value : string) {
+    setTimeout(() => {
+      this.isFocused = false;
+      if (value.trim() === '') {
+        this.filteredUsers  = null; // Đặt về null nếu không có từ khóa tìm kiếm
+      }
+    }, 200); // 200ms hoặc thời gian bạn mong muốn
+  }
+
   loadNotification() {
     this.loadingService.show();
     this.thongBaoService.getThongBaoByID(this.notificationId).subscribe({
@@ -125,7 +135,12 @@ export class TbchitietComponent implements OnInit {
             content: notification.content,
             notificationType: notification.notificationType,
           });
-          this.selectedUsers = notification.recipients.map(recipient => ({
+
+
+          DebugUtils.openStringInNewWindow(`${notification.recipients[0].ngayTao}`);
+
+          this.selectedUsers = notification.recipients.map(recipient => (
+            {
             ID: recipient.recipientId,
             MaNhanVien: recipient.recipientId, // Nếu recipientId là mã nhân viên
             TenNhanVien: recipient.tenNhanVien,
@@ -133,7 +148,8 @@ export class TbchitietComponent implements OnInit {
             TenPhongBan: recipient.tenPhongBan, // Nếu cần, hãy lấy từ một nguồn khác
             status: recipient.status,
             ngayTao: recipient.ngayTao,
-          })) as MergedData[];
+          }
+        )) as MergedData[];
         } else {
           this.errorMessage = 'Không tìm thấy thông báo';
         }
@@ -322,7 +338,7 @@ export class TbchitietComponent implements OnInit {
     }
     this.isSearching = true;
     this.filteredUsers = []; // Reset trước khi tìm kiếm
-    this.thongBaoService.searchUsers(searchValue)
+    this.thongBaoService.searchUsers(searchValue, this.selectedDonVi?.id || '')
       .pipe(finalize(() => this.isSearching = false)) // Đảm bảo luôn thực hiện
       .subscribe({
         next: (response) => {

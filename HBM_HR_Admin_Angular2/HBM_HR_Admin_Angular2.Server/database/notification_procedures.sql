@@ -319,7 +319,9 @@ BEGIN
         nr.IDThongBao,
         nr.NguoiNhan,
         nv.TenNhanVien,
-        nr.Status
+        nr.Status,
+        nr.NgayTao,
+        nr.NgaySua
     FROM [HBM_HCNSApp].[dbo].[NS_ADTB_NotificationRecipients] nr
     INNER JOIN [HBM_HCNSApp].[dbo].[NS_NhanViens] nv
         ON nr.NguoiNhan = nv.ID

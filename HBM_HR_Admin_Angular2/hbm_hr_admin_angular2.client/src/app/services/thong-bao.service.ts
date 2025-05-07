@@ -147,7 +147,7 @@ export class ThongBaoService {
     );
   }
 
-  searchUsers(keyword: string): Observable<DoLookupDatasRP> {
+  searchUsers(keyword: string, khoDuLieu: string): Observable<DoLookupDatasRP> {
     const url = `https://apihr.hbm.vn:9004/api/hr/employee/DoLookupDatas`;
     const requestBody = {
       AccessToken: "eaf0789cc663860acbf99017282eab25",
@@ -160,12 +160,9 @@ export class ThongBaoService {
       DLChamCongCondition: {
         Loai: "RQ_NV",
         TuKhoa: keyword,
-        KhoDuLieu: "08a8f3bec5934"
+        KhoDuLieu: khoDuLieu,
       }
     };
-
-    console.log('Searching users:', url, requestBody);
-    
     return this.http.post<DoLookupDatasRP>(url, requestBody).pipe(
       catchError(error => {
         console.error('Error searching users:', error);
