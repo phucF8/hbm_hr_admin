@@ -31,11 +31,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     new SqlParameter("@NotificationType", SqlDbType.TinyInt) { Value = notification.NotificationType },
                     new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = notification.NguoiTao } // You might want to get this from the current user
                 };
-                 _logger.LogInformation($"Tạo thông báo mới bởi: {notification.NguoiTao}");
-                await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC InsertNotification @ID, @Title, @Content, @NotificationType, @NguoiTao",
-                    parameters);
-               
+                await _context.Database.ExecuteSqlRawAsync("EXEC InsertNotification @ID, @Title, @Content, @NotificationType, @NguoiTao", parameters);
                 return notification;
             }
             catch (Exception ex)
@@ -133,14 +129,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     ToSentDate = string.IsNullOrWhiteSpace(ngayGuiDen) ? (DateTime?)null : DateTime.Parse(ngayGuiDen),
                     SentStatus = trangThai
                 };
-
-                var result = await connection.QueryAsync<Notification>(
-                    "NS_ADTB_GetNotificationsWithPaging",
-                    parameters,
-                    commandType: CommandType.StoredProcedure);
-
+                var result = await connection.QueryAsync<Notification>("NS_ADTB_GetNotificationsWithPaging",parameters,commandType: CommandType.StoredProcedure);
                 int totalCount = result.Any() ? result.First().TotalCount : 0;
-
                 return new PagedResult<Notification>
                 {
                     Items = result.ToList(),
@@ -167,19 +157,11 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     },
                     commandType: CommandType.StoredProcedure
                 );
-                if (result != null)
-                {
-                    _logger.LogInformation("Stored procedure returned a record");
-                }
-                else
-                {
-                    _logger.LogInformation("No record found for the given notification ID");
-                }
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting notification by ID");
+                _logger.LogError(ex, "GetNotificationByID error");
                 throw;
             }
         }
@@ -195,11 +177,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     new { NotificationID = notificationId },
                     commandType: CommandType.StoredProcedure
                 );
-                _logger.LogInformation($"Successfully deleted notification with ID: {notificationId}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error deleting notification with ID: {notificationId}");
+                _logger.LogError(ex, $"ERR: DeleteNotification {notificationId}");
                 throw;
             }
         }
@@ -208,18 +189,16 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         {
             try
             {
-                _logger.LogInformation($"Deleting multiple notifications with IDs: {notificationIds}");
                 using var connection = new SqlConnection(_connectionString);
                 await connection.ExecuteAsync(
                     "NS_ADTB_DeleteMultiNotification",
                     new { NotificationIDs = notificationIds },
                     commandType: CommandType.StoredProcedure
                 );
-                _logger.LogInformation($"Successfully deleted multiple notifications");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error deleting multiple notifications with IDs: {notificationIds}");
+                _logger.LogError(ex, $"Error DeleteMultiNotification: {notificationIds}");
                 throw;
             }
         }
@@ -314,7 +293,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public async Task DeleteNotificationRecipients_Multi(IEnumerable<string> notificationIds)
         {
-            _logger.LogInformation("DeleteNotificationRecipients_Multiple - NotificationIds: {NotificationIds}", string.Join(",", notificationIds));
             try
             {
                 using var connection = new SqlConnection(_connectionString);
@@ -330,7 +308,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting notification recipients");
+                _logger.LogError(ex, "Error DeleteNotificationRecipients_Multi");
                 throw;
             }
         }

@@ -300,12 +300,10 @@ export class TbchitietComponent implements OnInit {
               }
             });
           }
-
           this.isSubmitting = false;
           this.closePopupEvent.emit({
             response: true // cần update màn hình danh sách
           });
-
         },
         error: (error) => {
           this.loading = false;

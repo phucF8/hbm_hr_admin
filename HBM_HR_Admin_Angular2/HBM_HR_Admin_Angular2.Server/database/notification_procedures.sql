@@ -350,14 +350,19 @@ CREATE TYPE NotificationIdTableType AS TABLE
 (
     NotificationId VARCHAR(36)
 );
+
+
+
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'DeleteNotificationRecipients_Multiple')
+    DROP PROCEDURE DeleteNotificationRecipients_Multiple;
+GO
 CREATE PROCEDURE DeleteNotificationRecipients_Multiple
     @NotificationIds NotificationIdTableType READONLY
 AS
 BEGIN
     SET NOCOUNT ON;
-
     DELETE FROM [HBM_HCNSApp].[dbo].[NS_ADTB_NotificationRecipients]
-    WHERE NotificationId IN (SELECT NotificationId FROM @NotificationIds);
+    WHERE IDThongBao IN (SELECT NotificationId FROM @NotificationIds);
 END;
 
 

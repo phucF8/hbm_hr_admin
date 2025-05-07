@@ -131,15 +131,13 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         {
             try
             {
-                _logger.LogInformation($"Deleting multiple notifications: {string.Join(", ", ids)}");
                 await _repository.DeleteMultiNotification(string.Join(",", ids));
-                _logger.LogInformation($"Successfully deleted {ids.Length} notifications");
                 await _repository.DeleteNotificationRecipients_Multi(ids);
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting multiple notifications");
+                _logger.LogError(ex, "Error DeleteMultipleNotifications");
                 return StatusCode(500, "Đã xảy ra lỗi khi xóa thông báo");
             }
         }

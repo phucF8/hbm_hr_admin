@@ -82,6 +82,10 @@ export class ThongBaoComponent implements OnInit {
     this.loadListThongBao();
   }
 
+  hasSelectedThongBao(): boolean {
+    return this.thongBaoList.some(tb => tb.selected);
+  }
+
   loadListThongBao() {
     this.loadingService.show();
     this.thongBaoService.getListThongBao(

@@ -13,6 +13,9 @@
           <i class="bi bi-plus-circle"></i> Tạo mới
         </button>
         <button class="btn" (click)="openXuatFile()"><i class="bi bi-file-earmark-excel"></i> Xuất File</button>
+        <button *ngIf="hasSelectedThongBao()" class="btn" (click)="deleteMultiSelected()">
+          <i class="bi bi-trash"></i> Xóa những thông báo đã chọn
+        </button>
     </div>
 
     <div class="content">
