@@ -363,6 +363,60 @@ END;
 
 
 
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'UpdateNotificationStatus')
+    DROP PROCEDURE UpdateNotificationStatus;
+GO
+-- update trạng thái sau khi gửi thông báo
+CREATE PROCEDURE [dbo].[UpdateNotificationStatus]
+    @NotificationId NVARCHAR(36)
+AS
+BEGIN
+    -- Cập nhật bảng NS_ADTB_Notifications, thay đổi Status = 1 (Đã gửi)
+    UPDATE [dbo].[NS_ADTB_Notifications]
+    SET [Status] = 1
+    WHERE [ID] = @NotificationId;
+    
+END
+GO
+
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'UpdateStatusSentDetail')
+    DROP PROCEDURE UpdateStatusSentDetail;
+GO
+CREATE PROCEDURE [dbo].[UpdateStatusSentDetail]
+    @NotificationId VARCHAR(36),
+	@NguoiNhan VARCHAR(36)
+AS
+BEGIN
+    UPDATE [dbo].[NS_ADTB_NotificationRecipients]
+    SET [Status] = 1
+    WHERE [IDThongBao] = @NotificationId AND [NguoiNhan] = @NguoiNhan;
+END
+GO
+
+EXEC UpdateNotificationStatus @NotificationId = '60914bbc-928b-4ec0-b346-af5732be1998';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -475,28 +529,3 @@ EXEC GetDeviceTokenByEmployeeId @IDNhanVien = '123e4567-e89b-12d3-a456-426614174
 
 
 
-
--- update trạng thái sau khi gửi thông báo
-CREATE PROCEDURE [dbo].[UpdateNotificationStatus]
-    @NotificationId NVARCHAR(36)
-AS
-BEGIN
-    -- Cập nhật bảng NS_ADTB_Notifications, thay đổi Status = 1 (Đã gửi)
-    UPDATE [dbo].[NS_ADTB_Notifications]
-    SET [Status] = 1, 
-        [SentAt] = GETDATE(),  -- Cập nhật thời gian gửi
-        [NgaySua] = GETDATE(),  -- Cập nhật thời gian chỉnh sửa
-        [NguoiSua] = 'SYSTEM'   -- Thay thế nếu cần
-    WHERE [ID] = @NotificationId;
-
-    -- Cập nhật bảng NS_ADTB_NotificationRecipients, thay đổi Status = 1 (Đã nhận)
-    UPDATE [dbo].[NS_ADTB_NotificationRecipients]
-    SET [Status] = 1, 
-        [NgaySua] = GETDATE(),  -- Cập nhật thời gian chỉnh sửa
-        [NguoiSua] = 'SYSTEM'   -- Thay thế nếu cần
-    WHERE [NotificationId] = @NotificationId;
-    
-END
-GO
-
-EXEC UpdateNotificationStatus @NotificationId = '60914bbc-928b-4ec0-b346-af5732be1998';

@@ -81,7 +81,6 @@ public class FirebaseNotificationService
 
             if (response.SuccessCount > 0)
             {
-                _logger.LogInformation($"Successfully sent message to {response.SuccessCount} devices.");
                 return true;
             }
             else

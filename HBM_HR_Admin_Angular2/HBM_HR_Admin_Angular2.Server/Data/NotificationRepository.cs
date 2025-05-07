@@ -261,9 +261,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     new SqlParameter("@RecipientId", SqlDbType.VarChar) { Value = recipientId },
                     new SqlParameter("@NguoiTao", SqlDbType.VarChar) { Value = nguoiTao },
                 };
-                await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC InsertNotificationRecipient @NotificationId, @RecipientId, @NguoiTao",
-                    parameters);
+                await _context.Database.ExecuteSqlRawAsync("EXEC InsertNotificationRecipient @NotificationId, @RecipientId, @NguoiTao", parameters);
             }
             catch (Exception ex)
             {
@@ -369,9 +367,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 };
                 using var connection = new SqlConnection(_connectionString);
                 await connection.OpenAsync(); // 👈 thêm dòng này
-                await connection.ExecuteAsync(
-                    "EXEC UpdateNotificationStatus @NotificationId",
-                    parameters);
+                await connection.ExecuteAsync("EXEC UpdateNotificationStatus @NotificationId",parameters);
+                _logger.LogInformation($"THONG BAO: {notificationId} - SENT");
             }
             catch (Exception ex)
             {
@@ -379,6 +376,27 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 throw;
             }
         }
+
+        internal async Task UpdateStatusSentDetail(string notificationId,string nguoiNhan){
+            try
+            {
+                var parameters = new
+                {
+                    NotificationId = notificationId,
+                    NguoiNhan = nguoiNhan,
+                };
+                using var connection = new SqlConnection(_connectionString);
+                await connection.OpenAsync();
+                await connection.ExecuteAsync("EXEC UpdateStatusSentDetail @NotificationId, @NguoiNhan", parameters);
+                _logger.LogInformation($"THONG BAO: {notificationId} - SENT TO: {nguoiNhan}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating notification status detail");
+                throw;
+            }
+        }
+
 
 
     }

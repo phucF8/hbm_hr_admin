@@ -241,24 +241,17 @@ export class TbchitietComponent implements OnInit {
       };
       this.thongBaoService.createThongBao(notificationData).subscribe({
         next: (response) => {
-          alert('Thông báo đã được tạo thành công!');
-          this.router.navigate(['/thong-bao']);
+          this.onSend(response.id); // Gọi hàm gửi thông báo ngay sau khi tạo thành công
         },
         error: (error) => {
-          console.error('❌ Error creating notification:', error);
           this.errorMessage = error.error || 'Đã xảy ra lỗi khi tạo thông báo';
           alert(this.errorMessage);
         },
         complete: () => {
-          console.log('Request completed');
           this.isSubmitting = false;
-          this.closePopupEvent.emit({
-            response: true // cần update màn hình danh sách
-          });
         }
       });
     } else {
-      console.error('❌ Form is invalid');
       for (const key of Object.keys(this.thongBaoForm.controls)) {
         const control = this.thongBaoForm.get(key);
         if (control?.errors) {
@@ -277,7 +270,7 @@ export class TbchitietComponent implements OnInit {
   loading: boolean = false;
 
 
-  onSend() {
+  onSend(notificationId: string) {
     if (this.thongBaoForm.valid) {
       this.isSubmitting = true;
       this.errorMessage = '';
@@ -288,16 +281,14 @@ export class TbchitietComponent implements OnInit {
         return;
       }
       const request: TestSendNotificationRequest = {
-        NotificationID: this.notificationId,
+        NotificationID: notificationId,
         IDNhanViens: this.selectedUsers.map(user => user.ID).join(','),
         Title: this.thongBaoForm.get('title')?.value,
         Body: this.thongBaoForm.get('content')?.value,
         Data: {} // Nếu cần thêm dữ liệu bổ sung, hãy thêm vào đây
       };
-      console.log('Send notification request:', request);
       this.thongBaoService.sendThongBao(request).subscribe({
         next: (response) => {
-          console.log('✅ Notification sent successfully:', response);
           this.loading = false;
           this.responseData = response;
           this.status = 1; // Cập nhật trạng thái thành công
@@ -309,6 +300,12 @@ export class TbchitietComponent implements OnInit {
               }
             });
           }
+
+          this.isSubmitting = false;
+          this.closePopupEvent.emit({
+            response: true // cần update màn hình danh sách
+          });
+
         },
         error: (error) => {
           this.loading = false;
@@ -320,7 +317,6 @@ export class TbchitietComponent implements OnInit {
         }
       });
     } else {
-      console.error('❌ Form is invalid');
       Object.keys(this.thongBaoForm.controls).forEach(key => {
         const control = this.thongBaoForm.get(key);
         if (control?.errors) {

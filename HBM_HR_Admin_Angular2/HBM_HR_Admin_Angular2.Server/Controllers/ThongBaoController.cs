@@ -187,6 +187,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             }
         }
 
+
+        
+
         // API POST /api/thongbao/send - Gửi thông báo thử nghiệm
         [HttpPost("send")]
         public async Task<IActionResult> SendNotification([FromBody] TestSendNotificationRequest request)
@@ -221,6 +224,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 if (result)
                 {
                     userSuccessCount = userTotalCount;
+                    await _repository.UpdateStatusSentDetail(request.NotificationID, id);
                 }
                 userStats[id] = (userSuccessCount, userTotalCount);
                 successCount += userSuccessCount;
