@@ -23,7 +23,6 @@ export class XuatFileComponent {
     if (data && data.currentPage) {
       this.currentPage = data.currentPage;
     }
-
     this.xuatFileForm = this.fb.group({
       exportOption: ['current', Validators.required],
       fromPage: [1],

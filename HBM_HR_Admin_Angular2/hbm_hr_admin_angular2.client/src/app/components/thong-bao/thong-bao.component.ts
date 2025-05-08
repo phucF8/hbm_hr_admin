@@ -390,11 +390,7 @@ export class ThongBaoComponent implements OnInit {
   xuatFile(data: any): void {
     switch (data.exportOption) {
       case 'current':
-        const dataTest = [
-          { id: 1, name: 'Nguyen Van A', age: 30 },
-          { id: 2, name: 'Tran Thi B', age: 25 }
-        ];
-        this.exportCurrentPage(dataTest);
+        this.exportCurrentPage(data);
         break;
       case 'range':
         this.exportPageRange(data.fromPage, data.toPage);
@@ -416,7 +412,7 @@ export class ThongBaoComponent implements OnInit {
   openXuatFile() {
     const dialogRef = this.dialog.open(XuatFileComponent, {
       width: '400px',
-      data: {} // nếu muốn truyền gì đó
+      data: {currentPage: this.currentPage} // nếu muốn truyền gì đó
     });
 
     dialogRef.afterClosed().subscribe(result => {

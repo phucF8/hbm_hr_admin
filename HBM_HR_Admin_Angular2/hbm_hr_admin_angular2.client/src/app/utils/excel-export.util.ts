@@ -1,6 +1,6 @@
 // src/app/utils/excel-export.util.ts
 
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import * as FileSaver from 'file-saver';
 
 export function exportToExcel(data: any[]): void {
@@ -36,7 +36,7 @@ export function exportToExcel(data: any[]): void {
   });
 
   for (let row = 2; row <= data.length + 1; row++) {
-    ['D','E','F','G'].forEach(col => {
+    ['A','C','D','E','F','G'].forEach(col => {
       const cellAddress = `${col}${row}`;
       if (!worksheet[cellAddress]) return;
       worksheet[cellAddress].s = {
