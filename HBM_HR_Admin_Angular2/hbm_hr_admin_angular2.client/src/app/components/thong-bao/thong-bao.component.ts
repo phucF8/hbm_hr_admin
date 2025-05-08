@@ -63,6 +63,10 @@ export class ThongBaoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0]; // format YYYY-MM-DD
+    this.ngayTaoTu = formattedToday;
+    this.ngayTaoDen = formattedToday;
     this.loadListThongBao();
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
