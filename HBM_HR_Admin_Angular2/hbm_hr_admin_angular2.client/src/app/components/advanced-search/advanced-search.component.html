@@ -28,6 +28,17 @@
               <option [ngValue]="2">Chủ động</option>
             </select>
         </div>
+
+        <div class="form-group">
+            <label for="request-group">Mức độ hoàn thành</label>
+            <select id="mainType" [(ngModel)]="isSentToAll">
+              <option [ngValue]="null">Tất cả</option>
+              <option [ngValue]="1">Đã hoàn thành</option>
+              <option [ngValue]="2">Chưa hoàn thành</option>
+            </select>
+        </div>
+
+
         
         <div class="buttons-wrapper">
             <div class="button-container">

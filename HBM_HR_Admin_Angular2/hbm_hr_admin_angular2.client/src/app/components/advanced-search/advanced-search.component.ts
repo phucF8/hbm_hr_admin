@@ -20,6 +20,7 @@ export class AdvancedSearchComponent implements OnInit {
     ngayGuiDen?: string;
     trangThai?: number | null;
     notificationType?: number | null; // null: tất cả, 1: tự động, 2: chủ động
+    isSentToAll?: number | null; // null: tất cả, 1: đã hoàn thành, 2: chưa hoàn thành
     loaiThongBao?: string | null;
   }>();
 
@@ -30,10 +31,10 @@ export class AdvancedSearchComponent implements OnInit {
   ngayGuiDen?: string;
   trangThai?: number | null = null;
   notificationType?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
+  isSentToAll?: number | null = null; // null: tất cả, 1: đã hoàn thành, 2: chưa hoàn thành
   loaiThongBao?: string | null = null;
 
   constructor() {
-    console.log('AdvancedSearchComponent initialized');
     
   }
 
@@ -60,6 +61,7 @@ export class AdvancedSearchComponent implements OnInit {
       ngayGuiDen: this.ngayGuiDen,
       trangThai: this.trangThai,
       notificationType: this.notificationType,
+      isSentToAll: this.isSentToAll,
       loaiThongBao: this.loaiThongBao,
     });
 

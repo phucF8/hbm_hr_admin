@@ -1,6 +1,7 @@
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationsWithPaging')
     DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging
 GO
+
 CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @PageNumber INT,
     @PageSize INT,
@@ -8,11 +9,12 @@ CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @LoaiThongBao VARCHAR(8),
     @SortBy NVARCHAR(50) = 'NgayTao',  -- Tên cột để sắp xếp
     @SearchText NVARCHAR(255) = '',    -- Tìm kiếm tiêu đề hoặc nội dung
-    @SentStatus INT = NULL,        -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
-    @FromDate DATE = NULL,         -- Ngày tạo: từ ngày (bao gồm)
-    @ToDate DATE = NULL,           -- Ngày tạo: đến ngày (bao gồm)
-    @FromSentDate DATE = NULL,     -- Ngày gửi: từ ngày (bao gồm)
-    @ToSentDate DATE = NULL        -- Ngày gửi: đến ngày (bao gồm)
+    @SentStatus INT = NULL,            -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
+    @FromDate DATE = NULL,             -- Ngày tạo: từ ngày (bao gồm)
+    @ToDate DATE = NULL,               -- Ngày tạo: đến ngày (bao gồm)
+    @FromSentDate DATE = NULL,         -- Ngày gửi: từ ngày (bao gồm)
+    @ToSentDate DATE = NULL,           -- Ngày gửi: đến ngày (bao gồm)
+    @IsSentToAll INT = NULL            -- NULL: all, 1 Đã hoàn thành, 2 chưa hoàn thành
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -36,9 +38,6 @@ BEGIN
 
     IF @ToDate IS NOT NULL
         SET @ToDateTime = DATEADD(MILLISECOND, -3, DATEADD(DAY, 1, CAST(@ToDate AS DATETIME))); -- 23:59:59.997
-
-    -- Nếu dùng DATETIME2, bạn có thể làm chính xác hơn:
-    -- SET @ToDateTime = DATEADD(MILLISECOND, -1, DATEADD(DAY, 1, CAST(@ToDate AS DATETIME2)));
 
     WITH CTE AS (
         SELECT 
@@ -65,6 +64,11 @@ BEGIN
                 Title LIKE '%' + @SearchText + '%' OR 
                 Content LIKE '%' + @SearchText + '%'
             )
+            AND (
+                @IsSentToAll IS NULL
+                OR (@IsSentToAll = 1 AND ReceivedCount = TotalRecipients)
+                OR (@IsSentToAll = 2 AND ReceivedCount <> TotalRecipients)
+            )
     )
     SELECT 
         ID,
@@ -86,6 +90,7 @@ BEGIN
     FETCH NEXT @PageSize ROWS ONLY;
 END;
 GO
+
 -- TEST PROCEDURE NS_ADTB_GetNotificationsWithPaging
 EXEC NS_ADTB_GetNotificationsWithPaging
     @PageNumber = 1,

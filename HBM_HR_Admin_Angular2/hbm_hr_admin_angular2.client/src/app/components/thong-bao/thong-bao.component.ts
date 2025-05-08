@@ -33,7 +33,6 @@ export class ThongBaoComponent implements OnInit {
   selectAll: boolean = false;
   searchText: string = '';
   pageIndex: number = 1;
-  isDebug = environment.isDebug;
   tenNhanVien: string = '';
   notificationTypes = NOTIFICATION_TYPES;
   sortBy: string = 'NgayTao'; //mặc định sắp xếp theo ngày tạo mới nhất
@@ -44,6 +43,7 @@ export class ThongBaoComponent implements OnInit {
   ngayGuiDen?: string;
   trangThai?: number | null = null; // null: tất cả, 1: đã gửi, 0: chưa gửi
   notificationType?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
+  isSentToAll?: number | null = null; // null: tất cả, 1: đã hoàn thành, 2: chưa hoàn thành
   loaiThongBao?: string | null = null;
 
 
@@ -108,6 +108,7 @@ export class ThongBaoComponent implements OnInit {
       this.ngayGuiDen,
       this.trangThai,
       this.notificationType,
+      this.isSentToAll,
       this.loaiThongBao,
     ).subscribe({
       next: (data) => {
@@ -135,6 +136,7 @@ export class ThongBaoComponent implements OnInit {
         this.ngayGuiDen,
         this.trangThai,
         this.notificationType,
+        this.isSentToAll,
         this.loaiThongBao
       )
     );
@@ -167,14 +169,10 @@ export class ThongBaoComponent implements OnInit {
       alert('Vui lòng chọn ít nhất một thông báo để xóa!');
       return;
     }
-
     if (confirm(`Bạn có chắc chắn muốn xóa ${selectedNotifications.length} thông báo đã chọn?`)) {
       const deletePromises = selectedNotifications.map(tb => {
-        console.log("Deleting notification with ID:", tb.id);
         return this.thongBaoService.deleteThongBao(tb.id).toPromise();
       });
-
-
       Promise.all(deletePromises)
         .then(() => {
           console.log('Successfully deleted selected notifications');
@@ -308,6 +306,7 @@ export class ThongBaoComponent implements OnInit {
       ngayGuiDen?: string;
       trangThai?: number | null;
       notificationType?: number | null; //1 tự động 2 chủ động
+      isSentToAll?: number | null; //1 đã hoàn thành 2 chưa hoàn thành
       loaiThongBao?: string | null;  //vd RQ, GT, ...
     }): void {
     this.ngayTaoTu = data.ngayTaoTu;
@@ -316,6 +315,7 @@ export class ThongBaoComponent implements OnInit {
     this.ngayGuiDen = data.ngayGuiDen;
     this.trangThai = data.trangThai;
     this.notificationType = data.notificationType;
+    this.isSentToAll = data.isSentToAll;
     this.loaiThongBao = data.loaiThongBao;
     this.loadListThongBao();
     this.showSearchPopup = false; // Đóng popup sau khi tìm kiếm
