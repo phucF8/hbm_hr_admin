@@ -24,10 +24,18 @@
                     <label class="form-label required">Tiêu đề</label>
                     <input type="text" class="form-control" id="title" formControlName="title" placeholder="Tiêu đề"
                         [readonly]="status === 1"
-                        [class.is-invalid]="thongBaoForm.get('title')?.invalid && thongBaoForm.get('title')?.touched">
+                        [class.is-invalid]="submitted && thongBaoForm.get('title')?.invalid">
                         <a *ngIf="idThamChieu !== ''" class="link-right" (click)="goToDetail()">
                             Xem chi tiết
                         </a>
+                        <div class="error" *ngIf="submitted && thongBaoForm.get('title')?.errors">
+                            <div *ngIf="thongBaoForm.get('title')?.hasError('required')">
+                              Tiêu đề là bắt buộc.
+                            </div>
+                            <div *ngIf="thongBaoForm.get('title')?.hasError('minlength')">
+                              Tiêu đề phải có ít nhất {{ thongBaoForm.get('title')?.errors?.['minlength'].requiredLength }} ký tự.
+                            </div>
+                        </div>
                 </div>
             </div>
         </div>
@@ -35,13 +43,31 @@
         <div class="section">
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">Nội dung ngắn</label>
+                    <label class="form-label required">Nội dung ngắn</label>
                     <textarea class="form-control" id="content" style="height: 150px" formControlName="content"
                         placeholder="Nhập nội dung" [readonly]="status === 1"
-                        [class.is-invalid]="thongBaoForm.get('content')?.invalid && thongBaoForm.get('content')?.touched"></textarea>
+                        [class.is-invalid]="thongBaoForm.get('content')?.invalid && submitted">
+                    </textarea>
+                    <div class="error" *ngIf="submitted && thongBaoForm.get('content')?.errors">
+                        <div *ngIf="thongBaoForm.get('content')?.hasError('required')">
+                          Nội dung là bắt buộc.
+                        </div>
+                        <div *ngIf="thongBaoForm.get('content')?.hasError('minlength')">
+                          Nội dung phải có ít nhất {{ thongBaoForm.get('content')?.errors?.['minlength'].requiredLength }} ký tự.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+
+
+        
+
+
+
+
+
 
         <div class="section">
         
@@ -116,7 +142,7 @@
                     
                     </div>
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search"></i><!-- Biểu tượng tìm kiếm -->
+                        <i class="bi bi-search"></i>
                     </button>
                 </div>
         
@@ -138,6 +164,11 @@
                         </div>
                     </li>
                 </ul>
+                <div class="error" *ngIf="submitted && selectedUsers.length <= 0">
+                    <div >
+                      Hãy chọn ít nhất một nhân viên để nhận thông báo.
+                    </div>
+                </div>
         
             </form>
         </div>

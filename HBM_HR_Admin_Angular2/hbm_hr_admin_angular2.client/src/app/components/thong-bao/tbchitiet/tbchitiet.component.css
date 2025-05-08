@@ -419,6 +419,31 @@ body {
     height: 90vh; /* thay vì 500px */
 }
 
+.error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+  
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid {
+  border: 1px solid red;
+  background-color: #ffe6e6;
+}
+
+.is-invalid:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.25);
+}
+
+.error {
+  color: red;
+  font-size: 0.875em;
+  margin-top: 4px;
+}
+
+
 
 
 

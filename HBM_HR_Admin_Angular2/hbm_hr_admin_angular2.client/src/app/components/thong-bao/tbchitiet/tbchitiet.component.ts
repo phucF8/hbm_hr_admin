@@ -24,6 +24,7 @@ export class TbchitietComponent implements OnInit {
   notificationTypes = NOTIFICATION_TYPES;
   isSubmitting = false;
   errorMessage = '';
+  submitted = false;
   
   filteredUsers: MergedData[] | null = null;
   selectedUsers: MergedData[] = [];
@@ -85,7 +86,7 @@ export class TbchitietComponent implements OnInit {
     });
     this.thongBaoForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      content: ['', [Validators.required, Validators.minLength(3)]],
+      content: ['', [Validators.required, Validators.minLength(10)]],
     });
     this.searchUserForm = this.fb.group({
       search: ['', Validators.required]
@@ -166,6 +167,7 @@ export class TbchitietComponent implements OnInit {
   }
   
   onSubmit() {
+    this.submitted = true;
     if (!this.notificationId) {
       this.onSubmitCreateNew();
     } else {
@@ -222,7 +224,7 @@ export class TbchitietComponent implements OnInit {
   }
 
   onSubmitCreateNew() {
-    if (this.thongBaoForm.valid) {
+    if (this.thongBaoForm.valid && this.selectedUsers.length > 0){
       this.isSubmitting = true;
       this.errorMessage = '';
       const currentUser = this.authService.getCurrentUser();
@@ -254,11 +256,10 @@ export class TbchitietComponent implements OnInit {
       for (const key of Object.keys(this.thongBaoForm.controls)) {
         const control = this.thongBaoForm.get(key);
         if (control?.errors) {
-          console.error(`${key} errors:`, control.errors);
           const errorMessages = Object.entries(control.errors)
             .map(([errorKey, errorValue]) => `${errorKey}: ${JSON.stringify(errorValue)}`)
             .join(', ');
-          alert(`${key} errors: ${errorMessages}`);
+          // alert(`${key}: ${errorMessages}`);
           break; // Dừng đúng cách
         }
       }
@@ -325,7 +326,6 @@ export class TbchitietComponent implements OnInit {
 
   onSearchUser() {
     const searchValue = this.searchUserForm.get('search')?.value?.trim();
-    console.log('Từ khóa tìm kiếm:', searchValue);
     if (!searchValue) {
       this.filteredUsers = null; // Đặt về null nếu không có từ khóa tìm kiếm
       return;
