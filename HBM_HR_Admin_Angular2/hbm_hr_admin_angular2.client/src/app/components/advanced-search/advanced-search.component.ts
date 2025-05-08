@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { DebugUtils } from '@app/utils/debug-utils';
 
 @Component({
@@ -7,7 +7,7 @@ import { DebugUtils } from '@app/utils/debug-utils';
   templateUrl: './advanced-search.component.html',
   styleUrls: ['./advanced-search.component.css']
 })
-export class AdvancedSearchComponent{
+export class AdvancedSearchComponent implements OnInit {
 
   @Output() closePopupEvent = new EventEmitter<{
     response: boolean;
@@ -36,6 +36,14 @@ export class AdvancedSearchComponent{
     console.log('AdvancedSearchComponent initialized');
     
   }
+
+  ngOnInit(): void {
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0]; // format YYYY-MM-DD
+    this.ngayTaoTu = formattedToday;
+    this.ngayTaoDen = formattedToday;
+  }
+
 
   closePopup(): void {
     this.closePopupEvent.emit({

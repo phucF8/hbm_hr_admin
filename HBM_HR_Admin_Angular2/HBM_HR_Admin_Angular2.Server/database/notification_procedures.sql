@@ -1,8 +1,6 @@
--- DANH SÁCH THÔNG BÁO (CÓ TÌM KIẾM & SẮP XẾP)
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationsWithPaging')
     DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging
 GO
-
 CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @PageNumber INT,
     @PageSize INT,
@@ -14,7 +12,7 @@ CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @FromDate DATE = NULL,         -- Ngày tạo: từ ngày (bao gồm)
     @ToDate DATE = NULL,           -- Ngày tạo: đến ngày (bao gồm)
     @FromSentDate DATE = NULL,     -- Ngày gửi: từ ngày (bao gồm)
-    @ToSentDate DATE = NULL       -- Ngày gửi: đến ngày (bao gồm)
+    @ToSentDate DATE = NULL        -- Ngày gửi: đến ngày (bao gồm)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -28,6 +26,19 @@ BEGIN
             WHEN 'title' THEN 'Title'
             ELSE 'NgayTao' -- mặc định
         END;
+
+    -- Chuyển đổi FromDate và ToDate thành DATETIME với thời gian chính xác
+    DECLARE @FromDateTime DATETIME = NULL;
+    DECLARE @ToDateTime DATETIME = NULL;
+
+    IF @FromDate IS NOT NULL
+        SET @FromDateTime = DATEADD(DAY, 0, CAST(@FromDate AS DATETIME)); -- 00:00:00.000
+
+    IF @ToDate IS NOT NULL
+        SET @ToDateTime = DATEADD(MILLISECOND, -3, DATEADD(DAY, 1, CAST(@ToDate AS DATETIME))); -- 23:59:59.997
+
+    -- Nếu dùng DATETIME2, bạn có thể làm chính xác hơn:
+    -- SET @ToDateTime = DATEADD(MILLISECOND, -1, DATEADD(DAY, 1, CAST(@ToDate AS DATETIME2)));
 
     WITH CTE AS (
         SELECT 
@@ -47,8 +58,8 @@ BEGIN
             (@NotificationType = 0 OR NotificationType = @NotificationType)
             AND ((@LoaiThongBao IS NULL OR LoaiThongBao = @LoaiThongBao))
             AND (@SentStatus IS NULL OR Status = @SentStatus)
-            AND (@FromDate IS NULL OR NgayTao >= @FromDate)
-            AND (@ToDate IS NULL OR NgayTao <= @ToDate)
+            AND (@FromDateTime IS NULL OR NgayTao >= @FromDateTime)
+            AND (@ToDateTime IS NULL OR NgayTao <= @ToDateTime)
             AND (
                 @SearchText = '' OR 
                 Title LIKE '%' + @SearchText + '%' OR 
@@ -75,9 +86,7 @@ BEGIN
     FETCH NEXT @PageSize ROWS ONLY;
 END;
 GO
-
-
-
+-- TEST PROCEDURE NS_ADTB_GetNotificationsWithPaging
 EXEC NS_ADTB_GetNotificationsWithPaging
     @PageNumber = 1,
     @PageSize = 10,
