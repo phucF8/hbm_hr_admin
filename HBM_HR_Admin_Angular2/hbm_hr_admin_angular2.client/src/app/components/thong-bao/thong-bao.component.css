@@ -1,24 +1,37 @@
+.dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
 .dropdown-button {
     width: 28px;
     height: 28px;
-    background-color: #6c63ff; /* Màu xanh tím như trong ảnh */
+    background-color: white; /* Nền trắng */
+    border: 1px solid #6c63ff; /* Viền xanh tím */
     border-radius: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    margin-bottom: 5px;
-    position: relative;
-    left: 120px;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .arrow-down {
-    width: 0;
-    height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid white; /* Mũi tên trắng hướng xuống */
+    border-top: 6px solid #6c63ff; /* Mũi tên màu xanh tím */
+    transition: border-top-color 0.3s;
 }
+
+/* Hover effect */
+.dropdown-button:hover {
+    background-color: #6c63ff; /* Nền xanh tím khi hover */
+}
+
+.dropdown-button:hover .arrow-down {
+    border-top-color: white; /* Mũi tên đổi thành trắng khi hover */
+}
+
 
 body {
     font-family: Arial, sans-serif;
@@ -43,6 +56,8 @@ body {
     border-radius: 4px;
     overflow: hidden;
     z-index: 1000;
+    /*thêm code để căn phải*/
+    right: 0;
 }
 
 .header {
@@ -112,3 +127,37 @@ body {
     background-color: #e0e0e0;
     margin: 4px 0;
 }
+
+
+.my-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .my-table th,
+  .my-table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+    border: 1px solid #f3f3f3;
+  }
+  
+  /* Nếu bạn muốn header nổi bật hơn */
+  .my-table thead th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+  
+  /* Checkbox nhỏ hơn một chút */
+  .my-table th input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+  
+  /* Responsive: cho phép cuộn ngang trên mobile */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+
+
+
