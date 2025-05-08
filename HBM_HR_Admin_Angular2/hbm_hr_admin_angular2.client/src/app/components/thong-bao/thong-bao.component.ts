@@ -51,6 +51,8 @@ export class ThongBaoComponent implements OnInit {
   showThongBaoPopup: boolean = false;
   showSearchPopup: boolean = false;
 
+  ITEMS_PER_PAGE = ITEMS_PER_PAGE; // <- expose ra để dùng trong HTML
+
   constructor(
     private dialog: MatDialog,
     private thongBaoService: ThongBaoService,
@@ -84,6 +86,10 @@ export class ThongBaoComponent implements OnInit {
 
   hasSelectedThongBao(): boolean {
     return this.thongBaoList.some(tb => tb.selected);
+  }
+
+  getRowNumber(index: number): number {
+    return (this.currentPage - 1) * ITEMS_PER_PAGE + (index + 1);
   }
 
   loadListThongBao() {

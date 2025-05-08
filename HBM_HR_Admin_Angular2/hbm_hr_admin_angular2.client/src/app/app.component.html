@@ -3,7 +3,6 @@
     <div class="header">
       <img src="images/hbm_favicon.png" alt="Logo" class="" />
       <div class="nav-item">
-          <i>👤</i>
           <select>
               <option>Admin</option>
           </select>
@@ -36,8 +35,9 @@
       <div style="width: 100%;" ></div>
   
       <div class="dropdown-container">
-        <div class="dropdown-header">
-            <div class="user-name" (click)="togglePopup()" #button>{{tenNhanVien}}</div>
+        <div class="dropdown-header" (click)="togglePopup()" #button>
+            <img [src]="anhNhanVien" alt="Avatar" class="avatar">
+            <div class="user-name">{{tenNhanVien}} - {{maNhanVien}}</div>
         </div>
         
         <div class="dropdown-menu" *ngIf="showSignoutPopup">

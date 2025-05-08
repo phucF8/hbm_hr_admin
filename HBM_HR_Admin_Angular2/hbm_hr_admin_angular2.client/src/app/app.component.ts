@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LoadingService } from '@app/services/loading.service';
 import { Observable } from 'rxjs';
 import { DebugUtils } from './utils/debug-utils';
+import { getFullImageUrl } from './utils/url.utils';
 
 interface WeatherForecast {
   date: string;
@@ -22,6 +23,8 @@ interface WeatherForecast {
 export class AppComponent implements OnInit {
   isLoggedIn: boolean = false;
   tenNhanVien: string = '';
+  anhNhanVien: string = '';
+  maNhanVien: string = '';
   public forecasts: WeatherForecast[] = [];
   showCreatePopup = false;
   showSignoutPopup = false;
@@ -50,7 +53,10 @@ export class AppComponent implements OnInit {
       this.authService.currentUser$.subscribe((status) => {
         if (status?.Status == 'SUCCESS') {
           this.isLoggedIn = true;
-          this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';
+          this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || '';
+          this.anhNhanVien = this.authService.getCurrentUser()?.Anh || '';
+          this.anhNhanVien = getFullImageUrl(this.anhNhanVien);
+          this.maNhanVien = this.authService.getCurrentUser()?.MaNhanVien || '';
         }
         return status;
       });
@@ -61,7 +67,10 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
-      this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';
+      this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || '';
+      this.anhNhanVien = this.authService.getCurrentUser()?.Anh || '';
+      this.anhNhanVien = getFullImageUrl(this.anhNhanVien);
+      this.maNhanVien = this.authService.getCurrentUser()?.MaNhanVien || '';
     }
   }
 
