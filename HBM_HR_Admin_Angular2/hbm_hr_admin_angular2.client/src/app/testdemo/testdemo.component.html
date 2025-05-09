@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- BEGIN HEAD -->
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>TRANG CHỦ - Tập đoàn Hòa Bình Minh</title>
+    
+    <style type="text/css">
+    .jqstooltip {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        visibility: hidden;
+        background: rgb(0, 0, 0) transparent;
+        background-color: rgba(0, 0, 0, 0.6);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+        color: white;
+        font: 10px arial, san serif;
+        text-align: left;
+        white-space: nowrap;
+        padding: 5px;
+        border: 1px solid white;
+        box-sizing: content-box;
+        z-index: 10000;
+    }
+
+    .jqsfield {
+        color: white;
+        font: 10px arial, san serif;
+        text-align: left;
+    }
+</style>
+</head>
+
+
+
+
+
+
+
+
+
+    
+<div class="horizontal-menu">
+    <nav class="bottom-navbar">
+        <div class="width-8 text-right">
+            <a class="navbar-brand brand-logo mt-10 pr-10" href="http://localhost:3636/home">
+                <img src="images/hbm_favicon.png" alt="Logo" class="width-45px" alt="logo">
+            </a>
+        </div>
+
+        
+        
+        <div class="container" style="width: 76% !important; padding-left: 6px !important; padding-right: 6px !important">
+            <ul class="nav page-navigation">
+                <!-- ngRepeat: root in NavigatorModel.Data --><li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_11" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                    <a href="javascript:void(0)" class="nav-link" data-path="/">
+                        <i class="fa fa-bars menu-icon"></i>
+                        <span class="menu-title ng-binding" ng-bind="root.Title">Danh mục</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="col-group-wrapper row max-height-300px dv-scrollbar">
+                            <!-- ngRepeat: menu in root.ChiTiet | orderBy:'Order' --><div class="col-group ng-scope" style="width: 16.666666666666668%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Danh mục chung</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 16.666666666666668%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Cơ cấu tổ chức</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 16.666666666666668%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">C&amp;B</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 16.666666666666668%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Pháp nhân</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 16.666666666666668%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Khen thưởng kỷ luật</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 16.666666666666668%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Hành Chính</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li><li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_16" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                    <a href="javascript:void(0)" class="nav-link" data-path="/HR">
+                        <i class="fa fa-sitemap menu-icon"></i>
+                        <span class="menu-title ng-binding" ng-bind="root.Title">Nhân Sự</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="col-group-wrapper row max-height-300px dv-scrollbar">
+                            <!-- ngRepeat: menu in root.ChiTiet | orderBy:'Order' --><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Quản trị NS</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' --><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Tra cứu nhân viên</a>
+                                                        </li><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Hồ sơ nhân sự</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Danh mục KPIs</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Đánh giá KPIs</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' --><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Đánh giá nhân sự</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Khảo sát</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Báo cáo</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li><li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_E439B01196E44" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                    <a href="javascript:void(0)" class="nav-link" data-path="/HC">
+                        <i class="fa fa-calendar menu-icon"></i>
+                        <span class="menu-title ng-binding" ng-bind="root.Title">Hành chính</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="col-group-wrapper row max-height-300px dv-scrollbar">
+                            <!-- ngRepeat: menu in root.ChiTiet | orderBy:'Order' --><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Quản trị HC</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' --><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Đặt xe</a>
+                                                        </li><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Phòng họp</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Văn thư lưu trữ</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' --><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Kho biểu mẫu</a>
+                                                        </li><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Tra cứu văn bản</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Thiết lập C.Công</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Dữ liệu C.Công</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' --><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Dữ liệu chấm công</a>
+                                                        </li><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Giải trình công</a>
+                                                        </li><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Xem chi tiết ngày công</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 20%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Báo cáo</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li><li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_6CE3440A79B94" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                    <a href="javascript:void(0)" class="nav-link" data-path="/RQ">
+                        <i class="fa fa-random menu-icon"></i>
+                        <span class="menu-title ng-binding" ng-bind="root.Title">Request</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="col-group-wrapper row max-height-300px dv-scrollbar">
+                            <!-- ngRepeat: menu in root.ChiTiet | orderBy:'Order' --><div class="col-group ng-scope" style="width: 50%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Thiết lập</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 50%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Quy trình</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' --><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Tạo/Phê duyệt Request</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li><li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_CC8B728B802C4" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                    <a href="javascript:void(0)" class="nav-link" data-path="/PO">
+                        <i class="fa fa-archive menu-icon"></i>
+                        <span class="menu-title ng-binding" ng-bind="root.Title">Tài sản</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="col-group-wrapper row max-height-300px dv-scrollbar">
+                            <!-- ngRepeat: menu in root.ChiTiet | orderBy:'Order' --><div class="col-group ng-scope" style="width: 33.333333333333336%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Danh mục</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 33.333333333333336%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Nhập/xuất/bàn giao</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 33.333333333333336%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">QL Tài sản</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li><li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_2a1f65ac8fd34429" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                    <a href="javascript:void(0)" class="nav-link" data-path="/">
+                        <i class="fa fa-bullhorn menu-icon"></i>
+                        <span class="menu-title ng-binding" ng-bind="root.Title">TD&amp;DT</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="col-group-wrapper row max-height-300px dv-scrollbar">
+                            <!-- ngRepeat: menu in root.ChiTiet | orderBy:'Order' --><div class="col-group ng-scope" style="width: 33.333333333333336%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Tuyển dụng</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 33.333333333333336%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Kiểm tra</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 33.333333333333336%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Đào tạo</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' --><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Phê duyệt khóa đào tạo</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li><li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_99" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                    <a href="javascript:void(0)" class="nav-link" data-path="/SA">
+                        <i class="fa fa-gears menu-icon"></i>
+                        <span class="menu-title ng-binding" ng-bind="root.Title">Q.TRỊ</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="col-group-wrapper row max-height-300px dv-scrollbar">
+                            <!-- ngRepeat: menu in root.ChiTiet | orderBy:'Order' --><div class="col-group ng-scope" style="width: 25%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Thiết lập</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 25%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Modules</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 25%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Tài khoản</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' -->
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><div class="col-group ng-scope" style="width: 25%" ng-repeat="menu in root.ChiTiet | orderBy:&#39;Order&#39;">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="category-heading ng-binding">Khác</p>
+                                        <div class="submenu-item">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ul>
+                                                        <!-- ngRepeat: child in menu.ChiTiet | orderBy:'Order' --><li class="nav-item ng-scope" ng-repeat="child in menu.ChiTiet | orderBy:&#39;Order&#39;">
+                                                            <a class="nav-link text-nowrap ng-binding" href="javascript:void(0)" ng-click="redirectToWorkhub(child)">Quản trị thông báo</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end flex-grow-1 width-15">
+            <ul class="navbar-nav navbar-nav-right" style="display: -webkit-inline-box !important; padding-right: 15px !important">
+                
+                <li class="nav-item nav-profile dropdown">
+                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" id="profileDropdown" aria-expanded="false">
+                        <img ng-src="https://workhub.hbm.vn//Upload/NhanSu/154EFF69B7734EE2.PNG" alt="" class="img-36" src="./TRANG CHỦ - Tập đoàn Hòa Bình Minh_files/154EFF69B7734EE2.PNG">
+                        <span class="pl-10 fs-14 ng-binding" ng-bind="NavigatorModel.ThongTinTK">Phúc - S001</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown mt-0" aria-labelledby="profileDropdown" x-placement="bottom-end" style="position: absolute; transform: translate3d(-13px, 52px, 0px); top: 0px; left: 0px; will-change: transform;">
+                        <a class="dropdown-item" href="javascript:void(0)" ng-click="logout()">
+                            <i class="mdi mdi-logout text-danger min-width-15px"></i>
+                            Đăng xuất
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

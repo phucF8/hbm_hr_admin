@@ -1,56 +1,103 @@
 
 <header *ngIf="isLoggedIn">
-    <div class="header">
-      <img src="images/hbm_favicon.png" alt="Logo" class="" />
-      <div class="nav-item">
-          <select>
-              <option>Admin</option>
-          </select>
-      </div>
-      <!-- <div class="nav-item">
-          <i>📅</i>
-          <select>
-              <option>Hành chính</option>
-          </select>
-      </div>
-      <div class="nav-item">
-          <i>📝</i>
-          <select>
-              <option>Request</option>
-          </select>
-      </div>
-      <div class="nav-item">
-          <i>📊</i>
-          <select>
-              <option>TĐ&ĐT</option>
-          </select>
-      </div>
-      <div class="nav-item">
-          <i>⚙️</i>
-          <select>
-              <option>Ô TRỊ</option>
-          </select>
-      </div> -->
-  
-      <div style="width: 100%;" ></div>
-  
-      <div class="dropdown-container">
-        <div class="dropdown-header" (click)="togglePopup()" #button>
-            <img [src]="anhNhanVien" alt="Avatar" class="avatar">
-            <div class="user-name">{{tenNhanVien}} - {{maNhanVien}}</div>
-        </div>
-        
-        <div class="dropdown-menu" *ngIf="showSignoutPopup">
-            <a href="#" class="dropdown-item logout" (click)="logout()">
-                <i class="bi bi-box-arrow-right"></i> Đăng xuất
-            </a>
-        </div>
-      </div>
-  
-      
-      
+
+
+
+
+    <div class="horizontal-menu">
+        <nav class="bottom-navbar">
+            <div class="width-8 text-right">
+                <a class="navbar-brand brand-logo mt-10 pr-10" href="http://localhost:3636/home">
+                    <img src="images/hbm_favicon.png" alt="Logo" class="width-45px" alt="logo">
+                </a>
+            </div>
     
-  </div>  
+            
+
+
+            <!-- <div class="nav-item">
+                <select>
+                    <option>Admin</option>
+                </select>
+            </div> -->
+
+
+
+
+            
+            <div class="container" style="width: 76% !important; padding-left: 6px !important; padding-right: 6px !important">
+                <ul class="nav page-navigation">
+                    
+                    <li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_99" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                        <a href="javascript:void(0)" class="nav-link" data-path="/SA">
+                            <i class="fa fa-gears menu-icon"></i>
+                            <span class="menu-title ng-binding" ng-bind="root.Title">ADMIN</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+    
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end flex-grow-1 width-15">
+                <ul class="navbar-nav navbar-nav-right" style="display: -webkit-inline-box !important; padding-right: 15px !important">
+                    
+                    <li class="nav-item nav-profile dropdown">
+                        <a class="nav-link" href="javascript:void(0)" data-toggle="dropdown" id="profileDropdown" aria-expanded="false" (click)="togglePopup()" #button>
+                            <img alt="" class="img-36" [src]="anhNhanVien">
+                            <span class="pl-10 fs-14 ng-binding" ng-bind="NavigatorModel.ThongTinTK">{{tenNhanVien}} - {{maNhanVien}}</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </a>
+
+
+
+
+                        <div class="dropdown-menu_phuc" *ngIf="showSignoutPopup">
+                            <a href="#" class="dropdown-item logout" (click)="logout()">
+                                <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                            </a>
+                        </div>
+
+
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown mt-0" 
+                        aria-labelledby="profileDropdown" 
+                        x-placement="bottom-end"
+                        style="position: absolute; transform: translate3d(-13px, 52px, 0px); top: 0px; left: 0px; will-change: transform;">
+                            <a class="dropdown-item" href="javascript:void(0)" ng-click="logout()">
+                                <i class="mdi mdi-logout text-danger min-width-15px"></i>
+                                Đăng xuất
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
   </header>
     <main >
       <div *ngIf="isLoading | async" class="loading-overlay">
