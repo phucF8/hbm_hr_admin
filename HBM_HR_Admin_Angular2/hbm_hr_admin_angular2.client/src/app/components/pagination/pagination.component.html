@@ -5,7 +5,7 @@
     [class.opacity-50]="currentPage === 1"
     [class.pointer-events-none]="currentPage === 1"
     (click)="changePage(1)">
-    «
+    <i class="bi bi-skip-backward-fill"></i>
   </div>
 
   <!-- Nút "Previous" (về trang trước) -->
@@ -14,7 +14,7 @@
     [class.opacity-50]="currentPage === 1"
     [class.pointer-events-none]="currentPage === 1"
     (click)="changePage(currentPage - 1)">
-    ‹
+    <i class="bi bi-chevron-left"></i>
   </div>
 
   <!-- Danh sách các trang -->
@@ -33,7 +33,7 @@
     [class.opacity-50]="currentPage === totalPages"
     [class.pointer-events-none]="currentPage === totalPages"
     (click)="changePage(currentPage + 1)">
-    ›
+    <i class="bi bi-chevron-right"></i>
   </div>
 
   <!-- Nút "Next" (về trang cuối) -->
@@ -42,6 +42,6 @@
     [class.opacity-50]="currentPage === totalPages"
     [class.pointer-events-none]="currentPage === totalPages"
     (click)="changePage(totalPages)">
-    »
+    <i class="bi bi-skip-forward-fill"></i>
   </div>
 </div>
