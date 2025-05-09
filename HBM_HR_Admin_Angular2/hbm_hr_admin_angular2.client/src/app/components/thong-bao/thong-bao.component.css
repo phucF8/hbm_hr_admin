@@ -3,35 +3,23 @@
     display: inline-block;
 }
 
+
 .dropdown-button {
     width: 28px;
     height: 28px;
-    background-color: white; /* Nền trắng */
-    border: 1px solid #6c63ff; /* Viền xanh tím */
+    background-color: #6c63ff; /* Màu xanh tím như trong ảnh */
     border-radius: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .arrow-down {
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid #6c63ff; /* Mũi tên màu xanh tím */
-    transition: border-top-color 0.3s;
+    border-top: 6px solid white; /* Mũi tên trắng hướng xuống */
 }
-
-/* Hover effect */
-.dropdown-button:hover {
-    background-color: #6c63ff; /* Nền xanh tím khi hover */
-}
-
-.dropdown-button:hover .arrow-down {
-    border-top-color: white; /* Mũi tên đổi thành trắng khi hover */
-}
-
 
 body {
     font-family: Arial, sans-serif;
@@ -57,7 +45,6 @@ body {
     overflow: hidden;
     z-index: 1000;
     /*thêm code để căn phải*/
-    right: 0;
 }
 
 .header {
@@ -140,6 +127,11 @@ body {
     vertical-align: middle;
     padding: 8px;
     border: 1px solid #f3f3f3;
+  }
+
+  .my-table tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
   }
   
   /* Nếu bạn muốn header nổi bật hơn */

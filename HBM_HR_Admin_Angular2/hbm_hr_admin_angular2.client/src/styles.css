@@ -63,25 +63,25 @@ body {
 }
 
 .tabs {
-  background-color: #ecf0f1;
-  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 16px;
   display: flex;
 }
 
 .tab {
-  padding: 6px 12px;
-  margin-right: 10px;
+   background-color: #dbe3e6;
+  text-transform: uppercase;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
+  font-size: 14px;
+  padding: 14px 8px;
 }
 
-.tab.active {
-  border-bottom: 2px solid #3498db;
-}
+
 
 .action-buttons {
-  padding: 8px 15px;
+  padding-top: 8px;
+  padding-bottom: 8px;
   display: flex;
 }
 
@@ -112,14 +112,12 @@ body {
   border-radius: 5px;
   padding: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 48px;
 }
 
 .panel-header {
   display: flex;
   justify-content: space-between;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 8px;
   font-size: 12px;
 }
 
@@ -284,7 +282,7 @@ th {
 .pagination {
   display: flex;
   justify-content: flex-start;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
 .pagination-item {

@@ -11534,19 +11534,9 @@ pre code {
     background-color: #e7e9e9;
 }
 
-.table-success,
-.table-success>th,
-.table-success>td {
-    background-color: #d7f4d7;
-}
 
-.table-hover .table-success:hover {
-    background-color: #c3efc3;
-}
-
-.table-hover .table-success:hover>td,
-.table-hover .table-success:hover>th {
-    background-color: #c3efc3;
+.table-success{
+    background-color: red;
 }
 
 .table-info,
@@ -32138,8 +32128,8 @@ div.tagsinput span.tag a {
 }
 
 .horizontal-menu .bottom-navbar .page-navigation>.nav-item>.nav-link .menu-title {
-    font-size: 0.875rem;
-    font-weight: 400;
+    font-size: 16;
+    font-weight: 600;
 }
 
 .horizontal-menu .bottom-navbar .page-navigation>.nav-item>.nav-link .menu-icon {

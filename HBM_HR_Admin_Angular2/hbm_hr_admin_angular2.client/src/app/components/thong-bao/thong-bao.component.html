@@ -1,6 +1,4 @@
-
-    
-
+<div style="padding-left: 48px; padding-right: 48px;">
     <div class="tabs">
         <div class="tab active">Thông báo</div>
     </div>
@@ -18,7 +16,7 @@
         </button>
     </div>
 
-    <div class="content" >
+    <div>
         <div class="panel">
             <div class="panel-header">
                 <div><strong>BẢN GHI</strong></div>
@@ -80,7 +78,7 @@
                 
               </thead>
                 <tbody>
-                    <tr *ngFor="let tb of thongBaoList" [ngClass]="{'table-success': tb.status == 1}">
+                    <tr *ngFor="let tb of thongBaoList" [ngClass]="{'table-success': tb.status == 1}" (click)="tb.status == 1 ? viewThongBao(tb.id) : editThongBao(tb.id)" >
                       <td>
                         <input type="checkbox" [(ngModel)]="tb.selected" [disabled]="tb.status === 1">
                       </td>
@@ -97,7 +95,8 @@
                       <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
                       <td>{{ tb.loaiThongBao}}</td>
                       <td>
-                        <div class="dropdown-wrapper" (click)="toggleMenu(tb)">
+
+                        <div *ngIf="tb.status !== 1" class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">
                           <div class="dropdown-button">
                             <div class="arrow-down"></div>
                           </div>
@@ -134,6 +133,6 @@
     <div class="back-to-top">↑</div>
 
     
-
+</div>
 
    

@@ -10284,15 +10284,7 @@ ol.organizational-chart {
     background-color: #e7e9e9;
   }
   
-  .table-success,
-  .table-success > th,
-  .table-success > td {
-    background-color: #d7f4d7;
-  }
-  
-  .table-hover .table-success:hover {
-    background-color: #c3efc3;
-  }
+
   
   .table-hover .table-success:hover > td,
   .table-hover .table-success:hover > th {
@@ -24178,8 +24170,8 @@ ol.organizational-chart {
     min-width: 20px;
   }
   
-  .email-wrapper .mail-list-container .mail-list .content {
-    width: 83%;
+  .email-wrapper .mail-list-container .mail-list{
+    width: 80%;
     padding-left: 0;
     padding-right: 0;
   }
