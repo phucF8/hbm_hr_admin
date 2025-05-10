@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Input, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { ThongBaoService } from '../../services/thong-bao.service';
+import { ThongBaoService, MergedData } from '../../services/thong-bao.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
@@ -15,6 +15,11 @@ import * as FileSaver from 'file-saver';
 import { Observable, forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { exportToExcel } from '@app/utils/excel-export.util'; // Import your utility function for exporting to Excel
+
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
+import { DonVi } from '@app/models/donvi';
+import { TimkiemComponent } from '@app/uicomponents/timkiem/timkiem.component';
 
 
 
@@ -53,14 +58,40 @@ export class ThongBaoComponent implements OnInit {
 
   ITEMS_PER_PAGE = ITEMS_PER_PAGE; // <- expose ra để dùng trong HTML
 
+
+  searchUserForm: FormGroup;
+  filteredUsers: MergedData[] | null = null;
+  isSearching: boolean = false;
+  selectedDonVi: DonVi | null = null;
+  donvis: DonVi[] = [
+    { id: '385ae8c687d347e4', ma: 'GOL', tenKho: 'GẠCH' },
+    { id: 'F98431BCF2404EFC', ma: 'HBMVT', tenKho: 'VPVT' },
+    { id: '08a8f3bec5934', ma: 'S001', tenKho: 'VPTÐ' },
+    { id: 'd2f012837f434794', ma: 'S002', tenKho: 'THÉP' },
+    { id: '2d74d08d99734470', ma: 'S004', tenKho: 'VPYB' },
+    { id: '7d1e43e2b0fc4f54', ma: 'S005', tenKho: 'Ô TÔ' },
+    { id: '9e9a1bda336343b5', ma: 'S006', tenKho: 'XMMB' },
+    { id: 'f4424e5a354b4548', ma: 'S008', tenKho: 'HBYB' },
+    { id: '056fef14cbb64105', ma: 'S009', tenKho: 'XMMN' },
+    { id: '9513b33e7e58492e', ma: 'VLXD', tenKho: 'VLXD' },
+  ];
+  showDonVisPopup = false;
+  isFocused = false;
+  selectedUsers: MergedData[] = [];
+
   constructor(
+    private fb: FormBuilder,
     private dialog: MatDialog,
     private thongBaoService: ThongBaoService,
     private loadingService: LoadingService,
     private router: Router,
     private authService: AuthService,
     private toastr: ToastrService,
-  ) { }
+  ) {
+    this.searchUserForm = this.fb.group({
+      search: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     const today = new Date();
@@ -72,6 +103,16 @@ export class ThongBaoComponent implements OnInit {
     if (currentUser) {
       this.tenNhanVien = currentUser.TenNhanVien;
     }
+
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (currentUserStr) {
+      const currentUser = JSON.parse(currentUserStr);
+      var idKhoLamViec = currentUser.DataSets.Table[0].IDKhoLamViec;
+      this.selectedDonVi = this.donvis.find(d => d.id === idKhoLamViec ) || null;
+    } else {
+      console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!');
+    }
+
   }
 
   onPageChange(newPage: number) {
@@ -125,7 +166,7 @@ export class ThongBaoComponent implements OnInit {
 
   loadListThongBaoForPages(selectedPages: number[]): Observable<any[]> {
     this.loadingService.show();
-    const requests = selectedPages.map(page => 
+    const requests = selectedPages.map(page =>
       this.thongBaoService.getListThongBao(
         page,
         this.sortBy,
@@ -331,7 +372,7 @@ export class ThongBaoComponent implements OnInit {
     // this.notificationType - loai thong bao RQ, GT, ...
     // this.isSentToAll - mưc độ hoàn thành;
     // this.loaiThongBao = chủ động hay tự động;
-    this.loadListThongBao();  
+    this.loadListThongBao();
 
   }
 
@@ -435,7 +476,7 @@ export class ThongBaoComponent implements OnInit {
   openXuatFile() {
     const dialogRef = this.dialog.open(XuatFileComponent, {
       width: '400px',
-      data: {currentPage: this.currentPage} // nếu muốn truyền gì đó
+      data: { currentPage: this.currentPage } // nếu muốn truyền gì đó
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -457,5 +498,66 @@ export class ThongBaoComponent implements OnInit {
     document.body.classList.add('no-scroll');
   }
 
+  onSearchUser() {
+    const searchValue = this.searchUserForm.get('search')?.value?.trim();
+    if (!searchValue) {
+      this.filteredUsers = null; // Đặt về null nếu không có từ khóa tìm kiếm
+      return;
+    }
+    this.isSearching = true;
+    this.filteredUsers = []; // Reset trước khi tìm kiếm
+    this.thongBaoService.searchUsers(searchValue, this.selectedDonVi?.id || '')
+      .pipe(finalize(() => this.isSearching = false)) // Đảm bảo luôn thực hiện
+      .subscribe({
+        next: (response) => {
+          this.filteredUsers = (response?.DatasLookup || []).map(user => ({
+            ID: user.ID,
+            MaNhanVien: user.MaNhanVien,
+            TenNhanVien: user.TenNhanVien,
+            TenPhongBan: user.TenPhongBan,
+            status: 0 // Gán giá trị mặc định vì DoLookupData không có "status"
+          })) as MergedData[];
+        },
+        error: (error) => {
+          console.error('Lỗi tìm kiếm người dùng:', error);
+          this.filteredUsers = []; // Tránh giữ kết quả sai
+        }
+      });
+  }
 
+
+  openDonVisPopup() {
+    this.showDonVisPopup = !this.showDonVisPopup;
+  }
+
+  selectDonVi(item: DonVi): void {
+    this.selectedDonVi = item;
+    this.showDonVisPopup = false;
+  }
+
+  onBlurInput(value : string) {
+    setTimeout(() => {
+      this.isFocused = false;
+      if (value.trim() === '') {
+        this.filteredUsers  = null; // Đặt về null nếu không có từ khóa tìm kiếm
+      }
+    }, 200); // 200ms hoặc thời gian bạn mong muốn
+  }
+
+  
+  selectUser(user: any) {
+    if (!this.selectedUsers.find(u => u.ID === user.ID)) {
+      this.selectedUsers.push(user);
+    }
+    
+    // Log toàn bộ danh sách selectedUsers sau mỗi lần cập nhật
+    console.log("Current selectedUsers:", this.selectedUsers.map(u => u.ID));
+    
+    this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
+    this.filteredUsers = []; // Ẩn danh sách gợi ý
+  }
+
+  removeUser(user: any) {
+    this.selectedUsers = this.selectedUsers.filter(u => u.ID !== user.ID);
+  }
 }

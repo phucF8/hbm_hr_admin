@@ -19,6 +19,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
+import { TimkiemComponent } from './uicomponents/timkiem/timkiem.component';
+import { InputFormComponent } from './uicomponents/input-form/input-form.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +32,8 @@ import { MatRadioModule } from '@angular/material/radio';
     AdvancedSearchComponent,
     ToastTestComponent,
     XuatFileComponent,
+    TimkiemComponent,
+    InputFormComponent,
   ],
   imports: [
     BrowserModule,

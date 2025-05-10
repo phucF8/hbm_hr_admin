@@ -1,0 +1,11 @@
+<div class="form-group">
+    <label>{{ label }}</label>
+    <input
+        type="text"
+        class="form-control"
+        [placeholder]="placeholder"
+        [(ngModel)]="value"
+        (ngModelChange)="onValueChange($event)"
+        (keyup.enter)="onEnter.emit(value)"
+    />
+</div>
