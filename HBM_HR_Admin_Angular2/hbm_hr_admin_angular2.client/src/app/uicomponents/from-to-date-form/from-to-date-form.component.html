@@ -1,0 +1,19 @@
+<div class="form-group">
+    <label [for]="fromDateId">{{ label }}</label>
+    <div class="date-container">
+        <input
+            type="date"
+            [placeholder]="fromPlaceholder"
+            [id]="fromDateId"
+            [ngModel]="fromDate"
+            (ngModelChange)="onFromDateChange($event)"
+        >
+        <input
+            type="date"
+            [placeholder]="toPlaceholder"
+            [id]="toDateId"
+            [ngModel]="toDate"
+            (ngModelChange)="onToDateChange($event)"
+        >
+    </div>
+</div>

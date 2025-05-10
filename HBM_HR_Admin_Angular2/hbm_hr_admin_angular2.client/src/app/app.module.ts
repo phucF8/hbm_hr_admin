@@ -21,6 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { TimkiemComponent } from './uicomponents/timkiem/timkiem.component';
 import { InputFormComponent } from './uicomponents/input-form/input-form.component';
+import { FromToDateFormComponent } from './uicomponents/from-to-date-form/from-to-date-form.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { InputFormComponent } from './uicomponents/input-form/input-form.compone
     XuatFileComponent,
     TimkiemComponent,
     InputFormComponent,
+    FromToDateFormComponent,
   ],
   imports: [
     BrowserModule,

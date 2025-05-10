@@ -26,13 +26,7 @@
       
       <app-input-form label="Tiêu đề hoặc nội dung" placeholder="Nhập từ cần tìm kiếm" [(value)]="searchText" (onEnter)="onSearchTextChange()"/>
 
-      <div class="form-group">
-        <label for="time">Thời gian tạo</label>
-        <div class="date-container">
-          <input type="date" placeholder="Từ ngày" id="from-date" [(ngModel)]="ngayTaoTu">
-          <input type="date" placeholder="Đến ngày" id="to-date" [(ngModel)]="ngayTaoDen">
-        </div>
-      </div>
+      <app-from-to-date-form [(fromDate)]="ngayTaoTu" [(toDate)]="ngayTaoDen" label="Thời gian tạo" fromDateId="from-date" toDateId="to-date"/>
 
       <div class="form-group">
         <label for="request-group">Nhóm thông báo</label>
