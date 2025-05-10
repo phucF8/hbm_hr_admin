@@ -1,138 +1,223 @@
 <div style="padding-left: 48px; padding-right: 48px;">
-    <div class="tabs">
-        <div class="tab active">Thông báo</div>
-    </div>
+  <div class="tabs">
+    <div class="tab active">Thông báo</div>
+  </div>
 
-    <div class="action-buttons">
-        <button class="btn">
-          <i class="bi bi-search"></i>Tìm kiếm</button>
-        <!-- Button mở popup tạo mới -->
-        <button class="btn btn-primary" (click)="openTaoThongBaoPopup()">
-          <i class="bi bi-plus-circle"></i> Tạo mới
-        </button>
-        <button class="btn" (click)="openXuatFile()"><i class="bi bi-file-earmark-excel"></i> Xuất File</button>
-        <button *ngIf="hasSelectedThongBao()" class="btn" (click)="deleteMultiSelected()">
-          <i class="bi bi-trash"></i> Xóa những thông báo đã chọn
-        </button>
-    </div>
+  <div class="action-buttons">
 
-    <div>
-        <div class="panel">
-            <div class="panel-header">
-                <div><strong>BẢN GHI</strong></div>
-                <div class="search-container">
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Tìm kiếm theo tiêu đề"
-                      [(ngModel)]="searchText"
-                      (keyup.enter)="onSearchTextChange()" />
-                      
-                    <button class="btn btn-secondary" (click)="openSearchPopup()">
-                      <i class="bi bi-search"></i>
-                    </button>
-                    
-                  </div>
-            </div>
-
-            <div class="overlay" [hidden]="!showSearchPopup">
-                <div class="overlay-content"  style="background-color: transparent; padding: 0;width: 60%">
-                  <app-advanced-search
-                    (closePopupEvent)="handleClosePopup($event)"
-                    (searchPopupEvent)="handleSearchPopup($event)">
-                  </app-advanced-search>
-            
-                </div>
-            </div>
-
-            <!-- hộp thoại tạo thông báo mới hoặc xem chi tiết thông báo -->
-            <div class="overlay" *ngIf="showThongBaoPopup">
-                <div class="overlay-content" style="background-color: transparent; padding: 0;width: 60%">
-                <chitiet-thong-bao
-                    [notificationId]="notificationId"
-                    (closePopupEvent)="handleClosePopup($event)"
-                    (createEvent)="handleCreate($event)">
-                </chitiet-thong-bao>
-                </div>
-            </div>
-            
+  </div>
 
 
 
-            <table class="my-table">
-              <thead>
-                <tr>
-                  <th style="width: 2%;">
-                    <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
-                  </th>
-                  <th style="width: 2%;">#</th>
-                  <th style="width: 10%;">Tiêu đề</th>
-                  <th style="width: 25%;">Nội dung</th>
-                  <th style="width: 10%;">Người gửi</th>
-                  <th style="width: 15%;">Ngày tạo</th>
-                  <th style="width: 10%;">Hoàn thành</th>
-                  <th style="width: 10%;">Loại</th>
-                  <th style="width: 10%;">Nhóm</th>
-                  <th style="width: 5%;"></th>
-                </tr>
-                
-              </thead>
-                <tbody>
-                    <tr *ngFor="let tb of thongBaoList" [ngClass]="{'table-success': tb.status == 1}" (click)="tb.status == 1 ? viewThongBao(tb.id) : editThongBao(tb.id)" >
-                      <td>
-                        <input type="checkbox" [(ngModel)]="tb.selected" [disabled]="tb.status === 1">
-                      </td>
-                      <td>
-                        {{ (currentPage - 1) * ITEMS_PER_PAGE + (thongBaoList.indexOf(tb) + 1) }}
-                      </td>
-                      <td>
-                        {{ tb.title }}
-                      </td>
-                      <td style="text-align: justify;">{{ tb.content }}</td>
-                      <td>{{ tb.tenNhanVien }}</td>
-                      <td>{{ tb.ngayTao | date:'dd/MM/yyyy HH:mm' }}</td>
-                      <td>{{ tb.receivedCount }}/{{ tb.totalRecipients }}</td>
-                      <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
-                      <td>{{ tb.loaiThongBao}}</td>
-                      <td>
 
-                        <div *ngIf="tb.status !== 1" class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">
-                          <div class="dropdown-button">
-                            <div class="arrow-down"></div>
-                          </div>
-                          <div class="popup-menu" *ngIf="openedMenuId === tb.id">
-                            <div class="menu-item view" *ngIf="tb.status === 1" (click)="viewThongBao(tb.id)">
-                                <i class="bi bi-eye"></i>
-                                <div class="menu-text">Xem</div>
-                            </div>
-                            <div class="menu-item edit" *ngIf="tb.status !== 1" (click)="editThongBao(tb.id)">
-                                <i class="bi bi-pencil"></i>
-                                <div class="menu-text">Sửa</div>
-                            </div>
-                            <div class="menu-item delete" *ngIf="tb.status !== 1" (click)="deleteThongBao(tb.id)">
-                                <i class="bi bi-trash"></i>
-                                <div class="menu-text">Xóa</div>
-                            </div>
-                        </div>
-                        
-                        </div>
-                      </td>
-                      
-                    </tr>
-                </tbody>
-            </table>
 
-            <!-- Pagination section -->
-            <app-pagination [totalPages]="totalPages" [currentPage]="currentPage" (pageChange)="onPageChange($event)">
-            </app-pagination>
-            
+
+
+
+
+
+
+  <div class="search-container">
+    <div class="search-title">TIÊU CHÍ TÌM KIẾM</div>
+    <div class="search-form">
+
+      <div class="form-group">
+        <label for="carCode">Tiêu đề hoặc nội dung</label>
+        <input type="text" class="form-control" placeholder="Nhập từ cần tìm kiếm" [(ngModel)]="searchText"
+          (keyup.enter)="onSearchTextChange()" />
+      </div>
+
+      <div class="form-group">
+        <label for="time">Thời gian tạo</label>
+        <div class="date-container">
+          <input type="date" placeholder="Từ ngày" id="from-date" [(ngModel)]="ngayTaoTu">
+          <input type="date" placeholder="Đến ngày" id="to-date" [(ngModel)]="ngayTaoDen">
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request-group">Nhóm thông báo</label>
+        <select id="mainType" [(ngModel)]="loaiThongBao">
+          <option [ngValue]="null">Tất cả</option>
+          <option [ngValue]="'RQ'">Đề xuất</option>
+          <option [ngValue]="'GT'">Giải trình</option>
+          <option [ngValue]="'XE'">Đặt xe</option>
+          <option [ngValue]="'ROOM'">Đặt phòng họp</option>
+          <option [ngValue]="'KPI'">KPIs</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="request-group">Loại thông báo</label>
+        <select id="mainType" [(ngModel)]="notificationType">
+          <option [ngValue]="null">Tất cả</option>
+          <option [ngValue]="1">Tự động</option>
+          <option [ngValue]="2">Chủ động</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="request-group">Mức độ hoàn thành</label>
+        <select id="mainType" [(ngModel)]="isSentToAll">
+          <option [ngValue]="null">Tất cả</option>
+          <option [ngValue]="1">Đã hoàn thành</option>
+          <option [ngValue]="2">Chưa hoàn thành</option>
+        </select>
+      </div>
+
+
+
+
+      <div class="buttons-container">
+        <button class="btn" (click)="timKiem()">
+          <i class="bi bi-search"></i> Tìm kiếm
+        </button>
+      
+        <div class="right-buttons">
+          <button class="btn btn-primary" (click)="openTaoThongBaoPopup()">
+            <i class="bi bi-plus-circle"></i> Tạo mới
+          </button>
+          <button class="btn" (click)="openXuatFile()">
+            <i class="bi bi-file-earmark-excel"></i> Xuất File
+          </button>
+          <button *ngIf="hasSelectedThongBao()" class="btn" (click)="deleteMultiSelected()">
+            <i class="bi bi-trash"></i> Xóa những thông báo đã chọn
+          </button>
+        </div>
+      </div>
+      
     </div>
+  </div>
 
-    <!-- Back to top button -->
-    <div class="back-to-top">↑</div>
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <div><strong>BẢN GHI</strong></div>
+        <div class="search-container">
+
+
+          <button class="btn btn-secondary" (click)="openSearchPopup()">
+            <i class="bi bi-search"></i>
+          </button>
+
+        </div>
+      </div>
+
+      <div class="overlay" [hidden]="!showSearchPopup">
+        <div class="overlay-content" style="background-color: transparent; padding: 0;width: 60%">
+          <app-advanced-search (closePopupEvent)="handleClosePopup($event)"
+            (searchPopupEvent)="handleSearchPopup($event)">
+          </app-advanced-search>
+
+        </div>
+      </div>
+
+      <!-- hộp thoại tạo thông báo mới hoặc xem chi tiết thông báo -->
+      <div class="overlay" *ngIf="showThongBaoPopup">
+        <div class="overlay-content" style="background-color: transparent; padding: 0;width: 60%">
+          <chitiet-thong-bao [notificationId]="notificationId" (closePopupEvent)="handleClosePopup($event)"
+            (createEvent)="handleCreate($event)">
+          </chitiet-thong-bao>
+        </div>
+      </div>
+
+
+
+
+      <table class="my-table">
+        <thead>
+          <tr>
+            <th style="width: 2%;">
+              <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
+            </th>
+            <th style="width: 2%;">#</th>
+            <th style="width: 10%;">Tiêu đề</th>
+            <th style="width: 25%;">Nội dung</th>
+            <th style="width: 10%;">Người gửi</th>
+            <th style="width: 15%;">Ngày tạo</th>
+            <th style="width: 10%;">Hoàn thành</th>
+            <th style="width: 10%;">Loại</th>
+            <th style="width: 10%;">Nhóm</th>
+            <th style="width: 5%;"></th>
+          </tr>
+
+        </thead>
+        <tbody>
+          <tr *ngFor="let tb of thongBaoList" [ngClass]="{'table-success': tb.status == 1}"
+            (click)="tb.status == 1 ? viewThongBao(tb.id) : editThongBao(tb.id)">
+            <td>
+              <input type="checkbox" [(ngModel)]="tb.selected" [disabled]="tb.status === 1">
+            </td>
+            <td>
+              {{ (currentPage - 1) * ITEMS_PER_PAGE + (thongBaoList.indexOf(tb) + 1) }}
+            </td>
+            <td>
+              {{ tb.title }}
+            </td>
+            <td style="text-align: justify;">{{ tb.content }}</td>
+            <td>{{ tb.tenNhanVien }}</td>
+            <td>{{ tb.ngayTao | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ tb.receivedCount }}/{{ tb.totalRecipients }}</td>
+            <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
+            <td>{{ tb.loaiThongBao}}</td>
+            <td>
+
+              <div *ngIf="tb.status !== 1" class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">
+                <div class="dropdown-button">
+                  <div class="arrow-down"></div>
+                </div>
+                <div class="popup-menu" *ngIf="openedMenuId === tb.id">
+                  <div class="menu-item view" *ngIf="tb.status === 1" (click)="viewThongBao(tb.id)">
+                    <i class="bi bi-eye"></i>
+                    <div class="menu-text">Xem</div>
+                  </div>
+                  <div class="menu-item edit" *ngIf="tb.status !== 1" (click)="editThongBao(tb.id)">
+                    <i class="bi bi-pencil"></i>
+                    <div class="menu-text">Sửa</div>
+                  </div>
+                  <div class="menu-item delete" *ngIf="tb.status !== 1" (click)="deleteThongBao(tb.id)">
+                    <i class="bi bi-trash"></i>
+                    <div class="menu-text">Xóa</div>
+                  </div>
+                </div>
+
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination section -->
+      <app-pagination [totalPages]="totalPages" [currentPage]="currentPage" (pageChange)="onPageChange($event)">
+      </app-pagination>
+
+    </div>
+  </div>
+
+  <!-- Back to top button -->
+  <div class="back-to-top">↑</div>
+
+
 </div>
-
-   

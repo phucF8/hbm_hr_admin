@@ -322,6 +322,19 @@ export class ThongBaoComponent implements OnInit {
     document.body.classList.remove('no-scroll');
   }
 
+  timKiem() {
+    // this.ngayTaoTu
+    // this.ngayTaoDen
+    // this.ngayGuiTu - có vẻ dư thừa
+    // this.ngayGuiDen - có vẻ dư thừa
+    // this.trangThai - có vẻ dư thừa
+    // this.notificationType - loai thong bao RQ, GT, ...
+    // this.isSentToAll - mưc độ hoàn thành;
+    // this.loaiThongBao = chủ động hay tự động;
+    this.loadListThongBao();  
+
+  }
+
   sortByDate(field: string, direction: 'asc' | 'desc') {
     // if (!this.data || !Array.isArray(this.data)) {
     //   return;

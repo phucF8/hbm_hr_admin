@@ -153,3 +153,164 @@ body {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.search-container {
+    background-color: #6c5ce7;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+
+    background-color: white;
+  border-radius: 5px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.search-title {
+    color: #e74c3c;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 0px;
+    text-transform: uppercase;
+}
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+.form-group label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+}
+.form-control {
+    height: 38px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+.dropdown {
+    height: 38px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 226px;
+    background-color: white;
+}
+.btn {
+    height: 38px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-search {
+    background-color: #6c5ce7;
+}
+.btn-add {
+    background-color: #6c5ce7;
+}
+.btn-export {
+    background-color: #6c5ce7;
+}
+.btn i {
+    margin-right: 5px;
+}
+.buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-top: auto; /* đẩy xuống dưới */
+    padding-bottom: 1px;
+
+    justify-content: space-between;
+    align-items: center;
+    flex: 1; /* <-- đây là chìa khóa */
+    min-width: 0; /* đề phòng trường hợp bị tràn */
+}
+
+.right-buttons {
+    display: flex;
+    gap: 8px; /* khoảng cách giữa các nút */
+  }
+
+.date-container {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"], 
+input[type="date"], 
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fafafa;
+    color: #757575;
+}
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 15px;
+    padding-right: 30px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 14px;
+}
