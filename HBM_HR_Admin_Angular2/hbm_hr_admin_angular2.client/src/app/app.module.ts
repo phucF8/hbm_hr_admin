@@ -22,6 +22,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { TimkiemComponent } from './uicomponents/timkiem/timkiem.component';
 import { InputFormComponent } from './uicomponents/input-form/input-form.component';
 import { FromToDateFormComponent } from './uicomponents/from-to-date-form/from-to-date-form.component';
+import { OneSelectFormComponent } from './uicomponents/one-select-form/one-select-form.component';
+import { SearchUserFormComponent } from './uicomponents/search-user-form/search-user-form.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +38,8 @@ import { FromToDateFormComponent } from './uicomponents/from-to-date-form/from-t
     TimkiemComponent,
     InputFormComponent,
     FromToDateFormComponent,
+    OneSelectFormComponent,
+    SearchUserFormComponent,
   ],
   imports: [
     BrowserModule,

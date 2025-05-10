@@ -50,6 +50,24 @@ export class ThongBaoComponent implements OnInit {
   notificationType?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
   isSentToAll?: number | null = null; // null: tất cả, 1: đã hoàn thành, 2: chưa hoàn thành
   loaiThongBao?: string | null = null;
+  nhomThongBaoOptions = [
+    { value: null, label: 'Tất cả' },
+    { value: 'RQ', label: 'Đề xuất' },
+    { value: 'GT', label: 'Giải trình' },
+    { value: 'XE', label: 'Đặt xe' },
+    { value: 'ROOM', label: 'Đặt phòng họp' },
+    { value: 'KPI', label: 'KPIs' },
+];
+notificationTypeOptions = [
+  { value: null, label: 'Tất cả' },
+  { value: 1, label: 'Tự động' },
+  { value: 2, label: 'Chủ động' },
+];
+sentToAllOptions = [
+  { value: null, label: 'Tất cả' }, 
+  { value: 1, label: 'Đã hoàn thành' },
+  { value: 2, label: 'Chưa hoàn thành' },
+];
 
 
   notificationId: string = '';
@@ -60,7 +78,7 @@ export class ThongBaoComponent implements OnInit {
 
 
   searchUserForm: FormGroup;
-  filteredUsers: MergedData[] | null = null;
+  filteredUsers: MergedData[] = [];
   isSearching: boolean = false;
   selectedDonVi: DonVi | null = null;
   donvis: DonVi[] = [
@@ -501,7 +519,7 @@ export class ThongBaoComponent implements OnInit {
   onSearchUser() {
     const searchValue = this.searchUserForm.get('search')?.value?.trim();
     if (!searchValue) {
-      this.filteredUsers = null; // Đặt về null nếu không có từ khóa tìm kiếm
+      this.filteredUsers = []; // Đặt về null nếu không có từ khóa tìm kiếm
       return;
     }
     this.isSearching = true;
@@ -539,7 +557,7 @@ export class ThongBaoComponent implements OnInit {
     setTimeout(() => {
       this.isFocused = false;
       if (value.trim() === '') {
-        this.filteredUsers  = null; // Đặt về null nếu không có từ khóa tìm kiếm
+        this.filteredUsers  = []; // Đặt về null nếu không có từ khóa tìm kiếm
       }
     }, 200); // 200ms hoặc thời gian bạn mong muốn
   }

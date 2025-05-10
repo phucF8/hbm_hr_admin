@@ -1,0 +1,153 @@
+.form-control {
+    height: 38px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+
+input[type="text"], 
+input[type="date"], 
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fafafa;
+    color: #757575;
+}
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 15px;
+    padding-right: 30px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown-btn {
+    background-color: #f15a59;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;       /* Không cho xuống dòng */
+    margin-left: 10px;;
+   
+}
+
+
+.custom-popup {
+    position: absolute;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    overflow-y: auto;
+	margin-top: 4px;
+	background-color: white;
+	border: 1px solid #ccc;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	width: fit-content;
+	padding: 10px;
+}
+
+
+.grid-container {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr); /* 4 cột */
+	gap: 10px;
+}
+
+
+.location-tag {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+}
+
+.location-tag.selected {
+    background-color: red;
+    color: white;
+}
+
+.search-wrapper {
+    width: 100%; /* hoặc 100%, tùy layout */
+}
+
+
+.search-container-nguoitao {
+    padding-right: 2px;
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+    margin-right: 10px;
+}
+
+.employee-info {
+    flex: 1;
+}
+.location-info {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 3px;
+}
+
+.location-icon {
+    margin-right: 5px;
+    color: #666;
+}
+
+.employee-detail {
+    font-size: 12px;
+    color: #777;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    background-color: #ddd;
+    overflow: hidden;
+}
+
+.popup-container {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ddd;
+    width: 100%;
+    margin-left: 10px;
+    z-index: 1000;
+    overflow-y: auto;
+}
+  
+.employee-item {
+    display: flex;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    cursor: pointer; 
+}

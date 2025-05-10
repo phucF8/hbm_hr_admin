@@ -1,0 +1,11 @@
+<div class="form-group">
+    <label>{{ label }}</label>
+    <select
+        [ngModel]="value"
+        (ngModelChange)="onChange($event)"
+        (blur)="onTouched()">
+        <option *ngFor="let option of options" [ngValue]="option.value">
+            {{ option.label }}
+        </option>
+    </select>
+</div>

@@ -25,52 +25,16 @@
     <div class="search-form" style="display: flex; align-items: center;">
       
       <app-input-form label="Tiêu đề hoặc nội dung" placeholder="Nhập từ cần tìm kiếm" [(value)]="searchText" (onEnter)="onSearchTextChange()"/>
-
       <app-from-to-date-form [(fromDate)]="ngayTaoTu" [(toDate)]="ngayTaoDen" label="Thời gian tạo" fromDateId="from-date" toDateId="to-date"/>
-
-      <div class="form-group">
-        <label for="request-group">Nhóm thông báo</label>
-        <select id="mainType" [(ngModel)]="loaiThongBao">
-          <option [ngValue]="null">Tất cả</option>
-          <option [ngValue]="'RQ'">Đề xuất</option>
-          <option [ngValue]="'GT'">Giải trình</option>
-          <option [ngValue]="'XE'">Đặt xe</option>
-          <option [ngValue]="'ROOM'">Đặt phòng họp</option>
-          <option [ngValue]="'KPI'">KPIs</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="request-group">Loại thông báo</label>
-        <select id="mainType" [(ngModel)]="notificationType">
-          <option [ngValue]="null">Tất cả</option>
-          <option [ngValue]="1">Tự động</option>
-          <option [ngValue]="2">Chủ động</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="request-group">Mức độ hoàn thành</label>
-        <select id="mainType" [(ngModel)]="isSentToAll">
-          <option [ngValue]="null">Tất cả</option>
-          <option [ngValue]="1">Đã hoàn thành</option>
-          <option [ngValue]="2">Chưa hoàn thành</option>
-        </select>
-      </div>
+      <app-one-select-form [(ngModel)]="loaiThongBao"  [options]="nhomThongBaoOptions" label="Nhóm thông báo"/>
+      <app-one-select-form [(ngModel)]="notificationType" [options]="notificationTypeOptions" label="Loại thông báo"/>
+      <app-one-select-form [(ngModel)]="isSentToAll" [options]="sentToAllOptions" label="Hoàn thành"/>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+      <app-search-user-form [donvis]="donvis" [selectedDonVi]="selectedDonVi" [selectedUsers]="selectedUsers"
+        [filteredUsers]="filteredUsers" [isSearching]="isSearching" (donViSelected)="selectDonVi($event)"
+        (userSelected)="selectUser($event)" (userRemoved)="removeUser($event)" (searchUser)="onSearchUser()"
+        (blurInput)="onBlurInput($event)"></app-search-user-form>
 
       <div class="container">
         <label for="request-group">Người tạo</label>
