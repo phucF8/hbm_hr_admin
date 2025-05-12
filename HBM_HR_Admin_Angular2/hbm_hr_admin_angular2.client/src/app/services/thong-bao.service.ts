@@ -90,7 +90,7 @@ export class ThongBaoService {
   private apiUrl = `${environment.apiUrl}/thongbao`;  // Lấy apiUrl từ environment
   
   constructor(private http: HttpClient) { }
-  
+
   getListThongBao(
     pageIndex: number = 1,
     sortBy: string = 'ngayTao',
@@ -102,7 +102,8 @@ export class ThongBaoService {
     trangThai?: number | null, // null: tất cả, 1: đã gửi, 0: chưa gửi
     notificationType?: number | null, // null: tất cả, 1: tự động, 2: chủ động 
     isSentToAll?: number | null, // null: tất cả, 1: đã hoàn thành, 2: chưa hoàn thành
-    loaiThongBao?: string | null  //vd:loaiThongBao?: string | null  //vd: RQ,GT, ...
+    loaiThongBao?: string | null,  //vd:loaiThongBao?: string | null  //vd: RQ,GT, ...
+    nguoiTaoIds?: string[] // ← thêm vào đây
   ): Observable<{ items: ThongBao[], totalCount: number }> {
     let params = new HttpParams()
     if (pageIndex) 
@@ -125,11 +126,12 @@ export class ThongBaoService {
       params = params.set('isSentToAll', isSentToAll.toString());
     if (loaiThongBao) 
       params = params.set('loaiThongBao', loaiThongBao);
+    if (nguoiTaoIds && nguoiTaoIds.length > 0)
+      params = params.set('nguoiTaoIds', nguoiTaoIds.join(',')); // ← nối mảng thành chuỗi
     if (searchText) 
       params = params.set('searchText', searchText);
     
-    //DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
-    DebugUtils.openStringInNewWindow(`${isSentToAll}`);
+    DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
 
     return this.http.get<{ items: ThongBao[], totalCount: number }>(this.apiUrl, { params }).pipe(
       catchError(error => {

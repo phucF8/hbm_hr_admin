@@ -151,6 +151,7 @@ sentToAllOptions = [
       this.notificationType,
       this.isSentToAll,
       this.loaiThongBao,
+      this.selectedUsers.map(user => user.ID) // Chuyển đổi danh sách người dùng đã chọn thành danh sách ID
     ).subscribe({
       next: (data) => {
         this.thongBaoList = data.items;
