@@ -81,18 +81,7 @@ sentToAllOptions = [
   filteredUsers: MergedData[] = [];
   isSearching: boolean = false;
   selectedDonVi: DonVi | null = null;
-  donvis: DonVi[] = [
-    { id: '385ae8c687d347e4', ma: 'GOL', tenKho: 'GẠCH' },
-    { id: 'F98431BCF2404EFC', ma: 'HBMVT', tenKho: 'VPVT' },
-    { id: '08a8f3bec5934', ma: 'S001', tenKho: 'VPTÐ' },
-    { id: 'd2f012837f434794', ma: 'S002', tenKho: 'THÉP' },
-    { id: '2d74d08d99734470', ma: 'S004', tenKho: 'VPYB' },
-    { id: '7d1e43e2b0fc4f54', ma: 'S005', tenKho: 'Ô TÔ' },
-    { id: '9e9a1bda336343b5', ma: 'S006', tenKho: 'XMMB' },
-    { id: 'f4424e5a354b4548', ma: 'S008', tenKho: 'HBYB' },
-    { id: '056fef14cbb64105', ma: 'S009', tenKho: 'XMMN' },
-    { id: '9513b33e7e58492e', ma: 'VLXD', tenKho: 'VLXD' },
-  ];
+  
   showDonVisPopup = false;
   isFocused = false;
   selectedUsers: MergedData[] = [];
@@ -122,14 +111,7 @@ sentToAllOptions = [
       this.tenNhanVien = currentUser.TenNhanVien;
     }
 
-    const currentUserStr = localStorage.getItem('currentUser');
-    if (currentUserStr) {
-      const currentUser = JSON.parse(currentUserStr);
-      var idKhoLamViec = currentUser.DataSets.Table[0].IDKhoLamViec;
-      this.selectedDonVi = this.donvis.find(d => d.id === idKhoLamViec ) || null;
-    } else {
-      console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!');
-    }
+    
 
   }
 
@@ -514,6 +496,11 @@ sentToAllOptions = [
     this.notificationId = '';
     this.showThongBaoPopup = true;
     document.body.classList.add('no-scroll');
+  }
+
+  onSelectedUsersChanged(users: any[]) {
+    console.log('Danh sách người dùng được chọn:', users);
+    this.selectedUsers = users;
   }
 
   onSearchUser() {

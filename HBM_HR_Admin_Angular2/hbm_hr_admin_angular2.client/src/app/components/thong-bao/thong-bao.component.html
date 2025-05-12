@@ -22,96 +22,17 @@
 
     <app-timkiem></app-timkiem>
 
-    <div class="search-form" style="display: flex; align-items: center;">
+    <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
       
-      <app-input-form label="Tiêu đề hoặc nội dung" placeholder="Nhập từ cần tìm kiếm" [(value)]="searchText" (onEnter)="onSearchTextChange()"/>
-      <app-from-to-date-form [(fromDate)]="ngayTaoTu" [(toDate)]="ngayTaoDen" label="Thời gian tạo" fromDateId="from-date" toDateId="to-date"/>
-      <app-one-select-form [(ngModel)]="loaiThongBao"  [options]="nhomThongBaoOptions" label="Nhóm thông báo"/>
-      <app-one-select-form [(ngModel)]="notificationType" [options]="notificationTypeOptions" label="Loại thông báo"/>
-      <app-one-select-form [(ngModel)]="isSentToAll" [options]="sentToAllOptions" label="Hoàn thành"/>
-
-
-      <app-search-user-form [donvis]="donvis" [selectedDonVi]="selectedDonVi" [selectedUsers]="selectedUsers"
-        [filteredUsers]="filteredUsers" [isSearching]="isSearching" (donViSelected)="selectDonVi($event)"
-        (userSelected)="selectUser($event)" (userRemoved)="removeUser($event)" (searchUser)="onSearchUser()"
-        (blurInput)="onBlurInput($event)"></app-search-user-form>
-
-      <div class="container">
-        <label for="request-group">Người tạo</label>
-        <form [formGroup]="searchUserForm" (ngSubmit)="onSearchUser()">
-          <div class="search-container-nguoitao" style="align-items: center;">
-
-            <div class="search-wrapper">
-              <div *ngIf="isSearching" class="text-center py-2">
-                <div class="spinner-border text-primary" role="status"></div>
-              </div>
-
-              <input #searchInput type="text" class="search-input" style="
-    border: 1px solid white;
-    background-color: white;
-    border-radius: 4px;
-    font-size: 14px;
-    width: 100%;
-                        " id="search" formControlName="search" placeholder="Nhập từ khóa, ấn enter tìm kiếm..."
-                autocomplete="off" autofocus (focus)="isFocused = true" (blur)="onBlurInput(searchInput.value)">
-
-              <div class="popup-container" *ngIf="filteredUsers !== null && filteredUsers.length > 0 && isFocused">
-                <ul class="employee-list">
-                  <li class="employee-item" *ngFor="let user of filteredUsers" (click)="selectUser(user)">
-                    <div class="avatar">
-                      <img src="/api/placeholder/40/40" alt="{{ user.TenNhanVien }}">
-                    </div>
-                    <div class="employee-info">
-                      <div class="employee-name">{{ user.TenNhanVien }}</div>
-                      <div class="location-info">
-                        <span class="location-icon">⌖</span>
-                        <span>{{ user.TenPhongBan }}</span>
-                      </div>
-                      <div class="employee-detail">{{ user.MaNhanVien }} | {{ user.TenPhongBan }}</div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-
-            </div>
-
-            <div>
-              <button type="button" class="dropdown-btn" (click)="openDonVisPopup()" #button>
-                {{ selectedDonVi?.tenKho }}
-              </button>
-              <!-- Popup hiển thị danh sách -->
-              <div *ngIf="showDonVisPopup" class="custom-popup" #popup>
-                <div class="grid-container">
-                  <button class="location-tag" *ngFor="let item of donvis"
-                    [ngClass]="{ 'selected': selectedDonVi?.id === item.id }" (click)="selectDonVi(item)">{{ item.tenKho
-                    }}</button>
-                </div>
-              </div>
-            </div>
-
-
-          </div>
-
-
-          <ul *ngIf="selectedUsers.length > 0" class="list-group">
-            <li class="member-item" *ngFor="let user of selectedUsers">
-              <div class="avatar">
-                <img src="/api/placeholder/40/40" alt="{{user.TenNhanVien}}">
-              </div>
-              <div class="member-info">
-                <div class="member-name">{{user.TenNhanVien}}</div>
-                <div class="member-detail">{{user.MaNhanVien}} | {{user.TenPhongBan}}</div>
-              </div>
-              <button class="remove-btn" *ngIf="user.status === 0" (click)="removeUser(user)">⊗</button>
-              <div class="info-row" *ngIf="user.status === 1">
-                <div class="info-value">
-                  <p>{{ user.ngayTao | date: 'dd/MM/yyyy HH:mm' }}</p>
-                </div>
-              </div>
-            </li>
-          </ul>
-
-        </form>
+      <div>
+        <div style="display: flex;gap: 10px; margin-bottom: 16px;">
+          <app-input-form label="Tiêu đề hoặc nội dung" placeholder="Nhập từ cần tìm kiếm" [(value)]="searchText" (onEnter)="onSearchTextChange()"/>
+          <app-from-to-date-form [(fromDate)]="ngayTaoTu" [(toDate)]="ngayTaoDen" label="Thời gian tạo" fromDateId="from-date" toDateId="to-date"/>
+          <app-one-select-form [(ngModel)]="loaiThongBao"  [options]="nhomThongBaoOptions" label="Nhóm thông báo"/>
+          <app-one-select-form [(ngModel)]="notificationType" [options]="notificationTypeOptions" label="Loại thông báo"/>
+          <app-one-select-form [(ngModel)]="isSentToAll" [options]="sentToAllOptions" label="Hoàn thành"/>
+        </div>
+      <app-search-user-form  (selectedUsersChange)="onSelectedUsersChanged($event)"></app-search-user-form>
       </div>
 
       <div class="buttons-container">
