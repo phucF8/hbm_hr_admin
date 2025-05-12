@@ -34,6 +34,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
     [FromQuery] string? ngayTaoDen = null,
     [FromQuery] string? ngayGuiTu = null,
     [FromQuery] string? ngayGuiDen = null,
+    [FromQuery] string? ngTaoIds = null,
     [FromQuery] int? trangThai = null)
         {
             var notifications = await _repository.GetNotificationsWithPaging(
@@ -48,6 +49,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 ngayTaoDen, 
                 ngayGuiTu, 
                 ngayGuiDen, 
+                ngTaoIds,
                 trangThai);
 
             return Ok(notifications);
