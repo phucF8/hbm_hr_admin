@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Input, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { ThongBaoService, MergedData } from '../../services/thong-bao.service';
+import { ThongBaoService } from '../../services/thong-bao.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
@@ -20,6 +20,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { DonVi } from '@app/models/donvi';
 import { TimkiemComponent } from '@app/uicomponents/timkiem/timkiem.component';
+import { MergedData } from '@app/models/thong-bao.model';
 
 
 

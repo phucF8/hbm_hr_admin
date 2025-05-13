@@ -2,6 +2,7 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using HBM_HR_Admin_Angular2.Server.Data;
 using Microsoft.EntityFrameworkCore;
+using HBM_HR_Admin_Angular2.Server.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +20,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<NotificationRepository>();
+builder.Services.AddScoped<IDebugRepository, DebugRepository>();
+
+
 
 // Đăng ký dịch vụ FirebaseNotificationService
 builder.Services.AddSingleton<FirebaseNotificationService>();
 
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

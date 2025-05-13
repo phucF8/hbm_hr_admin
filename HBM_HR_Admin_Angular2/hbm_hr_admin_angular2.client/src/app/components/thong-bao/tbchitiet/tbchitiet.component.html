@@ -154,7 +154,7 @@
                         </div>
                         <div class="member-info">
                             <div class="member-name">{{user.TenNhanVien}}</div>
-                            <div class="member-detail">{{user.MaNhanVien}} | {{user.TenPhongBan}}</div>
+                            <div class="member-detail">{{user.MaNhanVien}} | {{user.TenChucDanh}}</div>
                         </div>
                         <button class="remove-btn" *ngIf="user.status === 0" (click)="removeUser(user)">⊗</button>
                         <div class="info-row" *ngIf="user.status === 1">

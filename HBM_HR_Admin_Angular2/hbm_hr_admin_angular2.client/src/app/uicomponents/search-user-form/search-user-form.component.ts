@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ThongBaoService, MergedData } from '../../services/thong-bao.service';
+import { ThongBaoService } from '../../services/thong-bao.service';
+import { MergedData } from '@app/models/thong-bao.model';
 import { finalize } from 'rxjs/operators';
 import { DebugUtils } from '@app/utils/debug-utils';
 import { DonVi } from '@app/models/donvi';
@@ -73,6 +74,7 @@ export class SearchUserFormComponent {
               MaNhanVien: user.MaNhanVien,
               TenNhanVien: user.TenNhanVien,
               TenPhongBan: user.TenPhongBan,
+              TenChucDanh: user.TenChucDanh,
               status: 0 // Gán giá trị mặc định vì DoLookupData không có "status"
             })) as MergedData[];
           },
@@ -96,6 +98,17 @@ export class SearchUserFormComponent {
     this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
     this.filteredUsers = []; // Ẩn danh sách gợi ý
     this.selectedUsersChange.emit(this.selectedUsers);
+     this.isFocused = true; // Đặt lại trạng thái focus
+
+
+    if (this.selectedUsers.length > 0) {
+      for (let i = 0; i < this.selectedUsers.length; i++) {
+        const user = this.selectedUsers[i];
+        console.log('User', i + 1, ':', JSON.stringify(user));
+      } 
+    }
+    
+
   }
 
   removeUser(user: any) {

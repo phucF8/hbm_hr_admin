@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Input, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ThongBaoService, DoLookupDatasRP, MergedData,TestSendNotificationRequest} from '../../../services/thong-bao.service';
+import { ThongBaoService, TestSendNotificationRequest} from '../../../services/thong-bao.service';
 import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
@@ -9,6 +9,7 @@ import { LoadingService } from '@app/services/loading.service';
 import { v4 as uuidv4 } from 'uuid';
 import { DonVi } from '@app/models/donvi';
 import { DebugUtils } from '@app/utils/debug-utils';
+import { MergedData, DoLookupDatasRP } from '@app/models/thong-bao.model';
 
 @Component({
   selector: 'chitiet-thong-bao',
@@ -122,6 +123,7 @@ export class TbchitietComponent implements OnInit {
     }, 200); // 200ms hoặc thời gian bạn mong muốn
   }
 
+  //load 1 thông báo từ API và hiển thị lên form
   loadNotification() {
     this.loadingService.show();
     this.thongBaoService.getThongBaoByID(this.notificationId).subscribe({
@@ -150,6 +152,8 @@ export class TbchitietComponent implements OnInit {
             TenNhanVien: recipient.tenNhanVien,
             tenChucDanh: recipient.tenChucDanh,
             TenPhongBan: recipient.tenPhongBan, // Nếu cần, hãy lấy từ một nguồn khác
+            TenChucDanh: recipient.tenChucDanh,
+            Anh: '',
             status: recipient.status,
             ngayTao: recipient.ngayTao,
           }

@@ -50,7 +50,7 @@
               (click)="selectUser(user)"
             >
               <div class="avatar">
-                <img src="/api/placeholder/40/40" alt="{{ user.TenNhanVien }}" />
+                <img src="{{user.Anh}}" alt="{{ user.TenNhanVien }}" />
               </div>
               <div class="employee-info">
                 <div class="employee-name">{{ user.TenNhanVien }}</div>
@@ -59,7 +59,7 @@
                   <span>{{ user.TenPhongBan }}</span>
                 </div>
                 <div class="employee-detail">
-                  {{ user.MaNhanVien }} | {{ user.TenPhongBan }}
+                  {{ user.MaNhanVien }} | {{ user.TenChucDanh }}
                 </div>
               </div>
             </li>
@@ -77,9 +77,14 @@
         </div>
         <div class="member-info">
           <div class="member-name">{{ user.TenNhanVien }}</div>
-          <div class="member-detail">
-            {{ user.MaNhanVien }} | {{ user.TenPhongBan }}
+          <div class="location-info">
+                  <span class="location-icon">⌖</span>
+                  <span>{{ user.TenPhongBan }}</span>
+                </div>
+          <div class="employee-detail">
+            {{ user.MaNhanVien }} | {{ user.TenChucDanh }}
           </div>
+          <div></div>
         </div>
         <button
           type="button"

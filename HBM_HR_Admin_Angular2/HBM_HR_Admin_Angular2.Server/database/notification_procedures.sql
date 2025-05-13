@@ -107,6 +107,7 @@ BEGIN
         ReceivedCount,
         TotalRecipients,
         NgayTao,
+        NguoiTao,
         TotalCount,
         CEILING(CAST(TotalCount AS FLOAT) / @PageSize) AS TotalPages
     FROM CTE
@@ -155,7 +156,7 @@ CREATE PROCEDURE NS_ADTB_GetNotificationById
 AS
 BEGIN
     SET NOCOUNT ON;
-
+    
     SELECT 
         tb.ID,
         tb.Title,
@@ -366,6 +367,9 @@ BEGIN
         nr.IDThongBao,
         nr.NguoiNhan,
         nv.TenNhanVien,
+        nv.TenChucDanh,
+        nv.TenPhongBan,
+        nv.TenKho,
         nr.Status,
         nr.NgayTao,
         nr.NgaySua

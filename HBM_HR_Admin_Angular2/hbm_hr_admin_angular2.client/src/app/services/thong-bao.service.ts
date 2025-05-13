@@ -4,33 +4,7 @@ import { Observable, catchError } from 'rxjs';
 import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao interface
 import { environment } from '../../environments/environment'; 
 import { DebugUtils } from '@app/utils/debug-utils';
-
-
-export interface MergedData {
-  ID: string;          // ID từ DoLookupData
-  MaNhanVien: string;  // Mã nhân viên từ DoLookupData
-  TenNhanVien: string; // Tên nhân viên từ DoLookupData
-  TenPhongBan: string; // Phòng ban từ DoLookupData
-  status: number | null; // Trạng thái thông báo từ ThongBaoRecipient
-  ngayTao: string;
-}
-
-export interface DoLookupData {
-  ID: string;
-  MaNhanVien: string;
-  TenNhanVien: string;
-  UserID: string;
-  TenPhongBan: string;
-  TenChucDanh: string;
-  Anh: string;
-  DonViRoot: string;
-  DiDong: string;
-}
-
-export interface DoLookupDatasRP {
-  Status: string;
-  DatasLookup: DoLookupData[];
-}
+import { DoLookupDatasRP } from '@app/models/thong-bao.model'; // Import the DoLookupDatasRP interface
 
 
 
