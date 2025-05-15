@@ -1,51 +1,4 @@
 
-
-
-
-
-
--- =============================================
--- Stored Procedure: NS_ADTB_GetNotificationById
--- Description: Lấy thông tin chi tiết của một thông báo theo ID
--- Author: HBM HR Admin
--- Created: 2024-03-19
--- =============================================
--- Lấy về thông tin của 1 record thông báo có id = ?
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationById')
-    DROP PROCEDURE NS_ADTB_GetNotificationById
-GO
-
-CREATE PROCEDURE NS_ADTB_GetNotificationById
-    @NotificationID VARCHAR(36)
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    SELECT 
-        tb.ID,
-        tb.Title,
-        tb.Content,
-        nv.TenNhanVien,
-        tb.NotificationType,
-        tb.LoaiThongBao,
-        tb.Status,
-        tb.NgayTao,
-        tb.NgaySua,
-        tb.NguoiTao,
-        tb.NguoiSua,
-        tb.IDThamChieu
-    FROM NS_ADTB_Notifications tb
-    LEFT JOIN NS_NhanViens nv ON tb.NguoiTao = nv.ID
-    WHERE tb.ID = @NotificationID;
-END
-GO
-
-EXEC NS_ADTB_GetNotificationById 
-    @NotificationID = '9d4be878907c4de1';
-
-
-
-
 -- SỬA THÔNG BÁO
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_UpdateNotification')
     DROP PROCEDURE NS_ADTB_UpdateNotification
@@ -217,33 +170,6 @@ EXEC InsertNotificationRecipient
 
 
 
---lấy về ds nhóm user đối với thông báo cho nhóm
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'SelectNotificationRecipients')
-    DROP PROCEDURE SelectNotificationRecipients;
-GO
-CREATE PROCEDURE SelectNotificationRecipients
-    @NotificationId VARCHAR(36)
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT 
-        nr.IDThongBao,
-        nr.NguoiNhan,
-        nv.TenNhanVien,
-        nv.TenChucDanh,
-        nv.TenPhongBan,
-        nv.TenKho,
-        nr.Status,
-        nr.NgayTao,
-        nr.NgaySua
-    FROM [HBM_HCNSApp].[dbo].[NS_ADTB_NotificationRecipients] nr
-    INNER JOIN [HBM_HCNSApp].[dbo].[NS_NhanViens] nv
-        ON nr.NguoiNhan = nv.ID
-    WHERE nr.IDThongBao = @NotificationId;
-END;
-
-EXEC SelectNotificationRecipients @NotificationId = 'GUID_CUA_NOTIFICATION'
 
 --xóa ds nhóm user đối với thông báo cho nhóm để insert lại sau đó (cho tính năng update)
 CREATE PROCEDURE DeleteNotificationRecipients

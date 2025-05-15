@@ -126,7 +126,7 @@
                             <ul class="employee-list">
                                 <li class="employee-item" *ngFor="let user of filteredUsers" (click)="selectUser(user)">
                                     <div class="avatar">
-                                        <img src="/api/placeholder/40/40" alt="{{ user.TenNhanVien }}">
+                                        <img src="{{user.Anh}}" alt="{{ user.TenNhanVien }}">
                                     </div>
                                     <div class="employee-info">
                                         <div class="employee-name">{{ user.TenNhanVien }}</div>
@@ -134,7 +134,7 @@
                                             <span class="location-icon">⌖</span>
                                             <span>{{ user.TenPhongBan }}</span>
                                         </div>
-                                        <div class="employee-detail">{{ user.MaNhanVien }} | {{ user.TenPhongBan }}</div>
+                                        <div class="employee-detail">{{ user.MaNhanVien }} | {{ user.TenChucDanh }}</div>
                                     </div>
                                 </li>
                             </ul>
@@ -150,10 +150,14 @@
                 <ul *ngIf="selectedUsers.length > 0" class="list-group">
                     <li class="member-item" *ngFor="let user of selectedUsers">
                         <div class="avatar">
-                            <img src="/api/placeholder/40/40" alt="{{user.TenNhanVien}}">
+                            <img src="{{user.Anh}}" alt="{{user.TenNhanVien}}">
                         </div>
                         <div class="member-info">
                             <div class="member-name">{{user.TenNhanVien}}</div>
+                            <div class="location-info">
+                                <span class="location-icon">⌖</span>
+                                <span>{{ user.TenPhongBan }}</span>
+                            </div>
                             <div class="member-detail">{{user.MaNhanVien}} | {{user.TenChucDanh}}</div>
                         </div>
                         <button class="remove-btn" *ngIf="user.status === 0" (click)="removeUser(user)">⊗</button>

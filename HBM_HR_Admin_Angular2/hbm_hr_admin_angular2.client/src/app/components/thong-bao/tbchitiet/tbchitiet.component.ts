@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { DonVi } from '@app/models/donvi';
 import { DebugUtils } from '@app/utils/debug-utils';
 import { MergedData, DoLookupDatasRP } from '@app/models/thong-bao.model';
+import { getFullImageUrl } from '@app/utils/url.utils';
 
 @Component({
   selector: 'chitiet-thong-bao',
@@ -153,7 +154,7 @@ export class TbchitietComponent implements OnInit {
             tenChucDanh: recipient.tenChucDanh,
             TenPhongBan: recipient.tenPhongBan, // Nếu cần, hãy lấy từ một nguồn khác
             TenChucDanh: recipient.tenChucDanh,
-            Anh: '',
+            Anh: getFullImageUrl(recipient.anh),
             status: recipient.status,
             ngayTao: recipient.ngayTao,
           }
@@ -345,6 +346,8 @@ export class TbchitietComponent implements OnInit {
             ID: user.ID,
             MaNhanVien: user.MaNhanVien,
             TenNhanVien: user.TenNhanVien,
+            Anh: getFullImageUrl(user.Anh),
+            TenChucDanh: user.TenChucDanh,
             TenPhongBan: user.TenPhongBan,
             status: 0 // Gán giá trị mặc định vì DoLookupData không có "status"
           })) as MergedData[];

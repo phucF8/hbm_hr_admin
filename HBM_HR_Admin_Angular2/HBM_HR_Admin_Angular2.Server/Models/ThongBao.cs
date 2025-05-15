@@ -38,6 +38,7 @@ public class NotificationRecipient
     public string NotificationId { get; set; }
     public string RecipientId { get; set; }
     public string TenNhanVien { get; set; } = string.Empty;
+    public string Anh { get; set; } = string.Empty;
     public string TenChucDanh { get; set; } = string.Empty;
     public string TenPhongBan { get; set; } = string.Empty;
     public string TenKho { get; set; } = string.Empty;

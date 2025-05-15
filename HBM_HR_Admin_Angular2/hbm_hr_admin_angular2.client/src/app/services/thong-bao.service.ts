@@ -121,6 +121,7 @@ export class ThongBaoService {
   
   getThongBaoByID(notificationID: string): Observable<ThongBao> {
     const url = `${this.apiUrl}/${notificationID}`;
+    DebugUtils.openStringInNewWindow(`${url}`);
     return this.http.get<ThongBao>(url).pipe(
       catchError(error => {
         DebugUtils.openStringInNewWindow(`${error.message}`);

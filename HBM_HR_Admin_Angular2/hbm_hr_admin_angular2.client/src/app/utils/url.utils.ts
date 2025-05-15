@@ -2,7 +2,7 @@
 
 export function getFullImageUrl(partialUrl: string): string {
     const host = 'https://workhub.hbm.vn';
-    const defaultAvatar = 'assets/images/default-avatar.png';  // Đường dẫn ảnh mặc định (nếu cần)
+    const defaultAvatar = 'images/avatar_default.png';  // Đường dẫn ảnh mặc định (nếu cần)
     if (!partialUrl) {
         return defaultAvatar;
     }
