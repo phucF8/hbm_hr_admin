@@ -77,6 +77,7 @@ export class ThongBaoService {
     notificationType?: number | null, // null: tất cả, 1: tự động, 2: chủ động 
     isSentToAll?: number | null, // null: tất cả, 1: đã hoàn thành, 2: chưa hoàn thành
     loaiThongBao?: string | null,  //vd:loaiThongBao?: string | null  //vd: RQ,GT, ...
+    isPlatform?: string | null, // null: tất cả, MB: mobile, WEB: web
     ngTaoIds?: string[] // ← thêm vào đây
   ): Observable<{ items: ThongBao[], totalCount: number }> {
     let params = new HttpParams()
@@ -104,6 +105,8 @@ export class ThongBaoService {
       params = params.set('ngTaoIds', ngTaoIds.join(',')); // ← nối mảng thành chuỗi
     if (searchText) 
       params = params.set('searchText', searchText);
+    if (isPlatform) 
+      params = params.set('platform', isPlatform);
     
     DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
 

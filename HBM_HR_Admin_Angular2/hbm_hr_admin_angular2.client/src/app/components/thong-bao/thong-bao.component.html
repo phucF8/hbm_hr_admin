@@ -29,6 +29,7 @@
           <app-one-select-form [(ngModel)]="loaiThongBao"  [options]="nhomThongBaoOptions" label="Nhóm thông báo"/>
           <app-one-select-form [(ngModel)]="notificationType" [options]="notificationTypeOptions" label="Loại thông báo"/>
           <app-one-select-form [(ngModel)]="isSentToAll" [options]="sentToAllOptions" label="Hoàn thành"/>
+          <app-one-select-form [(ngModel)]="isPlatform" [options]="platformOptions" label="Nền tảng phát sinh"/>
         </div>
       <app-search-user-form  (selectedUsersChange)="onSelectedUsersChanged($event)"></app-search-user-form>
       </div>
@@ -124,6 +125,7 @@
             <th style="width: 10%;">Hoàn thành</th>
             <th style="width: 10%;">Loại</th>
             <th style="width: 10%;">Nhóm</th>
+            <th style="width: 10%;">Nền tảng</th>
             <th style="width: 5%;"></th>
           </tr>
 
@@ -146,6 +148,7 @@
             <td>{{ tb.receivedCount }}/{{ tb.totalRecipients }}</td>
             <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
             <td>{{ tb.loaiThongBao}}</td>
+            <td>{{ tb.platform}}</td>
             <td>
 
               <div *ngIf="tb.status !== 1" class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">

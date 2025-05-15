@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Helpers;
 using HBM_HR_Admin_Angular2.Server.Models;
+using Google.Api.Gax;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
@@ -23,35 +24,36 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         // API GET /api/thongbao - Lấy danh sách thông báo
         [HttpGet]
         public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
-    [FromQuery] int pageIndex = 1,
-    [FromQuery] int pageSize = AppSettings.DefaultPageSize,
-    [FromQuery] int notificationType = 0,
-    [FromQuery] string? loaiThongBao = null,
-    [FromQuery] int? isSentToAll = null,
-    [FromQuery] string? sortBy = "ngayTao",
-    [FromQuery] string? searchText = "",
-    [FromQuery] string? ngayTaoTu = null,
-    [FromQuery] string? ngayTaoDen = null,
-    [FromQuery] string? ngayGuiTu = null,
-    [FromQuery] string? ngayGuiDen = null,
-    [FromQuery] string? ngTaoIds = null,
-    [FromQuery] int? trangThai = null)
+        [FromQuery] int pageIndex = 1,
+        [FromQuery] int pageSize = AppSettings.DefaultPageSize,
+        [FromQuery] int notificationType = 0,
+        [FromQuery] string? loaiThongBao = null,
+        [FromQuery] int? isSentToAll = null,
+        [FromQuery] string? sortBy = "ngayTao",
+        [FromQuery] string? searchText = "",
+        [FromQuery] string? ngayTaoTu = null,
+        [FromQuery] string? ngayTaoDen = null,
+        [FromQuery] string? ngayGuiTu = null,
+        [FromQuery] string? ngayGuiDen = null,
+        [FromQuery] string? ngTaoIds = null,
+        [FromQuery] string? platform = null,
+        [FromQuery] int? trangThai = null)
         {
             var notifications = await _repository.GetNotificationsWithPaging(
-                pageIndex, 
-                pageSize, 
+                pageIndex,
+                pageSize,
                 notificationType,
-                loaiThongBao, 
+                loaiThongBao,
                 isSentToAll,
-                sortBy, 
-                searchText, 
-                ngayTaoTu, 
-                ngayTaoDen, 
-                ngayGuiTu, 
-                ngayGuiDen, 
+                sortBy,
+                searchText,
+                ngayTaoTu,
+                ngayTaoDen,
+                ngayGuiTu,
+                ngayGuiDen,
                 ngTaoIds,
+                platform,
                 trangThai);
-
             return Ok(notifications);
         }
 
@@ -166,7 +168,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                         foreach (var recipientId in request.Recipients)
                         {
                             _logger.LogInformation($"InsertNotificationRecipient {result.ID}, {recipientId}, {"SYS"}");
-                            await _repository.InsertNotificationRecipient(result.ID, recipientId,"");
+                            await _repository.InsertNotificationRecipient(result.ID, recipientId, "");
                         }
                     }
                 }
@@ -182,7 +184,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         }
 
 
-        
+
 
         // API POST /api/thongbao/send - Gửi thông báo thử nghiệm
         [HttpPost("send")]

@@ -50,6 +50,7 @@ export class ThongBaoComponent implements OnInit {
   trangThai?: number | null = null; // null: tất cả, 1: đã gửi, 0: chưa gửi
   notificationType?: number | null = null; // null: tất cả, 1: tự động, 2: chủ động
   isSentToAll?: number | null = null; // null: tất cả, 1: đã hoàn thành, 2: chưa hoàn thành
+  isPlatform?: string | null = null; // null: tất cả, MB: là mobile, WEB: là web
   loaiThongBao?: string | null = null;
   nhomThongBaoOptions = [
     { value: null, label: 'Tất cả' },
@@ -69,7 +70,11 @@ sentToAllOptions = [
   { value: 1, label: 'Đã hoàn thành' },
   { value: 2, label: 'Chưa hoàn thành' },
 ];
-
+platformOptions = [
+  { value: null, label: 'Tất cả' }, 
+  { value: 'MB', label: 'Mobile' },
+  { value: 'WEB', label: 'Web' },
+];
 
   notificationId: string = '';
   showThongBaoPopup: boolean = false;
@@ -152,6 +157,7 @@ sentToAllOptions = [
       this.notificationType,
       this.isSentToAll,
       this.loaiThongBao,
+      this.isPlatform,
       this.selectedUsers.map(user => user.ID) // Chuyển đổi danh sách người dùng đã chọn thành danh sách ID
     ).subscribe({
       next: (data) => {

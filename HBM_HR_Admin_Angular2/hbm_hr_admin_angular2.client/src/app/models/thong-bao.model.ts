@@ -18,6 +18,7 @@ export interface ThongBao {
   loaiThongBao: string;
   idThamChieu: string;
   status: number;
+  platform: string;
   receivedCount: number;
   totalRecipients: number;
   ngayTao: string;

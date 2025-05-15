@@ -8,6 +8,7 @@ public class Notification
         public string LoaiThongBao { get; set; }
         public string IDThamChieu { get; set; }
         public byte Status { get; set; }
+        public string Platform { get; set; }
         public DateTime NgayTao { get; set; }
         public DateTime NgaySua { get; set; }
         public string NguoiTao { get; set; }

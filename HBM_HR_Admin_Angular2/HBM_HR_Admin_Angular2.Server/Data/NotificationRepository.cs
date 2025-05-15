@@ -112,6 +112,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             string? ngayGuiTu,
             string? ngayGuiDen,
             string? ngTaoIds,
+            string? platform,
             int? trangThai)
         {
             try
@@ -131,6 +132,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     FromSentDate = string.IsNullOrWhiteSpace(ngayGuiTu) ? (DateTime?)null : DateTime.Parse(ngayGuiTu),
                     ToSentDate = string.IsNullOrWhiteSpace(ngayGuiDen) ? (DateTime?)null : DateTime.Parse(ngayGuiDen),
                     NgTaoIds = ngTaoIds,
+                    Platform = platform,
                     SentStatus = trangThai
                 };
                 var result = await connection.QueryAsync<Notification>("NS_ADTB_GetNotificationsWithPaging",parameters,commandType: CommandType.StoredProcedure);
