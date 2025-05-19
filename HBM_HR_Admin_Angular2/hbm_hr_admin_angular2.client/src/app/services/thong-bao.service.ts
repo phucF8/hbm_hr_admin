@@ -159,6 +159,7 @@ export class ThongBaoService {
         KhoDuLieu: khoDuLieu,
       }
     };
+    DebugUtils.openStringInNewWindow(JSON.stringify(requestBody, null, 2));
     return this.http.post<DoLookupDatasRP>(url, requestBody).pipe(
       catchError(error => {
         console.error('Error searching users:', error);

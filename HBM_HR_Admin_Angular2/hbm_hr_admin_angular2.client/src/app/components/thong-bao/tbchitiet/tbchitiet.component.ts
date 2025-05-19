@@ -335,10 +335,16 @@ export class TbchitietComponent implements OnInit {
       this.filteredUsers = null; // Đặt về null nếu không có từ khóa tìm kiếm
       return;
     }
+    this.loadingService.show();
     this.isSearching = true;
     this.filteredUsers = []; // Reset trước khi tìm kiếm
     this.thongBaoService.searchUsers(searchValue, this.selectedDonVi?.id || '')
-      .pipe(finalize(() => this.isSearching = false)) // Đảm bảo luôn thực hiện
+      .pipe(finalize(() => {
+        
+        this.isSearching = false;
+        this.loadingService.hide();
+
+      })) // Đảm bảo luôn thực hiện
       .subscribe({
         next: (response) => {
           this.doLookupDatasRP = response;
