@@ -23,19 +23,19 @@
                 <div class="form-group">
                     <label class="form-label required">Tiêu đề</label>
                     <input type="text" class="form-control" id="title" formControlName="title" placeholder="Tiêu đề"
-                        [readonly]="status === 1"
-                        [class.is-invalid]="submitted && thongBaoForm.get('title')?.invalid">
-                        <a *ngIf="idThamChieu !== ''" class="link-right" (click)="goToDetail()">
-                            Xem chi tiết
-                        </a>
-                        <div class="error" *ngIf="submitted && thongBaoForm.get('title')?.errors">
-                            <div *ngIf="thongBaoForm.get('title')?.hasError('required')">
-                              Tiêu đề là bắt buộc.
-                            </div>
-                            <div *ngIf="thongBaoForm.get('title')?.hasError('minlength')">
-                              Tiêu đề phải có ít nhất {{ thongBaoForm.get('title')?.errors?.['minlength'].requiredLength }} ký tự.
-                            </div>
+                        [readonly]="status === 1" [class.is-invalid]="submitted && thongBaoForm.get('title')?.invalid">
+                    <a *ngIf="idThamChieu !== ''" class="link-right" (click)="goToDetail()">
+                        Xem chi tiết
+                    </a>
+                    <div class="error" *ngIf="submitted && thongBaoForm.get('title')?.errors">
+                        <div *ngIf="thongBaoForm.get('title')?.hasError('required')">
+                            Tiêu đề là bắt buộc.
                         </div>
+                        <div *ngIf="thongBaoForm.get('title')?.hasError('minlength')">
+                            Tiêu đề phải có ít nhất {{ thongBaoForm.get('title')?.errors?.['minlength'].requiredLength
+                            }} ký tự.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -50,10 +50,11 @@
                     </textarea>
                     <div class="error" *ngIf="submitted && thongBaoForm.get('content')?.errors">
                         <div *ngIf="thongBaoForm.get('content')?.hasError('required')">
-                          Nội dung là bắt buộc.
+                            Nội dung là bắt buộc.
                         </div>
                         <div *ngIf="thongBaoForm.get('content')?.hasError('minlength')">
-                          Nội dung phải có ít nhất {{ thongBaoForm.get('content')?.errors?.['minlength'].requiredLength }} ký tự.
+                            Nội dung phải có ít nhất {{
+                            thongBaoForm.get('content')?.errors?.['minlength'].requiredLength }} ký tự.
                         </div>
                     </div>
                 </div>
@@ -61,16 +62,13 @@
         </div>
 
 
-
-        
-
-
-
+        <quill-editor [(ngModel)]="noiDung" [modules]="modules" [style]="{width: '100%', minHeight: '200px'}">
+        </quill-editor>
 
 
 
         <div class="section">
-        
+
         </div>
 
 
@@ -98,31 +96,26 @@
                             {{ selectedDonVi?.tenKho }}
                         </button>
                         <!-- Popup hiển thị danh sách -->
-                        <div  *ngIf="showDonVisPopup"  class="custom-popup" #popup>
+                        <div *ngIf="showDonVisPopup" class="custom-popup" #popup>
                             <div class="grid-container">
-                                <button class="location-tag" *ngFor="let item of donvis" [ngClass]="{ 'selected': selectedDonVi?.id === item.id }"  (click)="selectDonVi(item)">{{ item.tenKho }}</button>
+                                <button class="location-tag" *ngFor="let item of donvis"
+                                    [ngClass]="{ 'selected': selectedDonVi?.id === item.id }"
+                                    (click)="selectDonVi(item)">{{ item.tenKho }}</button>
                             </div>
                         </div>
                     </div>
-        
+
                     <div class="search-wrapper">
                         <div *ngIf="isSearching" class="text-center py-2">
                             <div class="spinner-border text-primary" role="status"></div>
                         </div>
-                        
-                        <input
-                            #searchInput
-                            type="text"
-                            class="search-input"
-                            id="search"
-                            formControlName="search"
-                            placeholder="Nhập từ khóa, ấn enter tìm kiếm..."
-                            autocomplete="off"
-                            autofocus
-                            (focus)="isFocused = true"
-                            (blur)="onBlurInput(searchInput.value)">
-                        
-                        <div class="popup-container" *ngIf="filteredUsers !== null && filteredUsers.length > 0 && isFocused">
+
+                        <input #searchInput type="text" class="search-input" id="search" formControlName="search"
+                            placeholder="Nhập từ khóa, ấn enter tìm kiếm..." autocomplete="off" autofocus
+                            (focus)="isFocused = true" (blur)="onBlurInput(searchInput.value)">
+
+                        <div class="popup-container"
+                            *ngIf="filteredUsers !== null && filteredUsers.length > 0 && isFocused">
                             <ul class="employee-list">
                                 <li class="employee-item" *ngFor="let user of filteredUsers" (click)="selectUser(user)">
                                     <div class="avatar">
@@ -134,19 +127,20 @@
                                             <span class="location-icon">⌖</span>
                                             <span>{{ user.TenPhongBan }}</span>
                                         </div>
-                                        <div class="employee-detail">{{ user.MaNhanVien }} | {{ user.TenChucDanh }}</div>
+                                        <div class="employee-detail">{{ user.MaNhanVien }} | {{ user.TenChucDanh }}
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                    
+
                     </div>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search"></i>
                     </button>
                 </div>
-        
-                
+
+
                 <ul *ngIf="selectedUsers.length > 0" class="list-group">
                     <li class="member-item" *ngFor="let user of selectedUsers">
                         <div class="avatar">
@@ -162,18 +156,18 @@
                         </div>
                         <button class="remove-btn" *ngIf="user.status === 0" (click)="removeUser(user)">⊗</button>
                         <div class="info-row" *ngIf="user.status === 1">
-                                <div class="info-value">
-                                    <p>{{ user.ngayTao | date: 'dd/MM/yyyy HH:mm' }}</p>
-                                </div>
+                            <div class="info-value">
+                                <p>{{ user.ngayTao | date: 'dd/MM/yyyy HH:mm' }}</p>
+                            </div>
                         </div>
                     </li>
                 </ul>
                 <div class="error" *ngIf="submitted && selectedUsers.length <= 0">
-                    <div >
+                    <div>
                         Vui lòng chọn tối thiểu một nhân viên để gửi thông báo.
                     </div>
                 </div>
-        
+
             </form>
         </div>
 
@@ -229,7 +223,7 @@
             <button type="button" class="btn btn-cancel" (click)="closePopup()">
                 <span>⊝</span> Đóng
             </button>
-            <button type="submit" class="btn btn-submit"  *ngIf="!notificationId" >
+            <button type="submit" class="btn btn-submit" *ngIf="!notificationId">
                 <span>✉</span> Tạo/Gửi Thông báo
             </button>
         </div>
@@ -237,29 +231,3 @@
     </form>
 
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

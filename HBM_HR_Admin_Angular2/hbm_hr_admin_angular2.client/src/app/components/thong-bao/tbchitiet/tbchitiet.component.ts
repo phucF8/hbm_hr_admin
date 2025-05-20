@@ -56,6 +56,19 @@ export class TbchitietComponent implements OnInit {
   { id: '9513b33e7e58492e', ma: 'VLXD', tenKho: 'VLXD' },
   ];
 
+  modules = {
+  toolbar: [
+    ['bold', 'italic', 'underline'],        // định dạng chữ
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'header': [1, 2, 3, false] }],
+    ['link', 'image'],                      // liên kết, hình ảnh
+    ['clean']                               // xóa định dạng
+  ]
+};
+
+
+  noiDung: string = '';
+
   @ViewChild('popup') popupRef!: ElementRef;
 	@ViewChild('button') buttonRef!: ElementRef;
 

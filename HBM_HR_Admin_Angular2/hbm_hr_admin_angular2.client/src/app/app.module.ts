@@ -24,6 +24,7 @@ import { InputFormComponent } from './uicomponents/input-form/input-form.compone
 import { FromToDateFormComponent } from './uicomponents/from-to-date-form/from-to-date-form.component';
 import { OneSelectFormComponent } from './uicomponents/one-select-form/one-select-form.component';
 import { SearchUserFormComponent } from './uicomponents/search-user-form/search-user-form.component';
+import { QuillModule } from 'ngx-quill';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { SearchUserFormComponent } from './uicomponents/search-user-form/search-
     SearchUserFormComponent,
   ],
   imports: [
+     QuillModule.forRoot(),
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
