@@ -32,6 +32,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8088); // Cho phép lắng nghe mọi IP
+});
+
 var app = builder.Build();
 
 app.UseDefaultFiles();

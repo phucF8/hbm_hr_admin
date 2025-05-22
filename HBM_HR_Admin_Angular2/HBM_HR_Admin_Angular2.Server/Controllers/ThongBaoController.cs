@@ -58,7 +58,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         }
 
 
-        // API GET /api/thongbao/{id} - Lấy 1 danh sách thông báo củ thể
+        // API GET /api/thongbao/{id} - Lấy 1 thông báo củ thể
         [HttpGet("{id}")]
         public async Task<ActionResult<Notification>> GetNotification(string id)
         {

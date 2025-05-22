@@ -47,5 +47,7 @@ public class NotificationRecipient
     public DateTime NgaySua { get; set; }
     public string NguoiTao { get; set; }
     public string NguoiSua { get; set; }
+    
+    public string NguoiNhan { get; set; }
 }
 
