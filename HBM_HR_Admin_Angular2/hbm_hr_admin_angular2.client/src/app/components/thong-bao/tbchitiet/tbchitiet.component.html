@@ -22,7 +22,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label required">Tiêu đề</label>
-                    <input type="text" class="form-control" id="title" formControlName="title" placeholder="Tiêu đề"
+                    <input type="text" class="form-control" id="title" formControlName="title" placeholder="Nhập tiêu đề ..."
                         [readonly]="status === 1" [class.is-invalid]="submitted && thongBaoForm.get('title')?.invalid">
                     <a *ngIf="idThamChieu !== ''" class="link-right" (click)="goToDetail()">
                         Xem chi tiết
@@ -43,9 +43,9 @@
         <div class="section">
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label required">Nội dung ngắn</label>
+                    <label class="form-label required">Nội dung thông báo</label>
                     <textarea class="form-control" id="content" style="height: 150px" formControlName="content"
-                        placeholder="Nhập nội dung" [readonly]="status === 1"
+                        placeholder="Nhập nội dung thông báo ..." [readonly]="status === 1"
                         [class.is-invalid]="thongBaoForm.get('content')?.invalid && submitted">
                     </textarea>
                     <div class="error" *ngIf="submitted && thongBaoForm.get('content')?.errors">
@@ -61,11 +61,19 @@
             </div>
         </div>
 
-
-        <quill-editor [(ngModel)]="noiDung" [modules]="modules" [style]="{width: '100%', minHeight: '200px'}">
-        </quill-editor>
-
-
+        <!-- <div class="section">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label required">Nội dung chi tiết</label>
+                    <div
+                        style="resize: vertical; overflow: auto; min-height: 200px; width: 100%; border: 1px solid #ccc;">
+                        <quill-editor [(ngModel)]="noiDung" [modules]="modules"
+                            [style]="{width: '100%', height: '100%'}">
+                        </quill-editor>
+                    </div>
+                </div>
+            </div>
+        </div> -->
 
         <div class="section">
 

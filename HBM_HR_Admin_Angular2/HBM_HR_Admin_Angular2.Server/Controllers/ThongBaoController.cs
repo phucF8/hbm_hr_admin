@@ -197,6 +197,13 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             {
                 return BadRequest("ID nhân viên là bắt buộc");
             }
+            // Đảm bảo request.Data không null
+            if (request.Data == null)
+            {
+                request.Data = new Dictionary<string, string>();
+            }
+            request.Data["Type"] = "tb";
+            request.Data["ID"] = request.NotificationID;
             foreach (var id in request.IDNhanViens.Split(','))
             {
                 if (string.IsNullOrWhiteSpace(id))
@@ -212,6 +219,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 int userSuccessCount = 0;
                 int userTotalCount = deviceTokens.Count();
                 var tokens = deviceTokens.Select(dt => dt.DeviceToken).ToList();
+
+
+
                 var result = await _firebaseService.SendNotificationAsync(
                     tokens,
                     request.Title,
