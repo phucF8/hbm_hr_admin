@@ -1,14 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("V_NS_ADTB_ThongBao")]
-public class Notification
+[Table("NS_ADTB_Notifications")]
+public class ThongBao
 {
     public string ID { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
-    public string? TenNguoiTao { get; set; } //trường này có thể null - nên phải là string?
+   
     public byte NotificationType { get; set; }
+    public string? NguonUngDung { get; set; }
     public string? LoaiThongBao { get; set; }
     public string? IDThamChieu { get; set; }
     public byte Status { get; set; }
@@ -16,21 +17,32 @@ public class Notification
     public DateTime NgayTao { get; set; }
     public DateTime? NgaySua { get; set; }
     public string NguoiTao { get; set; }
-    public string? AnhNguoiTao { get; set; }
-    public List<V_NS_ADTB_NhanThongBao> lsV_NhanThongBao { get; set; } = new();
+    public string? NguoiSua { get; set; }
+
+    //public List<V_NS_ADTB_NhanThongBao> lsV_NhanThongBao { get; set; } = new();
 
 }
 
 [Table("V_NS_ADTB_NhanThongBao")]
 public class V_NS_ADTB_NhanThongBao
 {
+    [Key]
+    public string ID { get; set; }
+
     public string IDThongBao { get; set; }
+
     public string NguoiNhan { get; set; }
+
     public string? TenNguoiNhan { get; set; }
+
     public string? AnhNguoiNhan { get; set; }
+
     public byte? TrangThaiNhan { get; set; }
-    public Notification Notification { get; set; }
+
+    [ForeignKey("IDThongBao")]
+    public ThongBao Notification { get; set; }
 }
+
 
 
 public class PagedResult<T>

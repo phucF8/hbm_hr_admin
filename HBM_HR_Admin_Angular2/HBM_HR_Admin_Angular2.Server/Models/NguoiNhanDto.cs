@@ -1,0 +1,15 @@
+﻿namespace HBM_HR_Admin_Angular2.Server.Models
+{
+    public class NguoiNhanDto
+    {
+        public string ID { get; set; }
+        public string IDThongBao { get; set; }
+        public string NguoiNhan { get; set; }
+        public string TenNhanVien { get; set; }
+        public string AnhNhanVien { get; set; }
+        public byte Status { get; set; }
+        public DateTime NgayTao { get; set; }
+        public DateTime NgaySua { get; set; }
+    }
+
+}

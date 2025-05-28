@@ -12,13 +12,13 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
     {
         private readonly FirebaseNotificationService _firebaseService;
         private readonly NotificationRepository _repository;
-        private readonly INotificationService _notificationService;
+        private readonly IThongBaoService _notificationService;
         private readonly ILogger<ThongBaoController> _logger;
 
         public ThongBaoController(
             FirebaseNotificationService firebaseService,
             NotificationRepository repository,
-            INotificationService notificationService,
+            IThongBaoService notificationService,
             ILogger<ThongBaoController> logger)
         {
             _firebaseService = firebaseService;
@@ -32,7 +32,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API GET /api/thongbao - Lấy danh sách thông báo
         // [HttpGet]
-        public async Task<ActionResult<PagedResult<Notification>>> GetNotifications_dungSP(
+        public async Task<ActionResult<PagedResult<ThongBao>>> GetNotifications_dungSP(
         [FromQuery] int pageIndex = 1,
         [FromQuery] int pageSize = AppSettings.DefaultPageSize,
         [FromQuery] int notificationType = 0,
@@ -69,7 +69,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API GET /api/thongbao/{id} - Lấy 1 thông báo củ thể
         [HttpGet("{id}")]
-        public async Task<ActionResult<Notification>> GetNotification(string id)
+        public async Task<ActionResult<ThongBao>> GetNotification(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -87,11 +87,11 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API POST /api/thongbao - Tạo thông báo mới
         [HttpPost]
-        public async Task<ActionResult<Notification>> CreateNotification([FromBody] CreateNotificationRequest request)
+        public async Task<ActionResult<ThongBao>> CreateNotification([FromBody] CreateNotificationRequest request)
         {
             try
             {
-                var notification = new Notification
+                var notification = new ThongBao
                 {
                     ID = request.ID,
                     Title = request.Title,
@@ -107,7 +107,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                         await _repository.InsertNotificationRecipient(result.ID, recipientId, request.NguoiTao);
                     }
                 }
-                return CreatedAtAction(nameof(GetNotifications), new { id = result.ID }, result);
+                return CreatedAtAction(nameof(getListThongBao), new { id = result.ID }, result);
             }
             catch (Exception ex)
             {
@@ -151,11 +151,11 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API PUT /api/thongbao/{id} - Cập nhật thông báo
         [HttpPut("{id}")]
-        public async Task<ActionResult<Notification>> UpdateNotification(string id, [FromBody] UpdateNotificationRequest request)
+        public async Task<ActionResult<ThongBao>> UpdateNotification(string id, [FromBody] UpdateNotificationRequest request)
         {
             try
             {
-                var notification = new Notification
+                var notification = new ThongBao
                 {
                     ID = id,
                     Title = request.Title,
@@ -401,11 +401,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         //API GET /api/thongbao - Lấy danh sách thông báo - LINKQ
         [HttpGet]
-        public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
-            [FromQuery] NotificationPagingRequest param
-        )
+        public async Task<ActionResult<PagedResult<ThongBao>>> getListThongBao([FromQuery] NotificationPagingRequest param)
         {
-            var result = await _notificationService.GetNotificationsWithPaging(param);
+            var result = await _notificationService.getListThongBao(param);
             return Ok(new
             {
                 result.items,

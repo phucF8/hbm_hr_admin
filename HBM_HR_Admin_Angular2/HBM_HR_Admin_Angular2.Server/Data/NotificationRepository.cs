@@ -18,7 +18,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             _logger = logger;
         }
 
-        public async Task<Notification> CreateNotification(Notification notification)
+        public async Task<ThongBao> CreateNotification(ThongBao notification)
         {
             try
             {
@@ -40,13 +40,13 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task<IEnumerable<Notification>> GetNotificationsWithPaging0(int pageIndex, int pageSize, int notificationType)
+        public async Task<IEnumerable<ThongBao>> GetNotificationsWithPaging0(int pageIndex, int pageSize, int notificationType)
         {
             try
             {
                 _logger.LogInformation($"Calling stored procedure with notificationType: {notificationType}");
                 using var connection = new SqlConnection(_connectionString);
-                var result = await connection.QueryAsync<Notification>(
+                var result = await connection.QueryAsync<ThongBao>(
                     "NS_ADTB_GetNotificationsWithPaging",
                     new
                     {
@@ -66,14 +66,14 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task<(List<Notification> Notifications, int TotalCount)> GetNotificationsWithPaging1(int pageIndex, int pageSize, int notificationType)
+        public async Task<(List<ThongBao> Notifications, int TotalCount)> GetNotificationsWithPaging1(int pageIndex, int pageSize, int notificationType)
         {
             try
             {
                 _logger.LogInformation($"Calling stored procedure with notificationType: {notificationType}");
                 using var connection = new SqlConnection(_connectionString);
 
-                var result = await connection.QueryAsync<Notification>(
+                var result = await connection.QueryAsync<ThongBao>(
                     "NS_ADTB_GetNotificationsWithPaging",
                     new
                     {
@@ -98,7 +98,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task<PagedResult<Notification>> GetNotificationsWithPaging(
+        public async Task<PagedResult<ThongBao>> GetNotificationsWithPaging(
             int pageIndex,
             int pageSize,
             int notificationType,
@@ -134,9 +134,9 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     Platform = platform,
                     SentStatus = trangThai
                 };
-                var result = await connection.QueryAsync<Notification>("NS_ADTB_GetNotificationsWithPaging",parameters,commandType: CommandType.StoredProcedure);
+                var result = await connection.QueryAsync<ThongBao>("NS_ADTB_GetNotificationsWithPaging",parameters,commandType: CommandType.StoredProcedure);
                 int totalCount = 0;
-                return new PagedResult<Notification>
+                return new PagedResult<ThongBao>
                 {
                     items = result.ToList(),
                     TotalCount = totalCount
@@ -149,12 +149,12 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task<Notification?> GetNotificationByID(string notificationID)
+        public async Task<ThongBao?> GetNotificationByID(string notificationID)
         {
             try
             {
                 using var connection = new SqlConnection(_connectionString);
-                var result = await connection.QueryFirstOrDefaultAsync<Notification>(
+                var result = await connection.QueryFirstOrDefaultAsync<ThongBao>(
                     "NS_ADTB_GetNotificationById",
                     new
                     {
@@ -208,7 +208,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task<Notification> UpdateNotification(Notification notification)
+        public async Task<ThongBao> UpdateNotification(ThongBao notification)
         {
             try
             {

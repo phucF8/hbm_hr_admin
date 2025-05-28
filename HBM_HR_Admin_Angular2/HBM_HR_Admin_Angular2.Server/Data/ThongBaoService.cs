@@ -1,33 +1,64 @@
-using Google.Api.Gax;
-using Microsoft.Data.SqlClient;
+using HBM_HR_Admin_Angular2.Server.Models;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-using System.Linq;
 
 namespace HBM_HR_Admin_Angular2.Server.Data
 {
-    public interface INotificationService
+    public interface IThongBaoService
     {
-        Task<PagedResult<Notification>> GetNotificationsWithPaging(NotificationPagingRequest param);
+        Task<PagedResult<ThongBaoDto>> getListThongBao(NotificationPagingRequest param);
 
     }
 
-    public class NotificationService : INotificationService
+    public class ThongBaoService : IThongBaoService
     {
         private readonly ApplicationDbContext _context;
 
-        public NotificationService(ApplicationDbContext context)
+        public ThongBaoService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<PagedResult<Notification>> GetNotificationsWithPaging(NotificationPagingRequest param)
+        public async Task<PagedResult<ThongBaoDto>> getListThongBao(NotificationPagingRequest param)
         {
-            //var query = _context.NotificationsWithRecipients.AsQueryable();
-            var query = _context.V_ThongBao
-                .Include(n => n.lsV_NhanThongBao)
-                .AsQueryable();
-
+            var query = _context.DbThongBao
+            .Join(_context.NS_NhanViens,
+                tb => tb.NguoiTao,
+                nv => nv.ID,
+                (tb, nv) => new { tb, nv })
+            .Select(x => new ThongBaoDto
+            {
+                ID = x.tb.ID,
+                Title = x.tb.Title,
+                Content = x.tb.Content,
+                NotificationType = x.tb.NotificationType,
+                NguonUngDung = x.tb.NguonUngDung,
+                LoaiThongBao = x.tb.LoaiThongBao,
+                IDThamChieu = x.tb.IDThamChieu,
+                Status = x.tb.Status,
+                Platform = x.tb.Platform,
+                NgayTao = x.tb.NgayTao,
+                NgaySua = x.tb.NgaySua,
+                NguoiTao = x.tb.NguoiTao,
+                NguoiSua = x.tb.NguoiSua,
+                TenNhanVien = x.nv.TenNhanVien,
+                AnhNhanVien = x.nv.Anh,
+                DanhSachNguoiNhan = (
+                    from nr in _context.DbThongBaoNguoiNhan
+                    join nvnn in _context.NS_NhanViens on nr.NguoiNhan equals nvnn.ID
+                    where nr.IDThongBao == x.tb.ID
+                    select new NguoiNhanDto
+                    {
+                        ID = nr.ID,
+                        IDThongBao = nr.IDThongBao,
+                        NguoiNhan = nr.NguoiNhan,
+                        Status = nr.Status,
+                        NgayTao = nr.NgayTao,
+                        NgaySua = nr.NgaySua,
+                        TenNhanVien = nvnn.TenNhanVien,
+                        AnhNhanVien = nvnn.Anh
+                    }
+                ).ToList()
+            });
             if (param.NotificationType != null)
             {
                 int? type = param.NotificationType;
@@ -59,23 +90,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
             query = query.OrderByDescending(x => x.NgayTao);
             var totalCount = await query.CountAsync();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // var totalPages = (int)Math.Ceiling((double)totalCount / param.PageSize);
-            // Phân trang
-             // Log câu SQL trước khi thực thi
             string sql = EfSqlLogger.LogSqlWithParameters(query, 
                 new
                 {
@@ -89,7 +103,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            var result = new PagedResult<Notification>
+            var result = new PagedResult<ThongBaoDto>
             {
                 items = data,
                 TotalCount = totalCount,

@@ -20,7 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 
 builder.Services.AddScoped<NotificationRepository>();
 builder.Services.AddScoped<IDebugRepository, DebugRepository>();
-builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IThongBaoService, ThongBaoService>();
 
 
 
