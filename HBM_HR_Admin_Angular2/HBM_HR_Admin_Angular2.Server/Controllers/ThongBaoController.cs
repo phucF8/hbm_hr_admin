@@ -12,18 +12,27 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
     {
         private readonly FirebaseNotificationService _firebaseService;
         private readonly NotificationRepository _repository;
+        private readonly INotificationService _notificationService;
         private readonly ILogger<ThongBaoController> _logger;
 
-        public ThongBaoController(FirebaseNotificationService firebaseService, NotificationRepository repository, ILogger<ThongBaoController> logger)
+        public ThongBaoController(
+            FirebaseNotificationService firebaseService,
+            NotificationRepository repository,
+            INotificationService notificationService,
+            ILogger<ThongBaoController> logger)
         {
             _firebaseService = firebaseService;
             _repository = repository;
             _logger = logger;
+
+
+            _notificationService = notificationService;
+
         }
 
         // API GET /api/thongbao - Lấy danh sách thông báo
-        [HttpGet]
-        public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
+        // [HttpGet]
+        public async Task<ActionResult<PagedResult<Notification>>> GetNotifications_dungSP(
         [FromQuery] int pageIndex = 1,
         [FromQuery] int pageSize = AppSettings.DefaultPageSize,
         [FromQuery] int notificationType = 0,
@@ -72,7 +81,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return NotFound($"Notification with ID {id} not found");
             }
             var result = await _repository.SelectNotificationRecipients(id);
-            notification.Recipients = result.ToList();
+            // notification.Recipients = result.ToList();
             return Ok(notification);
         }
 
@@ -379,6 +388,43 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 UserStats = summary
             });
         }
+
+
+
+
+
+
+
+
+
+
+
+        //API GET /api/thongbao - Lấy danh sách thông báo - LINKQ
+        [HttpGet]
+        public async Task<ActionResult<PagedResult<Notification>>> GetNotifications(
+            [FromQuery] NotificationPagingRequest param
+        )
+        {
+            var result = await _notificationService.GetNotificationsWithPaging(param);
+            return Ok(new
+            {
+                result.items,
+                result.TotalCount,
+            });
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
     }
 
 

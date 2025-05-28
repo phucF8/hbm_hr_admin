@@ -1,41 +1,43 @@
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'NS_ADTB_GetNotificationsWithPaging')
-    DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging
+    DROP PROCEDURE NS_ADTB_GetNotificationsWithPaging;
 GO
 
 CREATE PROCEDURE NS_ADTB_GetNotificationsWithPaging
     @PageNumber INT,
     @PageSize INT,
-    @NotificationType INT,         -- 0: Lấy tất cả, 1 tự động, 2 chủ động
+    @NotificationType INT,
     @LoaiThongBao VARCHAR(8),
-    @SortBy NVARCHAR(50) = 'NgayTao',  -- Tên cột để sắp xếp
-    @SearchText NVARCHAR(255) = '',    -- Tìm kiếm tiêu đề hoặc nội dung
-    @SentStatus INT = NULL,            -- NULL: Lấy cả hai, 1: Đã gửi, 0: Chưa gửi
-	@Platform VARCHAR(10) = NULL,		-- Nền tảng Web, MB//mobile
-    @FromDate DATE = NULL,             -- Ngày tạo: từ ngày (bao gồm)
-    @ToDate DATE = NULL,               -- Ngày tạo: đến ngày (bao gồm)
-    @FromSentDate DATE = NULL,         -- Ngày gửi: từ ngày (bao gồm)
-    @ToSentDate DATE = NULL,           -- Ngày gửi: đến ngày (bao gồm)
-    @IsSentToAll INT = NULL,           -- NULL: all, 1 Đã hoàn thành, 2 chưa hoàn thành
-    @NgTaoIds NVARCHAR(MAX) = NULL     -- Danh sách ID người tạo, ngăn cách bởi dấu phẩy
+    @SortBy NVARCHAR(50) = 'NgayTao',
+    @SearchText NVARCHAR(255) = '',
+    @SentStatus INT = NULL,
+    @Platform VARCHAR(10) = NULL,
+    @FromDate DATE = NULL,
+    @ToDate DATE = NULL,
+    @FromSentDate DATE = NULL,
+    @ToSentDate DATE = NULL,
+    @IsSentToAll INT = NULL,
+    @NgTaoIds NVARCHAR(MAX) = NULL,
+    @NguoiNhanIds NVARCHAR(MAX) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-	IF @PageNumber < 1 SET @PageNumber = 1;
-    -- Xác định cột sắp xếp hợp lệ
+    IF @PageNumber < 1 SET @PageNumber = 1;
+
     DECLARE @SortColumn NVARCHAR(50) = 
         CASE LOWER(@SortBy)
             WHEN 'ngaytao' THEN 'NgayTao'
             WHEN 'title' THEN 'Title'
-            ELSE 'NgayTao' -- mặc định
+            ELSE 'NgayTao'
         END;
-    -- Chuyển đổi ngày thành dạng DATETIME chính xác
+
     DECLARE @FromDateTime DATETIME = NULL;
     DECLARE @ToDateTime DATETIME = NULL;
     IF @FromDate IS NOT NULL
-        SET @FromDateTime = DATEADD(DAY, 0, CAST(@FromDate AS DATETIME)); -- 00:00:00.000
+        SET @FromDateTime = DATEADD(DAY, 0, CAST(@FromDate AS DATETIME));
     IF @ToDate IS NOT NULL
-        SET @ToDateTime = DATEADD(MILLISECOND, -3, DATEADD(DAY, 1, CAST(@ToDate AS DATETIME))); -- 23:59:59.997
-    -- Chuyển danh sách ID người tạo thành bảng
+        SET @ToDateTime = DATEADD(MILLISECOND, -3, DATEADD(DAY, 1, CAST(@ToDate AS DATETIME)));
+
+    -- Tách danh sách người tạo
     DECLARE @NgTaoTable TABLE (NguoiTao NVARCHAR(50));
     IF @NgTaoIds IS NOT NULL AND LTRIM(RTRIM(@NgTaoIds)) <> ''
     BEGIN
@@ -49,69 +51,86 @@ BEGIN
             SET @Pos = @NextPos
         END
     END
-    -- Truy vấn chính
+
+    -- Tách danh sách người nhận
+    DECLARE @NguoiNhanTable TABLE (NguoiNhan NVARCHAR(50));
+    IF @NguoiNhanIds IS NOT NULL AND LTRIM(RTRIM(@NguoiNhanIds)) <> ''
+    BEGIN
+        DECLARE @Pos2 INT = 0, @NextPos2 INT, @Value2 NVARCHAR(50)
+        WHILE @Pos2 <= LEN(@NguoiNhanIds)
+        BEGIN
+            SET @NextPos2 = CHARINDEX(',', @NguoiNhanIds, @Pos2 + 1)
+            IF @NextPos2 = 0 SET @NextPos2 = LEN(@NguoiNhanIds) + 1
+            SET @Value2 = LTRIM(RTRIM(SUBSTRING(@NguoiNhanIds, @Pos2 + 1, @NextPos2 - @Pos2 - 1)))
+            IF @Value2 <> '' INSERT INTO @NguoiNhanTable (NguoiNhan) VALUES (@Value2)
+            SET @Pos2 = @NextPos2
+        END
+    END
+
     ;WITH CTE AS (
         SELECT 
-            [ID],
-            [Title],
-            [Content],
-            [TenNhanVien],        
-            [NotificationType],
-            [LoaiThongBao],
-            [Status],
-            [Platform],
-            [ReceivedCount],
-            [TotalRecipients],
-            [NgayTao],
-            [NguoiTao],
-            COUNT(*) OVER () AS TotalCount
-        FROM [HBM_HCNSApp].[dbo].[v_NotificationsWithRecipients] v
+            v.ID,
+            v.Title,
+            v.Content,
+            v.NotificationType,
+            v.LoaiThongBao,
+            v.NotificationStatus AS Status,
+            v.Platform,
+            v.NgayTao,
+            v.NguoiTao,
+            v.TenNguoiTao,
+            v.AnhNguoiTao,
+            v.NguoiNhan,
+            v.TenNguoiNhan,
+            v.RecipientStatus,
+            ROW_NUMBER() OVER (ORDER BY 
+                CASE WHEN @SortColumn = 'NgayTao' THEN NgayTao END DESC
+            ) AS RowNum
+        FROM v_NotificationsWithRecipients v
         WHERE 
-            (@NotificationType = 0 OR NotificationType = @NotificationType)
-            AND ((@LoaiThongBao IS NULL OR LoaiThongBao = @LoaiThongBao))
-            AND (@SentStatus IS NULL OR Status = @SentStatus)
-			AND (@Platform IS NULL OR [Platform] = @Platform)
-            AND (@FromDateTime IS NULL OR NgayTao >= @FromDateTime)
-            AND (@ToDateTime IS NULL OR NgayTao <= @ToDateTime)
+            (@NotificationType = 0 OR v.NotificationType = @NotificationType)
+            AND (@LoaiThongBao IS NULL OR v.LoaiThongBao = @LoaiThongBao)
+            AND (@SentStatus IS NULL OR v.RecipientStatus = @SentStatus)
+            AND (@Platform IS NULL OR v.Platform = @Platform)
+            AND (@FromDateTime IS NULL OR v.NgayTao >= @FromDateTime)
+            AND (@ToDateTime IS NULL OR v.NgayTao <= @ToDateTime)
             AND (
                 @SearchText = '' OR 
-                Title LIKE '%' + @SearchText + '%' OR 
-                Content LIKE '%' + @SearchText + '%'
-            )
-            AND (
-                @IsSentToAll IS NULL
-                OR (@IsSentToAll = 1 AND ReceivedCount = TotalRecipients)
-                OR (@IsSentToAll = 2 AND ReceivedCount <> TotalRecipients)
+                v.Title LIKE '%' + @SearchText + '%' OR 
+                v.Content LIKE '%' + @SearchText + '%'
             )
             AND (
                 @NgTaoIds IS NULL
-                OR EXISTS (
-                    SELECT 1 FROM @NgTaoTable t WHERE t.NguoiTao = v.NguoiTao
-                )
+                OR EXISTS (SELECT 1 FROM @NgTaoTable t WHERE t.NguoiTao = v.NguoiTao)
+            )
+            AND (
+                @NguoiNhanIds IS NULL
+                OR EXISTS (SELECT 1 FROM @NguoiNhanTable t WHERE t.NguoiNhan = v.NguoiNhan)
             )
     )
     SELECT 
         ID,
         Title,
         Content,
-        TenNhanVien,
         NotificationType,
         LoaiThongBao,
         Status,
-		Platform,
-        ReceivedCount,
-        TotalRecipients,
+        Platform,
         NgayTao,
         NguoiTao,
-        TotalCount,
-        CEILING(CAST(TotalCount AS FLOAT) / @PageSize) AS TotalPages
+        TenNguoiTao,
+        AnhNguoiTao,
+        NguoiNhan,
+        TenNguoiNhan,
+        RecipientStatus,
+        (SELECT COUNT(*) FROM CTE) AS TotalCount,
+        CEILING(CAST((SELECT COUNT(*) FROM CTE) AS FLOAT) / @PageSize) AS TotalPages
     FROM CTE
-    ORDER BY 
-        CASE WHEN @SortColumn = 'NgayTao' THEN NgayTao END DESC
-    OFFSET (@PageNumber - 1) * @PageSize ROWS
-    FETCH NEXT @PageSize ROWS ONLY;
+    WHERE RowNum BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize
+    ORDER BY RowNum;
 END;
 GO
+
 --
 EXEC NS_ADTB_GetNotificationsWithPaging
     @PageNumber = 1,

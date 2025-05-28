@@ -33,6 +33,16 @@
       "name": "localhost (Chrome)",
       "url": "https://localhost:4200",
       "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Launch Chrome with DevTools",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--remote-debugging-port=9222"
+      ]
     }
   ]
 }

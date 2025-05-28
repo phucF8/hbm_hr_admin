@@ -81,8 +81,11 @@ export class ThongBaoService {
     ngTaoIds?: string[] // ← thêm vào đây
   ): Observable<{ items: ThongBao[], totalCount: number }> {
     let params = new HttpParams()
-    if (pageIndex) 
-        params = params.set('pageIndex', pageIndex);
+    if (pageIndex){
+      console.log('Page Index:', pageIndex);
+      params = params.set('pageIndex', pageIndex);
+    } 
+        
     if (sortBy) 
       params = params.set('sortBy', sortBy);
     if (ngayTaoTu) 
@@ -108,7 +111,7 @@ export class ThongBaoService {
     if (isPlatform) 
       params = params.set('platform', isPlatform);
     
-    DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
+    // DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
 
     return this.http.get<{ items: ThongBao[], totalCount: number }>(this.apiUrl, { params }).pipe(
       catchError(error => {

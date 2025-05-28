@@ -22,7 +22,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models
         public string ID { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
-        public int NotificationType { get; set; }
+        public byte NotificationType { get; set; }
         public string NguoiTao { get; set; } = string.Empty;
         public List<string> Recipients { get; set; } // Danh sách ID người nhận
     }
@@ -31,7 +31,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models
     {
         public string Title { get; set; }
         public string Content { get; set; }
-        public int NotificationType { get; set; }
+        public byte NotificationType { get; set; }
         public List<string> Recipients { get; set; } // Danh sách ID người nhận
 
     }

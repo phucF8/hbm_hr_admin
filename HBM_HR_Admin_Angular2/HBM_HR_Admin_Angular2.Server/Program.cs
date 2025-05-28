@@ -16,11 +16,11 @@ builder.Services.AddCors(options =>
                     .AllowAnyHeader());
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<NotificationRepository>();
 builder.Services.AddScoped<IDebugRepository, DebugRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
 

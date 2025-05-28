@@ -151,7 +151,7 @@ export class TbchitietComponent implements OnInit {
           } else {
             this.thongBaoForm.get('notificationType')?.enable();
           }
-          this.tenNguoiTao = notification.tenNhanVien;
+          this.tenNguoiTao = notification.tenNguoiTao;
           this.ngayTao = notification.ngayTao;
           this.thongBaoForm.patchValue({
             title: notification.title,

@@ -9,24 +9,17 @@ SELECT
     n.Content,
     n.NotificationType,
     n.LoaiThongBao,
-	n.Status,
+    n.Status AS NotificationStatus,
     n.Platform,
     n.NgayTao,
     n.NguoiTao,
-    nv.TenNhanVien,
-    COUNT(r.ID) AS TotalRecipients,
-    SUM(CASE WHEN r.Status > 0 THEN 1 ELSE 0 END) AS ReceivedCount
+    nt.TenNhanVien AS TenNguoiTao,
+    nt.Anh AS AnhNguoiTao,         -- Thêm ảnh người tạo
+    r.NguoiNhan,
+    nr.TenNhanVien AS TenNguoiNhan,
+	nr.Anh AS AnhNguoiNhan,
+    r.Status AS RecipientStatus
 FROM NS_ADTB_Notifications n
-LEFT JOIN NS_NhanViens nv ON n.NguoiTao = nv.ID
-LEFT JOIN NS_ADTB_NotificationRecipients r ON n.ID = r.IDThongBao
-GROUP BY
-    n.ID,
-    n.Title,
-    n.Content,
-    n.NotificationType,
-    n.LoaiThongBao,
-	n.Status,
-    n.Platform,
-    n.NgayTao,
-	n.NguoiTao,
-    nv.TenNhanVien;
+LEFT JOIN NS_NhanViens nt ON n.NguoiTao = nt.ID       -- Người tạo
+LEFT JOIN NS_ADTB_NotificationRecipients r ON n.ID = r.IDThongBao 	-- 
+LEFT JOIN NS_NhanViens nr ON r.NguoiNhan = nr.ID;     -- Người nhận

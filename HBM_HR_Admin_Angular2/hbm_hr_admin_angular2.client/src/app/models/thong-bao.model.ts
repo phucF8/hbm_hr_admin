@@ -14,7 +14,7 @@ export interface ThongBao {
   title: string;
   content: string;
   senderId: string;
-  tenNhanVien: string;
+  tenNguoiTao: string;
   notificationType: number;
   loaiThongBao: string;
   idThamChieu: string;
@@ -25,6 +25,11 @@ export interface ThongBao {
   ngayTao: string;
   recipients: ThongBaoRecipient[];  // Danh sách người nhận
   selected?: boolean;
+
+  nguoiNhan?: string;
+  tenNguoiNhan?: string;
+  anhNguoiNhan?: string;
+
 }
 
 export interface MergedData {

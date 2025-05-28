@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
 using Dapper;
 
 namespace HBM_HR_Admin_Angular2.Server.Data
@@ -86,7 +85,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 );
 
                 // Lấy TotalCount từ phần tử đầu tiên (giả sử tất cả phần tử có TotalCount giống nhau)
-                int totalCount = result.Any() ? result.First().TotalCount : 0;
+                int totalCount = 0;
 
                 _logger.LogInformation($"Stored procedure returned {result.Count()} records, TotalCount: {totalCount}");
 
@@ -136,10 +135,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     SentStatus = trangThai
                 };
                 var result = await connection.QueryAsync<Notification>("NS_ADTB_GetNotificationsWithPaging",parameters,commandType: CommandType.StoredProcedure);
-                int totalCount = result.Any() ? result.First().TotalCount : 0;
+                int totalCount = 0;
                 return new PagedResult<Notification>
                 {
-                    Items = result.ToList(),
+                    items = result.ToList(),
                     TotalCount = totalCount
                 };
             }
