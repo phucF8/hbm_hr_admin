@@ -140,12 +140,13 @@
               {{ (currentPage - 1) * ITEMS_PER_PAGE + (thongBaoList.indexOf(tb) + 1) }}
             </td>
             <td>
+              {{ tb.id }}
               {{ tb.title }}
             </td>
             <td style="text-align: justify;">{{ tb.content }}</td>
             <td>{{ tb.tenNguoiTao }}</td>
             <td>{{ tb.ngayTao | date:'dd/MM/yyyy HH:mm' }}</td>
-            <td>{{ tb.tenNguoiNhan}}</td>
+            <td>{{ countNguoiNhanSuccess(tb.danhSachNguoiNhan)}}/{{tb.danhSachNguoiNhan.length}}</td>
             <td>{{ getNotificationTypeName(tb.notificationType) }}</td>
             <td>{{ tb.loaiThongBao}}</td>
             <td>{{ tb.platform}}</td>

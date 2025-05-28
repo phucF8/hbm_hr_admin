@@ -21,6 +21,7 @@ import { finalize } from 'rxjs/operators';
 import { DonVi } from '@app/models/donvi';
 import { TimkiemComponent } from '@app/uicomponents/timkiem/timkiem.component';
 import { MergedData } from '@app/models/thong-bao.model';
+import { DanhSachNguoiNhan, Item } from '@app/responses/thongbao_rp';
 
 
 
@@ -35,7 +36,7 @@ export class ThongBaoComponent implements OnInit {
   @Input() currentPage: number = 1;
   @Output() pageChange = new EventEmitter<number>();
 
-  thongBaoList: ThongBao[] = [];
+  thongBaoList: Item[] = [];
   selectAll: boolean = false;
   searchText: string = '';
   pageIndex: number = 1;
@@ -573,4 +574,9 @@ platformOptions = [
   removeUser(user: any) {
     this.selectedUsers = this.selectedUsers.filter(u => u.ID !== user.ID);
   }
+
+  countNguoiNhanSuccess(items: DanhSachNguoiNhan[]): number {
+    return items.filter(n => n.status > 0).length;
+  }
+
 }

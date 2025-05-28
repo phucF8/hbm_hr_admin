@@ -5,6 +5,7 @@ import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao int
 import { environment } from '../../environments/environment'; 
 import { DebugUtils } from '@app/utils/debug-utils';
 import { DoLookupDatasRP } from '@app/models/thong-bao.model'; // Import the DoLookupDatasRP interface
+import { Root } from '@app/responses/thongbao_rp';
 
 
 
@@ -79,7 +80,7 @@ export class ThongBaoService {
     loaiThongBao?: string | null,  //vd:loaiThongBao?: string | null  //vd: RQ,GT, ...
     isPlatform?: string | null, // null: tất cả, MB: mobile, WEB: web
     ngTaoIds?: string[] // ← thêm vào đây
-  ): Observable<{ items: ThongBao[], totalCount: number }> {
+  ): Observable<Root> {
     let params = new HttpParams()
     if (pageIndex){
       console.log('Page Index:', pageIndex);
@@ -113,7 +114,7 @@ export class ThongBaoService {
     
     // DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
 
-    return this.http.get<{ items: ThongBao[], totalCount: number }>(this.apiUrl, { params }).pipe(
+    return this.http.get<Root>(this.apiUrl, { params }).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
         throw error;

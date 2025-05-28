@@ -21,11 +21,39 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public async Task<PagedResult<ThongBaoDto>> getListThongBao(NotificationPagingRequest param)
         {
             var query = _context.DbThongBao
-            .Join(_context.NS_NhanViens,
-                tb => tb.NguoiTao,
-                nv => nv.ID,
-                (tb, nv) => new { tb, nv })
-            .Select(x => new ThongBaoDto
+                .Join(_context.NS_NhanViens,
+                    tb => tb.NguoiTao,
+                    nv => nv.ID,
+                    (tb, nv) => new { tb, nv });
+
+            // Áp dụng lọc ID người tạo (sau khi kiểm tra null)
+            if (!string.IsNullOrWhiteSpace(param.NgTaoIds))
+            {
+                var ngTaoIdList = param.NgTaoIds
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .ToList();
+                query = query.Where(x => ngTaoIdList.Contains(x.tb.NguoiTao));
+            }
+            // Các bộ lọc khác
+            if (param.NotificationType.HasValue)
+                query = query.Where(x => x.tb.NotificationType == param.NotificationType);
+            if (!string.IsNullOrEmpty(param.LoaiThongBao))
+                query = query.Where(x => x.tb.LoaiThongBao == param.LoaiThongBao);
+            if (!string.IsNullOrEmpty(param.Platform))
+                query = query.Where(x => x.tb.Platform == param.Platform);
+            if (param.ngayTaoTu.HasValue)
+                query = query.Where(x => x.tb.NgayTao >= param.ngayTaoTu.Value.Date);
+            if (param.ngayTaoDen.HasValue)
+            {
+                var to = param.ngayTaoDen.Value.Date.AddDays(1).AddMilliseconds(-3);
+                query = query.Where(x => x.tb.NgayTao <= to);
+            }
+            if (!string.IsNullOrWhiteSpace(param.SearchText))
+            {
+                var keyword = param.SearchText.ToLower();
+                query = query.Where(x => x.tb.Title.ToLower().Contains(keyword) || x.tb.Content.ToLower().Contains(keyword));
+            }
+            var projected = query.Select(x => new ThongBaoDto
             {
                 ID = x.tb.ID,
                 Title = x.tb.Title,
@@ -40,8 +68,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 NgaySua = x.tb.NgaySua,
                 NguoiTao = x.tb.NguoiTao,
                 NguoiSua = x.tb.NguoiSua,
-                TenNhanVien = x.nv.TenNhanVien,
-                AnhNhanVien = x.nv.Anh,
+                TenNguoiTao = x.nv.TenNhanVien,
+                AnhNguoiTao = x.nv.Anh,
                 DanhSachNguoiNhan = (
                     from nr in _context.DbThongBaoNguoiNhan
                     join nvnn in _context.NS_NhanViens on nr.NguoiNhan equals nvnn.ID
@@ -54,61 +82,23 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                         Status = nr.Status,
                         NgayTao = nr.NgayTao,
                         NgaySua = nr.NgaySua,
-                        TenNhanVien = nvnn.TenNhanVien,
-                        AnhNhanVien = nvnn.Anh
+                        TenNguoiNhan = nvnn.TenNhanVien,
+                        AnhNguoiNhan = nvnn.Anh
                     }
                 ).ToList()
             });
-            if (param.NotificationType != null)
-            {
-                int? type = param.NotificationType;
-                query = query.Where(x => x.NotificationType == type);
-            }
-            if (!string.IsNullOrEmpty(param.LoaiThongBao))
-                query = query.Where(x => x.LoaiThongBao == param.LoaiThongBao);
-
-            if (!string.IsNullOrEmpty(param.Platform))
-                query = query.Where(x => x.Platform == param.Platform);
-            if (param.ngayTaoTu.HasValue)
-                query = query.Where(x => x.NgayTao >= param.ngayTaoTu.Value.Date);
-            if (param.ngayTaoDen.HasValue)
-            {
-                var to = param.ngayTaoDen.Value.Date.AddDays(1).AddMilliseconds(-3);
-                query = query.Where(x => x.NgayTao <= to);
-            }
-            if (!string.IsNullOrWhiteSpace(param.SearchText))
-            {
-                var keyword = param.SearchText.ToLower();
-                query = query.Where(x => x.Title.Contains(keyword) || x.Content.Contains(keyword));
-            }
-            if (!string.IsNullOrWhiteSpace(param.NgTaoIds))
-            {
-                var ngTaoIdList = param.NgTaoIds
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    .ToList();
-                query = query.Where(x => ngTaoIdList.Contains(x.NguoiTao));
-            }
-            query = query.OrderByDescending(x => x.NgayTao);
-            var totalCount = await query.CountAsync();
-            string sql = EfSqlLogger.LogSqlWithParameters(query, 
-                new
-                {
-                    param.SearchText,
-                }
-            );
-            Console.WriteLine(sql);
+            projected = projected.OrderByDescending(x => x.NgayTao);
+            // Pagination
+            var totalCount = await projected.CountAsync();
             int pageIndex = param.pageIndex ?? 1;
-            int pageSize = param.PageSize > 0 ? param.PageSize : 20; // fallback nếu cần
-            var data = await query
-                .Skip((pageIndex - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-            var result = new PagedResult<ThongBaoDto>
+            int pageSize = param.PageSize > 0 ? param.PageSize : 20;
+            var data = await projected.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            string sql = EfSqlLogger.LogSqlWithParameters(projected);
+            return new PagedResult<ThongBaoDto>
             {
                 items = data,
-                TotalCount = totalCount,
+                TotalCount = totalCount
             };
-            return result;
         }
     }
 }

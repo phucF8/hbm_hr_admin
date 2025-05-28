@@ -15,8 +15,8 @@
         public DateTime? NgaySua { get; set; }
         public string NguoiTao { get; set; }
         public string? NguoiSua { get; set; }
-        public string TenNhanVien { get; set; }
-        public string AnhNhanVien { get; set; }
+        public string TenNguoiTao { get; set; }
+        public string AnhNguoiTao { get; set; }
         public List<NguoiNhanDto> DanhSachNguoiNhan { get; set; }
     }
 
