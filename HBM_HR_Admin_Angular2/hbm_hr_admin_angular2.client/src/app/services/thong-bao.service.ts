@@ -79,7 +79,8 @@ export class ThongBaoService {
     isSentToAll?: number | null, // null: tất cả, 1: đã hoàn thành, 2: chưa hoàn thành
     loaiThongBao?: string | null,  //vd:loaiThongBao?: string | null  //vd: RQ,GT, ...
     isPlatform?: string | null, // null: tất cả, MB: mobile, WEB: web
-    ngTaoIds?: string[] // ← thêm vào đây
+    ngTaoIds?: string[], // ← thêm vào đây
+    ngNhanIds?: string[],
   ): Observable<Root> {
     let params = new HttpParams()
     if (pageIndex){
@@ -107,6 +108,8 @@ export class ThongBaoService {
       params = params.set('loaiThongBao', loaiThongBao);
     if (ngTaoIds && ngTaoIds.length > 0)
       params = params.set('ngTaoIds', ngTaoIds.join(',')); // ← nối mảng thành chuỗi
+    if (ngNhanIds && ngNhanIds.length > 0)
+      params = params.set('ngNhanIds', ngNhanIds.join(',')); // ← nối mảng thành chuỗi
     if (searchText) 
       params = params.set('searchText', searchText);
     if (isPlatform) 

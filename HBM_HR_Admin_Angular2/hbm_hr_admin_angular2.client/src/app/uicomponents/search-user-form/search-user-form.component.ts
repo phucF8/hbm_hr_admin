@@ -14,6 +14,7 @@ import { DonVi } from '@app/models/donvi';
 })
 
 export class SearchUserFormComponent {
+  @Input() label: string = ''; // Nhận label từ component cha
   @Output() selectedUsersChange = new EventEmitter<any[]>(); // ✅ thêm dòng này
   
   searchUserForm: FormGroup;

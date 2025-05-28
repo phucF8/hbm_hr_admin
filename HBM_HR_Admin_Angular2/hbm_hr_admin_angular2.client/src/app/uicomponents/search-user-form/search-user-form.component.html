@@ -1,5 +1,5 @@
 <div class="container">
-  <label>Người tạo</label>
+  <label *ngIf="label">{{ label }}</label>
   <form [formGroup]="searchUserForm" (ngSubmit)="onSubmit();">
     <div class="search-container-nguoitao" style="align-items: center;">
       

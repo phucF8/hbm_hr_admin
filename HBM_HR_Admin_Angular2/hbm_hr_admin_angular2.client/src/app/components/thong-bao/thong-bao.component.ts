@@ -91,7 +91,8 @@ platformOptions = [
   
   showDonVisPopup = false;
   isFocused = false;
-  selectedUsers: MergedData[] = [];
+  ngTaoIds: MergedData[] = [];
+  ngNhanIds: MergedData[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -159,7 +160,8 @@ platformOptions = [
       this.isSentToAll,
       this.loaiThongBao,
       this.isPlatform,
-      this.selectedUsers.map(user => user.ID) // Chuyển đổi danh sách người dùng đã chọn thành danh sách ID
+      this.ngTaoIds.map(user => user.ID), // Chuyển đổi danh sách người dùng đã chọn thành danh sách ID
+      this.ngNhanIds.map(user => user.ID)
     ).subscribe({
       next: (data) => {
         this.thongBaoList = data.items;
@@ -507,9 +509,12 @@ platformOptions = [
     document.body.classList.add('no-scroll');
   }
 
-  onSelectedUsersChanged(users: any[]) {
-    console.log('Danh sách người dùng được chọn:', users);
-    this.selectedUsers = users;
+  ngTaoSelected(users: any[]) {
+    this.ngTaoIds = users;
+  }
+
+  ngNhanSelected(users: any[]) {
+    this.ngNhanIds = users;
   }
 
   onSearchUser() {
@@ -559,20 +564,20 @@ platformOptions = [
   }
 
   
-  selectUser(user: any) {
-    if (!this.selectedUsers.find(u => u.ID === user.ID)) {
-      this.selectedUsers.push(user);
-    }
+  // ngTaoSelected(user: any) {
+  //   if (!this.ngTaoIds.find(u => u.ID === user.ID)) {
+  //     this.ngTaoIds.push(user);
+  //   }
     
-    // Log toàn bộ danh sách selectedUsers sau mỗi lần cập nhật
-    console.log("Current selectedUsers:", this.selectedUsers.map(u => u.ID));
+  //   // Log toàn bộ danh sách selectedUsers sau mỗi lần cập nhật
+  //   console.log("Current selectedUsers:", this.ngTaoIds.map(u => u.ID));
     
-    this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
-    this.filteredUsers = []; // Ẩn danh sách gợi ý
-  }
+  //   this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
+  //   this.filteredUsers = []; // Ẩn danh sách gợi ý
+  // }
 
   removeUser(user: any) {
-    this.selectedUsers = this.selectedUsers.filter(u => u.ID !== user.ID);
+    this.ngTaoIds = this.ngTaoIds.filter(u => u.ID !== user.ID);
   }
 
   countNguoiNhanSuccess(items: DanhSachNguoiNhan[]): number {
