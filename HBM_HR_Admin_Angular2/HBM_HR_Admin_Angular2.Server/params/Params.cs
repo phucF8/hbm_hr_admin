@@ -8,6 +8,7 @@ public class NotificationPagingRequest
     public DateTime? ngayTaoDen { get; set; }
     public string? SearchText { get; set; }
     public string? NgTaoIds { get; set; }
+    public string? NgNhanIds { get; set; }
     public List<string>? NguoiNhanIds { get; set; }
     public string? SortBy { get; set; }
     public int PageNumber { get; set; }

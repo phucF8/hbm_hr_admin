@@ -29,11 +29,25 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             // Áp dụng lọc ID người tạo (sau khi kiểm tra null)
             if (!string.IsNullOrWhiteSpace(param.NgTaoIds))
             {
-                var ngTaoIdList = param.NgTaoIds
+                var ids = param.NgTaoIds
                     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                     .ToList();
-                query = query.Where(x => ngTaoIdList.Contains(x.tb.NguoiTao));
+                query = query.Where(x => ids.Contains(x.tb.NguoiTao));
             }
+            // Lọc theo người nhận
+            if (!string.IsNullOrWhiteSpace(param.NgNhanIds))
+            {
+                var nhanIds = param.NgNhanIds
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .ToList();
+                query = query.Where(x =>
+                    _context.DbThongBaoNguoiNhan.Any(nr =>
+                        nr.IDThongBao == x.tb.ID &&
+                        nhanIds.Contains(nr.NguoiNhan)
+                    )
+                );
+            }
+
             // Các bộ lọc khác
             if (param.NotificationType.HasValue)
                 query = query.Where(x => x.tb.NotificationType == param.NotificationType);
