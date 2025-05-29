@@ -50,7 +50,7 @@
               (click)="selectUser(user)"
             >
               <div class="avatar">
-                <img src="{{user.Anh}}" alt="{{ user.TenNhanVien }}" />
+                 <img [src]="user.Anh" [alt]="user.TenNhanVien" />
               </div>
               <div class="employee-info">
                 <div class="employee-name">{{ user.TenNhanVien }}</div>
@@ -66,14 +66,12 @@
           </ul>
         </div>
       </div>
-
-      
     </div>
 
     <ul *ngIf="selectedUsers.length > 0" class="list-group">
       <li class="member-item" *ngFor="let user of selectedUsers">
         <div class="avatar">
-          <img src="/api/placeholder/40/40" alt="{{ user.TenNhanVien }}" />
+          <img [src]="user.Anh" [alt]="user.TenNhanVien" />
         </div>
         <div class="member-info">
           <div class="member-name">{{ user.TenNhanVien }}</div>

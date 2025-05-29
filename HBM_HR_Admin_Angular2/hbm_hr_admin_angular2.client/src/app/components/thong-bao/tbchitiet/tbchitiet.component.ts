@@ -159,15 +159,15 @@ export class TbchitietComponent implements OnInit {
             notificationType: notification.notificationType,
           });
 
-          this.selectedUsers = notification.recipients.map(recipient => (
+          this.selectedUsers = notification.danhSachNguoiNhan.map(recipient => (
             {
-            ID: recipient.recipientId,
-            MaNhanVien: recipient.recipientId, // Nếu recipientId là mã nhân viên
-            TenNhanVien: recipient.tenNhanVien,
+            ID: recipient.id,
+            MaNhanVien: recipient.maNhanVien, // Nếu recipientId là mã nhân viên
+            TenNhanVien: recipient.tenNguoiNhan,
             tenChucDanh: recipient.tenChucDanh,
             TenPhongBan: recipient.tenPhongBan, // Nếu cần, hãy lấy từ một nguồn khác
             TenChucDanh: recipient.tenChucDanh,
-            Anh: getFullImageUrl(recipient.anh),
+            Anh: getFullImageUrl(recipient.anhNguoiNhan),
             status: recipient.status,
             ngayTao: recipient.ngayTao,
           }
@@ -361,15 +361,25 @@ export class TbchitietComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.doLookupDatasRP = response;
-          this.filteredUsers = (response?.DatasLookup || []).map(user => ({
-            ID: user.ID,
-            MaNhanVien: user.MaNhanVien,
-            TenNhanVien: user.TenNhanVien,
-            Anh: getFullImageUrl(user.Anh),
-            TenChucDanh: user.TenChucDanh,
-            TenPhongBan: user.TenPhongBan,
-            status: 0 // Gán giá trị mặc định vì DoLookupData không có "status"
-          })) as MergedData[];
+          
+          
+          this.filteredUsers = (response?.DatasLookup || []).map(user => {
+  console.log('Ảnh của user:', user.Anh); // Log tại đây
+
+  return {
+    ID: user.ID,
+    MaNhanVien: user.MaNhanVien,
+    TenNhanVien: user.TenNhanVien,
+    Anh: getFullImageUrl(user.Anh),
+    TenChucDanh: user.TenChucDanh,
+    TenPhongBan: user.TenPhongBan,
+    status: 0
+  } as MergedData;
+});
+
+
+
+
         },
         error: (error) => {
           console.error('Lỗi tìm kiếm người dùng:', error);

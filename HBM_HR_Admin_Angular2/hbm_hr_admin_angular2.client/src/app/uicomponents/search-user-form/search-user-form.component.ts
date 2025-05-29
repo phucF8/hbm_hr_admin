@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ThongBaoService } from '../../services/thong-bao.service';
 import { MergedData } from '@app/models/thong-bao.model';
 import { finalize } from 'rxjs/operators';
-import { DebugUtils } from '@app/utils/debug-utils';
 import { DonVi } from '@app/models/donvi';
+import { getFullImageUrl } from '@app/utils/url.utils';
 
 @Component({
   selector: 'app-search-user-form',
@@ -58,8 +58,6 @@ export class SearchUserFormComponent {
 
   onSubmit() {
     const searchValue = this.searchUserForm.value.search;
-    // this.searchUser.emit(searchValue);
-    // const searchValue = this.searchUserForm.get('search')?.value?.trim();
       if (!searchValue) {
         this.filteredUsers = []; // Đặt về null nếu không có từ khóa tìm kiếm
         return;
@@ -73,6 +71,7 @@ export class SearchUserFormComponent {
             this.filteredUsers = (response?.DatasLookup || []).map(user => ({
               ID: user.ID,
               MaNhanVien: user.MaNhanVien,
+              Anh : getFullImageUrl(user.Anh),
               TenNhanVien: user.TenNhanVien,
               TenPhongBan: user.TenPhongBan,
               TenChucDanh: user.TenChucDanh,
@@ -105,7 +104,7 @@ export class SearchUserFormComponent {
     if (this.selectedUsers.length > 0) {
       for (let i = 0; i < this.selectedUsers.length; i++) {
         const user = this.selectedUsers[i];
-        console.log('User', i + 1, ':', JSON.stringify(user));
+        console.log('SELECT User', i + 1, ':', user);
       } 
     }
     

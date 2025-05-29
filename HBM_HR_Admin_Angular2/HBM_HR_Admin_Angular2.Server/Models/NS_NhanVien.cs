@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace HBM_HR_Admin_Angular2.Server.Models
 {
+    [Table("NS_NhanViens")]
     public class NS_NhanVien
     {
         public string ID { get; set; }

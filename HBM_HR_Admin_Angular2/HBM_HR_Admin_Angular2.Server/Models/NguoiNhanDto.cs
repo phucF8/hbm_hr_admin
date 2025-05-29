@@ -7,6 +7,13 @@
         public string NguoiNhan { get; set; }
         public string TenNguoiNhan { get; set; }
         public string AnhNguoiNhan { get; set; }
+
+
+        public string MaNhanVien { get; set; }
+        public string TenChucDanh { get; set; }
+        public string TenPhongBan {  get; set; }        
+
+
         public byte Status { get; set; }
         public DateTime NgayTao { get; set; }
         public DateTime NgaySua { get; set; }

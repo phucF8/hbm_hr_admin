@@ -21,7 +21,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public async Task<PagedResult<ThongBaoDto>> getListThongBao(NotificationPagingRequest param)
         {
             var query = _context.DbThongBao
-                .Join(_context.NS_NhanViens,
+                .Join(_context.DbNhanVien,
                     tb => tb.NguoiTao,
                     nv => nv.ID,
                     (tb, nv) => new { tb, nv });
@@ -86,7 +86,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 AnhNguoiTao = x.nv.Anh,
                 DanhSachNguoiNhan = (
                     from nr in _context.DbThongBaoNguoiNhan
-                    join nvnn in _context.NS_NhanViens on nr.NguoiNhan equals nvnn.ID
+                    join nvnn in _context.DbNhanVien on nr.NguoiNhan equals nvnn.ID
                     where nr.IDThongBao == x.tb.ID
                     select new NguoiNhanDto
                     {

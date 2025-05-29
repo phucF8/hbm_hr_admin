@@ -5,7 +5,7 @@ import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao int
 import { environment } from '../../environments/environment'; 
 import { DebugUtils } from '@app/utils/debug-utils';
 import { DoLookupDatasRP } from '@app/models/thong-bao.model'; // Import the DoLookupDatasRP interface
-import { Root } from '@app/responses/thongbao_rp';
+import { Item, Root } from '@app/responses/thongbao_rp';
 
 
 
@@ -125,11 +125,10 @@ export class ThongBaoService {
     );
   }
   
-  
-  getThongBaoByID(notificationID: string): Observable<ThongBao> {
+  getThongBaoByID(notificationID: string): Observable<Item> {
     const url = `${this.apiUrl}/${notificationID}`;
     DebugUtils.openStringInNewWindow(`${url}`);
-    return this.http.get<ThongBao>(url).pipe(
+    return this.http.get<Item>(url).pipe(
       catchError(error => {
         DebugUtils.openStringInNewWindow(`${error.message}`);
         throw error;
@@ -166,7 +165,6 @@ export class ThongBaoService {
         KhoDuLieu: khoDuLieu,
       }
     };
-    DebugUtils.openStringInNewWindow(JSON.stringify(requestBody, null, 2));
     return this.http.post<DoLookupDatasRP>(url, requestBody).pipe(
       catchError(error => {
         console.error('Error searching users:', error);

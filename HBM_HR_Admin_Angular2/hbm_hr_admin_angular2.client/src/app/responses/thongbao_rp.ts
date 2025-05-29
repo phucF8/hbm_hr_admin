@@ -27,9 +27,15 @@ export interface DanhSachNguoiNhan {
   id: string
   idThongBao: string
   nguoiNhan: string
+  maNhanVien: string
   tenNguoiNhan: string
   anhNguoiNhan: string
+  tenChucDanh: string
+  tenPhongBan: string
   status: number
   ngayTao: string
   ngaySua: string
 }
+
+
+

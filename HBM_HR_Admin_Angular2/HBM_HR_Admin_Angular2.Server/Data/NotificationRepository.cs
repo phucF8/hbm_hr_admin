@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Dapper;
+using HBM_HR_Admin_Angular2.Server.Models;
 
 namespace HBM_HR_Admin_Angular2.Server.Data
 {
@@ -149,12 +150,12 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task<ThongBao?> GetNotificationByID(string notificationID)
+        public async Task<ThongBaoDto?> GetNotificationByID(string notificationID)
         {
             try
             {
                 using var connection = new SqlConnection(_connectionString);
-                var result = await connection.QueryFirstOrDefaultAsync<ThongBao>(
+                var result = await connection.QueryFirstOrDefaultAsync<ThongBaoDto>(
                     "NS_ADTB_GetNotificationById",
                     new
                     {
@@ -254,7 +255,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             }
         }
 
-        public async Task<IEnumerable<NotificationRecipient>> SelectNotificationRecipients(string notificationId)
+        public async Task<IEnumerable<NguoiNhanDto>> SelectNotificationRecipients(string notificationId)
         {
             try
             {
@@ -263,7 +264,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                     NotificationId = notificationId,
                 };
                 using var connection = new SqlConnection(_connectionString);
-                var result = await connection.QueryAsync<NotificationRecipient>(
+                var result = await connection.QueryAsync<NguoiNhanDto>(
                     "EXEC SelectNotificationRecipients @NotificationId",
                     parameters);
                 return result;

@@ -19,7 +19,7 @@ public class ThongBao
     public string NguoiTao { get; set; }
     public string? NguoiSua { get; set; }
 
-    //public List<V_NS_ADTB_NhanThongBao> lsV_NhanThongBao { get; set; } = new();
+    //public List<V_NS_ADTB_NhanThongBao> Recipients { get; set; } = new();
 
 }
 

@@ -85,7 +85,7 @@ export class AuthService {
         Password: password
       }
     };
-    DebugUtils.openStringInNewWindow(JSON.stringify(request, null, 2));
+    // DebugUtils.openStringInNewWindow(JSON.stringify(request, null, 2));
     return this.http.post<LoginResponse>(`${this.apiUrl}/DoCheckLogin`, request).pipe(
       tap(response => {
         if (response.Status === 'SUCCESS') {

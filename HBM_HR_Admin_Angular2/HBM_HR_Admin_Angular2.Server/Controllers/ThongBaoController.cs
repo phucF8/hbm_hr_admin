@@ -69,7 +69,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API GET /api/thongbao/{id} - Lấy 1 thông báo củ thể
         [HttpGet("{id}")]
-        public async Task<ActionResult<ThongBao>> GetNotification(string id)
+        public async Task<ActionResult<ThongBaoDto>> GetNotification(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -81,7 +81,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return NotFound($"Notification with ID {id} not found");
             }
             var result = await _repository.SelectNotificationRecipients(id);
-            // notification.Recipients = result.ToList();
+            notification.DanhSachNguoiNhan = result.ToList();
             return Ok(notification);
         }
 

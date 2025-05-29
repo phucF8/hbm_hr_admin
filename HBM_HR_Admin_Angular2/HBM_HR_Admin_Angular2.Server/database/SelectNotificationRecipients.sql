@@ -10,8 +10,9 @@ BEGIN
     SELECT 
         nr.IDThongBao,
         nr.NguoiNhan,
-        nv.TenNhanVien,
-        nv.Anh,
+        nv.MaNhanVien,
+        nv.TenNhanVien as TenNguoiNhan,
+        nv.Anh as AnhNguoiNhan,
         nv.TenChucDanh,
         nv.TenPhongBan,
         nv.TenKho,
