@@ -122,6 +122,7 @@
             <th style="width: 2%;">#</th>
             <th style="width: 10%;">Tiêu đề</th>
             <th style="width: 25%;">Nội dung thông báo</th>
+            <th style="width: 10%;">Hành động</th>
             <th style="width: 10%;">Người gửi</th>
             <th style="width: 15%;">Ngày tạo</th>
             <th style="width: 10%;">Hoàn thành</th>
@@ -145,6 +146,7 @@
               {{ tb.title }}
             </td>
             <td style="text-align: justify;">{{ tb.content }}</td>
+            <td style="text-align: center;">{{getActionName(tb.content)}}</td>
             <td>{{ tb.tenNguoiTao }}</td>
             <td>{{ tb.ngayTao | date:'dd/MM/yyyy HH:mm' }}</td>
             <td>{{ countNguoiNhanSuccess(tb.danhSachNguoiNhan)}}/{{tb.danhSachNguoiNhan.length}}</td>

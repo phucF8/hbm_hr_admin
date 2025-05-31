@@ -60,22 +60,22 @@ export class ThongBaoComponent implements OnInit {
     { value: 'XE', label: 'Đặt xe' },
     { value: 'ROOM', label: 'Đặt phòng họp' },
     { value: 'KPI', label: 'KPIs' },
-];
-notificationTypeOptions = [
-  { value: null, label: 'Tất cả' },
-  { value: 1, label: 'Tự động' },
-  { value: 2, label: 'Chủ động' },
-];
-sentToAllOptions = [
-  { value: null, label: 'Tất cả' }, 
-  { value: 1, label: 'Đã hoàn thành' },
-  { value: 2, label: 'Chưa hoàn thành' },
-];
-platformOptions = [
-  { value: null, label: 'Tất cả' }, 
-  { value: 'MB', label: 'Mobile' },
-  { value: 'WEB', label: 'Web' },
-];
+  ];
+  notificationTypeOptions = [
+    { value: null, label: 'Tất cả' },
+    { value: 1, label: 'Tự động' },
+    { value: 2, label: 'Chủ động' },
+  ];
+  sentToAllOptions = [
+    { value: null, label: 'Tất cả' },
+    { value: 1, label: 'Đã hoàn thành' },
+    { value: 2, label: 'Chưa hoàn thành' },
+  ];
+  platformOptions = [
+    { value: null, label: 'Tất cả' },
+    { value: 'MB', label: 'Mobile' },
+    { value: 'WEB', label: 'Web' },
+  ];
 
   notificationId: string = '';
   showThongBaoPopup: boolean = false;
@@ -88,7 +88,7 @@ platformOptions = [
   filteredUsers: MergedData[] = [];
   isSearching: boolean = false;
   selectedDonVi: DonVi | null = null;
-  
+
   showDonVisPopup = false;
   isFocused = false;
   ngTaoIds: MergedData[] = [];
@@ -119,7 +119,7 @@ platformOptions = [
       this.tenNhanVien = currentUser.TenNhanVien;
     }
 
-    
+
 
   }
 
@@ -301,6 +301,35 @@ platformOptions = [
       console.error('❌ Navigation failed:', error);
     });
   }
+
+  getActionName(content: string): string {   
+    if (!content) return '';
+
+    const lowerContent = content.toLowerCase();
+
+    if (lowerContent.includes('request') && lowerContent.includes('yêu cầu')) {
+      return 'Tạo Request';
+    }
+
+    if (lowerContent.includes('request') && lowerContent.includes('xác nhận')) {
+      return 'Duyệt Request';
+    }
+
+    if (lowerContent.includes('request') && lowerContent.includes('thảo luận')) {
+      return 'Thảo luận Request';
+    }
+
+     if (lowerContent.includes('giải trình') && lowerContent.includes('yêu cầu')) {
+      return 'Tạo Giải trình';
+    }
+
+    if (lowerContent.includes('giải trình') && lowerContent.includes('xác nhận')) {
+      return 'Duyệt Giải trình';
+    }
+
+    return '';
+  }
+
 
 
 
@@ -554,24 +583,24 @@ platformOptions = [
     this.showDonVisPopup = false;
   }
 
-  onBlurInput(value : string) {
+  onBlurInput(value: string) {
     setTimeout(() => {
       this.isFocused = false;
       if (value.trim() === '') {
-        this.filteredUsers  = []; // Đặt về null nếu không có từ khóa tìm kiếm
+        this.filteredUsers = []; // Đặt về null nếu không có từ khóa tìm kiếm
       }
     }, 200); // 200ms hoặc thời gian bạn mong muốn
   }
 
-  
+
   // ngTaoSelected(user: any) {
   //   if (!this.ngTaoIds.find(u => u.ID === user.ID)) {
   //     this.ngTaoIds.push(user);
   //   }
-    
+
   //   // Log toàn bộ danh sách selectedUsers sau mỗi lần cập nhật
   //   console.log("Current selectedUsers:", this.ngTaoIds.map(u => u.ID));
-    
+
   //   this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
   //   this.filteredUsers = []; // Ẩn danh sách gợi ý
   // }
