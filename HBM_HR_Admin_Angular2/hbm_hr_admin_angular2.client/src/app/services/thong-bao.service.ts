@@ -7,8 +7,6 @@ import { DebugUtils } from '@app/utils/debug-utils';
 import { DoLookupDatasRP } from '@app/models/thong-bao.model'; // Import the DoLookupDatasRP interface
 import { Item, Root } from '@app/responses/thongbao_rp';
 
-
-
 export interface ThongBaoRecipient {
   notificationId: string;
   recipientId: string;
@@ -25,7 +23,6 @@ export interface TestSendNotificationRequest {
 
 }
 
-
 interface UserStat {
   userId: string;
   success: number;
@@ -41,7 +38,6 @@ interface NotificationResponse {
   userStats: UserStat[];
 }
 
-
 export interface CreateThongBaoRequest {
   id: string;
   title: string;
@@ -51,7 +47,6 @@ export interface CreateThongBaoRequest {
   sentAt?: Date;
   recipients: string[]; // Danh sách ID người nhận
 }
-
 
 export interface UpdateThongBaoRequest extends CreateThongBaoRequest {
   id: string;
@@ -127,7 +122,7 @@ export class ThongBaoService {
   
   getThongBaoByID(notificationID: string): Observable<Item> {
     const url = `${this.apiUrl}/${notificationID}`;
-    DebugUtils.openStringInNewWindow(`${url}`);
+    // DebugUtils.openStringInNewWindow(`${url}`);
     return this.http.get<Item>(url).pipe(
       catchError(error => {
         DebugUtils.openStringInNewWindow(`${error.message}`);

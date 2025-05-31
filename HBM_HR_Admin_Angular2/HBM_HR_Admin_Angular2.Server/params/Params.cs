@@ -13,5 +13,5 @@ public class NotificationPagingRequest
     public string? SortBy { get; set; }
     public int PageNumber { get; set; }
     public int PageSize { get; set; }
-    public int? SentStatus { get; set; } // Added property to fix the error
+    public int? isSentToAll { get; set; } // Added property to fix the error
 }

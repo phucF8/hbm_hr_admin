@@ -67,6 +67,29 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 var keyword = param.SearchText.ToLower();
                 query = query.Where(x => x.tb.Title.ToLower().Contains(keyword) || x.tb.Content.ToLower().Contains(keyword));
             }
+            if (param.isSentToAll != null)
+            {
+                if (param.isSentToAll == 1)
+                {
+                    // Tất cả người nhận đều có Status > 0
+                    query = query.Where(x =>
+                        _context.DbThongBaoNguoiNhan
+                            .Where(nr => nr.IDThongBao == x.tb.ID)
+                            .All(nr => nr.Status > 0)
+                    );
+                }
+                else if (param.isSentToAll == 2)
+                {
+                    // Có ít nhất một người nhận có Status == 0
+                    query = query.Where(x =>
+                        _context.DbThongBaoNguoiNhan
+                            .Where(nr => nr.IDThongBao == x.tb.ID)
+                            .Any(nr => nr.Status == 0)
+                    );
+                }
+            }
+
+
             var projected = query.Select(x => new ThongBaoDto
             {
                 ID = x.tb.ID,

@@ -25,6 +25,8 @@ import { FromToDateFormComponent } from './uicomponents/from-to-date-form/from-t
 import { OneSelectFormComponent } from './uicomponents/one-select-form/one-select-form.component';
 import { SearchUserFormComponent } from './uicomponents/search-user-form/search-user-form.component';
 import { QuillModule } from 'ngx-quill';
+import { AuthInterceptor } from './guards/auth.interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -58,7 +60,16 @@ import { QuillModule } from 'ngx-quill';
     MatSelectModule,
     MatRadioModule
   ],
-  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
+  providers: [
+    { provide: LocationStrategy, 
+      useClass: HashLocationStrategy 
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

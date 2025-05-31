@@ -10,6 +10,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<ThongBao> DbThongBao { get; set; }
         public DbSet<NS_NhanVien> DbNhanVien { get; set; }
 
+        public DbSet<UserErrorReport> DbUserErrorReport { get; set; }
+
         public DbSet<ThongBaoNguoiNhan> DbThongBaoNguoiNhan { get; set; }
         
 
