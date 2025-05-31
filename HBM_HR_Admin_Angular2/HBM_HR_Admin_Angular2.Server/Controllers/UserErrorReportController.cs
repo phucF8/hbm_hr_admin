@@ -4,6 +4,7 @@ using HBM_HR_Admin_Angular2.Server.Helpers;
 using HBM_HR_Admin_Angular2.Server.Models;
 using Google.Api.Gax;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
@@ -38,20 +39,15 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             await _context.SaveChangesAsync();
             return Ok(new {status = "SUCCESS", message = "Gửi báo lỗi thành công", logId = log.Id });
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserErrorReport>>> GetAllReports()
+        {
+            var reports = await (from r in _context.DbUserErrorReport orderby r.CreatedAt descending select r).ToListAsync();
+            return Ok(reports);
+        }
+
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 

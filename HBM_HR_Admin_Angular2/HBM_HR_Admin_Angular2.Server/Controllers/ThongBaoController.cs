@@ -3,9 +3,11 @@ using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Helpers;
 using HBM_HR_Admin_Angular2.Server.Models;
 using Google.Api.Gax;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
+    [Authorize] // ⬅️ chặn yêu cầu không có hoặc token không hợp lệ
     [Route("api/thongbao")]
     [ApiController]
     public class ThongBaoController : ControllerBase

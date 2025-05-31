@@ -3,6 +3,11 @@ using Google.Apis.Auth.OAuth2;
 using HBM_HR_Admin_Angular2.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using HBM_HR_Admin_Angular2.Server.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using HBM_HR_Admin_Angular2.Server.constance;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +28,6 @@ builder.Services.AddScoped<IDebugRepository, DebugRepository>();
 builder.Services.AddScoped<IThongBaoService, ThongBaoService>();
 
 
-
 // Đăng ký dịch vụ FirebaseNotificationService
 builder.Services.AddSingleton<FirebaseNotificationService>();
 
@@ -37,7 +41,28 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(8088); // Cho phép lắng nghe mọi IP
 });
 
+var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+// Thêm Authentication với JWT Bearer
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidAudience = jwtOptions.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+        };
+    });
+builder.Services.AddAuthorization();
+builder.Services.AddSingleton<JwtTokenGenerator>();
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

@@ -14,7 +14,7 @@ export class AuthInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     //const token = localStorage.getItem('accessToken'); // hoặc sessionStorage
-    const token = "a7f2b9c8e5d14faea1431bd245c6f3cd98e2f7b34c617d8a4c82d6f57af9e319";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJleHAiOjE3NDg2ODAyMzUsImlzcyI6Imh0dHBzOi8vYWRtaW4uaGJtLnZuIiwiYXVkIjoiaGJtLW1vYmlsZS1hcHAifQ.oWIWxwPVkQIJfR7s-wZgRfGvUTaXtcixe3KbTuRxFS8";
     if (token) {
       // Gắn header Authorization: Bearer <token>
       request = request.clone({
