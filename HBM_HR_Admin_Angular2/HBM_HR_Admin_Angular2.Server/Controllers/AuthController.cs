@@ -33,9 +33,10 @@
                 Console.WriteLine($"username = {request.Username}");
                 var token = _jwtTokenGenerator.GenerateToken(request.Username);
                 Console.WriteLine($"token = {token}");
-                return Ok(new { token = token, username = request.Username });
+                return Ok(new {status="SUCCESS", token = token, username = request.Username });
             }
-            return Unauthorized("Sai tên đăng nhập hoặc mật khẩu");
+            return Unauthorized(new { status = "FAIL", message = "Sai tên đăng nhập hoặc mật khẩu" });
+
         }
 
     }
