@@ -1,6 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
+    <Version>1.0.0</Version>
+    <!-- hoặc lấy từ Git, CI/CD -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0+{GIT_SHA}</InformationalVersion>
+    <!-- bạn có thể thay bằng commit hash -->
+    
+    
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

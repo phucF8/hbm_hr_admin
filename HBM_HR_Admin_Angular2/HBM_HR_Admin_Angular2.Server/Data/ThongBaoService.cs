@@ -1,4 +1,5 @@
 using HBM_HR_Admin_Angular2.Server.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBM_HR_Admin_Angular2.Server.Data
@@ -6,6 +7,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
     public interface IThongBaoService
     {
         Task<PagedResult<ThongBaoDto>> getListThongBao(NotificationPagingRequest param);
+        Task<ApiResponse> nguoiNhanThongBaoUpdateStatus(string idThongBao, string idNhanVien,byte status);
 
     }
 
@@ -137,6 +139,39 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 TotalCount = totalCount
             };
         }
+
+        public async Task<ApiResponse> nguoiNhanThongBaoUpdateStatus(string idThongBao, string idNhanVien, byte status)
+        {
+            // Tìm bản ghi phù hợp
+            var record = await _context.DbThongBaoNguoiNhan
+                .FirstOrDefaultAsync(x => x.IDThongBao == idThongBao && x.NguoiNhan == idNhanVien);
+
+            if (record == null)
+            {
+                return new ApiResponse
+                {
+                    Status = "FAIL",
+                    Message = "Không tìm thấy bản ghi phù hợp."
+                };
+            }
+
+            // Cập nhật trạng thái
+            record.Status = status;
+            record.NgaySua = DateTime.Now;
+            // Bạn có thể cập nhật cả NguoiSua nếu cần, ví dụ:
+            // record.NguoiSua = idNguoiThucHien;
+
+            await _context.SaveChangesAsync();
+
+            return new ApiResponse
+            {
+                Status = "FAIL",
+                Message = "Không tìm thấy bản ghi phù hợp."
+            };
+
+        }
+
+
     }
 }
 

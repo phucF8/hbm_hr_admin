@@ -31,10 +31,8 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
-      console.log('LoginComponent: Đã tìm thấy thông tin đăng nhập, chuyển hướng đến trang thông báo');
-      this.router.navigate(['/thongbao']).then(() => {
-        console.log('LoginComponent: Chuyển hướng thành công');
-      }).catch(error => {
+      this.router.navigate(['/thongbao']).then(() => {})
+      .catch(error => {
         console.error('LoginComponent: Lỗi chuyển hướng:', error);
       });
     } else {

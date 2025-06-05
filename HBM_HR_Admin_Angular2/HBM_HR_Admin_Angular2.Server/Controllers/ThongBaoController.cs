@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
-    [Authorize] // ⬅️ chặn yêu cầu không có hoặc token không hợp lệ
+    //[Authorize] // ⬅️ chặn yêu cầu không có hoặc token không hợp lệ
     [Route("api/thongbao")]
     [ApiController]
     public class ThongBaoController : ControllerBase
@@ -71,7 +71,10 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         // API GET /api/thongbao/{id} - Lấy 1 thông báo củ thể
         [HttpGet("{id}")]
-        public async Task<ActionResult<ThongBaoDto>> GetNotification(string id)
+        public async Task<ActionResult<ThongBaoDto>> GetThongBaoChiTiet(
+            string id,
+            [FromQuery] string idNhanvien
+        )
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -84,6 +87,16 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             }
             var result = await _repository.SelectNotificationRecipients(id);
             notification.DanhSachNguoiNhan = result.ToList();
+            // ✅ Lặp qua từng người nhận để cập nhật trạng thái
+            foreach (var nguoiNhan in notification.DanhSachNguoiNhan)
+            {
+                // Cập nhật trạng thái nếu ID người nhận khớp với idNhanvien
+                if (nguoiNhan.NguoiNhan == idNhanvien)
+                {
+                    await _notificationService.nguoiNhanThongBaoUpdateStatus(id, idNhanvien,2);
+                }
+            }
+
             return Ok(notification);
         }
 
