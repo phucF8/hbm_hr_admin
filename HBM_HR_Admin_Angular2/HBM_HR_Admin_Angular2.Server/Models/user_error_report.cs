@@ -14,6 +14,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models
         public string VersionApp { get; set; }               // Phiên bản ứng dụng
         public string Device { get; set; }                   // Thiết bị: Android, iPhone, Web...
         public DateTime CreatedAt { get; set; } = DateTime.Now; // Thời điểm ghi nhận lỗi
+        public string Notes { get; set; }                       //Ghi chú
     }
 
     public class UserErrorReportDto
@@ -25,6 +26,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models
         public string ResponseJson { get; set; }
         public string VersionApp { get; set; }
         public string Device { get; set; }
+        public string Notes { get; set; }
     }
 
 }

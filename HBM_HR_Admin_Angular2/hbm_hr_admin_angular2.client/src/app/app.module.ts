@@ -27,6 +27,8 @@ import { SearchUserFormComponent } from './uicomponents/search-user-form/search-
 import { QuillModule } from 'ngx-quill';
 import { AuthInterceptor } from './guards/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ErrorUserReportComponent } from './components/error-user-report/error-user-report.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +45,8 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     FromToDateFormComponent,
     OneSelectFormComponent,
     SearchUserFormComponent,
+    ErrorUserReportComponent,
+    NotFoundComponent,
   ],
   imports: [
      QuillModule.forRoot(),
@@ -61,9 +65,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     MatRadioModule
   ],
   providers: [
-    { provide: LocationStrategy, 
-      useClass: HashLocationStrategy 
-    },
+    // {provide: LocationStrategy, useClass: HashLocationStrategy},
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

@@ -26,15 +26,32 @@
 
             
             <div class="container" style="width: 76% !important; padding-left: 6px !important; padding-right: 6px !important">
-                <ul class="nav page-navigation">
+                <ul class="nav page-navigation" style="display: flex; justify-content: flex-start;">
                     
-                    <li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_99" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
+                    <!-- <li class="nav-item mega-menu ng-scope" rootcss="hbm_menu" id="HBM_MENU_99" ng-show="root.ChiTiet.length &gt; 0" ng-repeat="root in NavigatorModel.Data">
                         <a href="javascript:void(0)" class="nav-link" data-path="/SA">
                             <i class="bi bi-bell-fill"  ></i>
                             <span class="menu-title" >ADMIN</span>
                             <i class="bi bi-chevron-down"></i>
                         </a>
+                    </li> -->
+
+                    <!-- ✅ Menu mới: Lỗi phản hồi -->
+                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }">
+                        <a class="nav-link" routerLink="/thongbao">
+                            <i class="bi bi-bell-fill"></i>
+                            <span class="menu-title">Thông báo</span>
+                        </a>
                     </li>
+
+                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }">
+                        <a class="nav-link" routerLink="/error-user-report">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span class="menu-title">Lỗi phản hồi</span>
+                        </a>
+                    </li>
+
+
 
                 </ul>
             </div>

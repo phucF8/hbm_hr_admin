@@ -1,0 +1,67 @@
+src/
+├── app/
+│   ├── app.module.ts
+│   ├── app.component.ts
+│   ├── comp-tong/
+│   │   ├── comp-tong.component.ts
+│   │   └── comp-tong.component.html
+│   └── demo/
+│       ├── demo.module.ts         <-- NEW
+│       ├── comp1/
+│       │   ├── comp1.component.ts
+│       │   └── comp1.component.html
+│       ├── comp2/
+│       │   ├── comp2.component.ts
+│       │   └── comp2.component.html
+│       └── comp-state.service.ts
+
+Trong angular 2+, 
+Lệnh tạo module tên là 'demo' (angular sẽ tự thêm thư mục tên là 'demo' nếu chưa có): 
+	ng generate module demo
+
+Lệnh tạo component tên là 'CompA' trong module trên
+	ng generate component demo/comp-a
+	
+Lệnh tạo routing cho module trên (có routing mới browser được), hãy duyệt http://localhost:4200/demo/comp-a 
+	ng generate module demo --routing
+	src/
+	└── app/
+		├── app.module.ts
+		├── app.component.ts
+		└── demo/
+			├── demo.module.ts
+			├── demo-routing.module.ts
+			└── comp-a	//thư mục đại diện cho component A
+
+chú ý: trong app.module.ts hãy bỏ dòng {provide: LocationStrategy, useClass: HashLocationStrategy}
+
+
+Điều hướng tới trang 404 khi url sai:
+{ path: '**', component: NotFoundComponent }
+
+
+trong module demo, điều hướng
+this.router.navigate(['demo/comp-a']);
+this.router.navigate(['demo/comp-b']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AutoSave
+>Preferences: Open Settings (JSON) → Enter
+"workbench.tree.indent": 20
+
+trên Input của CompA nhập Giá Trị Test A
+rồi sang CompB nhập giá trị Test B
+rồi lại nhấn nút quay lại CompA, nhưng giá trị Test A không còn

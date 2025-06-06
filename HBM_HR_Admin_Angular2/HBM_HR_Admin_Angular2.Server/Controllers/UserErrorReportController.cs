@@ -33,7 +33,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 ResponseJson = dto.ResponseJson,
                 VersionApp = dto.VersionApp,
                 Device = dto.Device,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                Notes = dto.Notes,
             };
             _context.DbUserErrorReport.Add(log);
             await _context.SaveChangesAsync();
