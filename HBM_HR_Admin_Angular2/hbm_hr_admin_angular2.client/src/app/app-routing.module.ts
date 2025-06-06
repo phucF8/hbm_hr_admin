@@ -4,12 +4,15 @@ import { LoginComponent } from './components/login/login.component';
 import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
 import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.component';
 import { AuthGuard } from './guards/auth.guard';
-import { ErrorUserReportComponent } from './components/error-user-report/error-user-report.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
   {
     path: 'demo', loadChildren: () => import('./demo/demo.module').then(m => m.DemoModule)
+  },
+
+  {
+    path: 'error-report', loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
   },
 
   { path: 'login', component: LoginComponent },
@@ -18,7 +21,6 @@ const routes: Routes = [
   { path: 'thong-bao/tbchitiet', component: TbchitietComponent },
   { path: 'thong-bao/tbchitiet/:id', component: TbchitietComponent },
 
-  { path: 'error-user-report', component: ErrorUserReportComponent }, // 👈 chuyển lên trên
 
   { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
   

@@ -27,8 +27,8 @@ import { SearchUserFormComponent } from './uicomponents/search-user-form/search-
 import { QuillModule } from 'ngx-quill';
 import { AuthInterceptor } from './guards/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ErrorUserReportComponent } from './components/error-user-report/error-user-report.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { ErrorUserReportComponent } from './error-report/error-user-report/error-user-report.component';
 
 @NgModule({
   declarations: [
