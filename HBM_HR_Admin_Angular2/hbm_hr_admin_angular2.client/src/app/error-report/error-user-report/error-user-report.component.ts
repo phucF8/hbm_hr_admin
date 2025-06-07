@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { Item } from '@app/responses/thongbao_rp';
 import { ErrorReportService } from '../services/error-report.service';
+import { ErrUserReportItem } from '../response/err_user_report_rp';
 
 @Component({
   selector: 'app-error-user-report',
@@ -10,18 +10,28 @@ import { ErrorReportService } from '../services/error-report.service';
 })
 export class ErrorUserReportComponent {
 
-  thongBaoList: Item[] = [];
-  openedMenuId: string | null = null;
+  listItem: ErrUserReportItem[] = [];
+  openedMenuId: number | null = null;
   showThongBaoPopup: boolean = false;
-  notificationId: string = '';
-
-
-
+  notificationId: number = 0;
+  selectAll: boolean = false;
 
   constructor(
     private errReportService: ErrorReportService,
   ) {}
 
+  ngOnInit(): void {
+    this.loadList();
+  }
+
+  toggleSelectAll() {
+    this.listItem.forEach(tb => {
+      if (tb.status !== 0) {
+        tb.selected = this.selectAll;
+      }
+    });
+
+  }
 
   loadList() {
       // this.loadingService.show();
@@ -29,7 +39,8 @@ export class ErrorUserReportComponent {
         
       ).subscribe({
         next: (data) => {
-          this.thongBaoList = data.items;
+          this.listItem = data;
+          console.log('Loaded notifications:', this.listItem.length);
           // this.loadingService.hide();
         },
         error: (error) => {
@@ -50,31 +61,30 @@ toggleMenu(tb: any) {
     }
   }
 
-  viewThongBao(id: string) {
-    document.body.classList.add('no-scroll');
+  view(id: number) {
     this.showThongBaoPopup = true;
     this.notificationId = id;
   }
 
-  deleteThongBao(id: string): void {
-    if (confirm(`Bạn có chắc chắn muốn xóa thông báo này?`)) {
+  delete(id: number): void {
+    if (confirm(`Bạn có chắc chắn muốn xóa mục này không?`)) {
       console.log("Deleting notification with ID:", id);
       this.errReportService.delete(id).subscribe({
         next: () => {
           console.log('Successfully deleted notification with ID:', id);
           this.loadList(); // Reload the list
-          alert('Đã xóa thành công thông báo!');
+          alert('Đã xóa thành công');
         },
         error: (error) => {
           console.error('Error deleting notification:', error);
-          alert('Đã xảy ra lỗi khi xóa thông báo!');
+          alert('Đã xảy ra lỗi khi xóa');
         }
       });
     }
   }
 
   deleteSelected() {
-    const selectedNotifications = this.thongBaoList.filter(tb => tb.selected);
+    const selectedNotifications = this.listItem.filter(tb => tb.selected);
     if (selectedNotifications.length === 0) {
       alert('Vui lòng chọn ít nhất một thông báo để xóa!');
       return;

@@ -1,9 +1,9 @@
-export interface Root {
-  items: Item[]
+export interface ThongBaoRP {
+  items: ThongBaoItem[]
   totalCount: number
 }
 
-export interface Item {
+export interface ThongBaoItem {
   id: string
   title: string
   content: string

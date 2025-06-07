@@ -21,7 +21,7 @@ import { finalize } from 'rxjs/operators';
 import { DonVi } from '@app/models/donvi';
 import { TimkiemComponent } from '@app/uicomponents/timkiem/timkiem.component';
 import { MergedData } from '@app/models/thong-bao.model';
-import { DanhSachNguoiNhan, Item } from '@app/responses/thongbao_rp';
+import { DanhSachNguoiNhan, ThongBaoItem } from '@app/responses/thongbao_rp';
 
 
 
@@ -36,7 +36,7 @@ export class ThongBaoComponent implements OnInit {
   @Input() currentPage: number = 1;
   @Output() pageChange = new EventEmitter<number>();
 
-  thongBaoList: Item[] = [];
+  thongBaoList: ThongBaoItem[] = [];
   selectAll: boolean = false;
   searchText: string = '';
   pageIndex: number = 1;

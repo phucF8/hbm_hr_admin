@@ -49,8 +49,8 @@ this.router.navigate(['demo/comp-a']);
 this.router.navigate(['demo/comp-b']);
 
 
-
-
+Lệnh tạo service: 
+	ng generate service demo/services/shared-data
 
 
 FORM:
@@ -60,11 +60,19 @@ formGroup
 
 
 
+tôi dùng ErrUserReportRP
 
 
 
-Lệnh tạo service: 
-	ng generate service demo/services/shared-data
+
+
+
+
+
+
+
+
+
 
 
 
@@ -77,6 +85,12 @@ AutoSave
 trên Input của CompA nhập Giá Trị Test A
 rồi sang CompB nhập giá trị Test B
 rồi lại nhấn nút quay lại CompA, nhưng giá trị Test A không còn
+
+
+
+
+Bia thì em ko ưa bon tren
+
 
 
 
@@ -108,6 +122,12 @@ phải thế nọ thế chai
 bắt thế nọ thế chai
 bắt khao nọ khao chai
 như cái thằng kia kìa
+
+Nhân định rằng mình hay mua đồ shopee, thế thì sao cứ bị nhấn
+
+Tại sao lại cứ phải nhăn nhó với nhau 
+và ép nhau lúc estiamte vậy nhỉ
+
 
 
 

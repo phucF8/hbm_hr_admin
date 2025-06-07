@@ -5,7 +5,7 @@ import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao int
 import { environment } from '../../environments/environment'; 
 import { DebugUtils } from '@app/utils/debug-utils';
 import { DoLookupDatasRP } from '@app/models/thong-bao.model'; // Import the DoLookupDatasRP interface
-import { Item, Root } from '@app/responses/thongbao_rp';
+import { ThongBaoItem, ThongBaoRP } from '@app/responses/thongbao_rp';
 
 export interface ThongBaoRecipient {
   notificationId: string;
@@ -76,7 +76,7 @@ export class ThongBaoService {
     isPlatform?: string | null, // null: tất cả, MB: mobile, WEB: web
     ngTaoIds?: string[], // ← thêm vào đây
     ngNhanIds?: string[],
-  ): Observable<Root> {
+  ): Observable<ThongBaoRP> {
     let params = new HttpParams()
     if (pageIndex){
       console.log('Page Index:', pageIndex);
@@ -112,7 +112,7 @@ export class ThongBaoService {
     
     // DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
 
-    return this.http.get<Root>(this.apiUrl, { params }).pipe(
+    return this.http.get<ThongBaoRP>(this.apiUrl, { params }).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
         throw error;
@@ -120,10 +120,10 @@ export class ThongBaoService {
     );
   }
   
-  getThongBaoByID(notificationID: string): Observable<Item> {
+  getThongBaoByID(notificationID: string): Observable<ThongBaoItem> {
     const url = `${this.apiUrl}/${notificationID}`;
     // DebugUtils.openStringInNewWindow(`${url}`);
-    return this.http.get<Item>(url).pipe(
+    return this.http.get<ThongBaoItem>(url).pipe(
       catchError(error => {
         DebugUtils.openStringInNewWindow(`${error.message}`);
         throw error;

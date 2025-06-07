@@ -29,12 +29,12 @@
         <div class="search-container">
 
 
-          
+
 
         </div>
       </div>
 
-      
+
 
       <!-- hộp thoại tạo thông báo mới hoặc xem chi tiết thông báo
       <div class="overlay" *ngIf="showThongBaoPopup">
@@ -52,55 +52,54 @@
         <thead>
           <tr>
             <th style="width: 2%;">
-              <!-- <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()"> -->
+              <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
             </th>
-            <th style="width: 2%;">#</th>
-            <th style="width: 10%;">Tiêu đề</th>
-            <th style="width: 20%;">Nội dung thông báo</th>
-            <th style="width: 10%;">Hành động</th>
-            <th style="width: 10%;">Người gửi</th>
-            <th style="width: 10%;">Ngày tạo</th>
-            <th style="width: 10%;">Hoàn thành</th>
-            <th style="width: 10%;">Loại</th>
-            <th style="width: 10%;">Nhóm</th>
-            <th style="width: 10%;">Nền tảng</th>
+            <th style="width: 2%;white-space: nowrap;text-align: center;">#</th>
+            <th style="width: 5%;white-space: nowrap;text-align: center;">username</th>
+            <th style="width: 5%;white-space: nowrap;text-align: center;">Tên nhân sự</th>
+            <th style="width: 10%;white-space: nowrap;text-align: center;">API</th>
+            <th style="white-space: nowrap;text-align: center;">Request & Response</th>
+            <th style="width: 5%;white-space: nowrap;text-align: center;">version</th>
+            <th style="width: 5%; white-space: nowrap;text-align: center;">Thiết bị</th>
             <th style="width: 5%;"></th>
           </tr>
 
         </thead>
         <tbody>
-          <tr *ngFor="let tb of thongBaoList" [ngClass]="{'table-success': tb.status == 1}"
-            (click)="viewThongBao(tb.id)">
+          <tr *ngFor="let tb of listItem" [ngClass]="{'table-success': tb.status == 0}" (click)="view(tb.id)">
             <td>
-              <input type="checkbox" [(ngModel)]="tb.selected" [disabled]="tb.status === 1">
+              {{tb.status}}
+              <input type="checkbox" [(ngModel)]="tb.selected" [disabled]="tb.status == 0">{{tb.status == 0 ? ' (Đã xử lý)' : ''}}
+            </td>
+            <td style="white-space: nowrap;">
+              {{ tb.createdAt | date:'dd/MM/yyyy HH:mm' }}
             </td>
             <td>
-              <!-- {{ (currentPage - 1) * ITEMS_PER_PAGE + (thongBaoList.indexOf(tb) + 1) }} -->
+              {{ tb.username }}
             </td>
-            <td>
-              {{ tb.title }}
+            <td style="text-align: justify; white-space: nowrap;">{{ tb.tenNhanVien }}</td>
+            <td style="text-align: left;">{{ tb.apiUrl }}</td>
+            <td style="text-align: left;">
+              <div style="max-height: 100px; overflow: hidden; text-overflow: ellipsis;">
+                {{tb.requestJson}} <br>---<br> {{tb.responseJson}}
+              </div>
             </td>
-            <td style="text-align: justify;">{{ tb.content }}</td>
-            <td style="text-align: center;"></td>
-            <td>{{ tb.tenNguoiTao }}</td>
-            <td>{{ tb.ngayTao | date:'dd/MM/yyyy HH:mm' }}</td>
-            <td></td>
-            <td></td>
-            <td>{{ tb.loaiThongBao}}</td>
-            <td>{{ tb.platform}}</td>
+
+            <td style="text-align: center;">{{tb.versionApp}}</td>
+            <td style="text-align: center;">{{ tb.device === 'a' ? 'Android' : tb.device === 'i' ? 'iPhone' : tb.device}}</td>
             <td>
 
-              <div *ngIf="tb.status !== 1" class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">
+              <div class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">
                 <div class="dropdown-button">
                   <div class="arrow-down"></div>
                 </div>
                 <div class="popup-menu" *ngIf="openedMenuId === tb.id">
-                  <div class="menu-item view" *ngIf="tb.status === 1" (click)="viewThongBao(tb.id)">
+                  <div class="menu-item view" (click)="view(tb.id)">
                     <i class="bi bi-eye"></i>
                     <div class="menu-text">Xem</div>
                   </div>
-                  
-                  <div class="menu-item delete" *ngIf="tb.status !== 1" (click)="deleteThongBao(tb.id)">
+
+                  <div class="menu-item delete" (click)="delete(tb.id)">
                     <i class="bi bi-trash"></i>
                     <div class="menu-text">Xóa</div>
                   </div>
