@@ -12,7 +12,7 @@ export class ErrorUserReportComponent {
 
   listItem: ErrUserReportItem[] = [];
   openedMenuId: number | null = null;
-  showThongBaoPopup: boolean = false;
+  showPopup: boolean = false;
   notificationId: number = 0;
   selectAll: boolean = false;
 
@@ -62,7 +62,7 @@ toggleMenu(tb: any) {
   }
 
   view(id: number) {
-    this.showThongBaoPopup = true;
+    this.showPopup = true;
     this.notificationId = id;
   }
 

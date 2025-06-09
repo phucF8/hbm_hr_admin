@@ -36,14 +36,14 @@
 
 
 
-      <!-- hộp thoại tạo thông báo mới hoặc xem chi tiết thông báo
-      <div class="overlay" *ngIf="showThongBaoPopup">
+      <!-- hộp thoại tạo thông báo mới hoặc xem chi tiết thông báo -->
+      <div class="overlay" *ngIf="showPopup">
         <div class="overlay-content" style="background-color: transparent; padding: 0;width: 60%">
           <chitiet-thong-bao [notificationId]="notificationId" (closePopupEvent)="handleClosePopup($event)"
             (createEvent)="handleCreate($event)">
           </chitiet-thong-bao>
         </div>
-      </div> -->
+      </div>
 
 
 

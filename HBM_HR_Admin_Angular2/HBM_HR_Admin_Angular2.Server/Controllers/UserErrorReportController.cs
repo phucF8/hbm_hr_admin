@@ -48,6 +48,32 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(reports);
         }
 
+        [HttpGet("err_report/{id}")]
+        public IActionResult GetReportDetail(int id)
+        {
+            var report = _context.DbUserErrorReport
+                .Where(r => r.Id == id)
+                .Select(r => new
+                {
+                    r.Id,
+                    r.Username,
+                    r.TenNhanVien,
+                    r.ApiUrl,
+                    r.RequestJson,
+                    r.ResponseJson,
+                    r.VersionApp,
+                    r.Device,
+                    r.CreatedAt,
+                    r.Notes
+                })
+                .FirstOrDefault();
+            if (report == null)
+                return NotFound(new { status = "FAIL", message = "Không tìm thấy báo lỗi với Id này."});
+            return Ok(new { status = "SUCCESS", message = "",report});
+        }
+
+
+
     }
 
 }
