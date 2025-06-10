@@ -4,6 +4,7 @@ import { Observable, catchError } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { environment } from '../../../environments/environment'; 
 import { ErrorUserReportRP, ErrUserReportItem } from '../response/err_user_report_rp';
+import { ErrorUserReportDetailRP } from '../response/err_user_report_detail_rp';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,18 @@ export class ErrorReportService {
       params = params.set('pageIndex', pageIndex);
     } 
     return this.http.get<ErrorUserReportRP>(this.apiUrl, { params }).pipe(
+      catchError(error => {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      })
+    );
+  }
+
+  getDetail(
+    id?: number
+  ): Observable<ErrorUserReportDetailRP> {
+    let params = new HttpParams()
+    return this.http.get<ErrorUserReportDetailRP>(`${this.apiUrl}/err_report/${id}`).pipe(
       catchError(error => {
         console.error('Error fetching notifications:', error);
         throw error;

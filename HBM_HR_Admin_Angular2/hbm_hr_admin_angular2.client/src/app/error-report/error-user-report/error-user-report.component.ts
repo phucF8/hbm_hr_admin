@@ -1,6 +1,8 @@
+import { MatDialog } from '@angular/material/dialog';
 import { Component } from '@angular/core';
 import { ErrorReportService } from '../services/error-report.service';
 import { ErrUserReportItem } from '../response/err_user_report_rp';
+import { ErrUserReportDetailPopupComponent } from '../error-report-detail/error-report-detail.component';
 
 @Component({
   selector: 'app-error-user-report',
@@ -18,7 +20,8 @@ export class ErrorUserReportComponent {
 
   constructor(
     private errReportService: ErrorReportService,
-  ) {}
+    private dialog: MatDialog,
+  ) { }
 
   ngOnInit(): void {
     this.loadList();
@@ -34,24 +37,22 @@ export class ErrorUserReportComponent {
   }
 
   loadList() {
-      // this.loadingService.show();
-      this.errReportService.getList(
-        
-      ).subscribe({
-        next: (data) => {
-          this.listItem = data;
-          console.log('Loaded notifications:', this.listItem.length);
-          // this.loadingService.hide();
-        },
-        error: (error) => {
-          console.error('Error loading notifications:', error);
-          // this.loadingService.hide();
-        }
-      });
-    }
+    // this.loadingService.show();
+    this.errReportService.getList(
+    ).subscribe({
+      next: (data) => {
+        this.listItem = data;
+        console.log('Loaded notifications:', this.listItem.length);
+        // this.loadingService.hide();
+      },
+      error: (error) => {
+        console.error('Error loading notifications:', error);
+        // this.loadingService.hide();
+      }
+    });
+  }
 
-
-toggleMenu(tb: any) {
+  toggleMenu(tb: any) {
     if (this.openedMenuId === tb.id) {
       // Nếu menu này đang mở -> đóng lại
       this.openedMenuId = null;
@@ -62,8 +63,29 @@ toggleMenu(tb: any) {
   }
 
   view(id: number) {
-    this.showPopup = true;
-    this.notificationId = id;
+    this.errReportService.getDetail(id).subscribe({
+      next: (report) => {
+        console.log('Loaded report detail:', report);
+        this.dialog.open(ErrUserReportDetailPopupComponent, {
+        data: report.report,
+        disableClose: true,
+        panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
+        width: '50vw',
+        height: '90vh',
+        maxWidth: '100vw'
+      })
+    .afterClosed().subscribe(result => {
+          console.log('Dialog closed with result:', result);
+          if (result) {
+            console.log('Dialog result:', result);
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading report detail:', error);
+        alert('Đã xảy ra lỗi khi tải chi tiết báo cáo');
+      }
+    });
   }
 
   delete(id: number): void {
@@ -97,7 +119,7 @@ toggleMenu(tb: any) {
       Promise.all(deletePromises)
         .then(() => {
           console.log('Successfully deleted selected notifications');
-          
+
           this.loadList(); // Reload the list
           alert('Đã xóa thành công các thông báo đã chọn!');
         })

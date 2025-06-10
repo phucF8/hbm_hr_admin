@@ -392,3 +392,39 @@ th {
 .toast-error {
   color: red;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Xóa bo góc và padding mặc định của dialog */
+.err-report-detail-dialog .mat-mdc-dialog-surface {
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background-color: transparent !important; /* Nếu muốn nền trong suốt */
+  box-shadow: none !important; /* Nếu muốn loại bỏ đổ bóng */
+}
+
+

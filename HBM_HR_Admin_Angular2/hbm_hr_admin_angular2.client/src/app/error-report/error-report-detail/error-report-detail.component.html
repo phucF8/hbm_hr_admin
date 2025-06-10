@@ -1,0 +1,97 @@
+<div class="container_popup">
+
+
+  <div class="header">CHI TIẾT BÁO LỖI</div>
+
+
+  <div class="section">
+
+    <div class="section-title">THÔNG TIN NGƯỜI DÙNG</div>
+
+    <div class="info-row">
+      <div class="info-label">› Username</div>
+      <div class="info-value">{{ data.username }}</div>
+      <button mat-icon-button (click)="copy(data.username)" matTooltip="Copy" style="margin-left: 16px;">
+          <i class="bi bi-clipboard"></i> <!-- Icon copy -->
+        </button>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">› Tên nhân viên</div>
+      <div class="info-value">{{ data.tenNhanVien }}</div>
+      <button mat-icon-button (click)="copy(data.tenNhanVien)" matTooltip="Copy" style="margin-left: 16px;">
+          <i class="bi bi-clipboard"></i> <!-- Icon copy -->
+        </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">THÔNG TIN API</div>
+
+    <div class="info-row">
+      <div class="info-value">{{ data.apiUrl }}</div>
+      <button mat-icon-button (click)="copy(data.apiUrl)" matTooltip="Copy" style="margin-left: 16px;">
+          <i class="bi bi-clipboard"></i> <!-- Icon copy -->
+        </button>
+    </div>
+
+    <div style="margin-top: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <label style="font-weight: bold;">Request</label>
+        <button mat-icon-button (click)="copyJson(data.requestJson)" matTooltip="Copy JSON">
+          <i class="bi bi-clipboard"></i> <!-- Icon copy -->
+        </button>
+
+      </div>
+
+      <div class="json-viewer-container">
+        <pre [innerHTML]="formattedHtmlRequestJSON" class="json-viewer-content"></pre>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <label style="font-weight: bold;">Response</label>
+          <button mat-icon-button (click)="copyJson(data.responseJson)" matTooltip="Copy JSON">
+            <i class="bi bi-clipboard"></i> <!-- Icon copy -->
+          </button>
+
+        </div>
+
+        <div class="json-viewer-container">
+          <pre [innerHTML]="formattedHtmlResponseJSON" class="json-viewer-content"></pre>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="section">
+      <div class="section-title">THÔNG TIN THIẾT BỊ</div>
+
+      <div class="info-row">
+        <div class="info-label">› Phiên bản app</div>
+        <div class="info-value">{{ data.versionApp }}</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">› Thiết bị</div>
+        <div class="info-value">{{ data.device }}</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">› Ngày báo lỗi</div>
+        <div class="info-value">{{ data.createdAt | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+
+      <div class="info-row" *ngIf="data.notes">
+        <div class="info-label">› Ghi chú</div>
+        <div class="info-value">{{ data.notes }}</div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button type="button" class="btn btn-cancel" mat-dialog-close (click)="closePopup()">
+        Đóng
+      </button>
+    </div>
+  </div>
