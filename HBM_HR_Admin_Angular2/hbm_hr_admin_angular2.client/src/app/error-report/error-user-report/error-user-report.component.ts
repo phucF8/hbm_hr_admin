@@ -105,6 +105,10 @@ export class ErrorUserReportComponent {
     }
   }
 
+  hasSelected(): boolean {
+    return this.listItem.some(tb => tb.selected);
+  }
+
   deleteSelected() {
     const selectedNotifications = this.listItem.filter(tb => tb.selected);
     if (selectedNotifications.length === 0) {

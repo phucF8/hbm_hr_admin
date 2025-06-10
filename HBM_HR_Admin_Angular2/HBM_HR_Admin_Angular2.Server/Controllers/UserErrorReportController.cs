@@ -89,7 +89,18 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(new { status = "SUCCESS", message = "Đã xóa báo lỗi thành công." });
         }
 
-
+        [HttpPost("del/{ids}")]
+        public IActionResult DeleteReports(int id)
+        {
+            var report = _context.DbUserErrorReport.FirstOrDefault(r => r.Id == id);
+            if (report == null)
+            {
+                return NotFound(new { status = "FAIL", message = "Không tìm thấy báo lỗi với Id này." });
+            }
+            _context.DbUserErrorReport.Remove(report);
+            _context.SaveChanges();
+            return Ok(new { status = "SUCCESS", message = "Đã xóa báo lỗi thành công." });
+        }
 
 
     }

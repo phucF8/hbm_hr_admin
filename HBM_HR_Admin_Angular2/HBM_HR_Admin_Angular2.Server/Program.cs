@@ -17,8 +17,8 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowAngular",
     policy => policy
-    //.AllowAnyOrigin()
-    .WithOrigins("http://admin.hbm.vn:8099")
+    .AllowAnyOrigin()
+    //.WithOrigins("http://admin.hbm.vn:8099")
     .AllowAnyMethod()
     .AllowAnyHeader());
 });

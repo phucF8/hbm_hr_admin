@@ -10,7 +10,27 @@
 
 
 
+ <div class="search-container">
 
+    <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
+
+      <div>
+        <div style="display: flex;gap: 10px; margin-bottom: 16px;">
+        </div>
+        <div style="display: flex; gap: 8px; width: 100%;">
+        </div>
+      </div>
+
+      <div class="buttons-container">
+        <div class="right-buttons">
+          <button *ngIf="hasSelected()" class="btn" (click)="deleteSelected()">
+            <i class="bi bi-trash"></i> Xóa những mục đã chọn
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 
 
