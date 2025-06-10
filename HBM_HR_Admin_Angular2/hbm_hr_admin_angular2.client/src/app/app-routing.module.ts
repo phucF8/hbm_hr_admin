@@ -24,7 +24,7 @@ const routes: Routes = [
 
   { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
   
-   { path: '**', component: NotFoundComponent }  // 👈 Thay vì redirect
+  { path: '**', component: NotFoundComponent }  // 👈 Thay vì redirect
   
 ];
 

@@ -44,7 +44,7 @@ export class ErrorReportService {
   
   delete(id: number): Observable<void> {
     console.log('Deleting notification:', id);
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.get<void>(`${this.apiUrl}/del/${id}`).pipe(
       catchError(error => {
         console.error('Error deleting notification:', error);
         throw error;

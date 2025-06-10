@@ -69,7 +69,9 @@
           <tr *ngFor="let tb of listItem" [ngClass]="{'table-success': tb.status == 0}" (click)="view(tb.id)">
             <td>
               {{tb.status}}
-              <input type="checkbox" [(ngModel)]="tb.selected" [disabled]="tb.status == 0">{{tb.status == 0 ? ' (Đã xử lý)' : ''}}
+              <input type="checkbox" (click)="$event.stopPropagation()" 
+              [(ngModel)]="tb.selected" [disabled]="tb.status == 0">
+              {{tb.status == 0 ? ' (Đã xử lý)' : ''}}
             </td>
             <td style="white-space: nowrap;">
               {{ tb.createdAt | date:'dd/MM/yyyy HH:mm' }}

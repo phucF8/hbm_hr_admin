@@ -19,6 +19,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             _context = context;
         }
 
+        //mobile gửi 1 báo lỗi
         [HttpPost("err_report")]
         public async Task<IActionResult> ErrReport([FromBody] UserErrorReportDto dto)
         {
@@ -41,6 +42,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(new {status = "SUCCESS", message = "Gửi báo lỗi thành công", logId = log.Id });
         }
 
+        //trả về danh sách các báo lỗi - có phân trang
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserErrorReport>>> GetAllReports()
         {
@@ -48,6 +50,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(reports);
         }
 
+        //trả về chi tiết 1 báo lỗi
         [HttpGet("err_report/{id}")]
         public IActionResult GetReportDetail(int id)
         {
@@ -71,6 +74,21 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return NotFound(new { status = "FAIL", message = "Không tìm thấy báo lỗi với Id này."});
             return Ok(new { status = "SUCCESS", message = "",report});
         }
+
+        // Xóa 1 báo lỗi
+        [HttpGet("del/{id}")]
+        public IActionResult DeleteReport(int id)
+        {
+            var report = _context.DbUserErrorReport.FirstOrDefault(r => r.Id == id);
+            if (report == null)
+            {
+                return NotFound(new { status = "FAIL", message = "Không tìm thấy báo lỗi với Id này." });
+            }
+            _context.DbUserErrorReport.Remove(report);
+            _context.SaveChanges();
+            return Ok(new { status = "SUCCESS", message = "Đã xóa báo lỗi thành công." });
+        }
+
 
 
 

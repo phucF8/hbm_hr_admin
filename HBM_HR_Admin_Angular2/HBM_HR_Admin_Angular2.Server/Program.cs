@@ -16,9 +16,11 @@ builder.Services.AddCors(options =>
 {
 
     options.AddPolicy("AllowAngular",
-    policy => policy.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
+    policy => policy
+    //.AllowAnyOrigin()
+    .WithOrigins("http://admin.hbm.vn:8099")
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -61,6 +63,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddSingleton<JwtTokenGenerator>();
 var app = builder.Build();
 
+// Áp dụng CORS
+app.UseCors("AllowAngular");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -76,8 +81,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-// Áp dụng CORS
-app.UseCors("AllowAngular");
+
 
 app.UseAuthorization();
 
