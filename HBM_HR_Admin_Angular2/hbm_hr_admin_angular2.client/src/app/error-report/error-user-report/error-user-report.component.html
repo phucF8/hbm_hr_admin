@@ -10,7 +10,7 @@
 
 
 
- <div class="search-container">
+  <div class="search-container">
 
     <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
 
@@ -86,12 +86,10 @@
 
         </thead>
         <tbody>
-          <tr *ngFor="let tb of listItem" [ngClass]="{'table-success': tb.status == 0}" (click)="view(tb.id)">
+          <tr *ngFor="let tb of listItem" [ngClass]="{'bao-loi-chua-xem': tb.status == 0,'bao-loi-da-xem': tb.status != 0}" (click)="view(tb.id)">
+
             <td>
-              {{tb.status}}
-              <input type="checkbox" (click)="$event.stopPropagation()" 
-              [(ngModel)]="tb.selected" [disabled]="tb.status == 0">
-              {{tb.status == 0 ? ' (Đã xử lý)' : ''}}
+              <input type="checkbox" (click)="$event.stopPropagation()" [(ngModel)]="tb.selected">
             </td>
             <td style="white-space: nowrap;">
               {{ tb.createdAt | date:'dd/MM/yyyy HH:mm' }}
@@ -108,14 +106,16 @@
             </td>
 
             <td style="text-align: center;">{{tb.versionApp}}</td>
-            <td style="text-align: center;">{{ tb.device === 'a' ? 'Android' : tb.device === 'i' ? 'iPhone' : tb.device}}</td>
+            <td style="text-align: center;">{{ tb.device === 'a' ? 'Android' : tb.device === 'i' ? 'iPhone' :
+              tb.device}}</td>
             <td>
 
-              <div class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">
+              <div class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()" >
                 <div class="dropdown-button">
                   <div class="arrow-down"></div>
                 </div>
                 <div class="popup-menu" *ngIf="openedMenuId === tb.id">
+
                   <div class="menu-item view" (click)="view(tb.id)">
                     <i class="bi bi-eye"></i>
                     <div class="menu-text">Xem</div>

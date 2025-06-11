@@ -15,6 +15,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models
         public string Device { get; set; }                   // Thiết bị: Android, iPhone, Web...
         public DateTime CreatedAt { get; set; } = DateTime.Now; // Thời điểm ghi nhận lỗi
         public string Notes { get; set; }                       //Ghi chú
+        public bool Status { get; set; }
     }
 
     public class UserErrorReportDto

@@ -1,8 +1,8 @@
 import { MatDialog } from '@angular/material/dialog';
-import { Component } from '@angular/core';
-import { ErrorReportService } from '../services/error-report.service';
+import { Component, HostListener } from '@angular/core';
 import { ErrUserReportItem } from '../response/err_user_report_rp';
 import { ErrUserReportDetailPopupComponent } from '../error-report-detail/error-report-detail.component';
+import { ErrorReportService } from '../services/error-report.service';
 
 @Component({
   selector: 'app-error-user-report',
@@ -10,6 +10,7 @@ import { ErrUserReportDetailPopupComponent } from '../error-report-detail/error-
   templateUrl: './error-user-report.component.html',
   styleUrl: './error-user-report.component.css'
 })
+
 export class ErrorUserReportComponent {
 
   listItem: ErrUserReportItem[] = [];
@@ -22,6 +23,14 @@ export class ErrorUserReportComponent {
     private errReportService: ErrorReportService,
     private dialog: MatDialog,
   ) { }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const clickedInside = (event.target as HTMLElement).closest('.dropdown-wrapper');
+    if (!clickedInside) {
+      this.openedMenuId = null;
+    }
+  }
 
   ngOnInit(): void {
     this.loadList();
@@ -60,6 +69,10 @@ export class ErrorUserReportComponent {
       // Đóng tất cả và mở menu mới
       this.openedMenuId = tb.id;
     }
+  }
+
+  closeMenu() {
+    this.openedMenuId = null;
   }
 
   view(id: number) {

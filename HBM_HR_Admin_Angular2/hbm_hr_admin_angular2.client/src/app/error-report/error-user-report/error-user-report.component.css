@@ -29,6 +29,7 @@
 
 .popup-menu {
     position: absolute;
+    right: 0; /* 👈 Căn phải */
     width: 150px;
     background-color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -85,4 +86,16 @@
   /* Checkbox nhỏ hơn một chút */
   .my-table th input[type="checkbox"] {
     transform: scale(1.2);
+  }
+
+  .bao-loi-chua-xem{
+    background-color: #EEE; /* Màu nền đỏ nhạt */
+    color: #000; /* Màu chữ đỏ đậm */
+    font-weight: bold;
+  }
+
+  .bao-loi-da-xem{
+    background-color: #FFF; /* Màu nền xanh nhạt */
+    color: #666; /* Màu chữ xanh đậm */
+    
   }

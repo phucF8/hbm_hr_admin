@@ -1,17 +1,13 @@
-import { Component, EventEmitter, OnInit, Input, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, OnInit, Input, Output, HostListener } from '@angular/core';
 import { ThongBaoService } from '../../services/thong-bao.service';
 import { Router } from '@angular/router';
-import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 import { LoadingService } from '@app/services/loading.service';
-import { NOTIFICATION_TYPES, NotificationType } from '../../constants/notification-types';
+import { NOTIFICATION_TYPES } from '../../constants/notification-types';
 import { ITEMS_PER_PAGE } from '../../constants/pagination.constants';
 import { MatDialog } from '@angular/material/dialog';
-import { ThongBao } from '../../models/thong-bao.model'; // Import the ThongBao interface
 import { ToastrService } from 'ngx-toastr';
-import { DebugUtils } from '@app/utils/debug-utils';
 import { XuatFileComponent } from '../xuat-file/xuat-file.component';
-import * as FileSaver from 'file-saver';
 import { Observable, forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { exportToExcel } from '@app/utils/excel-export.util'; // Import your utility function for exporting to Excel
@@ -19,7 +15,6 @@ import { exportToExcel } from '@app/utils/excel-export.util'; // Import your uti
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { DonVi } from '@app/models/donvi';
-import { TimkiemComponent } from '@app/uicomponents/timkiem/timkiem.component';
 import { MergedData } from '@app/models/thong-bao.model';
 import { DanhSachNguoiNhan, ThongBaoItem } from '@app/responses/thongbao_rp';
 
