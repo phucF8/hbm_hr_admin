@@ -24,3 +24,7 @@ obj/
 *.lock
 
 
+FileListAbsolute.txt
+HBM_HR_Admin_Angular2/HBM_HR_Admin_Angular2.Server/appsettings/serviceAccountKey.json
+
+
