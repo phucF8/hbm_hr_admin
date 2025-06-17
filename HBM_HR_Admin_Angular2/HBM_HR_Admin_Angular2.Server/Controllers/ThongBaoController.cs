@@ -73,7 +73,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ThongBaoDto>> GetThongBaoChiTiet(
             string id,
-            [FromQuery] string idNhanvien
+            [FromQuery] string? idNhanvien
         )
         {
             if (string.IsNullOrWhiteSpace(id))
