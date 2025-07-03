@@ -15,8 +15,6 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             _service = service;
         }
 
-
-
         [HttpPost("create")]
         public async Task<IActionResult> CreateTopic([FromBody] CreateTopicDto dto)
         {
@@ -29,6 +27,16 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         {
             var result = await _service.GetPagedTopicsAsync(page, pageSize);
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTopic(string id)
+        {
+            var success = await _service.DeleteTopicAsync(id);
+            if (!success)
+                return NotFound(new { message = "Topic not found" });
+
+            return Ok(new { message = "Deleted successfully" });
         }
 
 

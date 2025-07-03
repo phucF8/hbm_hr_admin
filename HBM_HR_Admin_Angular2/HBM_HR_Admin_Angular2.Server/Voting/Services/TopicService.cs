@@ -36,6 +36,12 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services
             return await _repository.GetPagedAsync(page, pageSize);
         }
 
+        public async Task<bool> DeleteTopicAsync(string id)
+        {
+            return await _repository.DeleteAsync(id);
+        }
+
+
 
     }
 

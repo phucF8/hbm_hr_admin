@@ -49,6 +49,15 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
             };
         }
 
+        public async Task<bool> DeleteAsync(string id)
+        {
+            var topic = await _context.Topics.FindAsync(id);
+            if (topic == null)
+                return false;
+            _context.Topics.Remove(topic);
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
 
     }
