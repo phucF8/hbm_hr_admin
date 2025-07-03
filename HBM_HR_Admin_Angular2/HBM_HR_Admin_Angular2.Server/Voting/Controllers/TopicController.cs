@@ -23,6 +23,15 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             var topic = await _service.CreateAsync(dto);
             return Ok(topic);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPagedTopics([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _service.GetPagedTopicsAsync(page, pageSize);
+            return Ok(result);
+        }
+
+
     }
 
 

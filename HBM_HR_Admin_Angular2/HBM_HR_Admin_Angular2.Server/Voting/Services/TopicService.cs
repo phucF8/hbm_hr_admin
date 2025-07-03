@@ -2,6 +2,7 @@
 using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBM_HR_Admin_Angular2.Server.Voting.Services
 {
@@ -29,6 +30,13 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services
 
             return await _repository.AddAsync(topic);
         }
+
+        public async Task<PagedResultDto<TopicDto>> GetPagedTopicsAsync(int page, int pageSize)
+        {
+            return await _repository.GetPagedAsync(page, pageSize);
+        }
+
+
     }
 
 
