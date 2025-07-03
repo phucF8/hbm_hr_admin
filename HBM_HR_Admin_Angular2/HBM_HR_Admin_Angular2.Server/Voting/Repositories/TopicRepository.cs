@@ -24,9 +24,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
         public async Task<PagedResultDto<TopicDto>> GetPagedAsync(int page, int pageSize)
         {
             var query = _context.Topics.OrderByDescending(t => t.CreatedAt);
-
             var totalItems = await query.CountAsync();
-
             var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -39,7 +37,6 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                     EndDate = t.EndDate
                 })
                 .ToListAsync();
-
             return new PagedResultDto<TopicDto>
             {
                 TotalItems = totalItems,

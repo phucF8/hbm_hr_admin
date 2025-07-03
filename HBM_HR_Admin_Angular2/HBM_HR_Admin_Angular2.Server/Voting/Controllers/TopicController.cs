@@ -1,4 +1,6 @@
-﻿using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
+﻿using HBM_HR_Admin_Angular2.Server.Models.Common;
+using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
+using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,14 +21,16 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         public async Task<IActionResult> CreateTopic([FromBody] CreateTopicDto dto)
         {
             var topic = await _service.CreateAsync(dto);
-            return Ok(topic);
+            if (topic == null)
+                return BadRequest(ApiResponse<string>.Error("Tạo chủ đề thất bại"));
+            return Ok(ApiResponse<object>.Success(topic, "Tạo chủ đề thành công"));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetPagedTopics([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _service.GetPagedTopicsAsync(page, pageSize);
-            return Ok(result);
+            return Ok(ApiResponse<object>.Success(result));
         }
 
         [HttpDelete("{id}")]
@@ -34,9 +38,9 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         {
             var success = await _service.DeleteTopicAsync(id);
             if (!success)
-                return NotFound(new { message = "Topic not found" });
+                return NotFound(ApiResponse<string>.Error("Topic not found"));
 
-            return Ok(new { message = "Deleted successfully" });
+            return Ok(ApiResponse<object>.Success("Xoá Topic thành công"));
         }
 
 

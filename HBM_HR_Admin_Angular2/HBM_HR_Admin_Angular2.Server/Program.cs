@@ -2,10 +2,13 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using HBM_HR_Admin_Angular2.Server.constance;
 using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.Middleware;
+using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Repositories;
 using HBM_HR_Admin_Angular2.Server.Voting.Repositories;
 using HBM_HR_Admin_Angular2.Server.Voting.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -66,8 +69,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
         };
     });
+
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<JwtTokenGenerator>();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errorMessages = context.ModelState
+            .Where(e => e.Value?.Errors.Count > 0)
+            .Select(e => $"{e.Key}: {e.Value.Errors.First().ErrorMessage}")
+            .ToList();
+        var response = ApiResponse<string>.Error(string.Join(" | ", errorMessages));
+        return new BadRequestObjectResult(response);
+    };
+});
+
+
 var app = builder.Build();
 
 // Áp dụng CORS
@@ -88,6 +107,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 
 
 app.UseAuthorization();
