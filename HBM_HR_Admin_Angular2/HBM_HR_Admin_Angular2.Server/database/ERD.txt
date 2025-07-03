@@ -1,0 +1,44 @@
++---------------------+         +---------------------+         +--------------------------+
+|        User         |         |        Topic        |         |        Question          |
++---------------------+         +---------------------+         +--------------------------+
+| Id (PK)             |<------->| Id (PK)             |<------->| Id (PK)                  |
+| Username            |         | Title               |         | TopicId (FK)             |
+| PasswordHash        |         | Description         |         | Content                  |
+| FullName            |         | StartDate           |         | Type                     |
+| Role                |         | EndDate             |         | Order                    |
+| CreatedAt           |         | CreatedBy (FK)      |         | CreatedBy (FK)           |
+| UpdatedAt           |         | UpdatedBy (FK)      |         | UpdatedBy (FK)           |
++---------------------+         | CreatedAt           |         | CreatedAt                |
+                                | UpdatedAt           |         | UpdatedAt                |
+                                +---------------------+         +--------------------------+
+
+       +-----------------------------+         +---------------------------+
+       |           Option            |         |        UserAnswer         |
+       +-----------------------------+         +---------------------------+
+       | Id (PK)                     |         | Id (PK)                   |
+       | QuestionId (FK) ----------->|         | UserId (FK) -------------> User
+       | Content                     |         | QuestionId (FK) ---------> Question
+       | Order                       |         | OptionId (nullable, FK) -> Option
+       | CreatedBy (FK)              |         | EssayAnswer               |
+       | UpdatedBy (FK)              |         | AnswerTime                |
+       | CreatedAt                   |         | CreatedBy (FK)            |
+       | UpdatedAt                   |         | UpdatedBy (FK)            |
+       +-----------------------------+         | CreatedAt                 |
+                                               | UpdatedAt                 |
+                                               +---------------------------+
+
+                    +-----------------------------+
+                    |   NotificationSchedule      |
+                    +-----------------------------+
+                    | Id (PK)                     |
+                    | TopicId (FK) ---------------> Topic
+                    | ScheduledTime               |
+                    | IsSent                      |
+                    | CreatedBy (FK)              |
+                    | UpdatedBy (FK)              |
+                    | CreatedAt                   |
+                    | UpdatedAt                   |
+                    +-----------------------------+
+
+
+

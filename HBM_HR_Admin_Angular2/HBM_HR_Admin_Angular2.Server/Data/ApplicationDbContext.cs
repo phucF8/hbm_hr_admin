@@ -1,4 +1,5 @@
 using HBM_HR_Admin_Angular2.Server.Models;
+using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBM_HR_Admin_Angular2.Server.Data
@@ -13,7 +14,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<UserErrorReport> DbUserErrorReport { get; set; }
 
         public DbSet<ThongBaoNguoiNhan> DbThongBaoNguoiNhan { get; set; }
-        
+
+        public DbSet<Topic> Topics { get; set; }
+
+
 
     }
 

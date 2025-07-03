@@ -1,12 +1,14 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using HBM_HR_Admin_Angular2.Server.constance;
 using HBM_HR_Admin_Angular2.Server.Data;
-using Microsoft.EntityFrameworkCore;
 using HBM_HR_Admin_Angular2.Server.Repositories;
+using HBM_HR_Admin_Angular2.Server.Voting.Repositories;
+using HBM_HR_Admin_Angular2.Server.Voting.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using HBM_HR_Admin_Angular2.Server.constance;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +30,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddScoped<NotificationRepository>();
 builder.Services.AddScoped<IDebugRepository, DebugRepository>();
 builder.Services.AddScoped<IThongBaoService, ThongBaoService>();
+
+// Đăng ký DI
+builder.Services.AddScoped<ITopicService, TopicService>();
+builder.Services.AddScoped<ITopicRepository, TopicRepository>(); // nếu dùng
+
 
 
 // Đăng ký dịch vụ FirebaseNotificationService
