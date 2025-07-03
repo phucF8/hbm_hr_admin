@@ -43,6 +43,17 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success("Xoá Topic thành công"));
         }
 
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateTopic([FromBody] UpdateTopicDto dto)
+        {
+            var updated = await _service.UpdateTopicAsync(dto);
+            if (updated == null)
+                return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề cần sửa"));
+
+            return Ok(ApiResponse<object>.Success(updated, "Cập nhật chủ đề thành công"));
+        }
+
+
 
     }
 

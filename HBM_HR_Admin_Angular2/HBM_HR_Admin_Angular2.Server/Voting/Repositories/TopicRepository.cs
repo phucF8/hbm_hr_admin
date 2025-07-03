@@ -56,6 +56,24 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
             return true;
         }
 
+        public async Task<Topic?> UpdateAsync(UpdateTopicDto dto)
+        {
+            var topic = await _context.Topics.FindAsync(dto.Id);
+            if (topic == null)
+                return null;
+
+            topic.Title = dto.Title;
+            topic.Description = dto.Description;
+            topic.StartDate = dto.StartDate;
+            topic.EndDate = dto.EndDate;
+            topic.UpdatedBy = dto.UpdatedBy;
+            topic.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return topic;
+        }
+
+
 
     }
 

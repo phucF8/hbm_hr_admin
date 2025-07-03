@@ -8,6 +8,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
         Task<Topic> AddAsync(Topic topic);
         Task<PagedResultDto<TopicDto>> GetPagedAsync(int page, int pageSize);
         Task<bool> DeleteAsync(string id);
+        Task<Topic?> UpdateAsync(UpdateTopicDto dto);
 
 
     }
