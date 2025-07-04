@@ -1,1 +1,128 @@
-<p>voting-list works!</p>
+<div style="padding-left: 48px; padding-right: 48px;">
+  <div class="tabs">
+    <div class="tab active">DANH SÁCH CHỦ ĐỀ</div>
+  </div>
+
+  <div class="action-buttons">
+
+  </div>
+
+
+
+
+  <div class="search-container">
+
+    <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
+
+      <div>
+        <div style="display: flex;gap: 10px; margin-bottom: 16px;">
+        </div>
+        <div style="display: flex; gap: 8px; width: 100%;">
+        </div>
+      </div>
+
+      <div class="buttons-container">
+        <div class="right-buttons">
+          <button *ngIf="hasSelected()" class="btn" (click)="deleteSelected()">
+            <i class="bi bi-trash"></i> Xóa những mục đã chọn
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <div><strong>BẢN GHI</strong></div>
+        <div class="search-container">
+
+
+
+
+        </div>
+      </div>
+
+
+
+      <!-- hộp thoại tạo thông báo mới hoặc xem chi tiết thông báo -->
+      <div class="overlay" *ngIf="showPopup">
+        <div class="overlay-content" style="background-color: transparent; padding: 0;width: 60%">
+          <!-- <chitiet-thong-bao [notificationId]="notificationId" (closePopupEvent)="handleClosePopup($event)"
+            (createEvent)="handleCreate($event)">
+          </chitiet-thong-bao> -->
+        </div>
+      </div>
+      <table class="my-table">
+        <thead>
+          <tr>
+            <th style="width: 2%;">
+              <input type="checkbox">
+            </th>
+            <th style="width: 10%;white-space: nowrap;text-align: center;">Thời gian</th>
+            <th style="width: 30%;white-space: nowrap;text-align: center;">Tiêu đề</th>
+            <th style="white-space: nowrap;text-align: center;">Mô tả</th>
+            <th style="width: 5%;"></th>
+          </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngIf="listItem && listItem.data && listItem.data.items">
+                <tr *ngFor="let tb of listItem.data.items" >
+                    <td>
+                    <input type="checkbox">
+                    </td>
+                    <td style="white-space: nowrap;">
+                    {{ tb.startDate | date:'HH:mm dd/MM/yyyy'}} - {{ tb.endDate | date:'HH:mm dd/MM/yyyy' }}
+                    </td>
+                    <td>
+                    {{ tb.title }}
+                    </td>
+                    <td style="text-align: justify;">{{ tb.description }}</td>
+                    <td>
+                        <div class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()" >
+                            <div class="dropdown-button">
+                            <div class="arrow-down"></div>
+                            </div>
+                            <div class="popup-menu" *ngIf="openedMenuId === tb.id">
+
+                            <!-- <div class="menu-item view" (click)="view(tb.id)"> -->
+                            <div>
+                                <i class="bi bi-eye"></i>
+                                <div class="menu-text">Xem</div>
+                            </div>
+
+                            <!-- <div class="menu-item delete" (click)="delete(tb.id)">
+                                <i class="bi bi-trash"></i>
+                                <div class="menu-text">Xóa</div>
+                            </div> -->
+                            </div>
+
+
+                        </div>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+      </table>
+      <!-- Pagination section -->
+      <!-- <app-pagination [totalPages]="totalPages" [currentPage]="currentPage" (pageChange)="onPageChange($event)">
+      </app-pagination> -->
+    </div>
+  </div>
+
+  <!-- Back to top button -->
+  <div class="back-to-top">↑</div>
+
+
+</div>
