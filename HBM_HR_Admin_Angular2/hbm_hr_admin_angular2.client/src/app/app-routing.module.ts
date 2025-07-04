@@ -8,11 +8,17 @@ import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
   {
-    path: 'demo', loadChildren: () => import('./demo/demo.module').then(m => m.DemoModule)
+    path: 'voting',
+    loadChildren: () => import('./voting/voting-module').then(m => m.VotingModule)
+  },
+  {
+    path: 'demo', 
+    loadChildren: () => import('./demo/demo.module').then(m => m.DemoModule)
   },
 
   {
-    path: 'error-report', loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
+    path: 'error-report', 
+    loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
   },
 
   { path: 'login', component: LoginComponent },
