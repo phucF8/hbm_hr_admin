@@ -76,30 +76,30 @@ export class VotingList {
     this.openedMenuId = null;
   }
 
-  view(id: number) {
-    // this.service.getDetail(id).subscribe({
-    //   next: (report) => {
-    //     console.log('Loaded report detail:', report);
-    //     this.dialog.open(ErrUserReportDetailPopupComponent, {
-    //     data: report.report,
-    //     disableClose: true,
-    //     panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
-    //     width: '50vw',
-    //     height: '90vh',
-    //     maxWidth: '100vw'
-    //   })
-    // .afterClosed().subscribe(result => {
-    //       console.log('Dialog closed with result:', result);
-    //       if (result) {
-    //         console.log('Dialog result:', result);
-    //       }
-    //     });
-    //   },
-    //   error: (error) => {
-    //     console.error('Error loading report detail:', error);
-    //     alert('Đã xảy ra lỗi khi tải chi tiết báo cáo');
-    //   }
-    // });
+  view(id: string) {
+    this.service.getDetail(id).subscribe({
+      next: (report) => {
+        console.log('Loaded report detail:', report);
+        this.dialog.open(ErrUserReportDetailPopupComponent, {
+        data: report.report,
+        disableClose: true,
+        panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
+        width: '50vw',
+        height: '90vh',
+        maxWidth: '100vw'
+      })
+    .afterClosed().subscribe(result => {
+          console.log('Dialog closed with result:', result);
+          if (result) {
+            console.log('Dialog result:', result);
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading report detail:', error);
+        alert('Đã xảy ra lỗi khi tải chi tiết báo cáo');
+      }
+    });
   }
 
   delete(id: number): void {

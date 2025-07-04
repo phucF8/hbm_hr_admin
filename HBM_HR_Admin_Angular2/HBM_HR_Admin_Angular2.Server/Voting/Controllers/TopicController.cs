@@ -1,8 +1,12 @@
-﻿using HBM_HR_Admin_Angular2.Server.Models.Common;
+﻿using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
 {
@@ -10,10 +14,12 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
     [Route("api/topics")]
     public class TopicController : ControllerBase
     {
+        private readonly ApplicationDbContext _context;
         private readonly ITopicService _service;
 
-        public TopicController(ITopicService service)
+        public TopicController(ApplicationDbContext context, ITopicService service)
         {
+            _context = context;
             _service = service;
         }
 
@@ -53,6 +59,14 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success(updated, "Cập nhật chủ đề thành công"));
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
+        {
+            var topic = await _service.GetTopicByIdAsync(id);
+            if (topic == null)
+                return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề"));
+            return Ok(ApiResponse<object>.Success(topic, "Thành công"));
+        }
 
 
     }

@@ -73,7 +73,10 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
             return topic;
         }
 
-
+        public async Task<Topic?> GetByIdAsync(string id)
+        {
+            return await _context.Topics.FirstOrDefaultAsync(t => t.Id == id);
+        }
 
     }
 

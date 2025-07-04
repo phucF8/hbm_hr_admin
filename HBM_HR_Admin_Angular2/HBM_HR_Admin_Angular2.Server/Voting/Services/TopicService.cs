@@ -45,7 +45,10 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services
             return await _repository.UpdateAsync(dto);
         }
 
-
+        public async Task<Topic?> GetTopicByIdAsync(string id)
+        {
+            return await _repository.GetByIdAsync(id);
+        }
 
     }
 
