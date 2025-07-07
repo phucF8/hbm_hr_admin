@@ -1,4 +1,5 @@
 ﻿using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
@@ -66,6 +67,26 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             if (topic == null)
                 return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề"));
             return Ok(ApiResponse<object>.Success(topic, "Thành công"));
+        }
+
+        // DELETE: api/topics/DeleteList
+        [HttpDelete("DeleteList")]
+        public async Task<IActionResult> DeleteTopics([FromBody] List<string> topicIds)
+        {
+            if (topicIds == null || topicIds.Count == 0)
+                return BadRequest("Danh sách Id rỗng.");
+
+            var topicsToDelete = await _context.Topics
+                .Where(t => topicIds.Contains(t.Id))
+                .ToListAsync();
+
+            if (topicsToDelete.Count == 0)
+                return NotFound(ApiResponse<object>.Error("Không tìm thấy topic nào để xoá."));
+
+            _context.Topics.RemoveRange(topicsToDelete);
+            await _context.SaveChangesAsync();
+
+            return Ok(ApiResponse<object>.Success(topicsToDelete.Count,"Đã xoá thành công"));
         }
 
 
