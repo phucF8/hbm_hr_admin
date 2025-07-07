@@ -42,24 +42,30 @@
       <input
         id="title" formControlName="title"
         type="text"
-        [(ngModel)]="data.title"
         class="form-control"
         placeholder="Nhập tiêu đề"
       />
     </div>
   </div>
+   <div *ngIf="myForm.get('title')?.invalid && myForm.get('title')?.touched" class="text-danger">
+      Tiêu đề không được để trống
+    </div>
 
     <div class="info-row">
     <div class="info-label">› Mô tả</div>
     <div class="info-value">
       <textarea
-        id="description" formControlName="description"
+        id="description" 
+        formControlName="description"
         type="text"
-        [(ngModel)]="data.description"
+
         rows="3"
         class="form-control"
         placeholder="Nhập mô tả"
       ></textarea>
+    </div>
+    <div *ngIf="myForm.get('description')?.invalid && myForm.get('description')?.touched" class="text-danger">
+      Mô tả không được để trống
     </div>
   </div>
 

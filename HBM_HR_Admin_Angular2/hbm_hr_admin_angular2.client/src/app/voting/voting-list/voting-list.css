@@ -99,3 +99,8 @@
     color: #666; /* Màu chữ xanh đậm */
     
   }
+
+  .right-buttons {
+    display: flex;
+    gap: 8px; /* khoảng cách giữa các nút */
+  }

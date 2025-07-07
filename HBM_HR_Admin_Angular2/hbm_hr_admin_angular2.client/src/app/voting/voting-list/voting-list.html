@@ -23,6 +23,9 @@
 
       <div class="buttons-container">
         <div class="right-buttons">
+          <button class="btn btn-primary" (click)="openCreateTopicDialog()">
+            <i class="bi bi-plus-circle"></i> Tạo mới
+          </button>
           <button *ngIf="hasSelected()" class="btn" (click)="deleteListSelected()">
             <i class="bi bi-trash"></i> Xóa những mục đã chọn
           </button>

@@ -35,4 +35,9 @@ export class VotingListService {
     });
   }
 
+  createTopic(topic: any): Observable<any> {
+    const url = `${this.apiUrl}/Create`;
+    return this.http.post(url, topic);
+  }
+
 }

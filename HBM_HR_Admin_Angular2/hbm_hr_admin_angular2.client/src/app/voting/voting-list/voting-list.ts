@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TopicDetailComponent } from '@app/voting/topic-detail/topic-detail.component';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 import { VotingListRP } from './responses/voting_list_rp';
+import { Observable } from 'rxjs/internal/Observable';
 
 
 @Component({
@@ -76,10 +77,10 @@ export class VotingList {
 
   view(id: string) {
     this.service.getDetail(id).subscribe({
-      next: (report) => {
-        console.log('Loaded report detail:', report);
+      next: (topic) => {
+        console.log('Loaded report detail:', topic);
         this.dialog.open(TopicDetailComponent, {
-        data: report.data,
+        data: topic.data,
         disableClose: true,
         panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
         width: '50vw',
@@ -87,18 +88,45 @@ export class VotingList {
         maxWidth: '100vw'
       })
     .afterClosed().subscribe(result => {
-          console.log('Dialog closed with result:', result);
           if (result) {
-            console.log('Dialog result:', result);
+            this.loadList(); 
           }
         });
       },
       error: (error) => {
-        console.error('Error loading report detail:', error);
         alert('Đã xảy ra lỗi khi tải chi tiết báo cáo');
       }
     });
   }
+
+  openCreateTopicDialog() {
+  const dialogRef = this.dialog.open(TopicDetailComponent, {
+    data: {},
+    disableClose: true,
+    panelClass: 'err-report-detail-dialog',
+    width: '50vw',
+    height: '90vh',
+    maxWidth: '100vw'
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.loadList(); // Reload danh sách nếu có
+      // Gọi API tạo topic ở đây
+      // this.service.createTopic(result).subscribe({
+      //   next: () => {
+      //     console.log('Tạo topic thành công');
+      //     alert('Tạo chủ đề thành công!');
+      //   },
+      //   error: (err) => {
+      //     console.error('Lỗi khi tạo topic:', err);
+      //     alert('Đã xảy ra lỗi khi tạo chủ đề');
+      //   }
+      // });
+    }
+  });
+}
+
 
   delete(id: number): void {
     // if (confirm(`Bạn có chắc chắn muốn xóa mục này không?`)) {
