@@ -1,0 +1,90 @@
+.container_popup {
+    background-color: #FFF;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-y: auto;
+    height: 100%;
+    width: 100%;
+    
+}
+
+.header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.info-label {
+    width: 120px;
+    color: #666;
+}
+
+.info-value {
+    color: #4169E1;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+    margin-top: 16px;
+}
+
+pre { font-family: monospace; white-space: pre-wrap; }
+.key    { color: brown; font-weight: bold; }
+.string { color: green; }
+.number { color: blue; }
+.boolean { color: orange; }
+.null   { color: gray; }
+
+
+.json-viewer-container {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f9f9f9;
+  font-family: monospace;
+  max-height: 400px;
+  overflow: auto;
+  padding: 1rem;
+  white-space: pre-wrap;
+}
+
+.json-viewer-content {
+  margin: 0;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+.btn-close-circle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #999;
+  border-radius: 50%;
+  background-color: white;
+  color: #333;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-close-circle:hover {
+  background-color: #eee;
+}

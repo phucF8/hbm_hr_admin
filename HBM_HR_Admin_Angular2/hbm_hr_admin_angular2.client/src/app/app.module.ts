@@ -29,6 +29,7 @@ import { AuthInterceptor } from './guards/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { ErrorUserReportComponent } from './error-report/error-user-report/error-user-report.component';
+import { TopicDetailComponent } from './voting/topic-detail/topic-detail.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { ErrorUserReportComponent } from './error-report/error-user-report/error
     SearchUserFormComponent,
     ErrorUserReportComponent,
     NotFoundComponent,
+    TopicDetailComponent,
   ],
   imports: [
      QuillModule.forRoot(),

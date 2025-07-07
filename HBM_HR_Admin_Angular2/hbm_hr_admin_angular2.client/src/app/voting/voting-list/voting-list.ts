@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ErrUserReportItem } from '@app/error-report/response/err_user_report_rp';
+import { TopicDetailComponent } from '@app/voting/topic-detail/topic-detail.component';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
-import { ErrUserReportDetailPopupComponent } from '@app/error-report/error-report-detail/error-report-detail.component';
 import { VotingListRP } from './responses/voting_list_rp';
+
 
 @Component({
   selector: 'app-voting-list',
@@ -38,11 +38,9 @@ export class VotingList {
   }
 
   toggleSelectAll() {
-    // this.listItem.forEach(tb => {
-    //   if (tb.status !== 0) {
-    //     tb.selected = this.selectAll;
-    //   }
-    // });
+    this.listItem?.data.items.forEach(tb => {
+        tb.selected = this.selectAll;
+    });
 
   }
 
@@ -80,8 +78,8 @@ export class VotingList {
     this.service.getDetail(id).subscribe({
       next: (report) => {
         console.log('Loaded report detail:', report);
-        this.dialog.open(ErrUserReportDetailPopupComponent, {
-        data: report.report,
+        this.dialog.open(TopicDetailComponent, {
+        data: report.data,
         disableClose: true,
         panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
         width: '50vw',
@@ -120,33 +118,30 @@ export class VotingList {
   }
 
   hasSelected(): boolean {
-    // return this.listItem.some(tb => tb.selected);
-    return false;
+    return this.listItem?.data?.items?.some(tb => tb.selected) ?? false;
   }
 
-  deleteSelected() {
-    // const selectedNotifications = this.listItem.filter(tb => tb.selected);
-    // if (selectedNotifications.length === 0) {
-    //   alert('Vui lòng chọn ít nhất một thông báo để xóa!');
-    //   return;
-    // }
-    // if (confirm(`Bạn có chắc chắn muốn xóa ${selectedNotifications.length} thông báo đã chọn?`)) {
-    //   const deletePromises = selectedNotifications.map(tb => {
+  deleteListSelected() {
+    const selectedNotifications = this.listItem?.data?.items?.filter(tb => tb.selected);
 
-    //     return this.service.delete(tb.id).toPromise();
-    //   });
-    //   Promise.all(deletePromises)
-    //     .then(() => {
-    //       console.log('Successfully deleted selected notifications');
+    if (!selectedNotifications || selectedNotifications.length === 0) {
+      alert('Vui lòng chọn ít nhất một mục để xóa!');
+      return;
+    }
 
-    //       this.loadList(); // Reload the list
-    //       alert('Đã xóa thành công các thông báo đã chọn!');
-    //     })
-    //     .catch(error => {
-    //       console.error('Error deleting notifications:', error);
-    //       alert('Đã xảy ra lỗi khi xóa thông báo!');
-    //     });
-    // }
+    if (confirm(`Bạn có chắc chắn muốn xóa ${selectedNotifications.length} mục đã chọn?`)) {
+      const idsToDelete = selectedNotifications.map(tb => tb.id);
+
+      this.service.deleteTopics(idsToDelete).subscribe({
+        next: () => {
+          this.loadList(); // Tải lại danh sách
+          alert('Đã xóa thành công các thông báo đã chọn!');
+        },
+        error: (error) => {
+          alert('Đã xảy ra lỗi khi xóa thông báo!');
+        }
+      });
+    }
   }
 
 }

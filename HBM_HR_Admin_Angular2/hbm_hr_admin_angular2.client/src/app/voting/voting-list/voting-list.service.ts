@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VotingListRP } from './responses/voting_list_rp';
-
+import {ApiResponse} from './responses/api-response.model';
+import { TopicDetail } from './responses/topic-detail.model';
+import { environment } from 'environments/environment'; 
 
 @Injectable({
   providedIn: 'root'
 })
 export class VotingListService {
-  private apiUrl = 'http://localhost:8088/api/topics';
+  private apiUrl = `${environment.apiUrl}/topics`;  // Lấy apiUrl từ environment
 
   constructor(private http: HttpClient) { }
 
@@ -16,5 +18,21 @@ export class VotingListService {
     return this.http.get<VotingListRP>(this.apiUrl);
   }
   
+  getDetail(id: string): Observable<ApiResponse<TopicDetail>> {
+    return this.http.get<ApiResponse<TopicDetail>>(`${this.apiUrl}/${id}`);
+  }
+
+  updateTopic(topic: TopicDetail): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/update`, topic);
+  }
+
+  deleteTopics(topicIds: string[]): Observable<any> {
+    const url = `${this.apiUrl}/DeleteList`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.delete(url, {
+      headers: headers,
+      body: topicIds  // 👈 Gửi danh sách ID trong body
+    });
+  }
 
 }

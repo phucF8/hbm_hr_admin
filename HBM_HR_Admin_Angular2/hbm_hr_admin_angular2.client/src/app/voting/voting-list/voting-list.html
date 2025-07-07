@@ -23,7 +23,7 @@
 
       <div class="buttons-container">
         <div class="right-buttons">
-          <button *ngIf="hasSelected()" class="btn" (click)="deleteSelected()">
+          <button *ngIf="hasSelected()" class="btn" (click)="deleteListSelected()">
             <i class="bi bi-trash"></i> Xóa những mục đã chọn
           </button>
         </div>
@@ -48,7 +48,13 @@
         <div><strong>BẢN GHI</strong></div>
         <div class="search-container">
 
-
+                    <div class="buttons-container">
+                      <div class="right-buttons">
+                        <button *ngIf="hasSelected()" class="btn" (click)="deleteListSelected()">
+                          <i class="bi bi-trash"></i> Xóa những mục đã chọn
+                        </button>
+                      </div>
+                    </div>
 
 
         </div>
@@ -68,7 +74,7 @@
         <thead>
           <tr>
             <th style="width: 2%;">
-              <input type="checkbox">
+              <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
             </th>
             <th style="width: 10%;white-space: nowrap;text-align: center;">Thời gian</th>
             <th style="width: 30%;white-space: nowrap;text-align: center;">Tiêu đề</th>
@@ -78,9 +84,9 @@
         </thead>
         <tbody>
             <ng-container *ngIf="listItem && listItem.data && listItem.data.items">
-                <tr *ngFor="let tb of listItem.data.items" >
+                <tr *ngFor="let tb of listItem.data.items" (click)="view(tb.id)" >
                     <td>
-                    <input type="checkbox">
+                    <input type="checkbox"  (click)="$event.stopPropagation()" [(ngModel)]="tb.selected">
                     </td>
                     <td style="white-space: nowrap;">
                     {{ tb.startDate | date:'HH:mm dd/MM/yyyy'}} - {{ tb.endDate | date:'HH:mm dd/MM/yyyy' }}
