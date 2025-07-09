@@ -1,0 +1,21 @@
+<div class="form-group">
+  <label>
+    <strong>{{ label }}</strong>
+    <span *ngIf="isRequired" style="color: red">*</span>
+  </label>
+
+  <textarea class="form-control" rows="4" [placeholder]="placeholder || label" [formControl]="control"
+    [class.invalid]="control.invalid && (control.dirty || control.touched)">
+  </textarea>
+
+  <div class="error" *ngIf="control.invalid && (control.dirty || control.touched)">
+    <span *ngIf="control.hasError('required')">Vui lòng nhập {{ label.toLowerCase() }}</span>
+    <span *ngIf="control.hasError('minlength')">Tối thiểu {{ control.errors?.['minlength'].requiredLength }} ký tự</span>
+    <span *ngIf="control.hasError('maxlength')">Tối đa {{ control.errors?.['maxlength'].requiredLength }} ký tự</span>
+  </div>
+
+  <div *ngIf="control.invalid && (control.dirty || control.touched)" style="color: red; font-size: 12px">
+    <div *ngIf="control.errors?.['required']">Trường này là bắt buộc.</div>
+    <!-- Các lỗi khác có thể thêm ở đây -->
+  </div>
+</div>

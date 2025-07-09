@@ -1,107 +1,80 @@
 <form [formGroup]="myForm" (ngSubmit)="onSubmit()" class="needs-validation">
-<div class="container_popup">
-  <div class="header">CHI TIẾT CHỦ ĐỀ
-    <button
-      type="button"
-      class="btn-close-circle"
-      aria-label="Đóng"
-      mat-dialog-close
-      (click)="closePopup()"
-    >
-      ×
-    </button>
-  </div>
-
-  <!-- THÔNG TIN NGƯỜI DÙNG -->
-  <div class="section">
-    <div class="section-title">NGƯỜI TẠO</div>
-
-    <div class="info-row">
-      <div class="info-label">› Username</div>
-      <div class="info-value">{{ data.createdBy }}</div>
+  <div class="container_popup">
+    <div class="header">CHI TIẾT CHỦ ĐỀ
+      <button type="button" class="btn-close-circle" aria-label="Đóng" mat-dialog-close (click)="closePopup()">
+        ×
+      </button>
     </div>
 
-    <div class="info-row">
-      <div class="info-label">› Người cập nhật cuối</div>
-      <div class="info-value">{{ data.updatedBy || 'Chưa cập nhật' }}</div>
-    </div>
-  </div>
+    <!-- THÔNG TIN NGƯỜI DÙNG -->
+    <div class="section">
+      <div class="section-title">NGƯỜI TẠO</div>
 
-  <!-- THÔNG TIN API -->
-  <div class="section">
-    <div class="section-title">THÔNG TIN CHỦ ĐỀ</div>
+      <div class="info-row">
+        <div class="info-label">› Username</div>
+        <div class="info-value">{{ data.createdBy }}</div>
+      </div>
 
-    <div class="info-row">
-      <div class="info-label">› ID</div>
-      <div class="info-value">{{ data.id }}</div>
-    </div>
-
-    
-
-<app-text-input
-   label="Tiêu đề"
-   placeholder="Nhập tiêu đề"
-   formControlName="title"
-  ></app-text-input>
-
-
-
-
-
-
-
-
-
-
-    <div class="info-row">
-    <div class="info-label">› Mô tả</div>
-    <div class="info-value">
-      <textarea
-        id="description" 
-        formControlName="description"
-        type="text"
-
-        rows="3"
-        class="form-control"
-        placeholder="Nhập mô tả"
-      ></textarea>
-    </div>
-    <div *ngIf="myForm.get('description')?.invalid && myForm.get('description')?.touched" class="text-danger">
-      Mô tả không được để trống
-    </div>
-  </div>
-
-    <div class="info-row">
-      <div class="info-label">› Ngày bắt đầu</div>
-      <div class="info-value">{{ data.startDate | date: 'dd/MM/yyyy HH:mm' }}</div>
+      <div class="info-row">
+        <div class="info-label">› Người cập nhật cuối</div>
+        <div class="info-value">{{ data.updatedBy || 'Chưa cập nhật' }}</div>
+      </div>
     </div>
 
-    <div class="info-row">
-      <div class="info-label">› Ngày kết thúc</div>
-      <div class="info-value">{{ data.endDate | date: 'dd/MM/yyyy HH:mm' }}</div>
+    <!-- THÔNG TIN API -->
+    <div class="section">
+      <div class="section-title">THÔNG TIN CHỦ ĐỀ</div>
+
+      <div class="info-row">
+        <div class="info-label">› ID</div>
+        <div class="info-value">{{ data.id }}</div>
+      </div>
+
+
+
+      <app-text-input formControlName="title" label="Tiêu đề" placeholder="Nhập tiêu đề" />
+
+      <app-area-input label="Mô tả" placeholder="Nhập nội dung mô tả" formControlName="description" />
+
+
+
+
+
+
+      
+
+      <div class="info-row">
+        <div class="info-label">› Ngày bắt đầu</div>
+        <div class="info-value">{{ data.startDate | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">› Ngày kết thúc</div>
+        <div class="info-value">{{ data.endDate | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+    </div>
+
+    <!-- THÔNG TIN THIẾT BỊ (TÙY CHỌN) -->
+    <div class="section">
+      <div class="section-title">THÔNG TIN HỆ THỐNG</div>
+
+      <div class="info-row">
+        <div class="info-label">› Ngày tạo</div>
+        <div class="info-value">{{ data.createdAt | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">› Cập nhật lúc</div>
+        <div class="info-value">{{ data.updatedAt ? (data.updatedAt | date: 'dd/MM/yyyy HH:mm') : 'Chưa cập nhật' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Nút đóng -->
+    <div class="button-group">
+      <button type="button" class="btn btn-cancel" mat-dialog-close (click)="onSubmit()">
+        CẬP NHẬT
+      </button>
     </div>
   </div>
-
-  <!-- THÔNG TIN THIẾT BỊ (TÙY CHỌN) -->
-  <div class="section">
-    <div class="section-title">THÔNG TIN HỆ THỐNG</div>
-
-    <div class="info-row">
-      <div class="info-label">› Ngày tạo</div>
-      <div class="info-value">{{ data.createdAt | date: 'dd/MM/yyyy HH:mm' }}</div>
-    </div>
-
-    <div class="info-row">
-      <div class="info-label">› Cập nhật lúc</div>
-      <div class="info-value">{{ data.updatedAt ? (data.updatedAt | date: 'dd/MM/yyyy HH:mm') : 'Chưa cập nhật' }}</div>
-    </div>
-  </div>
-
-  <!-- Nút đóng -->
-  <div class="button-group">
-    <button type="button" class="btn btn-cancel" mat-dialog-close (click)="onSubmit()">
-      CẬP NHẬT
-    </button>
-  </div>
-</div>
 </form>

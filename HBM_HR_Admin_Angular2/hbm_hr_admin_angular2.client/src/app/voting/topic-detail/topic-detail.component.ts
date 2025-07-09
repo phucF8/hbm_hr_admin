@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TopicDetail } from '../voting-list/responses/topic-detail.model';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 
 @Component({
@@ -15,15 +15,17 @@ export class TopicDetailComponent implements OnInit {
   myForm!: FormGroup;
 
   ngOnInit(): void {
-
+    setTimeout(() => {
+      this.cdRef.detectChanges();
+    });
   }
 
   constructor(
+    private cdRef: ChangeDetectorRef,
     private service: VotingListService,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<TopicDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public data: TopicDetail
-
   ) {
     this.myForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -36,7 +38,6 @@ export class TopicDetailComponent implements OnInit {
       });
     }
   }
-
 
   closePopup() {
     this.dialogRef.close();
@@ -61,7 +62,7 @@ export class TopicDetailComponent implements OnInit {
     };
     const jsonStr = JSON.stringify(updatedTopic); // null, 2 => để format đẹp
 
-    navigator.clipboard.writeText(jsonStr).then(() => {alert('Đã copy JSON vào clipboard!');}).catch(err => {});
+    navigator.clipboard.writeText(jsonStr).then(() => { alert('Đã copy JSON vào clipboard!'); }).catch(err => { });
 
     this.service.updateTopic(updatedTopic).subscribe({
       next: (res) => {
@@ -77,8 +78,8 @@ export class TopicDetailComponent implements OnInit {
           err?.error?.message ||  // nếu backend trả về { message: '...' }
           err?.message ||         // nếu là lỗi từ HttpClient
           'Đã xảy ra lỗi không xác định';
-            alert('Lỗi tạo chủ đề: ' + errorMsg);
-          }
+        alert('Lỗi tạo chủ đề: ' + errorMsg);
+      }
     });
   }
 
@@ -86,38 +87,40 @@ export class TopicDetailComponent implements OnInit {
   onSubmitCreate() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const newTopic: TopicDetail = {
-    ...this.myForm.value,
-    createdAt: new Date().toISOString(), // hoặc để backend xử lý
-    updatedAt: new Date().toISOString(),  // nếu cần
-    createdBy: currentUser.DataSets.Table[0].ID
-  };
+      ...this.myForm.value,
+      createdAt: new Date().toISOString(), // hoặc để backend xử lý
+      updatedAt: new Date().toISOString(),  // nếu cần
+      createdBy: currentUser.DataSets.Table[0].ID
+    };
 
-  const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
-  navigator.clipboard.writeText(jsonStr).then(() => {
-    alert('Đã copy JSON vào clipboard!');
-  }).catch(err => {});
+    const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      alert('Đã copy JSON vào clipboard!');
+    }).catch(err => { });
 
-  this.service.createTopic(newTopic).subscribe({
-    next: (res) => {
-      if (res.status === 'SUCCESS') {
-        alert('Tạo chủ đề thành công!');
-        this.dialogRef.close(newTopic);
-      } else {
-        alert('Tạo thất bại: ' + res.message);
+    this.service.createTopic(newTopic).subscribe({
+      next: (res) => {
+        if (res.status === 'SUCCESS') {
+          alert('Tạo chủ đề thành công!');
+          this.dialogRef.close(newTopic);
+        } else {
+          alert('Tạo thất bại: ' + res.message);
+        }
+      },
+      error: (err) => {
+        const errorMsg =
+          err?.error?.message ||  // nếu backend trả về { message: '...' }
+          err?.message ||         // nếu là lỗi từ HttpClient
+          'Đã xảy ra lỗi không xác định';
+        alert('Lỗi tạo chủ đề: ' + errorMsg);
       }
-    },
-    error: (err) => {
-  const errorMsg =
-    err?.error?.message ||  // nếu backend trả về { message: '...' }
-    err?.message ||         // nếu là lỗi từ HttpClient
-    'Đã xảy ra lỗi không xác định';
-      alert('Lỗi tạo chủ đề: ' + errorMsg);
-    }
 
-  });
-}
+    });
+  }
 
-
+  get titleControl(): FormControl {
+    return this.myForm.get('title') as FormControl;
+  }
 
 
 
