@@ -30,6 +30,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { ErrorUserReportComponent } from './error-report/error-user-report/error-user-report.component';
 import { TopicDetailComponent } from './voting/topic-detail/topic-detail.component';
+import { SharedModule } from "./shared/shared.module";
 
 @NgModule({
   declarations: [
@@ -51,7 +52,7 @@ import { TopicDetailComponent } from './voting/topic-detail/topic-detail.compone
     TopicDetailComponent,
   ],
   imports: [
-     QuillModule.forRoot(),
+    QuillModule.forRoot(),
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
@@ -59,13 +60,14 @@ import { TopicDetailComponent } from './voting/topic-detail/topic-detail.compone
     ReactiveFormsModule,
     BrowserAnimationsModule, // bắt buộc
     ToastrModule.forRoot({
-      positionClass: 'toast-top-right'  // 👈 Thêm dòng này
+        positionClass: 'toast-top-right' // 👈 Thêm dòng này
     }),
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatRadioModule
-  ],
+    MatRadioModule,
+    SharedModule
+],
   providers: [
     // {provide: LocationStrategy, useClass: HashLocationStrategy},
     {

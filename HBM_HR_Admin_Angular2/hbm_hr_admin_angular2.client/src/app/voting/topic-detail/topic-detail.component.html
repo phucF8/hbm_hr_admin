@@ -36,20 +36,22 @@
       <div class="info-value">{{ data.id }}</div>
     </div>
 
-    <div class="info-row">
-    <div class="info-label">› Tiêu đề</div>
-    <div class="info-value">
-      <input
-        id="title" formControlName="title"
-        type="text"
-        class="form-control"
-        placeholder="Nhập tiêu đề"
-      />
-    </div>
-  </div>
-   <div *ngIf="myForm.get('title')?.invalid && myForm.get('title')?.touched" class="text-danger">
-      Tiêu đề không được để trống
-    </div>
+    
+
+<app-text-input
+   label="Tiêu đề"
+   [required]="true"
+   formControlName="title"
+  ></app-text-input>
+
+
+
+
+
+
+
+
+
 
     <div class="info-row">
     <div class="info-label">› Mô tả</div>

@@ -5,16 +5,18 @@ import { VotingRoutingModule } from './voting-routing-module';
 import { VotingList } from './voting-list/voting-list';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
+import { SharedModule } from '@app/shared/shared.module';
 
 @NgModule({
   declarations: [
-    VotingList
+    VotingList 
   ],
   imports: [
     ReactiveFormsModule,
     CommonModule,
     VotingRoutingModule,
-    FormsModule
+    FormsModule,
+    SharedModule
   ]
 })
 export class VotingModule { }
