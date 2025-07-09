@@ -369,29 +369,7 @@ th {
 
 
 
-.toast-title {
-  top: 20px !important;
-  right: 0;
-  left: 0;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  position: fixed !important;
-  z-index: 99999 !important;
-  pointer-events: none; /* không che các nút phía dưới */
-  border-radius: 999px !important;  /* Bo góc tròn */
-  border: 1px solid red;
-  width: fit-content;
-  padding: 10px 20px;
-}
 
-.toast-success {
-  color: green !important;
-}
-
-.toast-error {
-  color: red;
-}
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

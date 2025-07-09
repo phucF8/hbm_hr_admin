@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TopicDetail } from '../voting-list/responses/topic-detail.model';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-topic-detail',
@@ -21,6 +22,7 @@ export class TopicDetailComponent implements OnInit {
   }
 
   constructor(
+    private toastr: ToastrService,
     private cdRef: ChangeDetectorRef,
     private service: VotingListService,
     private fb: FormBuilder,
@@ -62,15 +64,19 @@ export class TopicDetailComponent implements OnInit {
     };
     const jsonStr = JSON.stringify(updatedTopic); // null, 2 => để format đẹp
 
-    navigator.clipboard.writeText(jsonStr).then(() => { alert('Đã copy JSON vào clipboard!'); }).catch(err => { });
+    navigator.clipboard.writeText(jsonStr).then(() => { this.toastr.info('Đã copy to clipboard') }).catch(err => { });
 
     this.service.updateTopic(updatedTopic).subscribe({
       next: (res) => {
         if (res.status === 'SUCCESS') {
-          alert('Cập nhật thành công!');
+          this.toastr.success('Cập nhật thành công!', ``, {
+            positionClass: 'toast-top-right'
+          });
           this.dialogRef.close(res);
         } else {
-          alert('Cập nhật thất bại: ' + res.message);
+          this.toastr.error('ERROR', 'Cập nhật thất bại: ' + res.message, {
+            positionClass: 'toast-top-right'
+          });
         }
       },
       error: (err) => {

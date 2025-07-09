@@ -5,7 +5,7 @@ import { ControlContainer, FormControl, Validators } from '@angular/forms';
   selector: 'app-area-input',
   standalone: false,
   templateUrl: './area-input.component.html',
-  styleUrls: ['./area-input.component.css']
+  styleUrls: ['./area-input.component.css','./../../styles/shared.css']
 })
 export class AreaInputComponent {
   @Input() label: string = '';

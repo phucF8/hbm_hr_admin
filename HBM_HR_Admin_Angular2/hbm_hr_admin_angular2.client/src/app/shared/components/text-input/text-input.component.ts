@@ -5,7 +5,7 @@ import { ControlContainer, FormControl, Validators } from '@angular/forms';
   selector: 'app-text-input',
   standalone: false,
   templateUrl: './text-input.component.html',
-  styleUrls: ['./text-input.component.css']
+  styleUrls: ['./text-input.component.css','./../../styles/shared.css']
 })
 export class TextInputComponent {
   @Input() label: string = '';
