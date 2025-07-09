@@ -1,5 +1,5 @@
 import { Component, Input, Optional } from '@angular/core';
-import { ControlContainer, FormControl } from '@angular/forms';
+import { ControlContainer, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-text-input',
@@ -9,7 +9,6 @@ import { ControlContainer, FormControl } from '@angular/forms';
 })
 export class TextInputComponent {
   @Input() label: string = '';
-  @Input() required: boolean = false;
   @Input() placeholder: string = '';
   @Input() formControlName!: string;
 
@@ -17,5 +16,13 @@ export class TextInputComponent {
 
   get control(): FormControl {
     return this.controlContainer?.control?.get(this.formControlName) as FormControl;
+  }
+
+  /** ✅ Tự động phát hiện nếu control có validator required */
+  get isRequired(): boolean {
+    const validator = this.control?.validator;
+    if (!validator) return false;
+    const test = validator(new FormControl());
+    return !!(test && test['required']);
   }
 }
