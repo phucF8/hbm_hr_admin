@@ -23,6 +23,7 @@
     "@angular/platform-browser-dynamic": "^19.2.14",
     "@angular/router": "^19.2.14",
     "file-saver": "^2.0.5",
+    "flatpickr": "^4.6.13",
     "jest-editor-support": "*",
     "md5": "^2.3.0",
     "ngx-editor": "^19.0.0-beta.1",

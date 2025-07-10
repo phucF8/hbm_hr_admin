@@ -16,7 +16,7 @@ import { SharedModule } from '@app/shared/shared.module';
     CommonModule,
     VotingRoutingModule,
     FormsModule,
-    SharedModule
+    SharedModule,
   ]
 })
 export class VotingModule { }

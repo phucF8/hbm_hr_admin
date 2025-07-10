@@ -4,6 +4,7 @@ import { TopicDetail } from '../voting-list/responses/topic-detail.model';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-topic-detail',
@@ -32,11 +33,14 @@ export class TopicDetailComponent implements OnInit {
     this.myForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
+      startDate: [null],
+      endDate: [null],
     });
     if (data) {
       this.myForm.patchValue({
         title: data.title || '',
-        description: data.description || ''
+        description: data.description || '',
+        startDate: data.startDate ? formatDate(data.startDate, 'yyyy-MM-dd', 'en') : '',
       });
     }
   }

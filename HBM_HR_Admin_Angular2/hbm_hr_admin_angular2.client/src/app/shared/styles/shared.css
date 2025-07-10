@@ -32,6 +32,7 @@
   }
 
   input.form-control {
+    color: red;
     width: 100%;
     box-sizing: border-box;
   }
