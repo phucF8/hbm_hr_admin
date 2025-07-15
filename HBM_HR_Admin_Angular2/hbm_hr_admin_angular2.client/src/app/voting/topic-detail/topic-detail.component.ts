@@ -17,9 +17,7 @@ export class TopicDetailComponent implements OnInit {
   myForm!: FormGroup;
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.cdRef.detectChanges();
-    });
+    
   }
 
   constructor(
@@ -37,12 +35,17 @@ export class TopicDetailComponent implements OnInit {
       endDate: [null],
     });
     if (data) {
-      this.myForm.patchValue({
-        title: data.title || '',
-        description: data.description || '',
-        startDate: data.startDate ? formatDate(data.startDate, 'yyyy-MM-dd', 'en') : '',
-      });
+        this.myForm.patchValue({
+          title: data.title || '',
+          description: data.description || '',
+          startDate: data.startDate ? formatDate(data.startDate, 'yyyy-MM-dd', 'en') : null,
+          endDate: data.endDate ? formatDate(data.endDate, 'yyyy-MM-dd', 'en') : null,
+        });
     }
+  }
+
+  getFormControl(name: string): FormControl {
+    return this.myForm.get(name) as FormControl;
   }
 
   closePopup() {
@@ -60,6 +63,14 @@ export class TopicDetailComponent implements OnInit {
 
   onSubmitUpdate() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    // Xử lý giá trị rỗng thành null
+    const formValue = this.myForm.value;
+    if (formValue.startDate === '') {
+      formValue.startDate = null;
+    }
+    if (formValue.endDate === '') {
+      formValue.endDate = null;
+    }
     const updatedTopic: TopicDetail = {
       ...this.data,
       ...this.myForm.value,

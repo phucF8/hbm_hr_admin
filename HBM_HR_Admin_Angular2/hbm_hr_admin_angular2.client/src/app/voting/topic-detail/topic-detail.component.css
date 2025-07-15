@@ -88,3 +88,14 @@ pre { font-family: monospace; white-space: pre-wrap; }
 .btn-close-circle:hover {
   background-color: #eee;
 }
+
+.row {
+  display: flex;
+  gap: 16px; /* Khoảng cách giữa hai ô */
+  flex-wrap: wrap; /* Cho responsive nếu thu hẹp */
+}
+
+.col {
+  flex: 1;
+  min-width: 200px; /* Đảm bảo responsive */
+}

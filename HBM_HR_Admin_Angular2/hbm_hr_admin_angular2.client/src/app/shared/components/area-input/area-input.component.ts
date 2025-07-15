@@ -10,13 +10,10 @@ import { ControlContainer, FormControl, Validators } from '@angular/forms';
 export class AreaInputComponent {
   @Input() label: string = '';
   @Input() placeholder: string = '';
-  @Input() formControlName!: string;
+  @Input() control!: FormControl; // ✅ dùng formControl trực tiếp
 
   constructor(@Optional() private controlContainer: ControlContainer) {}
 
-  get control(): FormControl {
-    return this.controlContainer?.control?.get(this.formControlName) as FormControl;
-  }
 
   get isRequired(): boolean {
     const validator = this.control?.validator;

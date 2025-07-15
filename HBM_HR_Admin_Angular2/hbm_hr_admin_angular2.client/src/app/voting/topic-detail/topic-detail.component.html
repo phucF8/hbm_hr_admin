@@ -30,21 +30,25 @@
         <div class="info-value">{{ data.id }}</div>
       </div>
 
-      <app-text-input formControlName="title" label="Tiêu đề" placeholder="Nhập tiêu đề" />
+      <!-- <app-text-input formControlName="title" label="Tiêu đề" placeholder="Nhập tiêu đề" /> -->
 
-      <app-area-input label="Mô tả" placeholder="Nhập nội dung mô tả" formControlName="description" />
+      <!-- Truyền FormControl trực tiếp -->
+      <app-text-input label="Tiêu đề" [control]="getFormControl('title')"></app-text-input>
 
-      <app-date-input label="Ngày bắt đầu" placeholder="Nhập nội dung mô tả" formControlName="startDate" />
+      <app-area-input label="Mô tả" placeholder="Nhập nội dung mô tả" [control]="getFormControl('description')" />
 
-      <div class="info-row">
-        <div class="info-label">› Ngày bắt đầu</div>
-        <div class="info-value">{{ data.startDate | date: 'dd/MM/yyyy HH:mm' }}</div>
+      <div class="row">
+        <div class="col">
+          <app-date-input label="Ngày bắt đầu" placeholder="Nhập ngày bắt đầu"
+            [control]="getFormControl('startDate')" />
+        </div>
+        <div class="col">
+          <app-date-input label="Ngày kết thúc" placeholder="Nhập ngày kết thúc"
+            [control]="getFormControl('endDate')" />
+        </div>
       </div>
 
-      <div class="info-row">
-        <div class="info-label">› Ngày kết thúc</div>
-        <div class="info-value">{{ data.endDate | date: 'dd/MM/yyyy HH:mm' }}</div>
-      </div>
+
     </div>
 
     <!-- THÔNG TIN THIẾT BỊ (TÙY CHỌN) -->
@@ -61,6 +65,7 @@
         <div class="info-value">{{ data.updatedAt ? (data.updatedAt | date: 'dd/MM/yyyy HH:mm') : 'Chưa cập nhật' }}
         </div>
       </div>
+
     </div>
 
     <!-- Nút đóng -->

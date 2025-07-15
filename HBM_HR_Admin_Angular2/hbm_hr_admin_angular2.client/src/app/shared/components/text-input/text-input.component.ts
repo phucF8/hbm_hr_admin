@@ -8,15 +8,16 @@ import { ControlContainer, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./text-input.component.css','./../../styles/shared.css']
 })
 export class TextInputComponent {
+  @Input() 
   @Input() label: string = '';
   @Input() placeholder: string = '';
-  @Input() formControlName!: string;
+  @Input() control!: FormControl; // 👈 nhận FormControl từ bên ngoài
 
   constructor(@Optional() private controlContainer: ControlContainer) {}
 
-  get control(): FormControl {
-    return this.controlContainer?.control?.get(this.formControlName) as FormControl;
-  }
+  // get control(): FormControl {
+  //   return this.controlContainer?.control?.get(this.formControlName) as FormControl;
+  // }
 
   /** ✅ Tự động phát hiện nếu control có validator required */
   get isRequired(): boolean {
