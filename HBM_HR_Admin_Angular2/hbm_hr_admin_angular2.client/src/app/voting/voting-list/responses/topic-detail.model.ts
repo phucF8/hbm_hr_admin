@@ -8,4 +8,6 @@ export interface TopicDetail {
   updatedBy?: string | null;
   createdAt: string;
   updatedAt?: string | null;
+  createdByName: string;
+  updatedByName?: string | null;
 }
