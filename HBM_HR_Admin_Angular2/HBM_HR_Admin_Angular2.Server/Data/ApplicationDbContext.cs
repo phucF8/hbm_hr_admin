@@ -17,6 +17,9 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public DbSet<Topic> Topics { get; set; }
 
+        public DbSet<Question> Questions { get; set; }
+
+
 
 
     }
