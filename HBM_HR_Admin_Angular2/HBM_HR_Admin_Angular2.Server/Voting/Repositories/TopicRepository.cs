@@ -104,10 +104,21 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                             UpdatedByName = updatedUser.TenNhanVien,
                             CreatedAt = t.CreatedAt,
                             UpdatedAt = t.UpdatedAt,
+                            Questions = _context.Questions
+                                .Where(q => q.TopicId == t.Id)
+                                .OrderBy(q => q.OrderNumber)
+                                .Select(q => new QuestionDto
+                                {
+                                    Id = q.Id,
+                                    Content = q.Content,
+                                    Type = q.Type,
+                                    OrderNumber = q.OrderNumber
+                                }).ToList()
                         };
 
             return await query.FirstOrDefaultAsync();
         }
+
 
 
     }
