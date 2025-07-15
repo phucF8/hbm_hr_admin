@@ -1,14 +1,13 @@
 ﻿namespace HBM_HR_Admin_Angular2.Server.Voting.DTOs
 {
-    public class TopicDto
+    public class UpdateTopicDto
     {
-        public string Id { get; set; }
-        public string Title { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public string? CreatedByName { get; set; }
-        public string? UpdatedByName { get; set; }
-
+        public string UpdatedBy { get; set; } = string.Empty;
     }
+
 }

@@ -23,30 +23,20 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
 
         public async Task<PagedResultDto<TopicDto>> GetPagedAsync(int page, int pageSize)
         {
-            var query = from t in _context.Topics
-                        join created in _context.DbNhanVien on t.CreatedBy equals created.ID into createdGroup
-                        from createdUser in createdGroup.DefaultIfEmpty()
-                        join updated in _context.DbNhanVien on t.UpdatedBy equals updated.ID into updatedGroup
-                        from updatedUser in updatedGroup.DefaultIfEmpty()
-                        orderby t.CreatedAt descending
-                        select new TopicDto
-                        {
-                            Id = t.Id,
-                            Title = t.Title,
-                            Description = t.Description,
-                            StartDate = t.StartDate,
-                            EndDate = t.EndDate,
-                            CreatedByName = createdUser.TenNhanVien,
-                            UpdatedByName = updatedUser.TenNhanVien
-                        };
-
+            var query = _context.Topics.OrderByDescending(t => t.CreatedAt);
             var totalItems = await query.CountAsync();
-
             var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .Select(t => new TopicDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    StartDate = t.StartDate,
+                    EndDate = t.EndDate
+                })
                 .ToListAsync();
-
             return new PagedResultDto<TopicDto>
             {
                 TotalItems = totalItems,
@@ -55,7 +45,6 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                 Items = items
             };
         }
-
 
         public async Task<bool> DeleteAsync(string id)
         {
