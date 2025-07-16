@@ -14,5 +14,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Models
         public string? UpdatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        public List<Question> Questions { get; set; } = new();
     }
 }

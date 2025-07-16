@@ -68,20 +68,70 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
 
         public async Task<Topic?> UpdateAsync(UpdateTopicDto dto)
         {
-            var topic = await _context.Topics.FindAsync(dto.Id);
+            var topic = await _context.Topics
+                .Include(t => t.Questions)
+                .FirstOrDefaultAsync(t => t.Id == dto.Id);
+
             if (topic == null)
                 return null;
+            try
+            {
+                // ✅ Cập nhật thông tin Topic
+                topic.Title = dto.Title;
+                topic.Description = dto.Description;
+                topic.StartDate = dto.StartDate;
+                topic.EndDate = dto.EndDate;
+                topic.UpdatedBy = dto.UpdatedBy;
+                topic.UpdatedAt = DateTime.UtcNow;
 
-            topic.Title = dto.Title;
-            topic.Description = dto.Description;
-            topic.StartDate = dto.StartDate;
-            topic.EndDate = dto.EndDate;
-            topic.UpdatedBy = dto.UpdatedBy;
-            topic.UpdatedAt = DateTime.UtcNow;
+                // ✅ Cập nhật danh sách câu hỏi
+                var existingQuestionIds = topic.Questions.Select(q => q.Id).ToList();
+                var incomingQuestionIds = dto.Questions.Select(q => q.Id).ToList();
 
-            await _context.SaveChangesAsync();
-            return topic;
+                // ✅ Xoá các câu hỏi không còn trong danh sách mới
+                var toDelete = topic.Questions.Where(q => !incomingQuestionIds.Contains(q.Id)).ToList();
+                _context.Questions.RemoveRange(toDelete);
+
+                foreach (var questionDto in dto.Questions)
+                {
+                    var existingQuestion = topic.Questions.FirstOrDefault(q => q.Id == questionDto.Id);
+                    if (existingQuestion != null)
+                    {
+                        // ✅ Cập nhật câu hỏi cũ
+                        existingQuestion.Content = questionDto.Content;
+                        existingQuestion.Type = questionDto.Type;
+                        existingQuestion.OrderNumber = questionDto.OrderNumber;
+                    }
+                    else
+                    {
+                        // ✅ Thêm mới câu hỏi
+                        var newQuestion = new Question
+                        {
+                            Id = questionDto.Id,
+                            Content = questionDto.Content,
+                            Type = questionDto.Type,
+                            OrderNumber = questionDto.OrderNumber,
+                            TopicId = topic.Id,
+                            CreatedBy = topic.UpdatedBy,
+                        };
+                        topic.Questions.Add(newQuestion);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return topic;
+            }
+            catch (DbUpdateException ex)
+            {
+                var detailedError = ex.InnerException?.Message ?? ex.Message;
+                throw new Exception("Lỗi khi lưu dữ liệu vào DB: " + detailedError);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Lỗi không xác định: " + ex.Message);
+            }
         }
+
 
         public async Task<TopicDto?> GetByIdAsync(string id)
         {

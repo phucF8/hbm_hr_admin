@@ -8,6 +8,7 @@
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string UpdatedBy { get; set; } = string.Empty;
+        public List<UpdateQuestionDto> Questions { get; set; } = new();
     }
 
 }
