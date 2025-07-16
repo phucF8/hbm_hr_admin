@@ -99,3 +99,29 @@ pre { font-family: monospace; white-space: pre-wrap; }
   flex: 1;
   min-width: 200px; /* Đảm bảo responsive */
 }
+.question-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.question-left {
+  flex: 2;
+}
+
+.question-right {
+  flex: 1;
+}
+.question-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+

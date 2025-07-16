@@ -10,4 +10,19 @@ export interface TopicDetail {
   updatedAt?: string | null;
   createdByName: string;
   updatedByName?: string | null;
+  questions: QuestionDto[];
+}
+
+export interface Question {
+  id: string
+  content: string
+  type: string
+  orderNumber: number
+}
+
+export interface QuestionDto {
+  id: string;
+  content: string;
+  type: 'SingleChoice' | 'MultiChoice' | 'Essay';
+  orderNumber?: number;
 }

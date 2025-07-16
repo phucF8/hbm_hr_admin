@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TopicDetail } from '../voting-list/responses/topic-detail.model';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { QuestionDto, TopicDetail } from '../voting-list/responses/topic-detail.model';
+import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
@@ -15,6 +15,8 @@ import { formatDate } from '@angular/common';
 export class TopicDetailComponent implements OnInit {
 
   myForm!: FormGroup;
+  questions: QuestionDto[] = []; // dữ liệu sẽ được load từ API
+  questionsArray!: FormArray; // để tiện dùng trong HTML
 
   ngOnInit(): void {
     
@@ -33,6 +35,7 @@ export class TopicDetailComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(10)]],
       startDate: [null],
       endDate: [null],
+      questions: this.fb.array([]) // ✅ thêm vào đây
     });
     if (data) {
         this.myForm.patchValue({
@@ -41,7 +44,35 @@ export class TopicDetailComponent implements OnInit {
           startDate: data.startDate ? formatDate(data.startDate, 'yyyy-MM-dd', 'en') : null,
           endDate: data.endDate ? formatDate(data.endDate, 'yyyy-MM-dd', 'en') : null,
         });
+        this.questions = data.questions || [];
+        this.questionsArray = this.myForm.get('questions') as FormArray;
+        this.questions.forEach(q => {
+        this.questionsArray.push(this.fb.group({
+          id: [q.id],
+          content: [q.content, Validators.required],
+          type: [q.type || 'SingleChoice', Validators.required],
+          orderNumber: [q.orderNumber ?? 0]
+        }));
+      });
     }
+  }
+
+  // getter tiện dùng trong HTML
+  get questionsFormArray(): FormArray {
+    return this.myForm.get('questions') as FormArray;
+  }
+
+  addQuestion() {
+    this.questionsFormArray.push(this.fb.group({
+      id: [window.crypto.randomUUID()], // hoặc null nếu để backend xử lý
+      content: ['', Validators.required],
+      type: ['SingleChoice', Validators.required],
+      orderNumber: [this.questionsFormArray.length + 1]
+    }));
+  }
+
+  removeQuestion(index: number) {
+    this.questionsFormArray.removeAt(index);
   }
 
   getFormControl(name: string): FormControl {
