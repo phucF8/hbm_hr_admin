@@ -18,11 +18,21 @@ export interface Question {
   content: string
   type: string
   orderNumber: number
+  options: Option[]
 }
+
+export interface Option {
+  id: string
+  content: string
+  orderNumber: number
+}
+
 
 export interface QuestionDto {
   id: string;
   content: string;
   type: 'SingleChoice' | 'MultiChoice' | 'Essay';
   orderNumber?: number;
+  options: Option[]
 }
+

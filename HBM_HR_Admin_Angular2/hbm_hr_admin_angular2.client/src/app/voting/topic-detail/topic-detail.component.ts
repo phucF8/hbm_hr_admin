@@ -19,7 +19,7 @@ export class TopicDetailComponent implements OnInit {
   questionsArray!: FormArray; // để tiện dùng trong HTML
 
   ngOnInit(): void {
-    
+
   }
 
   constructor(
@@ -35,23 +35,35 @@ export class TopicDetailComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(10)]],
       startDate: [null],
       endDate: [null],
-      questions: this.fb.array([]) // ✅ thêm vào đây
+      questions: this.fb.array([
+
+      ]) // ✅ thêm vào đây
     });
     if (data) {
-        this.myForm.patchValue({
-          title: data.title || '',
-          description: data.description || '',
-          startDate: data.startDate ? formatDate(data.startDate, 'yyyy-MM-dd', 'en') : null,
-          endDate: data.endDate ? formatDate(data.endDate, 'yyyy-MM-dd', 'en') : null,
+      this.myForm.patchValue({
+        title: data.title || '',
+        description: data.description || '',
+        startDate: data.startDate ? formatDate(data.startDate, 'yyyy-MM-dd', 'en') : null,
+        endDate: data.endDate ? formatDate(data.endDate, 'yyyy-MM-dd', 'en') : null,
+      });
+      this.questions = data.questions || [];
+      this.questionsArray = this.myForm.get('questions') as FormArray;
+
+      this.questions.forEach(q => {
+        const optionsArray = this.fb.array<FormGroup>([]);
+        (q.options || []).forEach(opt => {
+          optionsArray.push(this.fb.group({
+            id: [opt.id],
+            content: [opt.content, Validators.required],
+            orderNumber: [opt.orderNumber ?? 0],
+          }));
         });
-        this.questions = data.questions || [];
-        this.questionsArray = this.myForm.get('questions') as FormArray;
-        this.questions.forEach(q => {
         this.questionsArray.push(this.fb.group({
           id: [q.id],
           content: [q.content, Validators.required],
           type: [q.type || 'SingleChoice', Validators.required],
-          orderNumber: [q.orderNumber ?? 0]
+          orderNumber: [q.orderNumber ?? 0],
+          options: optionsArray, // gán vào FormArray
         }));
       });
     }
@@ -78,6 +90,40 @@ export class TopicDetailComponent implements OnInit {
   getFormControl(name: string): FormControl {
     return this.myForm.get(name) as FormControl;
   }
+
+  getOptionsFormArray(questionIndex: number): FormArray {
+    return this.questionsFormArray.at(questionIndex).get('options') as FormArray;
+  }
+
+  addOption(questionIndex: number) {
+    const options = this.getOptionsFormArray(questionIndex);
+    options.push(this.fb.group({ text: [''] }));
+  }
+
+  removeOption(questionIndex: number, optionIndex: number) {
+    const options = this.getOptionsFormArray(questionIndex);
+    options.removeAt(optionIndex);
+  }
+
+  createQuestionForm(): FormGroup {
+    return this.fb.group({
+      content: ['', Validators.required],
+      type: ['SingleChoice', Validators.required],
+      options: this.fb.array([
+        this.createOptionForm()
+      ])
+    });
+  }
+
+
+  createOptionForm(): FormGroup {
+    return this.fb.group({
+      content: ['', Validators.required]
+    });
+  }
+
+
+
 
   closePopup() {
     this.dialogRef.close();

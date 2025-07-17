@@ -212,12 +212,22 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                                     Id = q.Id,
                                     Content = q.Content,
                                     Type = q.Type,
-                                    OrderNumber = q.OrderNumber
+                                    OrderNumber = q.OrderNumber,
+                                    Options = _context.Options
+                                        .Where(o => o.QuestionId == q.Id)
+                                        .OrderBy(o => o.OrderNumber)
+                                        .Select(o => new OptionDto
+                                        {
+                                            Id = o.Id,
+                                            Content = o.Content,
+                                            OrderNumber = o.OrderNumber
+                                        }).ToList()
                                 }).ToList()
                         };
 
             return await query.FirstOrDefaultAsync();
         }
+
 
 
 
