@@ -7,6 +7,15 @@
         public string Type { get; set; } = null!;
         public int? OrderNumber { get; set; }
         public string? UpdatedBy { get; set; }
+
+        public List<UpdateOptionDto> Options { get; set; } = new();
+    }
+
+    public class UpdateOptionDto
+    {
+        public string Id { get; set; } = default!; // Guid hoặc rỗng nếu thêm mới
+        public string Content { get; set; } = default!;
+        public int OrderNumber { get; set; }
     }
 
 }

@@ -70,10 +70,12 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
         {
             var topic = await _context.Topics
                 .Include(t => t.Questions)
+                    .ThenInclude(q => q.Options)
                 .FirstOrDefaultAsync(t => t.Id == dto.Id);
 
             if (topic == null)
                 return null;
+
             try
             {
                 // ✅ Cập nhật thông tin Topic
@@ -84,37 +86,84 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                 topic.UpdatedBy = dto.UpdatedBy;
                 topic.UpdatedAt = DateTime.UtcNow;
 
-                // ✅ Cập nhật danh sách câu hỏi
-                var existingQuestionIds = topic.Questions.Select(q => q.Id).ToList();
+                // ✅ Lấy danh sách ID các câu hỏi hiện có và mới
                 var incomingQuestionIds = dto.Questions.Select(q => q.Id).ToList();
+                var toDeleteQuestions = topic.Questions
+                    .Where(q => !incomingQuestionIds.Contains(q.Id))
+                    .ToList();
 
-                // ✅ Xoá các câu hỏi không còn trong danh sách mới
-                var toDelete = topic.Questions.Where(q => !incomingQuestionIds.Contains(q.Id)).ToList();
-                _context.Questions.RemoveRange(toDelete);
+                _context.Questions.RemoveRange(toDeleteQuestions);
 
-                foreach (var questionDto in dto.Questions)
+                foreach (var qDto in dto.Questions)
                 {
-                    var existingQuestion = topic.Questions.FirstOrDefault(q => q.Id == questionDto.Id);
-                    if (existingQuestion != null)
+                    var existingQ = topic.Questions.FirstOrDefault(q => q.Id == qDto.Id);
+
+                    if (existingQ != null)
                     {
                         // ✅ Cập nhật câu hỏi cũ
-                        existingQuestion.Content = questionDto.Content;
-                        existingQuestion.Type = questionDto.Type;
-                        existingQuestion.OrderNumber = questionDto.OrderNumber;
+                        existingQ.Content = qDto.Content;
+                        existingQ.Type = qDto.Type;
+                        existingQ.OrderNumber = qDto.OrderNumber;
+                        existingQ.UpdatedBy = dto.UpdatedBy;
+                        existingQ.UpdatedAt = DateTime.UtcNow;
+
+                        // ✅ Xử lý Options của câu hỏi này
+                        var incomingOptionIds = qDto.Options.Select(o => o.Id).ToList();
+                        var toDeleteOptions = existingQ.Options
+                            .Where(o => !incomingOptionIds.Contains(o.Id))
+                            .ToList();
+
+                        _context.Options.RemoveRange(toDeleteOptions);
+
+                        foreach (var oDto in qDto.Options)
+                        {
+                            var existingO = existingQ.Options.FirstOrDefault(o => o.Id == oDto.Id);
+                            if (existingO != null)
+                            {
+                                // Cập nhật option
+                                existingO.Content = oDto.Content;
+                                existingO.OrderNumber = oDto.OrderNumber;
+                                existingO.UpdatedBy = dto.UpdatedBy;
+                                existingO.UpdatedAt = DateTime.UtcNow;
+                            }
+                            else
+                            {
+                                // Thêm mới option
+                                var newOption = new Option
+                                {
+                                    Id = string.IsNullOrWhiteSpace(oDto.Id) ? Guid.NewGuid().ToString() : oDto.Id,
+                                    QuestionId = existingQ.Id,
+                                    Content = oDto.Content,
+                                    OrderNumber = oDto.OrderNumber,
+                                    CreatedBy = dto.UpdatedBy,
+                                    CreatedAt = DateTime.UtcNow
+                                };
+                                existingQ.Options.Add(newOption);
+                            }
+                        }
                     }
                     else
                     {
-                        // ✅ Thêm mới câu hỏi
-                        var newQuestion = new Question
+                        // ✅ Thêm mới câu hỏi và options
+                        var newQ = new Question
                         {
-                            Id = questionDto.Id,
-                            Content = questionDto.Content,
-                            Type = questionDto.Type,
-                            OrderNumber = questionDto.OrderNumber,
+                            Id = qDto.Id,
+                            Content = qDto.Content,
+                            Type = qDto.Type,
+                            OrderNumber = qDto.OrderNumber,
                             TopicId = topic.Id,
-                            CreatedBy = topic.UpdatedBy,
+                            CreatedBy = dto.UpdatedBy,
+                            CreatedAt = DateTime.UtcNow,
+                            Options = qDto.Options.Select(o => new Option
+                            {
+                                Id = string.IsNullOrWhiteSpace(o.Id) ? Guid.NewGuid().ToString() : o.Id,
+                                Content = o.Content,
+                                OrderNumber = o.OrderNumber,
+                                CreatedBy = dto.UpdatedBy,
+                                CreatedAt = DateTime.UtcNow
+                            }).ToList()
                         };
-                        topic.Questions.Add(newQuestion);
+                        topic.Questions.Add(newQ);
                     }
                 }
 
@@ -123,14 +172,15 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
             }
             catch (DbUpdateException ex)
             {
-                var detailedError = ex.InnerException?.Message ?? ex.Message;
-                throw new Exception("Lỗi khi lưu dữ liệu vào DB: " + detailedError);
+                var detail = ex.InnerException?.Message ?? ex.Message;
+                throw new Exception("Lỗi khi lưu vào DB: " + detail);
             }
             catch (Exception ex)
             {
                 throw new Exception("Lỗi không xác định: " + ex.Message);
             }
         }
+
 
 
         public async Task<TopicDto?> GetByIdAsync(string id)

@@ -1,6 +1,7 @@
 using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace HBM_HR_Admin_Angular2.Server.Data
 {
@@ -18,6 +19,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<Topic> Topics { get; set; }
 
         public DbSet<Question> Questions { get; set; }
+        public DbSet<Option> Options { get; set; }
 
 
 

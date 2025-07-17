@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HBM_HR_Admin_Angular2.Server.Voting.Models;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -28,6 +29,7 @@ public class Question
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public DateTime? UpdatedAt { get; set; }
+    public List<Option> Options { get; set; } = new();
 
     // Navigation property (nếu có)
     // public Topic Topic { get; set; } = null!;
