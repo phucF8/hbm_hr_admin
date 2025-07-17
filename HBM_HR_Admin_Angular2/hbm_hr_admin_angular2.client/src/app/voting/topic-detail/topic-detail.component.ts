@@ -97,7 +97,13 @@ export class TopicDetailComponent implements OnInit {
 
   addOption(questionIndex: number) {
     const options = this.getOptionsFormArray(questionIndex);
-    options.push(this.fb.group({ text: [''] }));
+    options.push(
+      this.fb.group({ 
+        id: [window.crypto.randomUUID()], // hoặc null nếu để backend xử lý
+        content: ['', Validators.required],
+        orderNumber: [options.length + 1]
+      })
+    );
   }
 
   removeOption(questionIndex: number, optionIndex: number) {
