@@ -62,39 +62,44 @@
     </div>
 
     <!-- Danh sách câu hỏi -->
-    <div formArrayName="questions">
-      <div *ngFor="let q of questionsFormArray.controls; let i = index" [formGroupName]="i" class="question-row">
-        <!-- Câu hỏi -->
-        <div class="question-left">
-          <label>Câu hỏi {{ i + 1 }}</label>
-          <input class="form-control" formControlName="content" placeholder="Nội dung câu hỏi" />
-        </div>
-        <!-- Loại câu hỏi -->
-        <div class="question-right">
-          <label>Loại</label>
-          <select class="form-select" formControlName="type">
-            <option value="SingleChoice">Chọn một</option>
-            <option value="MultiChoice">Chọn nhiều</option>
-            <option value="Essay">Tự luận</option>
-          </select>
-        </div>
-        <!-- Xoá câu hỏi -->
-        <div class="question-action">
-          <button type="button" class="btn btn-sm btn-outline-danger mt-4" (click)="removeQuestion(i)">🗑</button>
-        </div>
-        <!-- Option cho câu hỏi (nếu không phải dạng Essay) -->
-        <div *ngIf="q.get('type')?.value !== 'Essay'" formArrayName="options" class="options-wrapper">
-          <label class="mt-3">Các phương án:</label>
-          <div *ngFor="let opt of getOptionsFormArray(i).controls; let j = index" [formGroupName]="j"
-            class="option-row">
-            <input class="form-control mb-2" formControlName="content" placeholder="Nội dung phương án" />
-            <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeOption(i, j)">🗑</button>
+    <div formArrayName="questions" class="questions-container">
+      <div *ngFor="let q of questionsFormArray.controls; let i = index" [formGroupName]="i" class="question-card">
+
+        <!-- Header -->
+        <div class="question-header d-flex align-items-center justify-content-between">
+          <div class="cauhoi d-flex align-items-center gap-2">
+            <div class="badge bg-primary text-white px-3 py-1 rounded-pill">
+              
+            </div>
+            <input formControlName="content" class="form-control border-0 fs-6 fw-semibold"
+              placeholder="Nội dung câu hỏi" />
           </div>
-          <button type="button" class="btn btn-sm btn-outline-primary mt-2" (click)="addOption(i)">
-            ➕ Thêm phương án
-          </button>
+
+          <!-- Loại câu hỏi & xoá -->
+          <div class="d-flex align-items-center gap-2">
+            <select class="question-type-select" formControlName="type">
+              <option value="SingleChoice">Chọn một</option>
+              <option value="MultiChoice">Chọn nhiều</option>
+              <option value="Essay">Tự luận</option>
+            </select>
+            <div style="width: 8px; display: inline-block;"></div>
+            <button type="button" class="btn-vuong btn-outline-danger btn-sm" (click)="removeQuestion(i)">🗑</button>
+          </div>
         </div>
-        <hr />
+
+        <!-- Option nếu không phải Essay -->
+        <div *ngIf="q.get('type')?.value !== 'Essay'" formArrayName="options" class="options-container">
+          <button type="button" class="add-option-btn" (click)="addOption(i)">+Thêm lựa
+            chọn</button>
+          <div *ngFor="let opt of getOptionsFormArray(i).controls; let j = index" [formGroupName]="j"
+            class="option-item d-flex align-items-center gap-2 mb-2">
+            <input class="form-control" formControlName="content" placeholder="Nội dung phương án" />
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeOption(i, j)">🗑</button>
+          </div>
+          
+        </div>
+
+        
       </div>
     </div>
 

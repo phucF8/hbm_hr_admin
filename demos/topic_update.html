@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .add-question-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .add-question-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .questions-container {
+            space-y: 16px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .question-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .question-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .question-type {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .type-multiple { background: #dbeafe; color: #1d4ed8; }
+        .type-single { background: #dcfce7; color: #166534; }
+        .type-text { background: #fef3c7; color: #d97706; }
+        .type-rating { background: #fce7f3; color: #be185d; }
+
+        .question-content {
+            flex: 1;
+        }
+
+        .question-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            background: transparent;
+            border: none;
+            width: 100%;
+            padding: 4px 0;
+            outline: none;
+        }
+
+        .question-title:focus {
+            background: #f8fafc;
+            border-radius: 4px;
+            padding: 4px 8px;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-btn {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .edit-btn:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .delete-btn {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .delete-btn:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .drag-handle {
+            background: #f8fafc;
+            color: #94a3b8;
+            cursor: grab;
+        }
+
+        .drag-handle:hover {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .options-container {
+            padding: 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .options-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .options-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .add-option-btn {
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-option-btn:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .option-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .option-item:hover {
+            border-color: #cbd5e1;
+        }
+
+        .option-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            outline: none;
+            padding: 4px;
+        }
+
+        .option-input:focus {
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+
+        .option-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .option-delete {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .option-delete:hover {
+            background: #fef2f2;
+        }
+
+        .question-type-select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .question-type-select:focus {
+            border-color: #3b82f6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .collapse-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .collapse-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .collapsed .options-container {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .question-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .question-actions {
+                align-self: flex-end;
+            }
+
+            .options-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Question Manager</h1>
+            <p>Tạo và quản lý danh sách câu hỏi một cách dễ dàng</p>
+        </div>
+
+        <button class="add-question-btn" onclick="addQuestion()">
+            <span>+</span>
+            Thêm câu hỏi mới
+        </button>
+
+        <div class="questions-container" id="questionsContainer">
+            <div class="empty-state">
+                <h3>Chưa có câu hỏi nào</h3>
+                <p>Nhấn "Thêm câu hỏi mới" để bắt đầu tạo câu hỏi đầu tiên</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questionId = 1;
+        let optionId = 1;
+        let questions = [];
+
+        function addQuestion() {
+            const question = {
+                id: questionId++,
+                title: 'Câu hỏi mới',
+                type: 'multiple',
+                options: [],
+                collapsed: false
+            };
+
+            questions.push(question);
+            renderQuestions();
+        }
+
+        function deleteQuestion(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
+                questions = questions.filter(q => q.id !== id);
+                renderQuestions();
+            }
+        }
+
+        function updateQuestionTitle(id, title) {
+            const question = questions.find(q => q.id === id);
+            if (question) {
+                question.title = title;
+            }
+        }
+
+        function updateQuestionType(id, type) {
+            const question = questions.find(q => q.id === id);
+            if (question) {
+                question.type = type;
+                // Xóa options nếu chuyển sang text
+                if (type === 'text') {
+                    question.options = [];
+                }
+                renderQuestions();
+            }
+        }
+
+        function toggleCollapse(id) {
+            const question = questions.find(q => q.id === id);
+            if (question) {
+                question.collapsed = !question.collapsed;
+                renderQuestions();
+            }
+        }
+
+        function addOption(questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (question) {
+                question.options.push({
+                    id: optionId++,
+                    text: 'Lựa chọn mới'
+                });
+                renderQuestions();
+            }
+        }
+
+        function deleteOption(questionId, optionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (question) {
+                question.options = question.options.filter(o => o.id !== optionId);
+                renderQuestions();
+            }
+        }
+
+        function updateOption(questionId, optionId, text) {
+            const question = questions.find(q => q.id === questionId);
+            if (question) {
+                const option = question.options.find(o => o.id === optionId);
+                if (option) {
+                    option.text = text;
+                }
+            }
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                multiple: 'Nhiều lựa chọn',
+                single: 'Một lựa chọn',
+                text: 'Văn bản',
+                rating: 'Đánh giá'
+            };
+            return labels[type] || type;
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            
+            if (questions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Chưa có câu hỏi nào</h3>
+                        <p>Nhấn "Thêm câu hỏi mới" để bắt đầu tạo câu hỏi đầu tiên</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = questions.map(question => `
+                <div class="question-card ${question.collapsed ? 'collapsed' : ''}">
+                    <div class="question-header">
+                        <button class="action-btn drag-handle" title="Kéo thả để sắp xếp">
+                            ⋮⋮
+                        </button>
+                        
+                        <div class="question-type type-${question.type}">
+                            ${getTypeLabel(question.type)}
+                        </div>
+                        
+                        <div class="question-content">
+                            <input 
+                                type="text" 
+                                class="question-title" 
+                                value="${question.title}"
+                                onchange="updateQuestionTitle(${question.id}, this.value)"
+                                placeholder="Nhập tiêu đề câu hỏi..."
+                            >
+                        </div>
+                        
+                        <select 
+                            class="question-type-select"
+                            value="${question.type}"
+                            onchange="updateQuestionType(${question.id}, this.value)"
+                        >
+                            <option value="multiple">Nhiều lựa chọn</option>
+                            <option value="single">Một lựa chọn</option>
+                            <option value="text">Văn bản</option>
+                            <option value="rating">Đánh giá</option>
+                        </select>
+                        
+                        <div class="question-actions">
+                            ${question.type !== 'text' ? `
+                                <button class="action-btn collapse-btn" onclick="toggleCollapse(${question.id})" title="Thu gọn/Mở rộng">
+                                    ${question.collapsed ? '▼' : '▲'}
+                                </button>
+                            ` : ''}
+                            <button class="action-btn delete-btn" onclick="deleteQuestion(${question.id})" title="Xóa câu hỏi">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${question.type !== 'text' ? `
+                        <div class="options-container">
+                            <div class="options-header">
+                                <div class="options-title">Các lựa chọn</div>
+                                <button class="add-option-btn" onclick="addOption(${question.id})">
+                                    <span>+</span>
+                                    Thêm lựa chọn
+                                </button>
+                            </div>
+                            
+                            ${question.options.map(option => `
+                                <div class="option-item">
+                                    <input 
+                                        type="text" 
+                                        class="option-input" 
+                                        value="${option.text}"
+                                        onchange="updateOption(${question.id}, ${option.id}, this.value)"
+                                        placeholder="Nhập nội dung lựa chọn..."
+                                    >
+                                    <div class="option-actions">
+                                        <button class="option-delete" onclick="deleteOption(${question.id}, ${option.id})" title="Xóa lựa chọn">
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            ${question.options.length === 0 ? `
+                                <div style="text-align: center; color: #64748b; padding: 20px;">
+                                    Chưa có lựa chọn nào. Nhấn "Thêm lựa chọn" để bắt đầu.
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Khởi tạo
+        renderQuestions();
+    </script>
+</body>
+</html>

@@ -83,8 +83,8 @@ export class VotingList {
         data: topic.data,
         disableClose: true,
         panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
-        width: '50vw',
-        height: '90vh',
+        width: '100vw',
+        height: '100vh',
         maxWidth: '100vw'
       })
     .afterClosed().subscribe(result => {
