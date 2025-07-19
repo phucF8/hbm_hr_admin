@@ -50,6 +50,7 @@ import { SharedModule } from "./shared/shared.module";
     ErrorUserReportComponent,
     NotFoundComponent,
     TopicDetailComponent,
+    
   ],
   imports: [
     QuillModule.forRoot(),
@@ -66,7 +67,7 @@ import { SharedModule } from "./shared/shared.module";
     MatInputModule,
     MatSelectModule,
     MatRadioModule,
-    SharedModule
+    SharedModule,
 ],
   providers: [
     // {provide: LocationStrategy, useClass: HashLocationStrategy},

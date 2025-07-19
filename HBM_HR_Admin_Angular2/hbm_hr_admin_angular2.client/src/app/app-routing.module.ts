@@ -8,6 +8,10 @@ import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
   {
+    path: 'question-manager',
+    loadComponent: () => import('./question-manager/question-manager.component').then(m => m.QuestionManagerComponent)
+  },
+  {
     path: 'voting',
     loadChildren: () => import('./voting/voting-module').then(m => m.VotingModule)
   },
