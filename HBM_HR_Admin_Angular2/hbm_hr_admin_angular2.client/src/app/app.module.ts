@@ -31,6 +31,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { ErrorUserReportComponent } from './error-report/error-user-report/error-user-report.component';
 import { TopicDetailComponent } from './voting/topic-detail/topic-detail.component';
 import { SharedModule } from "./shared/shared.module";
+import { QuestionManagerComponent } from "@app/question-manager/question-manager.component";
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { SharedModule } from "./shared/shared.module";
     MatSelectModule,
     MatRadioModule,
     SharedModule,
+    QuestionManagerComponent
 ],
   providers: [
     // {provide: LocationStrategy, useClass: HashLocationStrategy},

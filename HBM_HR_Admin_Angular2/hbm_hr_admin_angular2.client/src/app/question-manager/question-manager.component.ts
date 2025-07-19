@@ -3,6 +3,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { Question, QuestionType } from './question.model';
 import { QuestionService } from './question.service';
 import { CommonModule } from '@angular/common';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-question-manager',
@@ -10,6 +12,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./question-manager.component.css'],
   imports: [
     CommonModule, // 👈 THÊM DÒNG NÀY
+    DragDropModule
   ]
 })
 export class QuestionManagerComponent implements OnInit, OnDestroy {
@@ -40,6 +43,10 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
     if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
       this.questionService.deleteQuestion(id);
     }
+  }
+
+  drop(event: CdkDragDrop<any[]>) {
+    moveItemInArray(this.questions, event.previousIndex, event.currentIndex);
   }
 
   updateQuestionTitle(event: Event, questionId: number): void {
