@@ -49,6 +49,13 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
     moveItemInArray(this.questions, event.previousIndex, event.currentIndex);
   }
 
+  dropOption(event: CdkDragDrop<any[]>, questionId: number) {
+    const question = this.questions.find(q => q.id === questionId);
+    if (question && question.options) {
+      moveItemInArray(question.options, event.previousIndex, event.currentIndex);
+    }
+  }
+
   updateQuestionTitle(event: Event, questionId: number): void {
     const input = event.target as HTMLInputElement;
     const newValue = input.value;

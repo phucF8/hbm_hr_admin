@@ -60,21 +60,36 @@
         </div>
 
         <!-- Options List -->
-        <div class="option-item" *ngFor="let option of question.options; trackBy: trackByOptionId">
-          <input type="text" class="option-input" [value]="option.text"
-            (change)="updateOption($event, question.id, option.id)" placeholder="Nhập nội dung lựa chọn...">
-          <div class="option-actions">
-            <button type="button" class="option-delete" (click)="deleteOption(question.id, option.id)"
-              title="Xóa lựa chọn">
-              ✕
+
+
+        <div cdkDropList [cdkDropListData]="question.options" (cdkDropListDropped)="dropOption($event, question.id)">
+
+
+          <div class="option-item" *ngFor="let option of question.options; trackBy: trackByOptionId" cdkDrag>
+
+            <button type="button" class="drag-handle" cdkDragHandle title="Kéo để sắp xếp">
+              ⋮⋮
             </button>
+
+            <input type="text" class="option-input" [value]="option.text"
+              (change)="updateOption($event, question.id, option.id)" placeholder="Nhập nội dung lựa chọn...">
+            <div class="option-actions">
+              <button type="button" class="option-delete" (click)="deleteOption(question.id, option.id)"
+                title="Xóa lựa chọn">
+                ✕
+              </button>
+            </div>
           </div>
+
+          <!-- Empty Options State -->
+          <div style="text-align: center; color: #64748b; padding: 20px;" *ngIf="question.options.length === 0">
+            Chưa có lựa chọn nào. Nhấn "Thêm lựa chọn" để bắt đầu.
+          </div>
+
+
         </div>
 
-        <!-- Empty Options State -->
-        <div style="text-align: center; color: #64748b; padding: 20px;" *ngIf="question.options.length === 0">
-          Chưa có lựa chọn nào. Nhấn "Thêm lựa chọn" để bắt đầu.
-        </div>
+
       </div>
     </div>
   </div>
