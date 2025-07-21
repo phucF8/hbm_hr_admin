@@ -137,7 +137,6 @@ export class TopicDetailComponent implements OnInit {
     });
   }
 
-
   createOptionForm(): FormGroup {
     return this.fb.group({
       content: ['', Validators.required]
@@ -147,7 +146,6 @@ export class TopicDetailComponent implements OnInit {
   onQuestionsChange(updatedQuestions: QuestionViewModel[]) {
     // Cập nhật lại data.questions nếu cần
     this.data.questions = mapToDto(updatedQuestions); // hoặc xử lý tuỳ ý
-    
     console.log('Question length = ', this.data.questions);
   }
 

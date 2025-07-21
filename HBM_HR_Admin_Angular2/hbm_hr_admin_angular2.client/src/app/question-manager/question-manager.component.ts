@@ -42,13 +42,21 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
   }
 
   addQuestion(): void {
-    this.questionService.addQuestion();
+    const newQuestion: QuestionViewModel = {
+      id: crypto.randomUUID(),
+      content: '',
+      type: 'SingleChoice',
+      options: [],
+      orderNumber: this.questions.length+1,
+      collapsed: false
+    };
+    this.questions.push(newQuestion);
     this.updateSomething();
   }
 
   deleteQuestion(id: string): void {
     if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
-      this.questionService.deleteQuestion(id);
+      this.questions = this.questions.filter(q => q.id !== id);
       this.updateSomething();
     }
   }
@@ -90,6 +98,10 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
 
   deleteOption(questionId: string, optionId: string): void {
     this.questionService.deleteOption(questionId, optionId);
+    const question = this.questions.find(q => q.id === questionId);
+    if (question) {
+      question.options = question.options.filter(o => o.id !== optionId);
+    }
     this.updateSomething();
   }
 
