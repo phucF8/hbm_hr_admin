@@ -10,7 +10,7 @@
     <!-- Empty State -->
     <div class="empty-state" *ngIf="questions.length === 0">
       <h3>Chưa có câu hỏi nào</h3>
-      <p>Nhấn "Thêm câu hỏi mới" để bắt đầu tạo câu hỏi đầu tiên</p>
+      <p>Nhấn "Thêm câu hỏi" để bắt đầu tạo câu hỏi đầu tiên</p>
     </div>
 
     <!-- Questions List -->
@@ -22,9 +22,9 @@
           ⋮⋮
         </button>
 
-        <div class="question-type" [ngClass]="'type-' + question.type">
+        <!-- <div class="question-type" [ngClass]="'type-' + question.type">
           {{ getTypeLabel(question.type) }}
-        </div>
+        </div> -->
 
         <div class="question-content">
           <input type="text" class="question-title" [value]="question.title"

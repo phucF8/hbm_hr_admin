@@ -12,7 +12,7 @@
   background: #f8fafc;
   color: #334155;
   line-height: 1.6;
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }
 
 .header {
@@ -57,7 +57,7 @@
 }
 
 .questions-container {
-  space-y: 16px;
+  
 }
 
 .question-card {

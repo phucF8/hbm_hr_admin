@@ -62,7 +62,7 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
 
     const question = this.questions.find(q => q.id === questionId);
     if (question) {
-      question.title = newValue;
+      //question.title = newValue;
     }
   }
 
