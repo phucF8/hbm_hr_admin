@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { QuestionDto, TopicDetail } from '../voting-list/responses/topic-detail.model';
+import { QuestionDto, QuestionViewModel, TopicDetail } from '../voting-list/responses/topic-detail.model';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
+import { mapToDto } from '@app/utils/question.mapper';
 
 @Component({
   selector: 'app-topic-detail',
@@ -69,6 +70,21 @@ export class TopicDetailComponent implements OnInit {
     }
   }
 
+  mapToViewModel(dto: QuestionDto): QuestionViewModel {
+    return {
+      ...dto,
+      collapsed: false
+    };
+  }
+
+  mapToViewModels(dtos: QuestionDto[]): QuestionViewModel[] {
+    return dtos.map(q => ({
+      ...q,
+      collapsed: false
+    }));
+  }
+
+
   // getter tiện dùng trong HTML
   get questionsFormArray(): FormArray {
     return this.myForm.get('questions') as FormArray;
@@ -98,7 +114,7 @@ export class TopicDetailComponent implements OnInit {
   addOption(questionIndex: number) {
     const options = this.getOptionsFormArray(questionIndex);
     options.push(
-      this.fb.group({ 
+      this.fb.group({
         id: [window.crypto.randomUUID()], // hoặc null nếu để backend xử lý
         content: ['', Validators.required],
         orderNumber: [options.length + 1]
@@ -128,103 +144,115 @@ export class TopicDetailComponent implements OnInit {
     });
   }
 
-
-
-
-  closePopup() {
-    this.dialogRef.close();
+  onQuestionsChange(updatedQuestions: QuestionViewModel[]) {
+    // Cập nhật lại data.questions nếu cần
+    this.data.questions = mapToDto(updatedQuestions); // hoặc xử lý tuỳ ý
+    
+    console.log('Question length = ', this.data.questions);
   }
 
-  onSubmit() {
-    if (this.myForm.invalid) return;
-    if (!this.data?.id) {
-      this.onSubmitCreate();
-    } else {
-      this.onSubmitUpdate();
-    }
+ 
+
+
+
+
+
+
+closePopup() {
+  this.dialogRef.close();
+}
+
+onSubmit() {
+  if (this.myForm.invalid) return;
+  if (!this.data?.id) {
+    this.onSubmitCreate();
+  } else {
+    this.onSubmitUpdate();
   }
+}
 
-  onSubmitUpdate() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    // Xử lý giá trị rỗng thành null
-    const formValue = this.myForm.value;
-    if (formValue.startDate === '') {
-      formValue.startDate = null;
-    }
-    if (formValue.endDate === '') {
-      formValue.endDate = null;
-    }
-    const updatedTopic: TopicDetail = {
-      ...this.data,
-      ...this.myForm.value,
-      updatedAt: new Date().toISOString(), // gán lại updatedAt nếu cần
-      updatedBy: currentUser.DataSets.Table[0].ID
-    };
-    const jsonStr = JSON.stringify(updatedTopic); // null, 2 => để format đẹp
+onSubmitUpdate() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  // Xử lý giá trị rỗng thành null
+  const formValue = this.myForm.value;
+  if (formValue.startDate === '') {
+    formValue.startDate = null;
+  }
+  if (formValue.endDate === '') {
+    formValue.endDate = null;
+  }
+  const updatedTopic: TopicDetail = {
+    ...this.data,
+    ...this.myForm.value,
+    updatedAt: new Date().toISOString(), // gán lại updatedAt nếu cần
+    updatedBy: currentUser.DataSets.Table[0].ID
+  };
+  updatedTopic.questions = this.data.questions;
+  const jsonStr = JSON.stringify(updatedTopic); // null, 2 => để format đẹp
 
-    navigator.clipboard.writeText(jsonStr).then(() => { this.toastr.info('Đã copy to clipboard') }).catch(err => { });
+  navigator.clipboard.writeText(jsonStr).then(() => { this.toastr.info('Đã copy to clipboard') }).catch(err => { });
 
-    this.service.updateTopic(updatedTopic).subscribe({
-      next: (res) => {
-        if (res.status === 'SUCCESS') {
-          this.toastr.success('Cập nhật thành công!', ``, {
-            positionClass: 'toast-top-right'
-          });
-          this.dialogRef.close(res);
-        } else {
-          this.toastr.error('ERROR', 'Cập nhật thất bại: ' + res.message, {
-            positionClass: 'toast-top-right'
-          });
-        }
-      },
-      error: (err) => {
-        const errorMsg =
-          err?.error?.message ||  // nếu backend trả về { message: '...' }
-          err?.message ||         // nếu là lỗi từ HttpClient
-          'Đã xảy ra lỗi không xác định';
-        alert('Lỗi tạo chủ đề: ' + errorMsg);
+  this.service.updateTopic(updatedTopic).subscribe({
+    next: (res) => {
+      if (res.status === 'SUCCESS') {
+        this.toastr.success('Cập nhật thành công!', ``, {
+          positionClass: 'toast-top-right'
+        });
+        this.dialogRef.close(res);
+      } else {
+        this.toastr.error('ERROR', 'Cập nhật thất bại: ' + res.message, {
+          positionClass: 'toast-top-right'
+        });
       }
-    });
-  }
+    },
+    error: (err) => {
+      const errorMsg =
+        err?.error?.message ||  // nếu backend trả về { message: '...' }
+        err?.message ||         // nếu là lỗi từ HttpClient
+        'Đã xảy ra lỗi không xác định';
+      alert('Lỗi tạo chủ đề: ' + errorMsg);
+    }
+  });
+}
 
 
-  onSubmitCreate() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    const newTopic: TopicDetail = {
-      ...this.myForm.value,
-      createdAt: new Date().toISOString(), // hoặc để backend xử lý
-      updatedAt: new Date().toISOString(),  // nếu cần
-      createdBy: currentUser.DataSets.Table[0].ID
-    };
+onSubmitCreate() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const newTopic: TopicDetail = {
+    ...this.myForm.value,
+    createdAt: new Date().toISOString(), // hoặc để backend xử lý
+    updatedAt: new Date().toISOString(),  // nếu cần
+    createdBy: currentUser.DataSets.Table[0].ID
+  };
 
-    const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
-    navigator.clipboard.writeText(jsonStr).then(() => {
-      alert('Đã copy JSON vào clipboard!');
-    }).catch(err => { });
+  const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
+  navigator.clipboard.writeText(jsonStr).then(() => {
+    alert('Đã copy JSON vào clipboard!');
+  }).catch(err => { });
 
-    this.service.createTopic(newTopic).subscribe({
-      next: (res) => {
-        if (res.status === 'SUCCESS') {
-          alert('Tạo chủ đề thành công!');
-          this.dialogRef.close(newTopic);
-        } else {
-          alert('Tạo thất bại: ' + res.message);
-        }
-      },
-      error: (err) => {
-        const errorMsg =
-          err?.error?.message ||  // nếu backend trả về { message: '...' }
-          err?.message ||         // nếu là lỗi từ HttpClient
-          'Đã xảy ra lỗi không xác định';
-        alert('Lỗi tạo chủ đề: ' + errorMsg);
+  this.service.createTopic(newTopic).subscribe({
+    next: (res) => {
+      if (res.status === 'SUCCESS') {
+        alert('Tạo chủ đề thành công!');
+        this.dialogRef.close(newTopic);
+      } else {
+        alert('Tạo thất bại: ' + res.message);
       }
+    },
+    error: (err) => {
+      const errorMsg =
+        err?.error?.message ||  // nếu backend trả về { message: '...' }
+        err?.message ||         // nếu là lỗi từ HttpClient
+        'Đã xảy ra lỗi không xác định';
+      alert('Lỗi tạo chủ đề: ' + errorMsg);
+    }
 
-    });
-  }
+  });
+}
 
   get titleControl(): FormControl {
-    return this.myForm.get('title') as FormControl;
-  }
+  return this.myForm.get('title') as FormControl;
+}
 
 
 

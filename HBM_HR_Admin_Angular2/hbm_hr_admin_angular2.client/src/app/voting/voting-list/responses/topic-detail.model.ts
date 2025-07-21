@@ -31,8 +31,14 @@ export interface Option {
 export interface QuestionDto {
   id: string;
   content: string;
-  type: 'SingleChoice' | 'MultiChoice' | 'Essay';
+  type: QuestionType;
   orderNumber?: number;
   options: Option[]
 }
+
+export interface QuestionViewModel extends QuestionDto {
+  collapsed: boolean;
+}
+
+export type QuestionType = 'SingleChoice' | 'MultiChoice' | 'Essay';
 

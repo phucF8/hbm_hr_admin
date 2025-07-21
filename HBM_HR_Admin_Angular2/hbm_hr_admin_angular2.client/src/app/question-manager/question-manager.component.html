@@ -14,8 +14,7 @@
     </div>
 
     <!-- Questions List -->
-    <div class="question-card" [ngClass]="{ 'collapsed': question.collapsed }" cdkDrag
-      *ngFor="let question of questions; trackBy: trackByQuestionId">
+    <div class="question-card" [ngClass]="{ 'collapsed': question.collapsed }" cdkDrag *ngFor="let question of questions; trackBy: trackByQuestionId">
       <!-- Question Header -->
       <div class="question-header">
         <button type="button" class="action-btn drag-handle" title="Kéo thả để sắp xếp" cdkDragHandle>
@@ -27,20 +26,24 @@
         </div> -->
 
         <div class="question-content">
-          <input type="text" class="question-title" [value]="question.title"
+
+    
+
+          <input type="text" class="question-title" [value]="question.content"
             (change)="updateQuestionTitle($event, question.id)" placeholder="Nhập tiêu đề câu hỏi...">
         </div>
 
-        <select class="question-type-select" [value]="question.type"
-          (change)="updateQuestionTitle($event, question.id)">
-          <option value="single">Chọn một</option>
-          <option value="multiple">Chọn nhiều</option>
-          <option value="text">Tự luận</option>
+        <select class="question-type-select" 
+          [(ngModel)]="question.type"
+          (ngModelChange)="updateQuestionType(question.id, $event)">
+          <option value='SingleChoice'>Chọn một</option>
+          <option value='MultiChoice'>Chọn nhiều</option>
+          <option value='Essay'>Tự luận</option>
         </select>
 
         <div class="question-actions">
           <button type="button" class="action-btn collapse-btn" (click)="toggleCollapse(question.id)"
-            title="Thu gọn/Mở rộng" *ngIf="question.type !== 'text'">
+            title="Thu gọn/Mở rộng" *ngIf="question.type !== 'Essay'">
             {{ question.collapsed ? '▼' : '▲' }}
           </button>
           <button type="button" class="action-btn delete-btn" (click)="deleteQuestion(question.id)" title="Xóa câu hỏi">
@@ -50,7 +53,7 @@
       </div>
 
       <!-- Options Container -->
-      <div class="options-container" *ngIf="question.type !== 'text'">
+      <div class="options-container" *ngIf="question.type !== 'Essay'">
         <div class="options-header">
           <div class="options-title">Các lựa chọn</div>
           <button type="button" class="add-option-btn" (click)="addOption(question.id)">
@@ -71,7 +74,7 @@
               ⋮⋮
             </button>
 
-            <input type="text" class="option-input" [value]="option.text"
+            <input type="text" class="option-input" [value]="option.content"
               (change)="updateOption($event, question.id, option.id)" placeholder="Nhập nội dung lựa chọn...">
             <div class="option-actions">
               <button type="button" class="option-delete" (click)="deleteOption(question.id, option.id)"
