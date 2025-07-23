@@ -78,7 +78,7 @@ export class QuestionService {
     if (question) {
       const newOption: Option = {
         id: crypto.randomUUID(), // chuỗi UUID dài 36 ký tự
-        content: 'Lựa chọn mới',
+        content: '',
         orderNumber: question.options.length + 1 // Gán thứ tự dựa trên độ dài mảng hiện tại
       };
       question.options.push(newOption);

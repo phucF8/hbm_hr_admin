@@ -6,7 +6,7 @@
     Thêm câu hỏi
   </button>
 
-  <div class="questions-container" cdkDropList (cdkDropListDropped)="drop($event)">
+  <div class="questions-container" cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="drop($event)">
     <!-- Empty State -->
     <div class="empty-state" *ngIf="questions.length === 0">
       <h3>Chưa có câu hỏi nào</h3>
@@ -14,27 +14,22 @@
     </div>
 
     <!-- Questions List -->
-    <div class="question-card" [ngClass]="{ 'collapsed': question.collapsed }" cdkDrag *ngFor="let question of questions; trackBy: trackByQuestionId">
+    <div class="question-card" 
+      [ngClass]="{ 'collapsed': question.collapsed }" 
+      *ngFor="let question of questions; 
+      trackBy: trackByQuestionId"
+      cdkDrag>
       <!-- Question Header -->
       <div class="question-header">
         <button type="button" class="action-btn drag-handle" title="Kéo thả để sắp xếp" cdkDragHandle>
           ⋮⋮
         </button>
-
-        <!-- <div class="question-type" [ngClass]="'type-' + question.type">
-          {{ getTypeLabel(question.type) }}
-        </div> -->
-
+        <label class="option-label">{{question.orderNumber}}.</label>
         <div class="question-content">
-
-    
-
           <input type="text" class="question-title" [value]="question.content"
             (change)="updateQuestionTitle($event, question.id)" placeholder="Nhập tiêu đề câu hỏi...">
         </div>
-
-        <select class="question-type-select" 
-          [(ngModel)]="question.type"
+        <select class="question-type-select" [(ngModel)]="question.type"
           (ngModelChange)="updateQuestionType(question.id, $event)">
           <option value='SingleChoice'>Chọn một</option>
           <option value='MultiChoice'>Chọn nhiều</option>
@@ -61,19 +56,16 @@
             Thêm lựa chọn
           </button>
         </div>
-
         <!-- Options List -->
-
-
         <div cdkDropList [cdkDropListData]="question.options" (cdkDropListDropped)="dropOption($event, question.id)">
-
-
-          <div class="option-item" *ngFor="let option of question.options; trackBy: trackByOptionId" cdkDrag>
-
+          <div class="option-item" 
+          *ngFor="let option of question.options; 
+          trackBy: trackByOptionId" 
+          cdkDrag>
             <button type="button" class="drag-handle" cdkDragHandle title="Kéo để sắp xếp">
               ⋮⋮
             </button>
-
+            <label class="option-label">{{option.orderNumber}}.</label>
             <input type="text" class="option-input" [value]="option.content"
               (change)="updateOption($event, question.id, option.id)" placeholder="Nhập nội dung lựa chọn...">
             <div class="option-actions">

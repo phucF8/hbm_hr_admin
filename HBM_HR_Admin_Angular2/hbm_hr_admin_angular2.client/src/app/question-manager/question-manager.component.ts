@@ -4,7 +4,7 @@ import { QuestionService } from './question.service';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Question, QuestionDto, QuestionType, QuestionViewModel } from '@app/voting/voting-list/responses/topic-detail.model';
+import { Option, Question, QuestionDto, QuestionType, QuestionViewModel } from '@app/voting/voting-list/responses/topic-detail.model';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -18,8 +18,10 @@ import { FormsModule } from '@angular/forms';
   ]
 })
 export class QuestionManagerComponent implements OnInit, OnDestroy {
- @Input() questions: QuestionViewModel[] = [];
- @Output() questionsChange = new EventEmitter<QuestionViewModel[]>();
+  @Input() inputQuestions: QuestionViewModel[] = [];
+  @Output() questionsChange = new EventEmitter<QuestionViewModel[]>();
+
+  questions: QuestionViewModel[] = [];
 
   updateSomething() {
     // Sau khi bạn thay đổi questions trong component con
@@ -27,12 +29,13 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
   }
 
   [x: string]: any;
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(private questionService: QuestionService) { }
 
   ngOnInit(): void {
+    this.questions = JSON.parse(JSON.stringify(this.inputQuestions));
     this.questionService.initializeQuestions(this.questions);
   }
 
@@ -47,7 +50,7 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
       content: '',
       type: 'SingleChoice',
       options: [],
-      orderNumber: this.questions.length+1,
+      orderNumber: this.questions.length + 1,
       collapsed: false
     };
     this.questions.push(newQuestion);
@@ -62,14 +65,30 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
   }
 
   drop(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.questions, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.questions, event.previousIndex, event.currentIndex); // Cập nhật lại thứ tự
+    this.questions.forEach((item, index) => {
+      item.orderNumber = index + 1;
+    });
+    this.updateSomething();
   }
 
   dropOption(event: CdkDragDrop<any[]>, questionId: string) {
     const question = this.questions.find(q => q.id === questionId);
     if (question && question.options) {
-      moveItemInArray(question.options, event.previousIndex, event.currentIndex);
+      moveItemInArray(question.options, event.previousIndex, event.currentIndex); // Gán lại orderNumber theo vị trí mới
+      question.options.forEach((option, index) => {
+        option.orderNumber = index + 1; // bắt đầu từ 1
+      });
+      this.updateSomething();
     }
+  }
+
+  trackByQuestionId(index: number, question: QuestionViewModel): string {
+    return question.id;
+  }
+
+  trackByOptionId(index: number, option: Option): string {
+    return option.id;
   }
 
   updateQuestionTitle(event: Event, questionId: string): void {
@@ -108,7 +127,6 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
   updateOption(event: Event, questionId: string, optionId: string): void {
     const input = event.target as HTMLInputElement;
     const text = input.value;
-
     const question = this.questions.find(q => q.id === questionId);
     if (question) {
       const option = question.options.find(o => o.id === optionId);
@@ -119,16 +137,9 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
     }
   }
 
-
   getTypeLabel(type: QuestionType): string {
     return this.questionService.getTypeLabel(type);
   }
 
-  trackByQuestionId(index: number, question: QuestionViewModel): string {
-    return question.id;
-  }
 
-  trackByOptionId(index: number, option: any): number {
-    return option.id;
-  }
 }

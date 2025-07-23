@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { QuestionDto, QuestionViewModel, TopicDetail } from '../voting-list/responses/topic-detail.model';
-import { FormGroup, FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl, FormArray, AbstractControl } from '@angular/forms';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
@@ -36,9 +36,7 @@ export class TopicDetailComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(10)]],
       startDate: [null],
       endDate: [null],
-      questions: this.fb.array([
-
-      ]) // ✅ thêm vào đây
+      questions: this.fb.array([])
     });
     if (data) {
       this.myForm.patchValue({
@@ -144,10 +142,26 @@ export class TopicDetailComponent implements OnInit {
   }
 
   onQuestionsChange(updatedQuestions: QuestionViewModel[]) {
-    // Cập nhật lại data.questions nếu cần
-    this.data.questions = mapToDto(updatedQuestions); // hoặc xử lý tuỳ ý
-    console.log('Question length = ', this.data.questions);
+    this.data.questions = mapToDto(updatedQuestions);
+    const questionsFormArray = this.fb.array(
+    this.data.questions.map(q => this.createQuestionFormGroup(q))
+    );
+    this.myForm.setControl('questions', questionsFormArray);
   }
+
+  private createQuestionFormGroup(q: QuestionDto): FormGroup {
+  return this.fb.group({
+    id: [q.id],
+    text: [q.content, Validators.required],
+    type: [q.type],
+    options: this.fb.array(
+      q.options.map(opt => this.fb.group({
+        id: [opt.id],
+        text: [opt.content, Validators.required],
+      }))
+    )
+  });
+}
 
  
 
@@ -161,13 +175,41 @@ closePopup() {
 }
 
 onSubmit() {
-  if (this.myForm.invalid) return;
+  if (this.myForm.invalid) {
+    this.logFormValidationErrors(this.myForm);
+    return;
+  }
+
   if (!this.data?.id) {
     this.onSubmitCreate();
   } else {
     this.onSubmitUpdate();
   }
 }
+
+private logFormValidationErrors(control: AbstractControl, path: string = ''): void {
+  if (control instanceof FormGroup || control instanceof FormArray) {
+    const group = control as FormGroup | FormArray;
+    Object.keys(group.controls).forEach((key) => {
+      const childControl = group.get(key);
+      const newPath = path ? `${path}.${key}` : key;
+      if (childControl) {
+        this.logFormValidationErrors(childControl, newPath);
+      }
+    });
+
+    // Nếu group/array invalid nhưng không có lỗi trực tiếp
+    if (control.invalid && !control.errors) {
+      console.warn(`⚠️ Trường "${path}" không hợp lệ do một control con sai.`);
+    }
+  } else {
+    if (control.invalid) {
+      console.warn(`❌ Trường "${path}" bị lỗi:`, control.errors);
+    }
+  }
+}
+
+
 
 onSubmitUpdate() {
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
