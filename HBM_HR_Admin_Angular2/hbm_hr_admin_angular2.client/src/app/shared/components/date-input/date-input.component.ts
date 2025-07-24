@@ -1,9 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, Optional } from '@angular/core';
-import { ControlContainer, FormControl } from '@angular/forms';
+import { ControlContainer, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-date-input',
-  standalone: false,
+  standalone: true,
+   imports: [CommonModule, ReactiveFormsModule],  // 👈 PHẢI THÊM ReactiveFormsModule
   templateUrl: './date-input.component.html',
   styleUrls: ['./date-input.component.css','./../../styles/shared.css']
 })

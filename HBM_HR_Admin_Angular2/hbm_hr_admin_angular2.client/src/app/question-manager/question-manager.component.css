@@ -338,3 +338,14 @@
     align-self: flex-start;
   }
 }
+
+.is-invalid {
+  border: 1px solid red;
+  background-color: #ffe6e6;
+}
+
+.invalid-feedback {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}

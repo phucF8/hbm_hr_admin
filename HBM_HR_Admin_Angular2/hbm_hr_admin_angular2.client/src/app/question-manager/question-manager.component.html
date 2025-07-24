@@ -1,4 +1,11 @@
-<div class="container">
+<div class="container" [formGroup]="parentGroup">
+  <!-- <p>QUESTIONS</p>
+  <pre>{{ parentGroup.value | json }}</pre>
+  <div *ngIf="parentGroup?.get('questions') as questionsControl">
+    Kiểu: {{ getControlType(questionsControl) }}
+  </div> -->
+
+
 
 
   <button type="button" class="add-question-btn" (click)="addQuestion()">
@@ -6,79 +13,83 @@
     Thêm câu hỏi
   </button>
 
-  <div class="questions-container" cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="drop($event)">
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="questions.length === 0">
-      <h3>Chưa có câu hỏi nào</h3>
-      <p>Nhấn "Thêm câu hỏi" để bắt đầu tạo câu hỏi đầu tiên</p>
-    </div>
-
+  <div formArrayName="questions" class="questions-container" cdkDropList [cdkDropListData]="formArray.controls" (cdkDropListDropped)="drop($event)">
     <!-- Questions List -->
-    <div class="question-card" 
-      [ngClass]="{ 'collapsed': question.collapsed }" 
-      *ngFor="let question of questions; 
-      trackBy: trackByQuestionId"
-      cdkDrag>
+    <div class="question-card" [ngClass]="{ 'collapsed': question.value.collapsed }" 
+    *ngFor="let question of formArray.controls; let i = index; trackBy: trackByQuestionId" 
+    [formGroupName]="i"
+    cdkDrag>
       <!-- Question Header -->
-      <div class="question-header">
+      <div class="question-header" >
         <button type="button" class="action-btn drag-handle" title="Kéo thả để sắp xếp" cdkDragHandle>
           ⋮⋮
         </button>
-        <label class="option-label">{{question.orderNumber}}.</label>
+        <!-- <label class="option-label">{{ question.get('orderNumber')?.value }}.</label> -->
         <div class="question-content">
-          <input type="text" class="question-title" [value]="question.content"
-            (change)="updateQuestionTitle($event, question.id)" placeholder="Nhập tiêu đề câu hỏi...">
+          <input type="text" 
+          class="question-title" [formControlName]="'content'" placeholder="Nhập tiêu đề câu hỏi..." 
+          [ngClass]="{ 'is-invalid': question.get('content')?.invalid && (question.get('content')?.touched || question.get('content')?.dirty) }" 
+          >
+          <div class="invalid-feedback" *ngIf="question.get('content')?.invalid && (question.get('content')?.touched || question.get('content')?.dirty)">
+            <span *ngIf="question.get('content')?.errors?.['required']">Vui lòng nhập nội dung câu hỏi.</span>
+            <!-- Thêm lỗi khác nếu có -->
+          </div>
+
+          <!-- <input type="text" class="question-title" [value]="question.get('content')"
+            placeholder="Nhập tiêu đề câu hỏi..."> -->
+
+
         </div>
-        <select class="question-type-select" [(ngModel)]="question.type"
-          (ngModelChange)="updateQuestionType(question.id, $event)">
-          <option value='SingleChoice'>Chọn một</option>
-          <option value='MultiChoice'>Chọn nhiều</option>
-          <option value='Essay'>Tự luận</option>
+
+        <select class="question-type-select" formControlName="type">
+          <option value="SingleChoice">Chọn một</option>
+          <option value="MultiChoice">Chọn nhiều</option>
+          <option value="Essay">Tự luận</option>
         </select>
 
         <div class="question-actions">
-          <button type="button" class="action-btn collapse-btn" (click)="toggleCollapse(question.id)"
-            title="Thu gọn/Mở rộng" *ngIf="question.type !== 'Essay'">
-            {{ question.collapsed ? '▼' : '▲' }}
+          <button type="button" class="action-btn collapse-btn" (click)="toggleCollapse(i)" title="Thu gọn/Mở rộng"
+            *ngIf="question.get('type')?.value !== 'Essay'">
+            {{ question.get('collapsed')?.value ? '▼' : '▲' }}
           </button>
-          <button type="button" class="action-btn delete-btn" (click)="deleteQuestion(question.id)" title="Xóa câu hỏi">
+
+          <button type="button" class="action-btn delete-btn" (click)="removeQuestion(i)" title="Xóa câu hỏi">
             🗑️
           </button>
         </div>
+
       </div>
 
       <!-- Options Container -->
-      <div class="options-container" *ngIf="question.type !== 'Essay'">
+      <div class="options-container" *ngIf="question.get('type')?.value !== 'Essay'">
         <div class="options-header">
           <div class="options-title">Các lựa chọn</div>
-          <button type="button" class="add-option-btn" (click)="addOption(question.id)">
+          <button type="button" class="add-option-btn" (click)="addOption(i)">
             <span>+</span>
             Thêm lựa chọn
           </button>
         </div>
         <!-- Options List -->
-        <div cdkDropList [cdkDropListData]="question.options" (cdkDropListDropped)="dropOption($event, question.id)">
-          <div class="option-item" 
-          *ngFor="let option of question.options; 
-          trackBy: trackByOptionId" 
-          cdkDrag>
+        <div formArrayName="options" cdkDropList [cdkDropListData]="getOptions(question).controls" (cdkDropListDropped)="dropOption($event, i)">
+          <div class="option-item"
+            *ngFor="let option of getOptions(question).controls; let j = index; trackBy: trackByOptionIndex"
+            [formGroupName]="j" cdkDrag>
             <button type="button" class="drag-handle" cdkDragHandle title="Kéo để sắp xếp">
               ⋮⋮
             </button>
-            <label class="option-label">{{option.orderNumber}}.</label>
-            <input type="text" class="option-input" [value]="option.content"
-              (change)="updateOption($event, question.id, option.id)" placeholder="Nhập nội dung lựa chọn...">
+            <label class="option-label">{{ option.get('orderNumber')?.value }}.</label>
+            <input type="text" class="option-input" formControlName="content" placeholder="Nhập nội dung lựa chọn..."
+            [ngClass]="{ 'is-invalid': option.get('content')?.invalid && (option.get('content')?.touched || option.get('content')?.dirty) }" 
+            >
+            <div class="invalid-feedback" *ngIf="option.get('content')?.invalid && (option.get('content')?.touched || option.get('content')?.dirty)">
+              <span *ngIf="option.get('content')?.errors?.['required']">Vui lòng nhập nội dung lựa chọn.</span>
+              <!-- Thêm lỗi khác nếu có -->
+            </div>
             <div class="option-actions">
-              <button type="button" class="option-delete" (click)="deleteOption(question.id, option.id)"
-                title="Xóa lựa chọn">
+              <button type="button" class="option-delete" (click)="deleteOption(i, j)" title="Xóa lựa chọn">
                 ✕
               </button>
             </div>
-          </div>
-
-          <!-- Empty Options State -->
-          <div style="text-align: center; color: #64748b; padding: 20px;" *ngIf="question.options.length === 0">
-            Chưa có lựa chọn nào. Nhấn "Thêm lựa chọn" để bắt đầu.
           </div>
 
 

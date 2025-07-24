@@ -66,31 +66,12 @@
 
 
 
-
-    
-
-
-<app-question-manager 
-  [inputQuestions]="mapToViewModels(data.questions)"
-  (questionsChange)="onQuestionsChange($event)">
+  
+<app-question-manager
+  [parentGroup] = "myForm"
+  [formArray]="questionsArray"
+  >
 </app-question-manager>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

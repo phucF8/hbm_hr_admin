@@ -1,22 +1,34 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { QuestionDto, QuestionViewModel, TopicDetail } from '../voting-list/responses/topic-detail.model';
-import { FormGroup, FormBuilder, Validators, FormControl, FormArray, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl, FormArray, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 import { ToastrService } from 'ngx-toastr';
-import { formatDate } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { mapToDto } from '@app/utils/question.mapper';
+import { QuestionManagerComponent } from '@app/question-manager/question-manager.component';
+import { TextInputComponent } from '@app/shared/components/text-input/text-input.component';
+import { AreaInputComponent } from '@app/shared/components/area-input/area-input.component';
+import { DateInputComponent } from '@app/shared/components/date-input/date-input.component';
 
 @Component({
   selector: 'app-topic-detail',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    QuestionManagerComponent,
+    TextInputComponent,
+    AreaInputComponent,
+    DateInputComponent,
+  ],
   templateUrl: './topic-detail.component.html',
-  styleUrl: './topic-detail.component.css'
+  styleUrl: './topic-detail.component.css',
 })
 export class TopicDetailComponent implements OnInit {
 
   myForm!: FormGroup;
-  questions: QuestionDto[] = []; // dữ liệu sẽ được load từ API
+  loadedQuestions: QuestionDto[] = []; // dữ liệu sẽ được load từ API
   questionsArray!: FormArray; // để tiện dùng trong HTML
 
   ngOnInit(): void {
@@ -38,6 +50,8 @@ export class TopicDetailComponent implements OnInit {
       endDate: [null],
       questions: this.fb.array([])
     });
+    this.questionsArray = this.myForm.get('questions') as FormArray;
+
     if (data) {
       this.myForm.patchValue({
         title: data.title || '',
@@ -45,28 +59,32 @@ export class TopicDetailComponent implements OnInit {
         startDate: data.startDate ? formatDate(data.startDate, 'yyyy-MM-dd', 'en') : null,
         endDate: data.endDate ? formatDate(data.endDate, 'yyyy-MM-dd', 'en') : null,
       });
-      this.questions = data.questions || [];
-      this.questionsArray = this.myForm.get('questions') as FormArray;
-
-      this.questions.forEach(q => {
-        const optionsArray = this.fb.array<FormGroup>([]);
-        (q.options || []).forEach(opt => {
-          optionsArray.push(this.fb.group({
-            id: [opt.id],
-            content: [opt.content, Validators.required],
-            orderNumber: [opt.orderNumber ?? 0],
-          }));
-        });
-        this.questionsArray.push(this.fb.group({
-          id: [q.id],
-          content: [q.content, Validators.required],
-          type: [q.type || 'SingleChoice', Validators.required],
-          orderNumber: [q.orderNumber ?? 0],
-          options: optionsArray, // gán vào FormArray
-        }));
+      this.loadedQuestions = data.questions || [];
+      this.loadedQuestions.forEach(q => {
+        this.questionsArray.push(this.createQuestionFormGroup(q));
       });
     }
   }
+
+  private createQuestionFormGroup(q: QuestionDto): FormGroup {
+    const optionsArray = this.fb.array<FormGroup>([]);
+    (q.options || []).forEach(opt => {
+      optionsArray.push(this.fb.group({
+        id: [opt.id],
+        content: [opt.content, Validators.required],
+        orderNumber: [opt.orderNumber ?? 0],
+      }));
+    });
+
+    return this.fb.group({
+      id: [q.id],
+      content: [q.content, Validators.required],
+      type: [q.type || 'SingleChoice', Validators.required],
+      orderNumber: [q.orderNumber ?? 0],
+      options: optionsArray,
+    });
+  }
+
 
   mapToViewModel(dto: QuestionDto): QuestionViewModel {
     return {
@@ -144,155 +162,144 @@ export class TopicDetailComponent implements OnInit {
   onQuestionsChange(updatedQuestions: QuestionViewModel[]) {
     this.data.questions = mapToDto(updatedQuestions);
     const questionsFormArray = this.fb.array(
-    this.data.questions.map(q => this.createQuestionFormGroup(q))
+      this.data.questions.map(q => this.createQuestionFormGroup(q))
     );
     this.myForm.setControl('questions', questionsFormArray);
   }
 
-  private createQuestionFormGroup(q: QuestionDto): FormGroup {
-  return this.fb.group({
-    id: [q.id],
-    text: [q.content, Validators.required],
-    type: [q.type],
-    options: this.fb.array(
-      q.options.map(opt => this.fb.group({
-        id: [opt.id],
-        text: [opt.content, Validators.required],
-      }))
-    )
-  });
-}
-
- 
 
 
 
 
 
 
-closePopup() {
-  this.dialogRef.close();
-}
 
-onSubmit() {
-  if (this.myForm.invalid) {
-    this.logFormValidationErrors(this.myForm);
-    return;
+
+
+
+  closePopup() {
+    this.dialogRef.close();
   }
 
-  if (!this.data?.id) {
-    this.onSubmitCreate();
-  } else {
-    this.onSubmitUpdate();
-  }
-}
+  onSubmit() {
+    if (this.myForm.invalid) {
+      this.logFormValidationErrors(this.myForm);
+      return;
+    }
 
-private logFormValidationErrors(control: AbstractControl, path: string = ''): void {
-  if (control instanceof FormGroup || control instanceof FormArray) {
-    const group = control as FormGroup | FormArray;
-    Object.keys(group.controls).forEach((key) => {
-      const childControl = group.get(key);
-      const newPath = path ? `${path}.${key}` : key;
-      if (childControl) {
-        this.logFormValidationErrors(childControl, newPath);
+    if (!this.data?.id) {
+      this.onSubmitCreate();
+    } else {
+      this.onSubmitUpdate();
+    }
+  }
+
+  private logFormValidationErrors(control: AbstractControl, path: string = ''): void {
+    if (control instanceof FormGroup || control instanceof FormArray) {
+      const group = control as FormGroup | FormArray;
+      Object.keys(group.controls).forEach((key) => {
+        const childControl = group.get(key);
+        const newPath = path ? `${path}.${key}` : key;
+        if (childControl) {
+          this.logFormValidationErrors(childControl, newPath);
+        }
+      });
+
+      // Nếu group/array invalid nhưng không có lỗi trực tiếp
+      if (control.invalid && !control.errors) {
+        console.warn(`⚠️ Trường "${path}" không hợp lệ do một control con sai.`);
+      }
+    } else {
+      if (control.invalid) {
+        console.warn(`❌ Trường "${path}" bị lỗi:`, control.errors);
+      }
+    }
+  }
+
+
+
+  onSubmitUpdate() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    // Xử lý giá trị rỗng thành null
+    const formValue = this.myForm.value;
+    if (formValue.startDate === '') {
+      formValue.startDate = null;
+    }
+    if (formValue.endDate === '') {
+      formValue.endDate = null;
+    }
+    const updatedTopic: TopicDetail = {
+      ...this.data,
+      ...this.myForm.value,
+      updatedAt: new Date().toISOString(), // gán lại updatedAt nếu cần
+      updatedBy: currentUser.DataSets.Table[0].ID
+    };
+    // updatedTopic.questions = this.data.questions;
+    const jsonStr = JSON.stringify(updatedTopic); // null, 2 => để format đẹp
+
+    navigator.clipboard.writeText(jsonStr).then(() => { this.toastr.info('Đã copy to clipboard') }).catch(err => { });
+
+    this.service.updateTopic(updatedTopic).subscribe({
+      next: (res) => {
+        if (res.status === 'SUCCESS') {
+          this.toastr.success('Cập nhật thành công!', ``, {
+            positionClass: 'toast-top-right'
+          });
+          this.dialogRef.close(res);
+        } else {
+          this.toastr.error('ERROR', 'Cập nhật thất bại: ' + res.message, {
+            positionClass: 'toast-top-right'
+          });
+        }
+      },
+      error: (err) => {
+        const errorMsg =
+          err?.error?.message ||  // nếu backend trả về { message: '...' }
+          err?.message ||         // nếu là lỗi từ HttpClient
+          'Đã xảy ra lỗi không xác định';
+        alert('Lỗi tạo chủ đề: ' + errorMsg);
       }
     });
-
-    // Nếu group/array invalid nhưng không có lỗi trực tiếp
-    if (control.invalid && !control.errors) {
-      console.warn(`⚠️ Trường "${path}" không hợp lệ do một control con sai.`);
-    }
-  } else {
-    if (control.invalid) {
-      console.warn(`❌ Trường "${path}" bị lỗi:`, control.errors);
-    }
   }
-}
 
 
+  onSubmitCreate() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const newTopic: TopicDetail = {
+      ...this.myForm.value,
+      createdAt: new Date().toISOString(), // hoặc để backend xử lý
+      updatedAt: new Date().toISOString(),  // nếu cần
+      createdBy: currentUser.DataSets.Table[0].ID
+    };
 
-onSubmitUpdate() {
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  // Xử lý giá trị rỗng thành null
-  const formValue = this.myForm.value;
-  if (formValue.startDate === '') {
-    formValue.startDate = null;
-  }
-  if (formValue.endDate === '') {
-    formValue.endDate = null;
-  }
-  const updatedTopic: TopicDetail = {
-    ...this.data,
-    ...this.myForm.value,
-    updatedAt: new Date().toISOString(), // gán lại updatedAt nếu cần
-    updatedBy: currentUser.DataSets.Table[0].ID
-  };
-  updatedTopic.questions = this.data.questions;
-  const jsonStr = JSON.stringify(updatedTopic); // null, 2 => để format đẹp
+    const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      alert('Đã copy JSON vào clipboard!');
+    }).catch(err => { });
 
-  navigator.clipboard.writeText(jsonStr).then(() => { this.toastr.info('Đã copy to clipboard') }).catch(err => { });
-
-  this.service.updateTopic(updatedTopic).subscribe({
-    next: (res) => {
-      if (res.status === 'SUCCESS') {
-        this.toastr.success('Cập nhật thành công!', ``, {
-          positionClass: 'toast-top-right'
-        });
-        this.dialogRef.close(res);
-      } else {
-        this.toastr.error('ERROR', 'Cập nhật thất bại: ' + res.message, {
-          positionClass: 'toast-top-right'
-        });
+    this.service.createTopic(newTopic).subscribe({
+      next: (res) => {
+        if (res.status === 'SUCCESS') {
+          alert('Tạo chủ đề thành công!');
+          this.dialogRef.close(newTopic);
+        } else {
+          alert('Tạo thất bại: ' + res.message);
+        }
+      },
+      error: (err) => {
+        const errorMsg =
+          err?.error?.message ||  // nếu backend trả về { message: '...' }
+          err?.message ||         // nếu là lỗi từ HttpClient
+          'Đã xảy ra lỗi không xác định';
+        alert('Lỗi tạo chủ đề: ' + errorMsg);
       }
-    },
-    error: (err) => {
-      const errorMsg =
-        err?.error?.message ||  // nếu backend trả về { message: '...' }
-        err?.message ||         // nếu là lỗi từ HttpClient
-        'Đã xảy ra lỗi không xác định';
-      alert('Lỗi tạo chủ đề: ' + errorMsg);
-    }
-  });
-}
 
-
-onSubmitCreate() {
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  const newTopic: TopicDetail = {
-    ...this.myForm.value,
-    createdAt: new Date().toISOString(), // hoặc để backend xử lý
-    updatedAt: new Date().toISOString(),  // nếu cần
-    createdBy: currentUser.DataSets.Table[0].ID
-  };
-
-  const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
-  navigator.clipboard.writeText(jsonStr).then(() => {
-    alert('Đã copy JSON vào clipboard!');
-  }).catch(err => { });
-
-  this.service.createTopic(newTopic).subscribe({
-    next: (res) => {
-      if (res.status === 'SUCCESS') {
-        alert('Tạo chủ đề thành công!');
-        this.dialogRef.close(newTopic);
-      } else {
-        alert('Tạo thất bại: ' + res.message);
-      }
-    },
-    error: (err) => {
-      const errorMsg =
-        err?.error?.message ||  // nếu backend trả về { message: '...' }
-        err?.message ||         // nếu là lỗi từ HttpClient
-        'Đã xảy ra lỗi không xác định';
-      alert('Lỗi tạo chủ đề: ' + errorMsg);
-    }
-
-  });
-}
+    });
+  }
 
   get titleControl(): FormControl {
-  return this.myForm.get('title') as FormControl;
-}
+    return this.myForm.get('title') as FormControl;
+  }
 
 
 

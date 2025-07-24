@@ -29,9 +29,7 @@ import { AuthInterceptor } from './guards/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { ErrorUserReportComponent } from './error-report/error-user-report/error-user-report.component';
-import { TopicDetailComponent } from './voting/topic-detail/topic-detail.component';
 import { SharedModule } from "./shared/shared.module";
-import { QuestionManagerComponent } from "@app/question-manager/question-manager.component";
 
 @NgModule({
   declarations: [
@@ -49,8 +47,7 @@ import { QuestionManagerComponent } from "@app/question-manager/question-manager
     OneSelectFormComponent,
     SearchUserFormComponent,
     ErrorUserReportComponent,
-    NotFoundComponent,
-    TopicDetailComponent,
+    NotFoundComponent
     
   ],
   imports: [
@@ -67,9 +64,7 @@ import { QuestionManagerComponent } from "@app/question-manager/question-manager
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatRadioModule,
-    SharedModule,
-    QuestionManagerComponent
+    MatRadioModule
 ],
   providers: [
     // {provide: LocationStrategy, useClass: HashLocationStrategy},

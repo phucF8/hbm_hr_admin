@@ -1,9 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, Optional } from '@angular/core';
-import { ControlContainer, FormControl, Validators } from '@angular/forms';
+import { ControlContainer, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-text-input',
-  standalone: false,
+  standalone: true,
+   imports: [CommonModule, ReactiveFormsModule],  // 👈 PHẢI THÊM ReactiveFormsModule
   templateUrl: './text-input.component.html',
   styleUrls: ['./text-input.component.css','./../../styles/shared.css']
 })
