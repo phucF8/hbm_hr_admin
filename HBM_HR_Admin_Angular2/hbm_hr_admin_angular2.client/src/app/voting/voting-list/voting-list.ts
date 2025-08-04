@@ -117,8 +117,8 @@ export class VotingList {
       data: {},
       disableClose: true,
       panelClass: 'err-report-detail-dialog',
-      width: '50vw',
-      height: '90vh',
+      width: '100vw',
+      height: '100vh',
       maxWidth: '100vw'
     });
 
@@ -179,7 +179,7 @@ export class VotingList {
           alert('Đã xóa thành công các mục đã chọn!');
         },
         error: (error) => {
-          alert('Đã xảy ra lỗi khi xóa!');
+          alert(`ERR: ${error.message}`);
         }
       });
     }

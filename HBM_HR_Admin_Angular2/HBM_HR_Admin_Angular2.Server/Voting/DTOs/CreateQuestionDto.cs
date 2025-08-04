@@ -2,9 +2,20 @@
 {
     public class CreateQuestionDto
     {
-        public string Content { get; set; } = string.Empty;
-        public int Order { get; set; }
-        public int TopicId { get; set; }
+        public string? Id { get; set; } // Cho phép truyền hoặc để null
+        public string Content { get; set; }
+        public string Type { get; set; }
+        public int OrderNumber { get; set; }
+
+        public List<CreateOptionDto>? Options { get; set; }
     }
+
+    public class CreateOptionDto
+    {
+        public string? Id { get; set; }
+        public string Content { get; set; }
+        public int OrderNumber { get; set; }
+    }
+
 
 }

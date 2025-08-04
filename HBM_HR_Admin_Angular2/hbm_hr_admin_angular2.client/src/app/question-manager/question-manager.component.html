@@ -24,7 +24,8 @@
         <button type="button" class="action-btn drag-handle" title="Kéo thả để sắp xếp" cdkDragHandle>
           ⋮⋮
         </button>
-        <!-- <label class="option-label">{{ question.get('orderNumber')?.value }}.</label> -->
+        <label class="option-label">{{ question.get('orderNumber')?.value }}.</label>
+        <label class="option-label">{{ question.get('id')?.value }}.</label>
         <div class="question-content">
           <input type="text" 
           class="question-title" [formControlName]="'content'" placeholder="Nhập tiêu đề câu hỏi..." 

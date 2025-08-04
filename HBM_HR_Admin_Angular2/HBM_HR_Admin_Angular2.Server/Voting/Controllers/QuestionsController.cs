@@ -47,7 +47,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Controllers
             return Ok(ApiResponse<object>.Success(question, "Tạo thành công"));
         }
 
-        [HttpDelete]
+        [HttpPost]
         public async Task<IActionResult> DeleteQuestions([FromBody] List<string> questionIds)
         {
             if (questionIds == null || !questionIds.Any())
@@ -67,7 +67,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Controllers
         }
 
 
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateQuestion(string id, [FromBody] UpdateQuestionDto dto)
         {
             if (id != dto.Id)

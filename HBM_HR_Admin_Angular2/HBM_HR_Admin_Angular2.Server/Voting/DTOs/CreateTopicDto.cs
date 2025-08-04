@@ -7,6 +7,9 @@
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string CreatedBy { get; set; }
+
+        public List<CreateQuestionDto>? Questions { get; set; }
     }
+
 
 }

@@ -25,11 +25,48 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 CreatedBy = dto.CreatedBy,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                Questions = dto.Questions?.Select(qDto => new Question
+                {
+                    Id = string.IsNullOrWhiteSpace(qDto.Id) ? Guid.NewGuid().ToString() : qDto.Id,
+                    Content = qDto.Content,
+                    Type = qDto.Type,
+                    OrderNumber = qDto.OrderNumber,
+                    TopicId = "", // Sẽ gán lại sau
+                    CreatedBy = dto.CreatedBy,
+                    CreatedAt = DateTime.UtcNow,
+                    Options = qDto.Options?.Select(oDto => new Option
+                    {
+                        Id = string.IsNullOrWhiteSpace(oDto.Id) ? Guid.NewGuid().ToString() : oDto.Id,
+                        Content = oDto.Content,
+                        OrderNumber = oDto.OrderNumber,
+                        CreatedBy = dto.CreatedBy,
+                        CreatedAt = DateTime.UtcNow,
+                        QuestionId = "" // Sẽ gán lại sau
+                    }).ToList()
+                }).ToList()
             };
+
+            // Cập nhật TopicId cho các câu hỏi, và QuestionId cho các options (sau khi đã có topic.Id)
+            if (topic.Questions != null)
+            {
+                foreach (var question in topic.Questions)
+                {
+                    question.TopicId = topic.Id;
+
+                    if (question.Options != null)
+                    {
+                        foreach (var option in question.Options)
+                        {
+                            option.QuestionId = question.Id;
+                        }
+                    }
+                }
+            }
 
             return await _repository.AddAsync(topic);
         }
+
 
         public async Task<PagedResultDto<TopicDto>> GetPagedTopicsAsync(int page, int pageSize)
         {

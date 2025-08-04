@@ -198,37 +198,62 @@ export class TopicDetailComponent implements OnInit {
     }
   }
 
-  private logFormValidationErrors(control: AbstractControl, path: string = ''): void {
+  private logFormValidationErrors(control: AbstractControl, path: string = ''): boolean {
     if (control instanceof FormGroup || control instanceof FormArray) {
       const group = control as FormGroup | FormArray;
-      Object.keys(group.controls).forEach((key) => {
+
+      for (const key of Object.keys(group.controls)) {
         const childControl = group.get(key);
         const newPath = path ? `${path}.${key}` : key;
         if (childControl) {
-          this.logFormValidationErrors(childControl, newPath);
+          const hasError = this.logFormValidationErrors(childControl, newPath);
+          if (hasError) return true; // ⛔ Dừng ngay khi gặp lỗi đầu tiên
         }
-      });
+      }
 
-      // Nếu group/array invalid nhưng không có lỗi trực tiếp
       if (control.invalid && !control.errors) {
-        // console.warn(`⚠️ Trường "${path}" không hợp lệ do một control con sai.`);
         Swal.fire({
           icon: 'error',
           title: 'Lỗi nhập liệu',
-          html:
-            `
-                    <p>${control.errors}</p>
-                    
-                  `,
+          html: `❌ Trường "${path}" không hợp lệ do một control con sai.`,
           confirmButtonText: 'Đóng'
         });
+        return true; // ⛔ Dừng tại đây
       }
     } else {
       if (control.invalid) {
-        console.warn(`❌ Trường "${path}" bị lỗi:`, control.errors);
+        const firstErrorKey = Object.keys(control.errors!)[0];
+        const errorMessage = this.getErrorMessage(firstErrorKey, control.errors![firstErrorKey]);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi nhập liệu',
+          html: `❌ Trường "${path}" lỗi: ${errorMessage}`,
+          confirmButtonText: 'Đóng'
+        });
+        return true; // ⛔ Dừng tại đây
       }
     }
+
+    return false; // ✅ Không có lỗi ở nhánh này
   }
+
+  private getErrorMessage(errorKey: string, errorValue: any): string {
+    switch (errorKey) {
+      case 'required':
+        return 'Trường này là bắt buộc.';
+      case 'minlength':
+        return `Độ dài tối thiểu là ${errorValue.requiredLength} ký tự.`;
+      case 'maxlength':
+        return `Độ dài tối đa là ${errorValue.requiredLength} ký tự.`;
+      case 'pattern':
+        return `Không đúng định dạng.`;
+      default:
+        return `Lỗi không xác định (${errorKey}).`;
+    }
+  }
+
+
 
 
 
@@ -288,11 +313,21 @@ export class TopicDetailComponent implements OnInit {
       createdBy: currentUser.DataSets.Table[0].ID
     };
 
+
+    console.log('Submit: newTopic =', newTopic);
+    console.log('newTopic.questions =', newTopic.questions);
+    console.log('typeof questions:', typeof newTopic.questions);
+    console.log('isArray:', Array.isArray(newTopic.questions));
+    console.log('JSON =', JSON.stringify(newTopic, null, 2));
+
+
+
     const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
+    console.log(jsonStr);
     // if (!environment.production) {
-    //   navigator.clipboard.writeText(jsonStr).then(() => {
-    //     alert('Đã copy JSON vào clipboard!');
-    //   }).catch(err => { });
+    // navigator.clipboard.writeText(jsonStr).then(() => {
+    //   alert('Đã copy JSON vào clipboard!');
+    // }).catch(err => { });
     // }
 
     this.service.createTopic(newTopic).subscribe({

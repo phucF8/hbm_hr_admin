@@ -66,15 +66,11 @@ export class QuestionManagerComponent implements OnInit, OnDestroy {
 
   addQuestion() {
     const questionGroup = this.fb.group({
+      id: [this.generateUUID()], // hoặc null nếu để backend xử lý
       content: ['', Validators.required],
       type: ['SingleChoice', Validators.required],
       orderNumber: [0],
-      options: this.fb.array([
-        this.fb.group({
-          content: ['', Validators.required],
-          orderNumber: [0]
-        })
-      ])
+      options: this.fb.array([])
     });
 
     this.formArray.push(questionGroup);

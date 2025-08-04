@@ -206,17 +206,6 @@ pre { font-family: monospace; white-space: pre-wrap; }
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   overflow: auto;
   animation: slideUp 0.8s ease-out;
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 }
 
 .header {
@@ -488,4 +477,3 @@ pre { font-family: monospace; white-space: pre-wrap; }
     grid-template-columns: 1fr;
   }
 
-}

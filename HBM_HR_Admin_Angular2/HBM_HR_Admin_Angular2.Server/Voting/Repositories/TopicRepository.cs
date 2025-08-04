@@ -16,10 +16,41 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
 
         public async Task<Topic> AddAsync(Topic topic)
         {
+            // Gán ID cho Topic nếu chưa có
+            topic.Id = string.IsNullOrWhiteSpace(topic.Id) ? Guid.NewGuid().ToString() : topic.Id;
+            topic.CreatedAt = DateTime.UtcNow;
+
+            // Duyệt qua các câu hỏi (nếu có)
+            if (topic.Questions != null && topic.Questions.Any())
+            {
+                foreach (var question in topic.Questions)
+                {
+                    // Gán ID và liên kết TopicId cho từng câu hỏi
+                    question.Id = string.IsNullOrWhiteSpace(question.Id) ? Guid.NewGuid().ToString() : question.Id;
+                    question.TopicId = topic.Id;
+                    question.CreatedAt = DateTime.UtcNow;
+
+                    // Duyệt các option của câu hỏi (nếu có)
+                    if (question.Options != null && question.Options.Any())
+                    {
+                        foreach (var option in question.Options)
+                        {
+                            option.Id = string.IsNullOrWhiteSpace(option.Id) ? Guid.NewGuid().ToString() : option.Id;
+                            option.QuestionId = question.Id;
+                            option.CreatedAt = DateTime.UtcNow;
+                            option.CreatedBy = topic.CreatedBy;
+                        }
+                    }
+
+                    question.CreatedBy = topic.CreatedBy;
+                }
+            }
+
             _context.Topics.Add(topic);
             await _context.SaveChangesAsync();
             return topic;
         }
+
 
         public async Task<PagedResultDto<TopicDto>> GetPagedAsync(int page, int pageSize)
         {

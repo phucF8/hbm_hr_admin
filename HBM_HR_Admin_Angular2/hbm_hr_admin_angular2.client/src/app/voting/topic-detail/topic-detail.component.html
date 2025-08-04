@@ -65,7 +65,7 @@
       <div class="button-group">
         <button type="button" class="btn btn-cancel" aria-label="Đóng" mat-dialog-close (click)="closePopup()">ĐÓNG</button>
         <button type="button" class="btn btn-cancel" mat-dialog-close (click)="onSubmit()">
-          CẬP NHẬT
+          {{ !this.data.id ? 'TẠO MỚI' : 'CẬP NHẬT' }}
         </button>
       </div>
 
