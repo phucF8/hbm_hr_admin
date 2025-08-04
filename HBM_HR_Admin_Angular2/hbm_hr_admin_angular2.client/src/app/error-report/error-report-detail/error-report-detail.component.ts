@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ErrUserReportDtail } from '../response/err_user_report_detail_rp';
 import { formatAndHighlightJson } from '@app/utils/json-utils';
+import { environment } from 'environments/environment';
 
 
 @Component({
@@ -18,7 +19,7 @@ export class ErrUserReportDetailPopupComponent {
   constructor(
     private dialogRef: MatDialogRef<ErrUserReportDetailPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ErrUserReportDtail
-    
+
   ) {
     this.formattedHtmlRequestJSON = formatAndHighlightJson(this.data.requestJson);
     this.formattedHtmlResponseJSON = formatAndHighlightJson(this.data.responseJson);
@@ -52,24 +53,32 @@ export class ErrUserReportDetailPopupComponent {
       const parsed = typeof json === 'string' ? JSON.parse(json) : json;
       const formatted = JSON.stringify(parsed, null, 2);
 
-      navigator.clipboard.writeText(formatted).then(() => {
-        console.log('Formatted JSON copied to clipboard');
-      }).catch(err => {
-        console.error('Copy failed:', err);
-      });
+      // if (!environment.production) {
+      //   navigator.clipboard.writeText(formatted).then(() => {
+      //     console.log('Formatted JSON copied to clipboard');
+      //   }).catch(err => {
+      //     console.error('Copy failed:', err);
+      //   });
+      // }
+
     } catch (err) {
       console.error('Invalid JSON format:', err);
     }
   }
 
-copy(value: string | object) {
+  copy(value: string | object) {
     const formatted = value.toString();
-    navigator.clipboard.writeText(formatted).then(() => {
-      console.log('Formatted JSON copied to clipboard');
-    }).catch(err => {
-      console.error('Copy failed:', err);
-    });
-}
+
+    // if (!environment.production) {
+    //   navigator.clipboard.writeText(formatted).then(() => {
+    //     console.log('Formatted JSON copied to clipboard');
+    //   }).catch(err => {
+    //     console.error('Copy failed:', err);
+    //   });
+    // }
+
+
+  }
 
   closePopup() {
     this.dialogRef.close();

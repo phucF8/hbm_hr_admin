@@ -5,6 +5,7 @@ import { TopicDetailComponent } from '@app/voting/topic-detail/topic-detail.comp
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 import { VotingListRP } from './responses/voting_list_rp';
 import { Observable } from 'rxjs/internal/Observable';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -40,7 +41,7 @@ export class VotingList {
 
   toggleSelectAll() {
     this.listItem?.data.items.forEach(tb => {
-        tb.selected = this.selectAll;
+      tb.selected = this.selectAll;
     });
 
   }
@@ -55,8 +56,20 @@ export class VotingList {
         // this.loadingService.hide();
       },
       error: (error) => {
-        console.error('Error loading notifications:', error);
-        // this.loadingService.hide();
+        const errorStatus = error.status;
+        const errorMessage = error.message || 'Không rõ lỗi';
+        const errorDetail = error.error?.message || JSON.stringify(error.error) || '';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi tải dữ liệu',
+          html: `
+            <p><b>Mã lỗi:</b> ${errorStatus}</p>
+            <p><b>Thông báo:</b> ${errorMessage}</p>
+            ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
+          `,
+          confirmButtonText: 'Đóng'
+        });
       }
     });
   }
@@ -80,18 +93,18 @@ export class VotingList {
       next: (topic) => {
         console.log('Loaded report detail:', topic);
         this.dialog.open(TopicDetailComponent, {
-        data: topic.data,
-        disableClose: true,
-        panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
-        width: '100vw',
-        height: '100vh',
-        maxWidth: '100vw'
-      })
-    .afterClosed().subscribe(result => {
-          if (result) {
-            this.loadList(); 
-          }
-        });
+          data: topic.data,
+          disableClose: true,
+          panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
+          width: '100vw',
+          height: '100vh',
+          maxWidth: '100vw'
+        })
+          .afterClosed().subscribe(result => {
+            if (result) {
+              this.loadList();
+            }
+          });
       },
       error: (error) => {
         alert('Đã xảy ra lỗi khi tải chi tiết báo cáo');
@@ -100,32 +113,32 @@ export class VotingList {
   }
 
   openCreateTopicDialog() {
-  const dialogRef = this.dialog.open(TopicDetailComponent, {
-    data: {},
-    disableClose: true,
-    panelClass: 'err-report-detail-dialog',
-    width: '50vw',
-    height: '90vh',
-    maxWidth: '100vw'
-  });
+    const dialogRef = this.dialog.open(TopicDetailComponent, {
+      data: {},
+      disableClose: true,
+      panelClass: 'err-report-detail-dialog',
+      width: '50vw',
+      height: '90vh',
+      maxWidth: '100vw'
+    });
 
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      this.loadList(); // Reload danh sách nếu có
-      // Gọi API tạo topic ở đây
-      // this.service.createTopic(result).subscribe({
-      //   next: () => {
-      //     console.log('Tạo topic thành công');
-      //     alert('Tạo chủ đề thành công!');
-      //   },
-      //   error: (err) => {
-      //     console.error('Lỗi khi tạo topic:', err);
-      //     alert('Đã xảy ra lỗi khi tạo chủ đề');
-      //   }
-      // });
-    }
-  });
-}
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadList(); // Reload danh sách nếu có
+        // Gọi API tạo topic ở đây
+        // this.service.createTopic(result).subscribe({
+        //   next: () => {
+        //     console.log('Tạo topic thành công');
+        //     alert('Tạo chủ đề thành công!');
+        //   },
+        //   error: (err) => {
+        //     console.error('Lỗi khi tạo topic:', err);
+        //     alert('Đã xảy ra lỗi khi tạo chủ đề');
+        //   }
+        // });
+      }
+    });
+  }
 
 
   delete(id: number): void {
@@ -163,10 +176,10 @@ export class VotingList {
       this.service.deleteTopics(idsToDelete).subscribe({
         next: () => {
           this.loadList(); // Tải lại danh sách
-          alert('Đã xóa thành công các thông báo đã chọn!');
+          alert('Đã xóa thành công các mục đã chọn!');
         },
         error: (error) => {
-          alert('Đã xảy ra lỗi khi xóa thông báo!');
+          alert('Đã xảy ra lỗi khi xóa!');
         }
       });
     }

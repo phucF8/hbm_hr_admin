@@ -10,6 +10,9 @@ import { QuestionManagerComponent } from '@app/question-manager/question-manager
 import { TextInputComponent } from '@app/shared/components/text-input/text-input.component';
 import { AreaInputComponent } from '@app/shared/components/area-input/area-input.component';
 import { DateInputComponent } from '@app/shared/components/date-input/date-input.component';
+import Swal from 'sweetalert2';
+import { environment } from 'environments/environment';
+
 
 @Component({
   selector: 'app-topic-detail',
@@ -82,6 +85,7 @@ export class TopicDetailComponent implements OnInit {
       type: [q.type || 'SingleChoice', Validators.required],
       orderNumber: [q.orderNumber ?? 0],
       options: optionsArray,
+      collapsed: false,
     });
   }
 
@@ -207,7 +211,17 @@ export class TopicDetailComponent implements OnInit {
 
       // Nếu group/array invalid nhưng không có lỗi trực tiếp
       if (control.invalid && !control.errors) {
-        console.warn(`⚠️ Trường "${path}" không hợp lệ do một control con sai.`);
+        // console.warn(`⚠️ Trường "${path}" không hợp lệ do một control con sai.`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi nhập liệu',
+          html:
+            `
+                    <p>${control.errors}</p>
+                    
+                  `,
+          confirmButtonText: 'Đóng'
+        });
       }
     } else {
       if (control.invalid) {
@@ -237,7 +251,9 @@ export class TopicDetailComponent implements OnInit {
     // updatedTopic.questions = this.data.questions;
     const jsonStr = JSON.stringify(updatedTopic); // null, 2 => để format đẹp
 
-    navigator.clipboard.writeText(jsonStr).then(() => { this.toastr.info('Đã copy to clipboard') }).catch(err => { });
+    // if (!environment.production) {
+    //   navigator.clipboard.writeText(jsonStr).then(() => { this.toastr.info('Đã copy to clipboard') }).catch(err => { });
+    // }
 
     this.service.updateTopic(updatedTopic).subscribe({
       next: (res) => {
@@ -273,9 +289,11 @@ export class TopicDetailComponent implements OnInit {
     };
 
     const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
-    navigator.clipboard.writeText(jsonStr).then(() => {
-      alert('Đã copy JSON vào clipboard!');
-    }).catch(err => { });
+    // if (!environment.production) {
+    //   navigator.clipboard.writeText(jsonStr).then(() => {
+    //     alert('Đã copy JSON vào clipboard!');
+    //   }).catch(err => { });
+    // }
 
     this.service.createTopic(newTopic).subscribe({
       next: (res) => {

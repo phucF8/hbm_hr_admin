@@ -40,7 +40,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success(result));
         }
 
-        [HttpDelete("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> DeleteTopic(string id)
         {
             var success = await _service.DeleteTopicAsync(id);
@@ -50,7 +50,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success("Xoá Topic thành công"));
         }
 
-        [HttpPut("update")]
+        [HttpPost("update")]
         public async Task<IActionResult> UpdateTopic([FromBody] UpdateTopicDto dto)
         {
             var updated = await _service.UpdateTopicAsync(dto);
@@ -70,7 +70,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         }
 
         // DELETE: api/topics/DeleteList
-        [HttpDelete("DeleteList")]
+        [HttpPost("DeleteList")]
         public async Task<IActionResult> DeleteTopics([FromBody] List<string> topicIds)
         {
             if (topicIds == null || topicIds.Count == 0)

@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/hbm_hr_admin_angular2.client",
+            "outputPath": "C:/adminthongbao_deploy/wwwroot",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [

@@ -7,6 +7,7 @@ import { EncryptionService } from '../../services/encryption.service';
 import { DebugUtils } from '@app/utils/debug-utils';
 import { LoadingService } from '@app/services/loading.service';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -69,6 +70,20 @@ export class LoginComponent implements OnInit {
       error: (error) => {
         this.loadingService.hide();
         this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác';
+        const errorStatus = error.status;
+                const errorMessage = error.message || 'Không rõ lỗi';
+                const errorDetail = error.error?.message || JSON.stringify(error.error) || '';
+        
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Lỗi tải dữ liệu',
+                  html: `
+                    <p><b>Mã lỗi:</b> ${errorStatus}</p>
+                    <p><b>Thông báo:</b> ${errorMessage}</p>
+                    ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
+                  `,
+                  confirmButtonText: 'Đóng'
+                });
       }
     });
   }

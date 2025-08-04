@@ -23,13 +23,13 @@ export class VotingListService {
   }
 
   updateTopic(topic: TopicDetail): Observable<ApiResponse<any>> {
-    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/update`, topic);
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/update`, topic);
   }
 
   deleteTopics(topicIds: string[]): Observable<any> {
     const url = `${this.apiUrl}/DeleteList`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.delete(url, {
+    return this.http.post(url, {
       headers: headers,
       body: topicIds  // 👈 Gửi danh sách ID trong body
     });
