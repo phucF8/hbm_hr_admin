@@ -166,8 +166,7 @@ export class ThongBaoComponent implements OnInit {
       error: (error) => {
         console.error('Error loading notifications:', error);
         this.loadingService.hide();
-        alert(`ERR: ${error}`);
-
+        alert('ERR: ' + JSON.stringify(error, null, 2));
       }
     });
   }

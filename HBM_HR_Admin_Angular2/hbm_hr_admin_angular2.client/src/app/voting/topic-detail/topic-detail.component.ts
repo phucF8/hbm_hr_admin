@@ -313,15 +313,6 @@ export class TopicDetailComponent implements OnInit {
       createdBy: currentUser.DataSets.Table[0].ID
     };
 
-
-    console.log('Submit: newTopic =', newTopic);
-    console.log('newTopic.questions =', newTopic.questions);
-    console.log('typeof questions:', typeof newTopic.questions);
-    console.log('isArray:', Array.isArray(newTopic.questions));
-    console.log('JSON =', JSON.stringify(newTopic, null, 2));
-
-
-
     const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp
     console.log(jsonStr);
     // if (!environment.production) {

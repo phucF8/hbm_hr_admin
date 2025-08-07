@@ -8,6 +8,7 @@ import { DebugUtils } from '@app/utils/debug-utils';
 import { LoadingService } from '@app/services/loading.service';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import { UsersService } from '@app/services/users.service';
 
 @Component({
   selector: 'app-login',
@@ -26,13 +27,16 @@ export class LoginComponent implements OnInit {
     private http: HttpClient, 
     private router: Router,
     private authService: AuthService,
+    private usersService: UsersService,
     private loadingService: LoadingService,
     private encryptionService: EncryptionService
   ) { }
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/thongbao']).then(() => {})
+      this.router.navigate(['/thongbao']).then(() => {
+
+      })
       .catch(error => {
         console.error('LoginComponent: Lỗi chuyển hướng:', error);
       });
@@ -59,7 +63,20 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         this.loadingService.hide();
         if (response.Status == 'SUCCESS'){
-          this.router.navigate(['/thongbao']); 
+          
+          // ✅ Gọi API lưu username vào bảng Users
+          this.usersService.saveUser(this.username).subscribe({
+            next: () => {
+              // ✅ Sau khi lưu thành công thì chuyển hướng
+              this.router.navigate(['/thongbao']);
+            },
+            error: (err) => {
+              console.error('Lỗi khi lưu user vào bảng Users:', err);
+              // Dù lỗi vẫn tiếp tục điều hướng
+              this.router.navigate(['/thongbao']);
+            }
+          });
+          
         }else{
           //this.toastr.error('Đã có lỗi xảy ra.', 'Lỗi');
           this.toastr.error('ERROR', response.Message, {
