@@ -17,6 +17,7 @@ import { finalize } from 'rxjs/operators';
 import { DonVi } from '@app/models/donvi';
 import { MergedData } from '@app/models/thong-bao.model';
 import { DanhSachNguoiNhan, ThongBaoItem } from '@app/responses/thongbao_rp';
+import Swal from 'sweetalert2';
 
 
 
@@ -166,7 +167,13 @@ export class ThongBaoComponent implements OnInit {
       error: (error) => {
         console.error('Error loading notifications:', error);
         this.loadingService.hide();
-        alert('ERR: ' + JSON.stringify(error, null, 2));
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi tải dữ liệu',
+          html: `<pre style="text-align:left;">ERR: ${JSON.stringify(error, null, 2)}</pre>`,
+          confirmButtonText: 'Đóng'
+        });
+
       }
     });
   }
@@ -298,7 +305,7 @@ export class ThongBaoComponent implements OnInit {
     });
   }
 
-  getActionName(content: string): string {   
+  getActionName(content: string): string {
     if (!content) return '';
 
     const lowerContent = content.toLowerCase();
@@ -315,7 +322,7 @@ export class ThongBaoComponent implements OnInit {
       return 'Thảo luận Request';
     }
 
-     if (lowerContent.includes('giải trình') && lowerContent.includes('yêu cầu')) {
+    if (lowerContent.includes('giải trình') && lowerContent.includes('yêu cầu')) {
       return 'Tạo Giải trình';
     }
 

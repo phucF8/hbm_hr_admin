@@ -57,32 +57,32 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(users);
         }
 
-        [HttpPost("assign")]
-        public IActionResult AssignPermissions([FromBody] AssignPermissionsDto request)
-        {
-            if (request.UserId == Guid.Empty || request.PermissionIds == null || !request.PermissionIds.Any())
-            {
-                return BadRequest("UserId và danh sách quyền là bắt buộc.");
-            }
+        //[HttpPost("assign")]
+        //public IActionResult AssignPermissions([FromBody] AssignPermissionsDto request)
+        //{
+        //    if (request.UserId == Guid.Empty || request.PermissionIds == null || !request.PermissionIds.Any())
+        //    {
+        //        return BadRequest("UserId và danh sách quyền là bắt buộc.");
+        //    }
 
-            // Xóa quyền cũ trước khi gán mới
-            var oldPermissions = _context.UserPermissions.Where(up => up.UserId == request.UserId);
+        //    // Xóa quyền cũ trước khi gán mới
+        //    var oldPermissions = _context.UserPermissions.Where(up => up.UserId == request.UserId);
 
-            _context.UserPermissions.RemoveRange(oldPermissions);
+        //    _context.UserPermissions.RemoveRange(oldPermissions);
 
-            // Gán quyền mới
-            var newPermissions = request.PermissionIds.Select(pid => new UserPermission
-            {
-                UserId = request.UserId,
-                PermissionId = pid,
-                AssignedAt = DateTime.Now
-            });
+        //    // Gán quyền mới
+        //    var newPermissions = request.PermissionIds.Select(pid => new UserPermission
+        //    {
+        //        UserId = request.UserId,
+        //        PermissionId = pid,
+        //        AssignedAt = DateTime.Now
+        //    });
 
-            _context.UserPermissions.AddRange(newPermissions);
-            _context.SaveChanges();
+        //    _context.UserPermissions.AddRange(newPermissions);
+        //    _context.SaveChanges();
 
-            return Ok(new { Message = "Gán quyền thành công." });
-        }
+        //    return Ok(new { Message = "Gán quyền thành công." });
+        //}
     }
 
 
