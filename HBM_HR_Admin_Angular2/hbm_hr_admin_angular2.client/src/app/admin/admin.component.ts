@@ -4,6 +4,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BASE_URL } from '@app/constants/constants';
 import { environment } from 'environments/environment';
+import { UserDetailComponent } from './user-detail/user-detail.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-admin',
@@ -13,6 +15,7 @@ import { environment } from 'environments/environment';
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnInit {
+
   users: any[] = [];
   permissions: any[] = [];
   selectedUsername: string = '';
@@ -20,7 +23,11 @@ export class AdminComponent implements OnInit {
   private host = `${environment.apiUrl}`;  // Lấy apiUrl từ environment
   BASE_URL = BASE_URL;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private dialog: MatDialog,
+    private http: HttpClient
+  
+  ) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -57,4 +64,31 @@ export class AdminComponent implements OnInit {
       alert('Lưu quyền thành công!');
     });
   }
+
+  viewUser(arg0: any) {
+    // this.service.getDetail(id).subscribe({
+    //       next: (topic) => {
+    //         console.log('Loaded report detail:', topic);
+
+            this.dialog.open(UserDetailComponent, {
+              data: null,
+              disableClose: false,
+              panelClass: 'my-dialog', // Thêm class để tùy chỉnh CSS
+              width: '80vw',
+              height: '80vh',
+              maxWidth: '100vw'
+            })
+              .afterClosed().subscribe(result => {
+                if (result) {
+                  //this.loadList();
+                }
+              });
+          // }
+          // error: (error) => {
+          //   alert('Đã xảy ra lỗi khi tải chi tiết báo cáo');
+          // }
+
+        // });
+  }
+
 }

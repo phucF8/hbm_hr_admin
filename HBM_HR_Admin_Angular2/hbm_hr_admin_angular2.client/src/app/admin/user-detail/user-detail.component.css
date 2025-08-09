@@ -1,4 +1,4 @@
-/* Modal Styles */
+/* Modal Styles
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -307,4 +307,4 @@
 
 .toggle-input:checked + .toggle-slider:before {
     transform: translateX(26px);
-}
+} */

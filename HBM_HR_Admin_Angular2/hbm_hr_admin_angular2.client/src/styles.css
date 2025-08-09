@@ -461,4 +461,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
             color: #475569;
         }
 
-        
+
+.my-dialog {
+  background-color: #fff !important;
+  color: #000; /* nếu muốn text rõ hơn */
+}
