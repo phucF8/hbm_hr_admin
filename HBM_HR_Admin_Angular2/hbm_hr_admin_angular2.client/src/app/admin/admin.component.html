@@ -1,0 +1,98 @@
+
+    
+    <div class="container">
+        <div class="page-header">
+         
+            <div class="search-title">Tiêu chí tìm kiếm</div>
+            <div class="search-filters">
+                <div class="filter-group">
+                    <label class="filter-label">Tìm kiếm user</label>
+                    <input type="text" class="filter-input" placeholder="Nhập từ khóa tìm kiếm">
+                </div>
+                <div class="action-buttons">
+                <button class="btn btn-search">🔍 Tìm kiếm</button>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="table-actions">
+            <div class="table-info">
+                
+            </div>
+            <div class="bulk-actions">
+                <button class="btn btn-sm" style="background: #6c757d; color: white;">Xóa</button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="checkbox"></th>
+                        <th>#</th>
+                        <th>Thông tin user</th>
+                        <th>Vai trò</th>
+
+                        
+
+                        <th>Nền tảng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>1</td>
+                        <td>
+                            <div class="user-info-cell">
+                                <div class="user-avatar-text">QT</div>
+                                <div class="user-details">
+                                    <div class="user-name">QUÁCH THỊ THANH KHIẾU</div>
+                                    <div class="user-email">quach.khieucompany.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="role-badge role-admin">Admin</span></td>
+
+
+
+                        <td>
+                            <div class="action-icons">
+                                <span class="action-icon" title="Phân quyền">🔑</span>
+                            </div>
+                        </td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+        </div>
+        
+
+    </div>
+
+
+
+
+<h2>Gán quyền cho người dùng</h2>
+
+<label>Chọn username:</label>
+<select [(ngModel)]="selectedUsername" (change)="onUserChange()">
+  <option *ngFor="let user of users" [value]="user.username">
+    {{ user.username }}
+  </option>
+</select>
+
+<div *ngIf="selectedUsername">
+  <h3>Danh sách quyền</h3>
+  <div *ngFor="let p of permissions">
+    <label>
+      <input type="checkbox"
+             [value]="p.code"
+             [(ngModel)]="p.selected" />
+      {{ p.name }}
+    </label>
+  </div>
+
+  <button (click)="savePermissions()">Lưu quyền</button>
+</div>

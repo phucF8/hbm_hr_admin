@@ -5,6 +5,8 @@ import { ThongBaoComponent } from './components/thong-bao/thong-bao.component';
 import { TbchitietComponent } from './components/thong-bao/tbchitiet/tbchitiet.component';
 import { AuthGuard } from './guards/auth.guard';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { AdminComponent } from './admin/admin.component';
+import { UserDetailComponent } from './admin/user-detail/user-detail.component';
 
 const routes: Routes = [
   {
@@ -24,6 +26,10 @@ const routes: Routes = [
     path: 'error-report', 
     loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
   },
+  
+  { path: 'admin', component: AdminComponent },
+  { path: 'user-detail', component: UserDetailComponent },
+
 
   { path: 'login', component: LoginComponent },
   { path: 'thongbao', component: ThongBaoComponent, canActivate: [AuthGuard] },

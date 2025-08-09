@@ -6,10 +6,35 @@
         public string Username { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
     }
+    public class UserDto
+    {
+        public string Username { get; set; }
+    }
 
     public class SaveUserRequest
     {
         public string Username { get; set; } = null!;
     }
+
+    public class Permission
+    {
+        public int Id { get; set; }
+        public string Code { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class UserPermission
+    {
+        public Guid UserId { get; set; }
+        public int PermissionId { get; set; }
+        public DateTime? AssignedAt { get; set; }
+    }
+
+    public class AssignPermissionsDto
+    {
+        public Guid UserId { get; set; }
+        public List<int> PermissionIds { get; set; }
+    }
+
 
 }
