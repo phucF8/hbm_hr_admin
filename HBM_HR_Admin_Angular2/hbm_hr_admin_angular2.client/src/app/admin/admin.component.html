@@ -1,75 +1,74 @@
+<div class="container">
+  <div class="page-header">
 
-    
-    <div class="container">
-        <div class="page-header">
-         
-            <div class="search-title">Tiêu chí tìm kiếm</div>
-            <div class="search-filters">
-                <div class="filter-group">
-                    <label class="filter-label">Tìm kiếm user</label>
-                    <input type="text" class="filter-input" placeholder="Nhập từ khóa tìm kiếm">
-                </div>
-                <div class="action-buttons">
-                <button class="btn btn-search">🔍 Tìm kiếm</button>
-                </div>
-            </div>
-            
-        </div>
-        
-        <div class="table-actions">
-            <div class="table-info">
-                
-            </div>
-            <div class="bulk-actions">
-                <button class="btn btn-sm" style="background: #6c757d; color: white;">Xóa</button>
-            </div>
-        </div>
-        
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" class="checkbox"></th>
-                        <th>#</th>
-                        <th>Thông tin user</th>
-                        <th>Vai trò</th>
+    <div class="search-title">Tiêu chí tìm kiếm</div>
+    <div class="search-filters">
+      <div class="filter-group">
+        <label class="filter-label">Tìm kiếm user</label>
+        <input type="text" class="filter-input" placeholder="Nhập từ khóa tìm kiếm">
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-search">🔍 Tìm kiếm</button>
+      </div>
+    </div>
 
-                        
+  </div>
 
-                        <th>Nền tảng</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="checkbox" class="checkbox"></td>
-                        <td>1</td>
-                        <td>
-                            <div class="user-info-cell">
-                                <div class="user-avatar-text">QT</div>
-                                <div class="user-details">
-                                    <div class="user-name">QUÁCH THỊ THANH KHIẾU</div>
-                                    <div class="user-email">quach.khieucompany.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="role-badge role-admin">Admin</span></td>
-
-
-
-                        <td>
-                            <div class="action-icons">
-                                <span class="action-icon" title="Phân quyền">🔑</span>
-                            </div>
-                        </td>
-                    </tr>
-
-
-                </tbody>
-            </table>
-        </div>
-        
+  <div class="table-actions">
+    <div class="table-info">
 
     </div>
+    <div class="bulk-actions">
+      <button class="btn btn-sm" style="background: #6c757d; color: white;">Xóa</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th><input type="checkbox" class="checkbox"></th>
+          <th>#</th>
+          <th>Thông tin user</th>
+          <th>Vai trò</th>
+
+
+
+          <th>Nền tảng</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users; let i = index">
+          <td><input type="checkbox" class="checkbox"></td>
+          <td>1</td>
+          <td>
+            <div class="user-info-cell">
+              <img [src]="BASE_URL + user.avatarUrl" alt="User Avatar" class="user-avatar-img" />
+
+              <div class="user-details">
+                <div class="user-name">{{user.fullName}}</div>
+                <div class="user-email">{{user.username}}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="role-badge role-admin">Admin</span></td>
+
+
+
+          <td>
+            <div class="action-icons">
+              <span class="action-icon" title="Phân quyền">🔑</span>
+            </div>
+          </td>
+        </tr>
+
+
+      </tbody>
+    </table>
+  </div>
+
+
+</div>
 
 
 
@@ -87,12 +86,29 @@
   <h3>Danh sách quyền</h3>
   <div *ngFor="let p of permissions">
     <label>
-      <input type="checkbox"
-             [value]="p.code"
-             [(ngModel)]="p.selected" />
+      <input type="checkbox" [value]="p.code" [(ngModel)]="p.selected" />
       {{ p.name }}
     </label>
   </div>
 
   <button (click)="savePermissions()">Lưu quyền</button>
+</div>
+
+
+
+
+<div class="user-list">
+  <div class="user-item" *ngFor="let user of users; let i = index">
+
+    <div class="user-name">{{ user.fullName }} {{ user.username }}</div>
+    <div class="user-email">{{ user.avatarUrl }}</div>
+    <div class="user-date">{{ user.createdAt | date:'dd/MM/yyyy' }}</div>
+
+    <!-- Hiển thị nguyên JSON -->
+    <pre class="user-json">{{ user | json }}</pre>
+  </div>
+
+  <div *ngIf="users.length === 0" class="no-data">
+    Không có dữ liệu
+  </div>
 </div>

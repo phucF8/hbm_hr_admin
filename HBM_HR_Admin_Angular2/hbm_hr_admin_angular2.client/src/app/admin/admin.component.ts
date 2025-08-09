@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { BASE_URL } from '@app/constants/constants';
 import { environment } from 'environments/environment';
 
 @Component({
@@ -17,6 +18,7 @@ export class AdminComponent implements OnInit {
   selectedUsername: string = '';
 
   private host = `${environment.apiUrl}`;  // Lấy apiUrl từ environment
+  BASE_URL = BASE_URL;
 
   constructor(private http: HttpClient) {}
 

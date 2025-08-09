@@ -50,7 +50,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             var users = _context.Users
                                 .Select(u => new UserDto
                                 {
-                                    Username = u.Username
+                                    Username = u.Username,
+                                    FullName = u.FullName,
+                                    AvatarUrl = u.AvatarUrl
                                 })
                                 .ToList();
 

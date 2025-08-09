@@ -365,6 +365,14 @@
             font-weight: 600;
             font-size: 12px;
         }
+
+        .user-avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* bo tròn */
+            object-fit: cover;  /* ảnh không bị méo */
+            border: 2px solid #fff;
+        }
         
         .user-details {
             display: flex;

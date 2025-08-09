@@ -3,12 +3,17 @@
     public class User
     {
         public Guid Id { get; set; }
-        public string Username { get; set; } = null!;
+        public string Username { get; set; } = string.Empty; // NOT NULL
+        public string FullName { get; set; } = string.Empty; // NOT NULL
+        public string? AvatarUrl { get; set; } // NULLABLE
         public DateTime CreatedAt { get; set; }
     }
+
     public class UserDto
     {
-        public string Username { get; set; }
+        public string Username { get; set; } = null!;
+        public string FullName { get; set; } = null!;
+        public string AvatarUrl { get; set; } = null!;
     }
 
     public class SaveUserRequest
