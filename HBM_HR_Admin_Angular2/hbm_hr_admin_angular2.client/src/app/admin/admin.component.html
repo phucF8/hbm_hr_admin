@@ -73,42 +73,14 @@
 
 
 
-<h2>Gán quyền cho người dùng</h2>
-
-<label>Chọn username:</label>
-<select [(ngModel)]="selectedUsername" (change)="onUserChange()">
-  <option *ngFor="let user of users" [value]="user.username">
-    {{ user.username }}
-  </option>
-</select>
-
-<div *ngIf="selectedUsername">
-  <h3>Danh sách quyền</h3>
-  <div *ngFor="let p of permissions">
-    <label>
-      <input type="checkbox" [value]="p.code" [(ngModel)]="p.selected" />
-      {{ p.name }}
-    </label>
-  </div>
-
-  <button (click)="savePermissions()">Lưu quyền</button>
-</div>
-
-
-
-
-<div class="user-list">
+<!-- <div class="user-list">
   <div class="user-item" *ngFor="let user of users; let i = index">
-
     <div class="user-name">{{ user.fullName }} {{ user.username }}</div>
     <div class="user-email">{{ user.avatarUrl }}</div>
     <div class="user-date">{{ user.createdAt | date:'dd/MM/yyyy' }}</div>
-
-    <!-- Hiển thị nguyên JSON -->
     <pre class="user-json">{{ user | json }}</pre>
   </div>
-
   <div *ngIf="users.length === 0" class="no-data">
     Không có dữ liệu
   </div>
-</div>
+</div> -->
