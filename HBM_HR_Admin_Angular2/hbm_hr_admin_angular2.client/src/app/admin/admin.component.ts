@@ -65,13 +65,16 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  viewUser(arg0: any) {
+  viewUser(user: any) {
+
     // this.service.getDetail(id).subscribe({
     //       next: (topic) => {
     //         console.log('Loaded report detail:', topic);
 
             this.dialog.open(UserDetailComponent, {
-              data: null,
+              data: {
+                user: user
+              },
               disableClose: false,
               panelClass: 'my-dialog', // Thêm class để tùy chỉnh CSS
               width: '80vw',

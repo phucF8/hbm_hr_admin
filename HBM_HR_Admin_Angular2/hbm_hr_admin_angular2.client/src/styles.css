@@ -462,7 +462,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
         }
 
 
-.my-dialog {
-  background-color: #fff !important;
+.mat-mdc-dialog-surface {
+  background-color: transparent !important;
   color: #000; /* nếu muốn text rõ hơn */
 }

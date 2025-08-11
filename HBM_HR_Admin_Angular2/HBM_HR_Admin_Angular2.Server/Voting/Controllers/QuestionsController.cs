@@ -33,7 +33,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddQuestion([FromBody] Question question)
         {
             if (!_context.Topics.Any(t => t.Id == question.TopicId))
@@ -47,7 +47,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Controllers
             return Ok(ApiResponse<object>.Success(question, "Tạo thành công"));
         }
 
-        [HttpPost]
+        [HttpPost("delete")]
         public async Task<IActionResult> DeleteQuestions([FromBody] List<string> questionIds)
         {
             if (questionIds == null || !questionIds.Any())

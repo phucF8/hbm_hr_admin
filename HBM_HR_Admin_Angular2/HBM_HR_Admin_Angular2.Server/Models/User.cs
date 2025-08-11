@@ -28,13 +28,23 @@
         public string Code { get; set; }
         public string Name { get; set; }
     }
+    public class UserPermission
+    {
+        public int Id { get; set; } // Khóa chính mới
+        public Guid UserId { get; set; }
+        public int PermissionId { get; set; }
+        public DateTime? AssignedAt { get; set; }
 
-    //public class UserPermission
-    //{
-    //    public Guid UserId { get; set; }
-    //    public int PermissionId { get; set; }
-    //    public DateTime? AssignedAt { get; set; }
-    //}
+        // Navigation properties (tùy chọn)
+        public User User { get; set; }
+        public Permission Permission { get; set; }
+    }
+
+    public class UserPermissionDto
+    {
+        public Guid UserId { get; set; }
+        public List<int> PermissionIds { get; set; } = new();
+    }
 
     public class AssignPermissionsDto
     {
