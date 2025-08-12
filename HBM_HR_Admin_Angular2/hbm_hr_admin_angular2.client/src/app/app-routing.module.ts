@@ -7,6 +7,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { AdminComponent } from './admin/admin.component';
 import { UserDetailComponent } from './admin/user-detail/user-detail.component';
+import { VotePageComponent } from './voting/vote-page/vote-page.component';
 
 const routes: Routes = [
   {
@@ -27,6 +28,8 @@ const routes: Routes = [
     loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
   },
   
+  { path: 'voting-page', component: VotePageComponent },
+
   { path: 'admin', component: AdminComponent },
   { path: 'user-detail', component: UserDetailComponent },
 
