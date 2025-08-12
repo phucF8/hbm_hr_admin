@@ -1,1 +1,113 @@
-<p>vote-page works!</p>
+<!-- vote-page.component.html -->
+<div class="vote-container">
+  <!-- Header Section -->
+  <div class="vote-header">
+    <div class="header-gradient"></div>
+    <div class="header-content">
+      <h1 class="poll-title">{{ pollTitle }}</h1>
+      <p class="poll-description">{{ pollDescription }}</p>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+        </div>
+        <span class="progress-text">{{ getProgressPercentage() | number:'1.0-0' }}% hoàn thành</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Questions Section -->
+  <div class="questions-container">
+    <div class="question-card" *ngFor="let question of questions; let i = index"
+      [class.answered]="isQuestionAnswered(question)">
+
+      <!-- Question Header -->
+      <div class="question-header">
+        <div class="question-number">{{ i + 1 }}</div>
+        <div class="question-content">
+          <h3 class="question-text">{{ question.text }}</h3>
+          <span class="required-badge" *ngIf="question.required">Bắt buộc</span>
+          <span class="optional-badge" *ngIf="!question.required">Tùy chọn</span>
+        </div>
+      </div>
+
+      <!-- Multiple Choice Questions -->
+      <div class="choices-container" *ngIf="question.type === 'single-choice' || question.type === 'multiple-choice'">
+        <div class="choice-item" *ngFor="let choice of question.choices"
+          [class.selected]="isChoiceSelected(question.id, choice.id)"
+          (click)="onChoiceSelect(question.id, choice.id, question.type === 'multiple-choice')">
+
+          <div class="choice-input">
+            <div class="radio-checkbox" [class.radio]="question.type === 'single-choice'"
+              [class.checkbox]="question.type === 'multiple-choice'"
+              [class.checked]="isChoiceSelected(question.id, choice.id)">
+              <div class="inner-circle" *ngIf="question.type === 'single-choice'"></div>
+              <div class="checkmark" *ngIf="question.type === 'multiple-choice'">✓</div>
+            </div>
+          </div>
+
+          <label class="choice-label">{{ choice.text }}</label>
+
+          <div class="choice-animation"></div>
+        </div>
+      </div>
+
+      <!-- Text Input Questions -->
+      <div class="text-input-container" *ngIf="question.type === 'text'">
+        <textarea class="text-input" placeholder="Nhập câu trả lời của bạn..."
+          [value]="userVotes[question.id]?.textAnswer || ''"
+          (input)="onTextChange(question.id, ($any($event.target)).value)" rows="4">
+        </textarea>
+
+        <div class="character-count">
+          {{ (userVotes[question.id]?.textAnswer || '').length }}/500
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Section -->
+  <div class="submit-section">
+    <div class="submit-card">
+      <div class="submit-info" *ngIf="!canSubmit()">
+        <div class="info-icon">ⓘ</div>
+        <span>Vui lòng trả lời tất cả câu hỏi bắt buộc để gửi</span>
+      </div>
+
+      <button class="submit-btn" [class.loading]="isSubmitting" [class.success]="hasSubmitted"
+        [disabled]="!canSubmit() || isSubmitting" (click)="onSubmit()">
+
+        <div class="btn-content" *ngIf="!isSubmitting && !hasSubmitted">
+          <span>Gửi phiếu bình chọn</span>
+          <div class="btn-icon">→</div>
+        </div>
+
+        <div class="btn-loading" *ngIf="isSubmitting">
+          <div class="spinner"></div>
+          <span>Đang gửi...</span>
+        </div>
+
+        <div class="btn-success" *ngIf="hasSubmitted">
+          <div class="success-icon">✓</div>
+          <span>Đã gửi thành công!</span>
+        </div>
+      </button>
+
+      <button class="reset-btn" *ngIf="hasSubmitted" (click)="resetForm()">
+        Tạo phiếu mới
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Animation Overlay -->
+  <div class="success-overlay" *ngIf="hasSubmitted">
+    <div class="success-animation">
+      <div class="success-circle">
+        <div class="success-checkmark">✓</div>
+      </div>
+      <h2>Cảm ơn bạn!</h2>
+      <p>Phiếu bình chọn của bạn đã được ghi nhận.</p>
+    </div>
+  </div>
+</div>
