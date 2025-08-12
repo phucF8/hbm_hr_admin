@@ -6,33 +6,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 [Table("BB_Questions")]
 public class Question
 {
-    [Key]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
-
-    [Required]
-    public string TopicId { get; set; } = null!;
-
-    [Required]
-    public string Content { get; set; } = null!;
-
-    [Required]
-    [EnumDataType(typeof(QuestionType))]
-    public string Type { get; set; } = "SingleChoice"; // Hoặc bạn có thể dùng enum thật sự
-
+    public string Id { get; set; }
+    public string TopicId { get; set; }
+    public string Content { get; set; }
+    public string Type { get; set; }
     public int? OrderNumber { get; set; }
-
-    [Required]
-    public string CreatedBy { get; set; } = null!;
-
-    public string? UpdatedBy { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-
+    public string CreatedBy { get; set; }
+    public string UpdatedBy { get; set; }
+    public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    public List<Option> Options { get; set; } = new();
 
-    // Navigation property (nếu có)
-    // public Topic Topic { get; set; } = null!;
+    public Topic Topic { get; set; }
+    public ICollection<Option> Options { get; set; }
+
 }
 
 

@@ -25,6 +25,20 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Topic -> Questions
+            modelBuilder.Entity<Topic>()
+                .HasMany(t => t.Questions)
+                .WithOne(q => q.Topic)
+                .HasForeignKey(q => q.TopicId);
+
+            // Question -> Options
+            modelBuilder.Entity<Question>()
+                .HasMany(q => q.Options)
+                .WithOne(o => o.Question)
+                .HasForeignKey(o => o.QuestionId);
+        }
 
 
 

@@ -89,7 +89,45 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success(topicsToDelete.Count,"Đã xoá thành công"));
         }
 
+        [HttpGet("voting/{id}")]
+        public async Task<ActionResult<TopicVotingDto>> GetTopicWithQuestions(string id)
+        {
+            var topic = await _context.Topics
+                .Include(t => t.Questions)
+                    .ThenInclude(q => q.Options)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
+            if (topic == null)
+                return NotFound();
+
+            var result = new TopicVotingDto
+            {
+                Id = topic.Id,
+                Title = topic.Title,
+                Description = topic.Description,
+                StartDate = topic.StartDate,
+                EndDate = topic.EndDate,
+                Questions = topic.Questions
+                    .OrderBy(q => q.OrderNumber)
+                    .Select(q => new QuestionDto
+                    {
+                        Id = q.Id,
+                        Content = q.Content,
+                        Type = q.Type,
+                        OrderNumber = q.OrderNumber,
+                        Options = q.Options
+                            .OrderBy(o => o.OrderNumber)
+                            .Select(o => new OptionDto
+                            {
+                                Id = o.Id,
+                                Content = o.Content,
+                                OrderNumber = o.OrderNumber
+                            }).ToList()
+                    }).ToList()
+            };
+
+            return Ok(result);
+        }
 
     }
 

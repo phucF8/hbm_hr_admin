@@ -26,35 +26,35 @@
       <div class="question-header">
         <div class="question-number">{{ i + 1 }}</div>
         <div class="question-content">
-          <h3 class="question-text">{{ question.text }}</h3>
-          <span class="required-badge" *ngIf="question.required">Bắt buộc</span>
-          <span class="optional-badge" *ngIf="!question.required">Tùy chọn</span>
+          <h3 class="question-text">{{ question.content }}</h3>
+          <!-- <span class="required-badge" *ngIf="question.required">Bắt buộc</span>
+          <span class="optional-badge" *ngIf="!question.required">Tùy chọn</span> -->
         </div>
       </div>
 
       <!-- Multiple Choice Questions -->
-      <div class="choices-container" *ngIf="question.type === 'single-choice' || question.type === 'multiple-choice'">
-        <div class="choice-item" *ngFor="let choice of question.choices"
+      <div class="choices-container" *ngIf="question.type === 'SingleChoice' || question.type === 'MultiChoice'">
+        <div class="choice-item" *ngFor="let choice of question.options"
           [class.selected]="isChoiceSelected(question.id, choice.id)"
-          (click)="onChoiceSelect(question.id, choice.id, question.type === 'multiple-choice')">
+          (click)="onChoiceSelect(question.id, choice.id, question.type === 'MultiChoice')">
 
           <div class="choice-input">
-            <div class="radio-checkbox" [class.radio]="question.type === 'single-choice'"
-              [class.checkbox]="question.type === 'multiple-choice'"
+            <div class="radio-checkbox" [class.radio]="question.type === 'SingleChoice'"
+              [class.checkbox]="question.type === 'MultiChoice'"
               [class.checked]="isChoiceSelected(question.id, choice.id)">
-              <div class="inner-circle" *ngIf="question.type === 'single-choice'"></div>
-              <div class="checkmark" *ngIf="question.type === 'multiple-choice'">✓</div>
+              <div class="inner-circle" *ngIf="question.type === 'SingleChoice'"></div>
+              <div class="checkmark" *ngIf="question.type === 'MultiChoice'">✓</div>
             </div>
           </div>
 
-          <label class="choice-label">{{ choice.text }}</label>
+          <label class="choice-label">{{ choice.content }}</label>
 
           <div class="choice-animation"></div>
         </div>
       </div>
 
       <!-- Text Input Questions -->
-      <div class="text-input-container" *ngIf="question.type === 'text'">
+      <div class="text-input-container" *ngIf="question.type === 'Essay'">
         <textarea class="text-input" placeholder="Nhập câu trả lời của bạn..."
           [value]="userVotes[question.id]?.textAnswer || ''"
           (input)="onTextChange(question.id, ($any($event.target)).value)" rows="4">

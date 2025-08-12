@@ -2,19 +2,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { VotingService } from '@app/services/voting.service';
 
-interface Choice {
+interface Option {
   id: string;
-  text: string;
+  content: string;
   votes?: number;
+  orderNumber: number;
 }
 
 interface Question {
   id: string;
-  text: string;
-  type: 'multiple-choice' | 'single-choice' | 'text';
-  choices?: Choice[];
-  required: boolean;
+  content: string;
+  type: 'MultiChoice' | 'SingleChoice' | 'Essay';
+  options?: Option[];
+  //required: boolean;
 }
 
 interface VoteData {
@@ -33,47 +35,51 @@ interface VoteData {
   ]
 })
 export class VotePageComponent implements OnInit {
-  pollTitle: string = 'Khảo sát ý kiến về sản phẩm mới';
-  pollDescription: string = 'Chúng tôi muốn lắng nghe ý kiến của bạn để cải thiện sản phẩm';
+  pollTitle: string = '';
+  pollDescription: string = '';
   
   questions: Question[] = [
     {
       id: '1',
-      text: 'Bạn đánh giá như thế nào về giao diện của ứng dụng?',
-      type: 'single-choice',
-      required: true,
-      choices: [
-        { id: '1a', text: 'Rất tốt', votes: 0 },
-        { id: '1b', text: 'Tốt', votes: 0 },
-        { id: '1c', text: 'Bình thường', votes: 0 },
-        { id: '1d', text: 'Không tốt', votes: 0 },
-        { id: '1e', text: 'Rất không tốt', votes: 0 }
+      content: 'Bạn đánh giá như thế nào về giao diện của ứng dụng?',
+      type: 'SingleChoice',
+      //required: true,
+      options: [
+        { id: '1a', content: 'Rất tốt', votes: 0 ,orderNumber: 1},
+        { id: '1b', content: 'Tốt', votes: 0 ,orderNumber: 2},
+        { id: '1c', content: 'Bình thường', votes: 0,orderNumber: 3 },
+        { id: '1d', content: 'Không tốt', votes: 0,orderNumber: 4 },
+        { id: '1e', content: 'Rất không tốt', votes: 0,orderNumber: 5 }
       ]
     },
     {
       id: '2',
-      text: 'Những tính năng nào bạn thấy hữu ích nhất? (Có thể chọn nhiều)',
-      type: 'multiple-choice',
-      required: true,
-      choices: [
-        { id: '2a', text: 'Giao diện thân thiện', votes: 0 },
-        { id: '2b', text: 'Tốc độ xử lý nhanh', votes: 0 },
-        { id: '2c', text: 'Nhiều tùy chọn', votes: 0 },
-        { id: '2d', text: 'Dễ sử dụng', votes: 0 },
-        { id: '2e', text: 'Tính bảo mật cao', votes: 0 }
+      content: 'Những tính năng nào bạn thấy hữu ích nhất? (Có thể chọn nhiều)',
+      type: 'MultiChoice',
+      //required: true,
+      options: [
+        { id: '1a', content: 'Rất tốt', votes: 0 ,orderNumber: 1},
+        { id: '1b', content: 'Tốt', votes: 0 ,orderNumber: 2},
+        { id: '1c', content: 'Bình thường', votes: 0,orderNumber: 3 },
+        { id: '1d', content: 'Không tốt', votes: 0,orderNumber: 4 },
+        { id: '1e', content: 'Rất không tốt', votes: 0,orderNumber: 5 }
       ]
     },
     {
       id: '3',
-      text: 'Bạn có góp ý gì khác để chúng tôi cải thiện sản phẩm?',
-      type: 'text',
-      required: false
+      content: 'Bạn có góp ý gì khác để chúng tôi cải thiện sản phẩm?',
+      type: 'Essay',
+      //required: false
     }
   ];
 
   userVotes: { [questionId: string]: VoteData } = {};
   isSubmitting: boolean = false;
   hasSubmitted: boolean = false;
+
+  topicData: any;
+
+  constructor(private votingService: VotingService) {}
 
   ngOnInit(): void {
     // Initialize user votes object
@@ -84,7 +90,26 @@ export class VotePageComponent implements OnInit {
         textAnswer: ''
       };
     });
+
+    this.loadTopic();
+
   }
+
+  loadTopic() {
+    const topicId = '4e08d249-9624-40d5-aeb5-3f55ca19746b'; // ID topic cần lấy
+    this.votingService.getVotingTopic(topicId).subscribe({
+      next: (data) => {
+        this.topicData = data;
+        this.pollTitle = data.title;
+        this.pollDescription = data.description;
+        this.questions = data.questions;
+      },
+      error: (err) => {
+        console.error('Lỗi khi load topic:', err);
+      }
+    });
+  }
+
 
   onChoiceSelect(questionId: string, choiceId: string, isMultiple: boolean = false): void {
     if (!this.userVotes[questionId]) {
@@ -131,7 +156,7 @@ export class VotePageComponent implements OnInit {
     const vote = this.userVotes[question.id];
     if (!vote) return false;
 
-    if (question.type === 'text') {
+    if (question.type === 'Essay') {
       return !!vote.textAnswer && vote.textAnswer.trim().length > 0;
     } else {
       return !!vote.selectedChoices && vote.selectedChoices.length > 0;
@@ -139,8 +164,9 @@ export class VotePageComponent implements OnInit {
   }
 
   canSubmit(): boolean {
-    const requiredQuestions = this.questions.filter(q => q.required);
-    return requiredQuestions.every(question => this.isQuestionAnswered(question));
+    //const requiredQuestions = this.questions.filter(q => q.required);
+    //return requiredQuestions.every(question => this.isQuestionAnswered(question));
+    return true;
   }
 
   onSubmit(): void {
