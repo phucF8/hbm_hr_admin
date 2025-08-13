@@ -8,43 +8,51 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { AdminComponent } from './admin/admin.component';
 import { UserDetailComponent } from './admin/user-detail/user-detail.component';
 import { VotePageComponent } from './voting/vote-page/vote-page.component';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 
 const routes: Routes = [
+  {
+    path: '',
+    component: MainLayoutComponent,
+    children: [
+      { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
+      { path: 'thongbao', component: ThongBaoComponent, canActivate: [AuthGuard] },
+      { path: 'admin', component: AdminComponent },
+      {
+        path: 'voting',
+        loadChildren: () => import('./voting/voting-module').then(m => m.VotingModule)
+      },
+      {
+        path: 'error-report',
+        loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
+      },
+      // thêm các routes khác ở đây
+    ]
+  },
+
   {
     path: 'question-manager',
     loadComponent: () => import('./question-manager/question-manager.component').then(m => m.QuestionManagerComponent)
   },
+
   {
-    path: 'voting',
-    loadChildren: () => import('./voting/voting-module').then(m => m.VotingModule)
-  },
-  {
-    path: 'demo', 
+    path: 'demo',
     loadChildren: () => import('./demo/demo.module').then(m => m.DemoModule)
   },
 
-  {
-    path: 'error-report', 
-    loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
-  },
-  
+
+
   { path: 'voting-page', component: VotePageComponent },
 
-  { path: 'admin', component: AdminComponent },
   { path: 'user-detail', component: UserDetailComponent },
 
-
   { path: 'login', component: LoginComponent },
-  { path: 'thongbao', component: ThongBaoComponent, canActivate: [AuthGuard] },
-  
+
   { path: 'thong-bao/tbchitiet', component: TbchitietComponent },
   { path: 'thong-bao/tbchitiet/:id', component: TbchitietComponent },
 
-
-  { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
-  
   { path: '**', component: NotFoundComponent }  // 👈 Thay vì redirect
-  
+
 ];
 
 @NgModule({

@@ -5,6 +5,7 @@ using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Middleware;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Repositories;
+using HBM_HR_Admin_Angular2.Server.Services;
 using HBM_HR_Admin_Angular2.Server.Voting.Repositories;
 using HBM_HR_Admin_Angular2.Server.Voting.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,6 +38,13 @@ builder.Services.AddScoped<IThongBaoService, ThongBaoService>();
 // Đăng ký DI
 builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<ITopicRepository, TopicRepository>(); // nếu dùng
+
+//Đăng nh
+builder.Services.AddScoped<JwtTokenGenerator>();
+//builder.Services.AddScoped<HrAuthService>();
+builder.Services.AddHttpClient<HrAuthService>();
+
+
 
 
 

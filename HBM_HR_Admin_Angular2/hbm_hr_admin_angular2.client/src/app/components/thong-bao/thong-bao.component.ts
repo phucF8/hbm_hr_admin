@@ -115,8 +115,6 @@ export class ThongBaoComponent implements OnInit {
       this.tenNhanVien = currentUser.TenNhanVien;
     }
 
-
-
   }
 
   onPageChange(newPage: number) {

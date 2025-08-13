@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
+
 namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
 {
     [ApiController]
@@ -127,6 +128,41 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             };
 
             return Ok(result);
+        }
+
+        [HttpPost("submit")]
+        public async Task<IActionResult> SubmitAnswers([FromBody] List<UserAnswerDto> answers)
+        {
+            if (answers == null || !answers.Any())
+            {
+                return BadRequest(new { message = "Không có câu trả lời nào được gửi" });
+            }
+
+            //var userId = "USER_ID_LOGIN"; // TODO: lấy từ token hoặc session
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var now = DateTime.UtcNow;
+
+            foreach (var ans in answers)
+            {
+                var entity = new BB_UserAnswer
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserId = userId,
+                    QuestionId = ans.QuestionId,
+                    OptionId = ans.OptionId,
+                    EssayAnswer = ans.EssayAnswer,
+                    AnsweredAt = now,
+                    CreatedBy = userId,
+                    CreatedAt = now
+                };
+
+                _context.BB_UserAnswers.Add(entity);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { status = "SUCCESS", message = "Lưu câu trả lời thành công" });
         }
 
     }

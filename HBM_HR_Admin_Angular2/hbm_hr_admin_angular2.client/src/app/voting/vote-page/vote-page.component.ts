@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { VotingService } from '@app/services/voting.service';
+import { UserAnswerRequest, VotingService } from '@app/services/voting.service';
 
 interface Option {
   id: string;
@@ -38,40 +38,7 @@ export class VotePageComponent implements OnInit {
   pollTitle: string = '';
   pollDescription: string = '';
   
-  questions: Question[] = [
-    {
-      id: '1',
-      content: 'Bạn đánh giá như thế nào về giao diện của ứng dụng?',
-      type: 'SingleChoice',
-      //required: true,
-      options: [
-        { id: '1a', content: 'Rất tốt', votes: 0 ,orderNumber: 1},
-        { id: '1b', content: 'Tốt', votes: 0 ,orderNumber: 2},
-        { id: '1c', content: 'Bình thường', votes: 0,orderNumber: 3 },
-        { id: '1d', content: 'Không tốt', votes: 0,orderNumber: 4 },
-        { id: '1e', content: 'Rất không tốt', votes: 0,orderNumber: 5 }
-      ]
-    },
-    {
-      id: '2',
-      content: 'Những tính năng nào bạn thấy hữu ích nhất? (Có thể chọn nhiều)',
-      type: 'MultiChoice',
-      //required: true,
-      options: [
-        { id: '1a', content: 'Rất tốt', votes: 0 ,orderNumber: 1},
-        { id: '1b', content: 'Tốt', votes: 0 ,orderNumber: 2},
-        { id: '1c', content: 'Bình thường', votes: 0,orderNumber: 3 },
-        { id: '1d', content: 'Không tốt', votes: 0,orderNumber: 4 },
-        { id: '1e', content: 'Rất không tốt', votes: 0,orderNumber: 5 }
-      ]
-    },
-    {
-      id: '3',
-      content: 'Bạn có góp ý gì khác để chúng tôi cải thiện sản phẩm?',
-      type: 'Essay',
-      //required: false
-    }
-  ];
+  questions: Question[] = [];
 
   userVotes: { [questionId: string]: VoteData } = {};
   isSubmitting: boolean = false;
@@ -178,7 +145,32 @@ export class VotePageComponent implements OnInit {
 
     // Simulate API call
     setTimeout(() => {
-      console.log('Submitted votes:', this.userVotes);
+       const answers: UserAnswerRequest[] = [
+        {
+          questionId: '1j0wlksi8atmdwt439a',
+          optionId: 'wuvgx2hry6mdwt461x',
+          essayAnswer: ''
+        },
+        {
+          questionId: 'cmala26vdplme0zxxzu',
+          optionId: 'q5jw7cxi9ylme1017i6',
+          essayAnswer: ''
+        }
+      ];
+
+      this.votingService.submitAnswers(answers).subscribe({
+      next: (res) => {
+        if (res.status === 'SUCCESS') {
+          console.log('✅', res.message);
+        } else {
+          console.warn('⚠', res.message);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Lỗi khi submit:', err);
+      }
+    });
+
       this.isSubmitting = false;
       this.hasSubmitted = true;
       

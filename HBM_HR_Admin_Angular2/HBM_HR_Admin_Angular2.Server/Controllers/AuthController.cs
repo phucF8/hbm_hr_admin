@@ -2,6 +2,7 @@
 {
     using Azure.Core;
     using HBM_HR_Admin_Angular2.Server.constance;
+    using HBM_HR_Admin_Angular2.Server.Services;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.IdentityModel.Tokens;
     using System.Collections.Generic;
@@ -15,28 +16,63 @@
     {
         private readonly JwtTokenGenerator _jwtTokenGenerator;
 
-        public AuthController(JwtTokenGenerator jwtTokenGenerator)
+        private readonly HrAuthService _hrAuthService;
+        private readonly IConfiguration _config;
+
+        public AuthController(JwtTokenGenerator jwtTokenGenerator, HrAuthService hrAuthService, IConfiguration config)
         {
             _jwtTokenGenerator = jwtTokenGenerator;
+            _hrAuthService = hrAuthService;
+            _config = config;
+        }
+        
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var hrResult = await _hrAuthService.AuthenticateAsync(request.Username, request.Password);
+
+            // Nếu login HR thất bại
+            if (hrResult == null || hrResult.Status != "SUCCESS")
+            {
+                return Unauthorized(new { message = hrResult?.Message ?? "Invalid username or password" });
+            }
+
+            var token = GenerateJwtToken(request.Username);// Nếu login HR thành công -> tạo JWT riêng
+
+            var nhanVien = hrResult.DataSets?.Table?.FirstOrDefault();// Lấy thông tin nhân viên từ API HR
+            return Ok(new
+            {
+                token,
+                username = request.Username,
+                role = "Admin", // gán role cứng hoặc lấy từ DB của bạn
+                expiresIn = _config.GetValue<int>("JwtSettings:ExpiryMinutes") * 60,
+                nhanVien = nhanVien
+            });
+
         }
 
-        private static readonly Dictionary<string, string> users = new()
+        private string GenerateJwtToken(string username)
         {
-            { "admin", "123456" } // Giả lập user (bạn có thể kết nối DB)
+            var jwtSettings = _config.GetSection("JwtSettings");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(ClaimTypes.Role, "Admin"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
-        {
-            if (users.ContainsKey(request.Username) && users[request.Username] == request.Password)
-            {
-                Console.WriteLine($"username = {request.Username}");
-                var token = _jwtTokenGenerator.GenerateToken(request.Username);
-                Console.WriteLine($"token = {token}");
-                return Ok(new {status="SUCCESS", token = token, username = request.Username });
-            }
-            return Unauthorized(new { status = "FAIL", message = "Sai tên đăng nhập hoặc mật khẩu" });
+            var token = new JwtSecurityToken(
+                issuer: jwtSettings["Issuer"],
+                audience: jwtSettings["Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(jwtSettings.GetValue<int>("ExpiryMinutes")),
+                signingCredentials: creds
+            );
 
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
     }

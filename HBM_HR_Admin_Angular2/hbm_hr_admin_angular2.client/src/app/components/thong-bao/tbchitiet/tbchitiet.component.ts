@@ -94,11 +94,10 @@ export class TbchitietComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    this.authService.currentUser$.subscribe((status) => {
-      if (status?.Status === 'SUCCESS') {
-        this.tenNguoiTao = this.authService.getCurrentUser()?.TenNhanVien || 'Người dùng';
-      }
-    });
+    
+
+    this.tenNguoiTao = localStorage.getItem('tenNhanVien') || '';
+    
     this.thongBaoForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       content: ['', [Validators.required, Validators.minLength(10)]],

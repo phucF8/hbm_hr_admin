@@ -49,106 +49,193 @@ export interface LoginAdminResponse {
   message: string
 }
 
+// export interface LoginResponse {
+//   Status: string;
+//   Message: string;
+//   DataSets: {
+//     Table: UserInfo[];
+//     Table1: UserPermission[];
+//     Table2: Array<{
+//       ID: string;
+//       Code: string;
+//       Title: string;
+//       Url: string;
+//       IconUrl: string;
+//       ParentId: string;
+//     }>;
+//     Table3: Array<{
+//       ID: string;
+//       TenKho: string;
+//       Ma: string;
+//       DiaChi: string;
+//       Email: string;
+//       DienThoai: string;
+//     }>;
+//   };
+// }
+
+export interface NhanVien {
+  id: string;
+  idPhongBan: string;
+  idKhoLamViec: string;
+  idChucVu: number;
+  hinhThucLamViec: string;
+  ngayHoSo: string; // ISO date string
+  maNhanVien: string;
+  tenNhanVien: string;
+  username: string;
+  userID: string;
+  tenPhongBan: string;
+  tenChucVu: string;
+  idBoPhan: string;
+  idChucDanh: number;
+  tenChucDanh: string;
+  anh: string;
+  tenBoPhan: string;
+  tenDonVi: string;
+  diDong: string;
+  maPhongBan: string;
+}
+
 export interface LoginResponse {
-  Status: string;
-  Message: string;
-  DataSets: {
-    Table: UserInfo[];
-    Table1: UserPermission[];
-    Table2: Array<{
-      ID: string;
-      Code: string;
-      Title: string;
-      Url: string;
-      IconUrl: string;
-      ParentId: string;
-    }>;
-    Table3: Array<{
-      ID: string;
-      TenKho: string;
-      Ma: string;
-      DiaChi: string;
-      Email: string;
-      DienThoai: string;
-    }>;
-  };
+  token: string;
+  username: string;
+  role: string;
+  expiresIn: number;
+  message?: string; // Có thể null nếu login thành công
+  nhanVien: NhanVien;
+}
+
+
+export interface LoginResponse {
+  token: string;
+  username: string;
+  role: string;
+  expiresIn: number;
+  message?: string; // Có thể null nếu login thành công
+  nhanVien: NhanVien;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<LoginResponse | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {
-    // Kiểm tra token trong localStorage khi khởi tạo service
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
-    }
-  }
 
+  }
 
   login(username: string, password: string): Observable<LoginResponse> {
-    const request: LoginRequest = {
-      AccessToken: API_CONSTANTS.ACCESS_TOKEN,
-      NhanVienInfo: {
-        Username: username,
-        Password: password
-      }
-    };
+    const body = { username, password };
+    return this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, body)
+      .pipe(
+        tap(res => {
+          if (res && res.token) {
+            // Lưu token và thông tin cơ bản
+            localStorage.setItem('access_token', res.token);
+            localStorage.setItem('username', res.username);
+            localStorage.setItem('role', res.role);
 
-    return this.http.post<LoginResponse>(`${API_CONSTANTS.LOGIN_BASE_URL}/DoCheckLogin`, request).pipe(
-      switchMap(response => {
-        if (response.Status === 'SUCCESS') {
-          return this.http.post<LoginAdminResponse>(`${API_CONSTANTS.AUTH_URL}/login`, {Username: 'admin',password:'123456'}).pipe(// Gọi API từ server khác tại đây, ví dụ:
-            tap(secondResponse => {
-              if (secondResponse.status === 'SUCCESS') {
-                localStorage.setItem('currentUser', JSON.stringify(response));
-                localStorage.setItem('accessToken', secondResponse.token);
-                this.currentUserSubject.next(response);
-              } else {
-                throw new Error(secondResponse.message || 'Login failed');
-              }
-            }),
-            switchMap(() => of(response)) // Đảm bảo trả về `response` để không làm hỏng kiểu trả về của Observable
-          );
-        } else {
-          return throwError(() => new Error(response.Message));
-        }
-      }),
-      catchError(error => {
-        console.error('Login failed:', error);
-        return throwError(() => error);
-      })
-    );
+            // Lưu thông tin nhân viên đầy đủ cho UserInfo
+            if (res.nhanVien) {
+              localStorage.setItem('id', res.nhanVien.id || '');
+              localStorage.setItem('maNhanVien', res.nhanVien.maNhanVien || '');
+              localStorage.setItem('tenNhanVien', res.nhanVien.tenNhanVien || '');
+              localStorage.setItem('userID', res.nhanVien.userID || '');
+              localStorage.setItem('tenPhongBan', res.nhanVien.tenPhongBan || '');
+              localStorage.setItem('tenChucVu', res.nhanVien.tenChucVu || '');
+              localStorage.setItem('tenBoPhan', res.nhanVien.tenBoPhan || '');
+              localStorage.setItem('tenDonVi', res.nhanVien.tenDonVi || '');
+              localStorage.setItem('diDong', res.nhanVien.diDong || '');
+              localStorage.setItem('maPhongBan', res.nhanVien.maPhongBan || '');
+              localStorage.setItem('anh', res.nhanVien.anh || '');
+            }
+          }
+        })
+      );
   }
+
+
+  // login0(username: string, password: string): Observable<LoginResponse> {
+  //   const request: LoginRequest = {
+  //     AccessToken: API_CONSTANTS.ACCESS_TOKEN,
+  //     NhanVienInfo: {
+  //       Username: username,
+  //       Password: password
+  //     }
+  //   };
+
+  //   return this.http.post<LoginResponse>(`${API_CONSTANTS.LOGIN_BASE_URL}/DoCheckLogin`, request).pipe(
+  //     switchMap(response => {
+  //       if (response.Status === 'SUCCESS') {
+  //         return this.http.post<LoginAdminResponse>(`${API_CONSTANTS.AUTH_URL}/login`, {Username: 'admin',password:'123456'}).pipe(// Gọi API từ server khác tại đây, ví dụ:
+  //           tap(secondResponse => {
+  //             if (secondResponse.status === 'SUCCESS') {
+  //               localStorage.setItem('currentUser', JSON.stringify(response));
+  //               localStorage.setItem('accessToken', secondResponse.token);
+  //               this.currentUserSubject.next(response);
+  //             } else {
+  //               throw new Error(secondResponse.message || 'Login failed');
+  //             }
+  //           }),
+  //           switchMap(() => of(response)) // Đảm bảo trả về `response` để không làm hỏng kiểu trả về của Observable
+  //         );
+  //       } else {
+  //         return throwError(() => new Error(response.Message));
+  //       }
+  //     }),
+  //     catchError(error => {
+  //       console.error('Login failed:', error);
+  //       return throwError(() => error);
+  //     })
+  //   );
+  // }
 
 
   logout(): void {
-    // Xóa thông tin user và token khỏi localStorage
-    localStorage.removeItem('currentUser');
-    this.currentUserSubject.next(null);
+    localStorage.clear();// Xóa toàn bộ dữ liệu trong localStorage
+    sessionStorage.clear();// Xóa toàn bộ dữ liệu trong sessionStorage (nếu có dùng)
   }
 
   isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
+    const token = localStorage.getItem('access_token');
+    return token !== null && token.trim() !== '';
   }
+
 
   getCurrentUser(): UserInfo | null {
-    return this.currentUserSubject.value?.DataSets.Table[0] || null;
+    const id = localStorage.getItem('id');
+    if (!id) {
+      return null; // Nếu chưa lưu thông tin user thì trả null
+    }
+
+    return {
+      ID: id,
+      MaNhanVien: localStorage.getItem('maNhanVien') || '',
+      TenNhanVien: localStorage.getItem('tenNhanVien') || '',
+      Username: localStorage.getItem('username') || '',
+      UserID: localStorage.getItem('userID') || '',
+      TenPhongBan: localStorage.getItem('tenPhongBan') || '',
+      TenChucVu: localStorage.getItem('tenChucVu') || '',
+      TenBoPhan: localStorage.getItem('tenBoPhan') || '',
+      TenDonVi: localStorage.getItem('tenDonVi') || '',
+      DiDong: localStorage.getItem('diDong') || '',
+      MaPhongBan: localStorage.getItem('maPhongBan') || '',
+      Anh: localStorage.getItem('anh') || ''
+    };
   }
 
+
   getUserPermissions(): Array<{ Code: string, Name: string }> {
-    return this.currentUserSubject.value?.DataSets.Table1 || [];
+    return [];
   }
 
   getUserMenus(): Array<{ ID: string, Code: string, Title: string, Url: string, IconUrl: string, ParentId: string }> {
-    return this.currentUserSubject.value?.DataSets.Table2 || [];
+    return [];
   }
 
   getUserLocation(): { TenKho: string, Ma: string, DiaChi: string, Email: string, DienThoai: string } | null {
-    return this.currentUserSubject.value?.DataSets.Table3[0] || null;
+    return null;
   }
 } 

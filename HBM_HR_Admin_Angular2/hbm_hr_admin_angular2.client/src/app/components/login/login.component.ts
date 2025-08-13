@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private toastr: ToastrService,
-    private http: HttpClient, 
+    private http: HttpClient,
     private router: Router,
     private authService: AuthService,
     private usersService: UsersService,
@@ -37,9 +37,9 @@ export class LoginComponent implements OnInit {
       this.router.navigate(['/thongbao']).then(() => {
 
       })
-      .catch(error => {
-        console.error('LoginComponent: Lỗi chuyển hướng:', error);
-      });
+        .catch(error => {
+          console.error('LoginComponent: Lỗi chuyển hướng:', error);
+        });
     } else {
       console.log('LoginComponent: Chưa có thông tin đăng nhập, hiển thị form đăng nhập');
     }
@@ -62,45 +62,55 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.username, encryptedPassword).subscribe({
       next: (response) => {
         this.loadingService.hide();
-        if (response.Status == 'SUCCESS'){
-          
+        if (response.token != null) {
+
           // ✅ Gọi API lưu username vào bảng Users
           this.usersService.saveUser(this.username).subscribe({
             next: () => {
-              // ✅ Sau khi lưu thành công thì chuyển hướng
-              this.router.navigate(['/thongbao']);
             },
             error: (err) => {
               console.error('Lỗi khi lưu user vào bảng Users:', err);
-              // Dù lỗi vẫn tiếp tục điều hướng
-              this.router.navigate(['/thongbao']);
             }
           });
-          
-        }else{
+          this.router.navigate(['/thongbao']);
+        } else {
           //this.toastr.error('Đã có lỗi xảy ra.', 'Lỗi');
-          this.toastr.error('ERROR', response.Message, {
+          this.toastr.error('ERROR', response.message, {
             positionClass: 'toast-top-center'
           });
+
+          const errorDetail = JSON.stringify(response) || '';
+
+          Swal.fire({
+          icon: 'error',
+          title: 'Lỗi tải dữ liệu',
+          html: `
+                    <p><b>Mã lỗi:</b> </p>
+                    <p><b>Thông báo:</b> </p>
+                    ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
+                  `,
+          confirmButtonText: 'Đóng'
+        });
+
         }
       },
       error: (error) => {
         this.loadingService.hide();
         this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác';
         const errorStatus = error.status;
-                const errorMessage = error.message || 'Không rõ lỗi';
-                const errorDetail = error.error?.message || JSON.stringify(error.error) || '';
-        
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Lỗi tải dữ liệu',
-                  html: `
+        const errorMessage = error.message || 'Không rõ lỗi';
+        const errorDetail = error.error?.message || JSON.stringify(error.error) || '';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi tải dữ liệu',
+          html: `
                     <p><b>Mã lỗi:</b> ${errorStatus}</p>
                     <p><b>Thông báo:</b> ${errorMessage}</p>
                     ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
                   `,
-                  confirmButtonText: 'Đóng'
-                });
+          confirmButtonText: 'Đóng'
+        });
       }
     });
   }
