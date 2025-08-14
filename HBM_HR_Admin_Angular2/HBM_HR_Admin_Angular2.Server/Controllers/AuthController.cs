@@ -2,6 +2,7 @@
 {
     using Azure.Core;
     using HBM_HR_Admin_Angular2.Server.constance;
+    using HBM_HR_Admin_Angular2.Server.Models;
     using HBM_HR_Admin_Angular2.Server.Services;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.IdentityModel.Tokens;
@@ -36,10 +37,8 @@
             {
                 return Unauthorized(new { message = hrResult?.Message ?? "Invalid username or password" });
             }
-
-            var token = GenerateJwtToken(request.Username);// Nếu login HR thành công -> tạo JWT riêng
-
             var nhanVien = hrResult.DataSets?.Table?.FirstOrDefault();// Lấy thông tin nhân viên từ API HR
+            var token = GenerateJwtToken(request.Username, nhanVien);// Nếu login HR thành công -> tạo JWT riêng
             return Ok(new
             {
                 token,
@@ -51,7 +50,7 @@
 
         }
 
-        private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(string username, HrAuthService.EmployeeInfo? nhanVien)
         {
             var jwtSettings = _config.GetSection("JwtSettings");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]));
@@ -59,10 +58,11 @@
 
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, username),
-            new Claim(ClaimTypes.Role, "Admin"),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+                new Claim(ClaimTypes.NameIdentifier, nhanVien.ID.ToString()), // cần claim này
+                new Claim(JwtRegisteredClaimNames.Sub, username),
+                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],

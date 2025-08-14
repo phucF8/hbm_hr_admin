@@ -137,12 +137,12 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             {
                 return BadRequest(new { message = "Không có câu trả lời nào được gửi" });
             }
-
-            //var userId = "USER_ID_LOGIN"; // TODO: lấy từ token hoặc session
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
+            if (userId == null)
+            {
+                return NotFound(new { message = "Không thể xác định danh tính người dùng. Vui lòng đăng nhập lại." });
+            }
             var now = DateTime.UtcNow;
-
             foreach (var ans in answers)
             {
                 var entity = new BB_UserAnswer
@@ -159,9 +159,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
 
                 _context.BB_UserAnswers.Add(entity);
             }
-
             await _context.SaveChangesAsync();
-
             return Ok(new { status = "SUCCESS", message = "Lưu câu trả lời thành công" });
         }
 

@@ -17,7 +17,7 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
       { path: 'thongbao', component: ThongBaoComponent, canActivate: [AuthGuard] },
-      { path: 'admin', component: AdminComponent },
+      { path: 'admin', component: AdminComponent},
       {
         path: 'voting',
         loadChildren: () => import('./voting/voting-module').then(m => m.VotingModule)

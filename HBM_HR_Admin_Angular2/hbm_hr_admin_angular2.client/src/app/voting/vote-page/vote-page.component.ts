@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UserAnswerRequest, VotingService } from '@app/services/voting.service';
+import Swal from 'sweetalert2';
 
 interface Option {
   id: string;
@@ -29,15 +30,16 @@ interface VoteData {
   selector: 'app-vote-page',
   templateUrl: './vote-page.component.html',
   styleUrls: ['./vote-page.component.scss'],
-  imports:[
+  imports: [
     CommonModule,
     ReactiveFormsModule
   ]
 })
 export class VotePageComponent implements OnInit {
+
   pollTitle: string = '';
   pollDescription: string = '';
-  
+
   questions: Question[] = [];
 
   userVotes: { [questionId: string]: VoteData } = {};
@@ -45,8 +47,11 @@ export class VotePageComponent implements OnInit {
   hasSubmitted: boolean = false;
 
   topicData: any;
+  debugAnswers: UserAnswerRequest[] | undefined;
 
-  constructor(private votingService: VotingService) {}
+  constructor(
+    private votingService: VotingService
+  ) { }
 
   ngOnInit(): void {
     // Initialize user votes object
@@ -73,6 +78,12 @@ export class VotePageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Lỗi khi load topic:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi tải dữ liệu',
+          html: `${JSON.stringify(err)}`,
+          confirmButtonText: 'Đóng'
+        });
       }
     });
   }
@@ -91,7 +102,7 @@ export class VotePageComponent implements OnInit {
       // Multiple choice logic
       const selectedChoices = this.userVotes[questionId].selectedChoices || [];
       const index = selectedChoices.indexOf(choiceId);
-      
+
       if (index > -1) {
         selectedChoices.splice(index, 1);
       } else {
@@ -131,9 +142,33 @@ export class VotePageComponent implements OnInit {
   }
 
   canSubmit(): boolean {
-    //const requiredQuestions = this.questions.filter(q => q.required);
-    //return requiredQuestions.every(question => this.isQuestionAnswered(question));
+    // const requiredQuestions = this.questions.filter(q => q.required);
+    // return requiredQuestions.every(question => this.isQuestionAnswered(question));
     return true;
+  }
+
+  convertUserVotesToAnswers(userVotes: { [questionId: string]: VoteData }): UserAnswerRequest[] {
+    const answers: UserAnswerRequest[] = [];
+    Object.values(userVotes).forEach(vote => {
+      // Nếu có selectedChoices -> mỗi option tạo 1 answer
+      if (vote.selectedChoices && vote.selectedChoices.length > 0) {
+        vote.selectedChoices.forEach(choiceId => {
+          answers.push({
+            questionId: vote.questionId,
+            optionId: choiceId,
+            essayAnswer: vote.textAnswer || ''
+          });
+        });
+      } else {
+        // Nếu không có selectedChoices nhưng có textAnswer
+        answers.push({
+          questionId: vote.questionId,
+          essayAnswer: vote.textAnswer || ''
+        });
+      }
+    });
+
+    return answers;
   }
 
   onSubmit(): void {
@@ -145,35 +180,36 @@ export class VotePageComponent implements OnInit {
 
     // Simulate API call
     setTimeout(() => {
-       const answers: UserAnswerRequest[] = [
-        {
-          questionId: '1j0wlksi8atmdwt439a',
-          optionId: 'wuvgx2hry6mdwt461x',
-          essayAnswer: ''
-        },
-        {
-          questionId: 'cmala26vdplme0zxxzu',
-          optionId: 'q5jw7cxi9ylme1017i6',
-          essayAnswer: ''
-        }
-      ];
-
+      const answers = this.convertUserVotesToAnswers(this.userVotes);
+      this.debugAnswers = answers;
+      // UserAnswerRequest[] = [
+      //   {
+      //     questionId: '1j0wlksi8atmdwt439a',
+      //     optionId: 'wuvgx2hry6mdwt461x',
+      //     essayAnswer: ''
+      //   },
+      //   {
+      //     questionId: 'cmala26vdplme0zxxzu',
+      //     optionId: 'q5jw7cxi9ylme1017i6',
+      //     essayAnswer: ''
+      //   }
+      // ];
       this.votingService.submitAnswers(answers).subscribe({
-      next: (res) => {
-        if (res.status === 'SUCCESS') {
-          console.log('✅', res.message);
-        } else {
-          console.warn('⚠', res.message);
+        next: (res) => {
+          if (res.status === 'SUCCESS') {
+            console.log('✅', res.message);
+          } else {
+            console.warn('⚠', res.message);
+          }
+        },
+        error: (err) => {
+          console.error('❌ Lỗi khi submit:', err);
         }
-      },
-      error: (err) => {
-        console.error('❌ Lỗi khi submit:', err);
-      }
-    });
+      });
 
       this.isSubmitting = false;
       this.hasSubmitted = true;
-      
+
       // Show success message for 3 seconds
       setTimeout(() => {
         this.hasSubmitted = false;
@@ -192,4 +228,12 @@ export class VotePageComponent implements OnInit {
     const answeredQuestions = this.questions.filter(q => this.isQuestionAnswered(q)).length;
     return (answeredQuestions / totalQuestions) * 100;
   }
+
+  getTextAnswer(questionID: string) {
+    if (this.userVotes[questionID]) {
+      return this.userVotes[questionID].textAnswer || '';
+    }
+    return '';
+  }
+
 }

@@ -47,7 +47,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         }
 
 
-        [HttpGet("all")]
+        [HttpPost("GetAllUsers")]
         public ActionResult<IEnumerable<UserDto>> GetAllUsers()
         {
             var users = _context.Users
