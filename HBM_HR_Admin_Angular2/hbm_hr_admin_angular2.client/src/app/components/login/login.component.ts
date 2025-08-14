@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 import { UsersService } from '@app/services/users.service';
 import { Observable } from 'rxjs';
+import { ErrorService } from '@app/services/error.service';
 
 @Component({
   selector: 'app-login',
@@ -31,8 +32,9 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private usersService: UsersService,
     private loadingService: LoadingService,
+    private errorService: ErrorService,
     private encryptionService: EncryptionService
-  ) { 
+  ) {
     this.isLoading = loadingService.isLoading$
   }
 
@@ -85,36 +87,42 @@ export class LoginComponent implements OnInit {
 
           const errorDetail = JSON.stringify(response) || '';
 
-          Swal.fire({
-          icon: 'error',
-          title: 'Lỗi tải dữ liệu',
-          html: `
-                    <p><b>Mã lỗi:</b> </p>
-                    <p><b>Thông báo:</b> </p>
-                    ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
-                  `,
-          confirmButtonText: 'Đóng'
-        });
+          // Swal.fire({
+          //   icon: 'error',
+          //   title: 'Lỗi tải dữ liệu',
+          //   html: `
+          //           <p><b>Mã lỗi:</b> </p>
+          //           <p><b>Thông báo:</b> </p>
+          //           ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
+          //         `,
+          //   confirmButtonText: 'Đóng'
+          // });
+
+          this.errorService.showError([
+          response.message || '',
+          JSON.stringify(response) || ''
+        ]);
 
         }
       },
       error: (error) => {
         this.loadingService.hide();
-        this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác';
-        const errorStatus = error.status;
-        const errorMessage = error.message || 'Không rõ lỗi';
-        const errorDetail = error.error?.message || JSON.stringify(error.error) || '';
+        this.errorService.showError([
+          error.status?.toString(),
+          error.message,
+          error.error?.message || JSON.stringify(error.error) || ''
+        ]);
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Lỗi tải dữ liệu',
-          html: `
-                    <p><b>Mã lỗi:</b> ${errorStatus}</p>
-                    <p><b>Thông báo:</b> ${errorMessage}</p>
-                    ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
-                  `,
-          confirmButtonText: 'Đóng'
-        });
+        // Swal.fire({
+        //   icon: 'error',
+        //   title: 'Lỗi tải dữ liệu',
+        //   html: `
+        //             <p><b>Mã lỗi:</b> ${errorStatus}</p>
+        //             <p><b>Thông báo:</b> ${errorMessage}</p>
+        //             ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
+        //           `,
+        //   confirmButtonText: 'Đóng'
+        // });
       }
     });
   }

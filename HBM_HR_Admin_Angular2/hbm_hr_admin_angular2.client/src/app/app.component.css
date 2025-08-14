@@ -1,4 +1,22 @@
-﻿
+﻿.error-content h3 {
+  margin: 0 0 10px 0;
+  color: #d32f2f;
+}
+
+.error-content p {
+  flex-grow: 1;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+
+
+
+
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -29,4 +47,100 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+
+
+
+
+
+
+/* Overlay che toàn màn hình */
+.error-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+}
+
+/* Khung hộp thoại */
+.error-dialog {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Tiêu đề lỗi */
+.error-dialog h3 {
+  margin-top: 0;
+  color: #d9534f;
+  font-size: 1.5rem; /* ~ 24px */
+  font-weight: bold;
+}
+
+/* Container của nút đóng */
+.close-btn-container {
+  display: flex;
+  justify-content: flex-end; /* đẩy nút sang phải */
+  margin-top: 15px;
+}
+
+/* Nút đóng */
+.close-btn {
+  margin-top: 15px;
+  padding: 8px 16px;
+  background: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: flex-end; /* đẩy nút sang phải */
+  
+}
+
+.close-btn:hover {
+  background: #c9302c;
+}
+
+
+
+
+
+
+
+.error-content {
+  display: flex;
+  align-items: center; /* căn giữa icon và text */
+}
+
+.error-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px;
+}
+
+.error-icon i {
+  font-size: 64px;
+  color: #f39c12;
+}
+
+.error-text {
+  flex: 1;
+}
+
+.error-list p {
+  margin: 0;
+  text-align: left;
 }

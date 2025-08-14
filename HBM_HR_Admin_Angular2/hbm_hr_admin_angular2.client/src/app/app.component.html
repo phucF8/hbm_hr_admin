@@ -1,4 +1,34 @@
 <div *ngIf="isLoading | async" class="loading-overlay">
-    <div class="spinner"></div>
+  <div class="spinner"></div>
 </div>
+
+<!-- Hộp thoại báo lỗi -->
+<div *ngIf="errorMessage | async as err" class="error-overlay">
+  <div class="error-dialog">
+
+    <h3>Cảnh báo</h3>
+
+    <div class="error-content">
+      <!-- Cột trái: Icon -->
+      <div class="error-icon">
+        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+      </div>
+
+      <!-- Cột phải: Nội dung -->
+      <div class="error-text">
+        <div *ngIf="err && err.length" class="error-list">
+          <p *ngFor="let line of err">{{ line }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nút đóng -->
+    <div class="close-btn-container">
+      <button class="close-btn" (click)="errorService.clearError()">Đóng</button>
+    </div>
+
+  </div>
+</div>
+
+
 <router-outlet></router-outlet>

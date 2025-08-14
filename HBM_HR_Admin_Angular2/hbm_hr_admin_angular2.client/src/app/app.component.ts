@@ -3,6 +3,7 @@ import { Component, EventEmitter, OnInit, Input, Output, HostListener, ViewChild
 import { AuthService } from './services/auth.service'; // Đảm bảo đường dẫn đúng
 import { Router } from '@angular/router';
 import { LoadingService } from '@app/services/loading.service';
+import { ErrorService } from '@app/services/error.service';
 import { Observable } from 'rxjs';
 import { DebugUtils } from './utils/debug-utils';
 import { getFullImageUrl } from './utils/url.utils';
@@ -17,11 +18,14 @@ import { getFullImageUrl } from './utils/url.utils';
 export class AppComponent {
 
   isLoading: Observable<boolean>;
+   errorMessage: Observable<string[] | null>;
 
   constructor(
     private loadingService: LoadingService,
+    public errorService: ErrorService
   ){
     this.isLoading = loadingService.isLoading$
+    this.errorMessage = errorService.error$;
   }
   
 }

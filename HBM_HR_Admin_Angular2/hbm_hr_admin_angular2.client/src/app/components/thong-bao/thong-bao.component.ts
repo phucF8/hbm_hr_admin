@@ -18,6 +18,7 @@ import { DonVi } from '@app/models/donvi';
 import { MergedData } from '@app/models/thong-bao.model';
 import { DanhSachNguoiNhan, ThongBaoItem } from '@app/responses/thongbao_rp';
 import Swal from 'sweetalert2';
+import { ErrorService } from '@app/services/error.service';
 
 
 
@@ -95,6 +96,7 @@ export class ThongBaoComponent implements OnInit {
     private dialog: MatDialog,
     private thongBaoService: ThongBaoService,
     private loadingService: LoadingService,
+    private errorService: ErrorService,
     private router: Router,
     private authService: AuthService,
     private toastr: ToastrService,
@@ -165,12 +167,13 @@ export class ThongBaoComponent implements OnInit {
       error: (error) => {
         console.error('Error loading notifications:', error);
         this.loadingService.hide();
-        Swal.fire({
-          icon: 'error',
-          title: 'Lỗi tải dữ liệu',
-          html: `<pre style="text-align:left;">ERR: ${JSON.stringify(error, null, 2)}</pre>`,
-          confirmButtonText: 'Đóng'
-        });
+        this.errorService.showError([JSON.stringify(error, null, 2)]);
+        // Swal.fire({
+        //   icon: 'error',
+        //   title: 'Lỗi tải dữ liệu',
+        //   html: `<pre style="text-align:left;">ERR: ${JSON.stringify(error, null, 2)}</pre>`,
+        //   confirmButtonText: 'Đóng'
+        // });
 
       }
     });
