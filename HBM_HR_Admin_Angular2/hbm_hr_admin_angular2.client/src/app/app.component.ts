@@ -7,12 +7,6 @@ import { Observable } from 'rxjs';
 import { DebugUtils } from './utils/debug-utils';
 import { getFullImageUrl } from './utils/url.utils';
 
-interface WeatherForecast {
-  date: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
-}
 
 @Component({
   selector: 'app-root',
@@ -21,5 +15,13 @@ interface WeatherForecast {
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+
+  isLoading: Observable<boolean>;
+
+  constructor(
+    private loadingService: LoadingService,
+  ){
+    this.isLoading = loadingService.isLoading$
+  }
   
 }

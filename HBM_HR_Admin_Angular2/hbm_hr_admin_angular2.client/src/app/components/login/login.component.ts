@@ -9,6 +9,7 @@ import { LoadingService } from '@app/services/loading.service';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 import { UsersService } from '@app/services/users.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ export class LoginComponent implements OnInit {
   password: string = '';
   showPassword: boolean = false;
   errorMessage: string = '';
+  isLoading: Observable<boolean>;
 
   constructor(
     private toastr: ToastrService,
@@ -30,7 +32,9 @@ export class LoginComponent implements OnInit {
     private usersService: UsersService,
     private loadingService: LoadingService,
     private encryptionService: EncryptionService
-  ) { }
+  ) { 
+    this.isLoading = loadingService.isLoading$
+  }
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
