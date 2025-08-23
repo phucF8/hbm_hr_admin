@@ -2,6 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
+import { ApiResponse } from '@app/voting/voting-list/responses/api-response.model';
+
+export interface Topic {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  hasAnswered: boolean;
+  questions: any[];
+}
 
 export interface UserAnswerRequest {
   questionId: string;
@@ -34,5 +45,19 @@ export class VotingService {
     });
     return this.http.post<any>(url, answers, { headers });
   }
+
+  /** 🔹 Lấy danh sách topic theo userId */
+  getTopicsByUser(userId: string): Observable<ApiResponse<Topic[]>> {
+    const url = `${this.baseUrl}/topics/topic-list/${userId}`;
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      throw new Error('No access token found');
+    }
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<ApiResponse<Topic[]>>(url, { headers });
+  }
+
 
 }

@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="header">
+    <h1><i class="fas fa-clipboard-list"></i> Danh sách Topic Khảo sát</h1>
+  </div>
+
+  <div class="topics-container">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Đang tải dữ liệu...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && topics.length === 0" class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <h3>Không có topic nào</h3>
+      <p>Hiện tại chưa có topic khảo sát nào được tạo.</p>
+    </div>
+
+    <!-- Danh sách topics -->
+    <div *ngFor="let topic of topics" class="topic-card" [ngClass]="topic.hasAnswered ? 'answered' : 'not-answered'">
+      <div class="topic-header">
+
+        <div class="topic-info" (click)="answerSurvey(topic)">
+          <div class="topic-title">{{ topic.title }}</div>
+          <div class="topic-description" [innerHTML]="topic.description"></div>
+          <div class="topic-dates">
+            <div class="date-item">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Bắt đầu: {{ formatDate(topic.startDate) }}</span>
+            </div>
+            <div class="date-item">
+              <i class="fas fa-calendar-check"></i>
+              <span>Kết thúc: {{ formatDate(topic.endDate) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-buttons">
+          <span *ngIf="topic.hasAnswered" class="status-badge status-answered">
+            <i class="fas fa-check"></i> Đã trả lời
+          </span>
+          <span *ngIf="!topic.hasAnswered" class="status-badge status-pending">
+            <i class="fas fa-clock"></i> Chưa trả lời
+          </span>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+</div>

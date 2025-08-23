@@ -9,6 +9,7 @@ import { AdminComponent } from './admin/admin.component';
 import { UserDetailComponent } from './admin/user-detail/user-detail.component';
 import { VotePageComponent } from './voting/vote-page/vote-page.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { TopicListComponent } from './voting/topic-list/topic-list.component';
 
 const routes: Routes = [
   {
@@ -41,7 +42,7 @@ const routes: Routes = [
   },
 
 
-
+  { path: 'topic-list', component: TopicListComponent },
   { path: 'voting-page', component: VotePageComponent },
 
   { path: 'user-detail', component: UserDetailComponent },
