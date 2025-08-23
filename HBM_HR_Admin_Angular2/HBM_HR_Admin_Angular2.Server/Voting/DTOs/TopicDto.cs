@@ -14,6 +14,8 @@
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
+        public bool HasAnswered { get; set; }
+
         public List<QuestionDto> Questions { get; set; } = new();
 
     }

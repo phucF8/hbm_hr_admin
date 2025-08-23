@@ -110,6 +110,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
                 EndDate = topic.EndDate,
                 Questions = topic.Questions
                     .OrderBy(q => q.OrderNumber)
+
                     .Select(q => new QuestionDto
                     {
                         Id = q.Id,
@@ -156,11 +157,31 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
                     CreatedBy = userId,
                     CreatedAt = now
                 };
-
                 _context.BB_UserAnswers.Add(entity);
             }
             await _context.SaveChangesAsync();
             return Ok(new { status = "SUCCESS", message = "Lưu câu trả lời thành công" });
+        }
+
+        [HttpGet("topic-list/{userId}")]
+        public async Task<ActionResult<IEnumerable<TopicDto>>> GetTopics(string userId)
+        {
+            var topics = await _context.Topics
+                .Select(t => new TopicDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    StartDate = t.StartDate,
+                    EndDate = t.EndDate,
+                    HasAnswered = _context.BB_UserAnswers
+                        .Any(ua => ua.UserId == userId
+                                   && _context.Questions
+                                       .Any(q => q.Id == ua.QuestionId && q.TopicId == t.Id))
+                })
+                .ToListAsync();
+
+            return Ok(ApiResponse<object>.Success(data: topics,message:""));
         }
 
     }
