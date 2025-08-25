@@ -22,6 +22,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public async Task<PagedResult<ThongBaoDto>> getListThongBao(NotificationPagingRequest param)
         {
+            
             var query = _context.DbThongBao
                 .Join(_context.DbNhanVien,
                     tb => tb.NguoiTao,

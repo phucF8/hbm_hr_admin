@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/thongbao']).then(() => {
+      this.router.navigate(['topic-list']).then(() => {
 
       })
         .catch(error => {
@@ -78,7 +78,7 @@ export class LoginComponent implements OnInit {
               console.error('Lỗi khi lưu user vào bảng Users:', err);
             }
           });
-          this.router.navigate(['/thongbao']);
+          this.router.navigate(['topic-list']);
         } else {
           //this.toastr.error('Đã có lỗi xảy ra.', 'Lỗi');
           this.toastr.error('ERROR', response.message, {

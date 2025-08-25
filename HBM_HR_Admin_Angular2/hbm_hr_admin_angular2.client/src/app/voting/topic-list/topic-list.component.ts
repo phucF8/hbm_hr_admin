@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VotingService } from '@app/services/voting.service';
+import { Router } from '@angular/router';
 
 interface Topic {
   id: string;
@@ -33,6 +34,7 @@ export class TopicListComponent implements OnInit {
   errorMessage = '';
 
   constructor(
+    private router: Router,
     private votingService: VotingService,
     private http: HttpClient
   ) { }
@@ -84,7 +86,8 @@ export class TopicListComponent implements OnInit {
   }
 
   answerSurvey(topic: Topic) {
-    alert(`${topic.hasAnswered ? 'Chỉnh sửa câu trả lời' : 'Trả lời'}: ${topic.id}`);
+    //alert(`${topic.hasAnswered ? 'Chỉnh sửa câu trả lời' : 'Trả lời'}: ${topic.id}`);
+this.router.navigate(['/voting',  topic.id]);
   }
 
 }

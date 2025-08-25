@@ -58,7 +58,7 @@
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, nhanVien.ID.ToString()), // cần claim này
+                new Claim(ClaimTypes.NameIdentifier, nhanVien.UserID.ToString()), // cần claim này
                 new Claim(JwtRegisteredClaimNames.Sub, username),
                 new Claim(ClaimTypes.Role, "Admin"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

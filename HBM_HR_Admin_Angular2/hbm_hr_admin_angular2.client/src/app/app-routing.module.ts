@@ -10,10 +10,11 @@ import { UserDetailComponent } from './admin/user-detail/user-detail.component';
 import { VotePageComponent } from './voting/vote-page/vote-page.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { TopicListComponent } from './voting/topic-list/topic-list.component';
+import { UserLayoutComponent } from './layouts/user-layout/user-layout.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'admin',
     component: MainLayoutComponent,
     children: [
       { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
@@ -32,6 +33,17 @@ const routes: Routes = [
   },
 
   {
+    path: '',
+    component: UserLayoutComponent,
+    children: [
+      { path: '', redirectTo: 'topic-list', pathMatch: 'full' },
+      { path: 'topic-list', component: TopicListComponent },
+      { path: 'voting/:topicId', component: VotePageComponent },
+    ],
+    canActivate: [AuthGuard]
+  },
+
+  {
     path: 'question-manager',
     loadComponent: () => import('./question-manager/question-manager.component').then(m => m.QuestionManagerComponent)
   },
@@ -40,10 +52,6 @@ const routes: Routes = [
     path: 'demo',
     loadChildren: () => import('./demo/demo.module').then(m => m.DemoModule)
   },
-
-
-  { path: 'topic-list', component: TopicListComponent },
-  { path: 'voting-page', component: VotePageComponent },
 
   { path: 'user-detail', component: UserDetailComponent },
 

@@ -2,8 +2,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { ErrorService } from '@app/services/error.service';
 import { UserAnswerRequest, VotingService } from '@app/services/voting.service';
-import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 interface Option {
   id: string;
@@ -48,10 +51,17 @@ export class VotePageComponent implements OnInit {
 
   topicData: any;
   debugAnswers: UserAnswerRequest[] | undefined;
+  topicId: string = '';
 
   constructor(
-    private votingService: VotingService
-  ) { }
+    private router: Router,
+    private errorService: ErrorService, 
+    private route: ActivatedRoute,
+    private votingService: VotingService,
+    private toastr: ToastrService,
+  ) { 
+    this.topicId = this.route.snapshot.paramMap.get('topicId')!;
+  }
 
   ngOnInit(): void {
     // Initialize user votes object
@@ -68,8 +78,8 @@ export class VotePageComponent implements OnInit {
   }
 
   loadTopic() {
-    const topicId = '4e08d249-9624-40d5-aeb5-3f55ca19746b'; // ID topic cần lấy
-    this.votingService.getVotingTopic(topicId).subscribe({
+    
+    this.votingService.getVotingTopic(this.topicId).subscribe({
       next: (data) => {
         this.topicData = data;
         this.pollTitle = data.title;
@@ -78,12 +88,7 @@ export class VotePageComponent implements OnInit {
       },
       error: (err) => {
         console.error('Lỗi khi load topic:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Lỗi tải dữ liệu',
-          html: `${JSON.stringify(err)}`,
-          confirmButtonText: 'Đóng'
-        });
+        this.errorService.showError([JSON.stringify(err)]);
       }
     });
   }
@@ -142,7 +147,7 @@ export class VotePageComponent implements OnInit {
   }
 
   canSubmit(): boolean {
-    // const requiredQuestions = this.questions.filter(q => q.required);
+    // const requiredQuestions = this.questions.filter(q => q.id);
     // return requiredQuestions.every(question => this.isQuestionAnswered(question));
     return true;
   }
@@ -175,46 +180,34 @@ export class VotePageComponent implements OnInit {
     if (!this.canSubmit() || this.isSubmitting) {
       return;
     }
-
     this.isSubmitting = true;
-
-    // Simulate API call
-    setTimeout(() => {
-      const answers = this.convertUserVotesToAnswers(this.userVotes);
-      this.debugAnswers = answers;
-      // UserAnswerRequest[] = [
-      //   {
-      //     questionId: '1j0wlksi8atmdwt439a',
-      //     optionId: 'wuvgx2hry6mdwt461x',
-      //     essayAnswer: ''
-      //   },
-      //   {
-      //     questionId: 'cmala26vdplme0zxxzu',
-      //     optionId: 'q5jw7cxi9ylme1017i6',
-      //     essayAnswer: ''
-      //   }
-      // ];
-      this.votingService.submitAnswers(answers).subscribe({
-        next: (res) => {
-          if (res.status === 'SUCCESS') {
-            console.log('✅', res.message);
-          } else {
-            console.warn('⚠', res.message);
-          }
-        },
-        error: (err) => {
-          console.error('❌ Lỗi khi submit:', err);
+    const answers = this.convertUserVotesToAnswers(this.userVotes);
+    this.debugAnswers = answers;
+    this.votingService.submitAnswers(answers).subscribe({
+      next: (res) => {
+        if (res.status === 'SUCCESS') {
+          this.toastr.success('Phiếu bình chọn của bạn đã được ghi nhận.','Cảm ơn bạn', {
+          positionClass: 'toast-top-center',
+          timeOut: 5000, // 5s
+          progressBar: true
+        });
+          this.isSubmitting = false;
+          this.hasSubmitted = true;
+          console.log('✅', res.message);
+          this.router.navigate(['/topic-list']);
+        } else {
+          this.isSubmitting = false;
+          this.hasSubmitted = false;
+          console.warn('⚠', res.message);
+          this.errorService.showError([res.message]);
         }
-      });
-
-      this.isSubmitting = false;
-      this.hasSubmitted = true;
-
-      // Show success message for 3 seconds
-      setTimeout(() => {
+      },
+      error: (err) => {
+        this.isSubmitting = false;
         this.hasSubmitted = false;
-      }, 3000);
-    }, 1500);
+        this.errorService.showError([err.message]);
+      }
+    });
   }
 
   resetForm(): void {
