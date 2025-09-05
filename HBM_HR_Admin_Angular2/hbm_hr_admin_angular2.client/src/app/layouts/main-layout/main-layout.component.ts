@@ -25,6 +25,7 @@ export class MainLayoutComponent {
   tenNhanVien: string = '';
   anhNhanVien: string = '';
   maNhanVien: string = '';
+  userID: string | null;
   showCreatePopup = false;
   showSignoutPopup = false;
 
@@ -55,6 +56,7 @@ export class MainLayoutComponent {
     this.tenNhanVien = localStorage.getItem('tenNhanVien') || '';
     this.anhNhanVien = getFullImageUrl(localStorage.getItem('anh') || '');
     this.maNhanVien = localStorage.getItem('maNhanVien') || '';
+    this.userID = localStorage.getItem('userID');
 
     // this.authService.currentUser$.subscribe((status) => {
     //   if (status?.Status == 'SUCCESS') {

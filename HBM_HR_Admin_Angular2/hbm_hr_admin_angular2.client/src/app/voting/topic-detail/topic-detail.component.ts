@@ -255,7 +255,7 @@ export class TopicDetailComponent implements OnInit {
 
 
   onSubmitUpdate() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userID = localStorage.getItem('userID')
     // Xử lý giá trị rỗng thành null
     const formValue = this.myForm.value;
     if (formValue.startDate === '') {
@@ -268,7 +268,7 @@ export class TopicDetailComponent implements OnInit {
       ...this.data,
       ...this.myForm.value,
       updatedAt: new Date().toISOString(), // gán lại updatedAt nếu cần
-      updatedBy: currentUser.DataSets.Table[0].ID
+      updatedBy: userID,
     };
     // updatedTopic.questions = this.data.questions;
     const jsonStr = JSON.stringify(updatedTopic); // null, 2 => để format đẹp
@@ -302,12 +302,12 @@ export class TopicDetailComponent implements OnInit {
 
 
   onSubmitCreate() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userID = localStorage.getItem('userID')
     const newTopic: TopicDetail = {
       ...this.myForm.value,
       createdAt: new Date().toISOString(), // hoặc để backend xử lý
       updatedAt: new Date().toISOString(),  // nếu cần
-      createdBy: currentUser.DataSets.Table[0].ID
+      createdBy: userID,
     };
 
     const jsonStr = JSON.stringify(newTopic, null, 2); // format JSON đẹp

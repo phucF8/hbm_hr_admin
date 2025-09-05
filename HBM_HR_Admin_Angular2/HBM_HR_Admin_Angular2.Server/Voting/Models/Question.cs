@@ -16,7 +16,6 @@ public class Question
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
-    public Topic Topic { get; set; }
     public ICollection<Option> Options { get; set; }
 
 }

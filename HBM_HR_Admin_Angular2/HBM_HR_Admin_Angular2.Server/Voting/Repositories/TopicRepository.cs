@@ -3,38 +3,30 @@ using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
-{
-    public class TopicRepository : ITopicRepository
-    {
+namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
+    public class TopicRepository : ITopicRepository {
         private readonly ApplicationDbContext _context;
 
-        public TopicRepository(ApplicationDbContext context)
-        {
+        public TopicRepository(ApplicationDbContext context) {
             _context = context;
         }
 
-        public async Task<Topic> AddAsync(Topic topic)
-        {
+        public async Task<Topic> AddAsync(Topic topic) {
             // Gán ID cho Topic nếu chưa có
             topic.Id = string.IsNullOrWhiteSpace(topic.Id) ? Guid.NewGuid().ToString() : topic.Id;
             topic.CreatedAt = DateTime.UtcNow;
 
             // Duyệt qua các câu hỏi (nếu có)
-            if (topic.Questions != null && topic.Questions.Any())
-            {
-                foreach (var question in topic.Questions)
-                {
+            if (topic.Questions != null && topic.Questions.Any()) {
+                foreach (var question in topic.Questions) {
                     // Gán ID và liên kết TopicId cho từng câu hỏi
                     question.Id = string.IsNullOrWhiteSpace(question.Id) ? Guid.NewGuid().ToString() : question.Id;
                     question.TopicId = topic.Id;
                     question.CreatedAt = DateTime.UtcNow;
 
                     // Duyệt các option của câu hỏi (nếu có)
-                    if (question.Options != null && question.Options.Any())
-                    {
-                        foreach (var option in question.Options)
-                        {
+                    if (question.Options != null && question.Options.Any()) {
+                        foreach (var option in question.Options) {
                             option.Id = string.IsNullOrWhiteSpace(option.Id) ? Guid.NewGuid().ToString() : option.Id;
                             option.QuestionId = question.Id;
                             option.CreatedAt = DateTime.UtcNow;
@@ -52,16 +44,14 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
         }
 
 
-        public async Task<PagedResultDto<TopicDto>> GetPagedAsync(int page, int pageSize)
-        {
+        public async Task<PagedResultDto<TopicDto>> GetPagedAsync(int page, int pageSize) {
             var query = from t in _context.Topics
                         join created in _context.DbNhanVien on t.CreatedBy equals created.ID into createdGroup
                         from createdUser in createdGroup.DefaultIfEmpty()
                         join updated in _context.DbNhanVien on t.UpdatedBy equals updated.ID into updatedGroup
                         from updatedUser in updatedGroup.DefaultIfEmpty()
                         orderby t.CreatedAt descending
-                        select new TopicDto
-                        {
+                        select new TopicDto {
                             Id = t.Id,
                             Title = t.Title,
                             Description = t.Description,
@@ -78,8 +68,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResultDto<TopicDto>
-            {
+            return new PagedResultDto<TopicDto> {
                 TotalItems = totalItems,
                 Page = page,
                 PageSize = pageSize,
@@ -87,8 +76,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
             };
         }
 
-        public async Task<bool> DeleteAsync(string id)
-        {
+        public async Task<bool> DeleteAsync(string id) {
             var topic = await _context.Topics.FindAsync(id);
             if (topic == null)
                 return false;
@@ -97,18 +85,10 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
             return true;
         }
 
-        public async Task<Topic?> UpdateAsync(UpdateTopicDto dto)
-        {
-            var topic = await _context.Topics
-                .Include(t => t.Questions)
-                    .ThenInclude(q => q.Options)
-                .FirstOrDefaultAsync(t => t.Id == dto.Id);
-
-            if (topic == null)
-                return null;
-
-            try
-            {
+        public async Task<Topic?> UpdateAsync(UpdateTopicDto dto) {
+            var topic = await _context.Topics.Include(t => t.Questions).ThenInclude(q => q.Options).FirstOrDefaultAsync(t => t.Id == dto.Id);
+            if (topic == null) return null;
+            try {
                 // ✅ Cập nhật thông tin Topic
                 topic.Title = dto.Title;
                 topic.Description = dto.Description;
@@ -116,52 +96,33 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                 topic.EndDate = dto.EndDate;
                 topic.UpdatedBy = dto.UpdatedBy;
                 topic.UpdatedAt = DateTime.UtcNow;
-
                 // ✅ Lấy danh sách ID các câu hỏi hiện có và mới
                 var incomingQuestionIds = dto.Questions.Select(q => q.Id).ToList();
-                var toDeleteQuestions = topic.Questions
-                    .Where(q => !incomingQuestionIds.Contains(q.Id))
-                    .ToList();
-
+                var toDeleteQuestions = topic.Questions.Where(q => !incomingQuestionIds.Contains(q.Id)).ToList();
                 _context.Questions.RemoveRange(toDeleteQuestions);
-
-                foreach (var qDto in dto.Questions)
-                {
+                foreach (var qDto in dto.Questions) {
                     var existingQ = topic.Questions.FirstOrDefault(q => q.Id == qDto.Id);
-
-                    if (existingQ != null)
-                    {
-                        // ✅ Cập nhật câu hỏi cũ
+                    if (existingQ != null) {// ✅ Cập nhật câu hỏi cũ
                         existingQ.Content = qDto.Content;
                         existingQ.Type = qDto.Type;
                         existingQ.OrderNumber = qDto.OrderNumber;
                         existingQ.UpdatedBy = dto.UpdatedBy;
                         existingQ.UpdatedAt = DateTime.UtcNow;
-
                         // ✅ Xử lý Options của câu hỏi này
                         var incomingOptionIds = qDto.Options.Select(o => o.Id).ToList();
-                        var toDeleteOptions = existingQ.Options
-                            .Where(o => !incomingOptionIds.Contains(o.Id))
-                            .ToList();
-
+                        var toDeleteOptions = existingQ.Options.Where(o => !incomingOptionIds.Contains(o.Id)).ToList();
                         _context.Options.RemoveRange(toDeleteOptions);
-
-                        foreach (var oDto in qDto.Options)
-                        {
+                        foreach (var oDto in qDto.Options) {
                             var existingO = existingQ.Options.FirstOrDefault(o => o.Id == oDto.Id);
-                            if (existingO != null)
-                            {
+                            if (existingO != null) {
                                 // Cập nhật option
                                 existingO.Content = oDto.Content;
                                 existingO.OrderNumber = oDto.OrderNumber;
                                 existingO.UpdatedBy = dto.UpdatedBy;
                                 existingO.UpdatedAt = DateTime.UtcNow;
-                            }
-                            else
-                            {
+                            } else {
                                 // Thêm mới option
-                                var newOption = new Option
-                                {
+                                var newOption = new Option {
                                     Id = string.IsNullOrWhiteSpace(oDto.Id) ? Guid.NewGuid().ToString() : oDto.Id,
                                     QuestionId = existingQ.Id,
                                     Content = oDto.Content,
@@ -172,12 +133,9 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                                 existingQ.Options.Add(newOption);
                             }
                         }
-                    }
-                    else
-                    {
+                    } else {
                         // ✅ Thêm mới câu hỏi và options
-                        var newQ = new Question
-                        {
+                        var newQ = new Question {
                             Id = qDto.Id,
                             Content = qDto.Content,
                             Type = qDto.Type,
@@ -185,8 +143,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                             TopicId = topic.Id,
                             CreatedBy = dto.UpdatedBy,
                             CreatedAt = DateTime.UtcNow,
-                            Options = qDto.Options.Select(o => new Option
-                            {
+                            Options = qDto.Options.Select(o => new Option {
                                 Id = string.IsNullOrWhiteSpace(o.Id) ? Guid.NewGuid().ToString() : o.Id,
                                 Content = o.Content,
                                 OrderNumber = o.OrderNumber,
@@ -200,30 +157,24 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
 
                 await _context.SaveChangesAsync();
                 return topic;
-            }
-            catch (DbUpdateException ex)
-            {
+            } catch (DbUpdateException ex) {
                 var detail = ex.InnerException?.Message ?? ex.Message;
                 throw new Exception("Lỗi khi lưu vào DB: " + detail);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception("Lỗi không xác định: " + ex.Message);
             }
         }
 
 
 
-        public async Task<TopicDto?> GetByIdAsync(string id)
-        {
+        public async Task<TopicDto?> GetByIdAsync(string id) {
             var query = from t in _context.Topics
                         where t.Id == id
                         join created in _context.DbNhanVien on t.CreatedBy equals created.ID into createdGroup
                         from createdUser in createdGroup.DefaultIfEmpty()
                         join updated in _context.DbNhanVien on t.UpdatedBy equals updated.ID into updatedGroup
                         from updatedUser in updatedGroup.DefaultIfEmpty()
-                        select new TopicDto
-                        {
+                        select new TopicDto {
                             Id = t.Id,
                             Title = t.Title,
                             Description = t.Description,
@@ -238,8 +189,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                             Questions = _context.Questions
                                 .Where(q => q.TopicId == t.Id)
                                 .OrderBy(q => q.OrderNumber)
-                                .Select(q => new QuestionDto
-                                {
+                                .Select(q => new QuestionDto {
                                     Id = q.Id,
                                     Content = q.Content,
                                     Type = q.Type,
@@ -247,8 +197,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories
                                     Options = _context.Options
                                         .Where(o => o.QuestionId == q.Id)
                                         .OrderBy(o => o.OrderNumber)
-                                        .Select(o => new OptionDto
-                                        {
+                                        .Select(o => new OptionDto {
                                             Id = o.Id,
                                             Content = o.Content,
                                             OrderNumber = o.OrderNumber

@@ -27,20 +27,6 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public DbSet<BB_UserAnswer> BB_UserAnswers { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // Topic -> Questions
-            modelBuilder.Entity<Topic>()
-                .HasMany(t => t.Questions)
-                .WithOne(q => q.Topic)
-                .HasForeignKey(q => q.TopicId);
-
-            // Question -> Options
-            modelBuilder.Entity<Question>()
-                .HasMany(q => q.Options)
-                .WithOne(o => o.Question)
-                .HasForeignKey(o => o.QuestionId);
-        }
 
 
 
