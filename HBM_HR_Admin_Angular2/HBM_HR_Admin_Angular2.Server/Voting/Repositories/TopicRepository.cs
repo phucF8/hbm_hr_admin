@@ -2,6 +2,7 @@
 using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
     public class TopicRepository : ITopicRepository {
@@ -86,7 +87,12 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
         }
 
         public async Task<Topic?> UpdateAsync(UpdateTopicDto dto) {
-            var topic = await _context.Topics.Include(t => t.Questions).ThenInclude(q => q.Options).FirstOrDefaultAsync(t => t.Id == dto.Id);
+            Topic topic = null;
+            try {
+                topic = await _context.Topics.Include(t => t.Questions).ThenInclude(q => q.Options).FirstOrDefaultAsync(t => t.Id == dto.Id);
+            }catch(Exception ex) {
+                throw new Exception("ERROR: " + ex.Message);
+            }
             if (topic == null) return null;
             try {
                 // ✅ Cập nhật thông tin Topic
