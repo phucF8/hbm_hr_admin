@@ -39,10 +39,10 @@ export class SurveyReviewComponent {
   loadTopicForReview() {
     this.votingService.getTopicForReview(this.topicId).subscribe({
       next: (data) => {
-        this.topicData = data;
-        this.pollTitle = data.title;
-        this.pollDescription = data.description;
-        this.questions = data.questions;
+        this.topicData = data.data;
+        this.pollTitle = this.topicData.title;
+        this.pollDescription = this.topicData.description;
+        this.questions = this.topicData.questions;
       },
       error: (err) => {
         console.error('Lỗi khi load topic:', err);
@@ -51,18 +51,22 @@ export class SurveyReviewComponent {
     });
   }
 
-  getTextAnswer(questionID: string) {
-    // if (this.userVotes[questionID]) {
-    //   return this.userVotes[questionID].textAnswer || '';
-    // }
-    return '';
+  getTextAnswer(questionId: string): string {
+    const question = this.topicData.questions.find((q: any) => q.id === questionId);
+    if (!question || !question.userAnswers) return '';
+    // Tìm câu trả lời dạng text (essayAnswer khác rỗng)
+    const essay = question.userAnswers.find((ans: any) => ans.essayAnswer);
+    return essay ? essay.essayAnswer : '';
   }
 
   isChoiceSelected(questionId: string, choiceId: string): boolean {
-    // const vote = this.userVotes[questionId];
-    // return vote && vote.selectedChoices ? vote.selectedChoices.includes(choiceId) : false;
-    return true;
+    const question = this.topicData.questions.find((q: any) => q.id === questionId);
+    if (!question || !question.userAnswers) return false;
+    // Kiểm tra có optionId nào trùng với choiceId hay không
+    return question.userAnswers.some((ans: any) => ans.optionId === choiceId);
   }
+
+
 
   isQuestionAnswered(question: Question): boolean {
     return true;

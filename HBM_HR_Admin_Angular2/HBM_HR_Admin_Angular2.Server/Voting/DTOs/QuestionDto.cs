@@ -7,7 +7,7 @@
         public string Type { get; set; } = null!;
         public int? OrderNumber { get; set; }
         public List<OptionDto> Options { get; set; } = new();
-        public UserAnswerDto? UserAnswer { get; set; }
+        public List<UserAnswerDto> UserAnswers { get; set; } = new();  // thay vì UserAnswer
     }
 
     public class OptionDto
