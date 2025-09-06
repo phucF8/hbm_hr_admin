@@ -11,7 +11,8 @@
 
   <!-- Questions Section -->
   <div class="questions-container">
-    <div class="question-card" *ngFor="let question of questions; let i = index" [class.answered]="isQuestionAnswered(question)">
+    <div class="question-card" *ngFor="let question of questions; let i = index"
+      [class.answered]="isQuestionAnswered(question)">
 
       <!-- Question Header -->
       <div class="question-header">
@@ -26,8 +27,7 @@
       <!-- Multiple Choice Questions -->
       <div class="choices-container" *ngIf="question.type === 'SingleChoice' || question.type === 'MultiChoice'">
         <div class="choice-item" *ngFor="let choice of question.options"
-          [class.selected]="isChoiceSelected(question.id, choice.id)"
-        >
+          [class.selected]="isChoiceSelected(question.id, choice.id)">
 
           <div class="choice-input">
             <div class="radio-checkbox" [class.radio]="question.type === 'SingleChoice'"
@@ -46,13 +46,10 @@
 
       <!-- Text Input Questions -->
       <div class="text-input-container" *ngIf="question.type === 'Essay'">
-        <textarea class="text-input" placeholder="Nhập câu trả lời của bạn..."
-          [value]="getTextAnswer(question.id)"
-        >
-        </textarea>
+        <div class="text-display">
+          {{ getTextAnswer(question.id) || 'Chưa có câu trả lời' }}
+        </div>
       </div>
+
     </div>
   </div>
-
-
-
