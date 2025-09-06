@@ -55,11 +55,11 @@ export class VotePageComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private errorService: ErrorService, 
+    private errorService: ErrorService,
     private route: ActivatedRoute,
     private votingService: VotingService,
     private toastr: ToastrService,
-  ) { 
+  ) {
     this.topicId = this.route.snapshot.paramMap.get('topicId')!;
   }
 
@@ -78,7 +78,7 @@ export class VotePageComponent implements OnInit {
   }
 
   loadTopic() {
-    
+
     this.votingService.getVotingTopic(this.topicId).subscribe({
       next: (data) => {
         this.topicData = data;
@@ -186,11 +186,11 @@ export class VotePageComponent implements OnInit {
     this.votingService.submitAnswers(answers).subscribe({
       next: (res) => {
         if (res.status === 'SUCCESS') {
-          this.toastr.success('Phiếu bình chọn của bạn đã được ghi nhận.','Cảm ơn bạn', {
-          positionClass: 'toast-top-center',
-          timeOut: 5000, // 5s
-          progressBar: true
-        });
+          this.toastr.success('Phiếu bình chọn của bạn đã được ghi nhận.', 'Cảm ơn bạn', {
+            positionClass: 'toast-top-center',
+            timeOut: 5000, // 5s
+            progressBar: true
+          });
           this.isSubmitting = false;
           this.hasSubmitted = true;
           console.log('✅', res.message);
@@ -198,14 +198,19 @@ export class VotePageComponent implements OnInit {
         } else {
           this.isSubmitting = false;
           this.hasSubmitted = false;
-          console.warn('⚠', res.message);
           this.errorService.showError([res.message]);
         }
       },
       error: (err) => {
         this.isSubmitting = false;
         this.hasSubmitted = false;
-        this.errorService.showError([err.message]);
+        if (err.err.message) {
+          this.errorService.showError([err.err.message]);
+        }
+        if (err.message) {
+          this.errorService.showError([err.message]);
+        }
+
       }
     });
   }

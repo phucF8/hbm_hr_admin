@@ -62,14 +62,13 @@ export class VotingList {
 
         Swal.fire({
           icon: 'error',
-          title: 'Lỗi tải dữ liệu',
-          html: `
-            <p><b>Mã lỗi:</b> ${errorStatus}</p>
-            <p><b>Thông báo:</b> ${errorMessage}</p>
-            ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
-          `,
+          title: 'Đã xảy ra lỗi khi tải danh sách chủ đề',
+          html: error.status === 0
+            ? 'Không nhận được phản hồi từ server. Có thể server chưa chạy hoặc bị chặn kết nối.'
+            : error.message,
           confirmButtonText: 'Đóng'
         });
+
       }
     });
   }
@@ -107,7 +106,15 @@ export class VotingList {
           });
       },
       error: (error) => {
-        alert('Đã xảy ra lỗi khi tải chi tiết báo cáo');
+        Swal.fire({
+          icon: 'error',
+          title: 'Đã xảy ra lỗi khi tải chi tiết báo cáo',
+          html: error.status === 0
+            ? 'Không nhận được phản hồi từ server. Có thể server chưa chạy hoặc bị chặn kết nối.'
+            : error.message,
+          confirmButtonText: 'Đóng'
+        });
+
       }
     });
   }
