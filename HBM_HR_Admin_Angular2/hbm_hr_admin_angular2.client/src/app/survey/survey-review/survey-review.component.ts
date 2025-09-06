@@ -9,7 +9,7 @@ import { Question } from '@app/voting/voting-list/responses/topic-detail.model';
 @Component({
   selector: 'app-survey-review',
   templateUrl: './survey-review.component.html',
-  styleUrl: './survey-review.component.css',
+  styleUrl: './survey-review.component.scss',
   imports: [
     CommonModule,
     ReactiveFormsModule
