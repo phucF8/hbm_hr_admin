@@ -84,10 +84,15 @@ export class TopicListComponent implements OnInit {
       year: 'numeric'
     });
   }
-
-  answerSurvey(topic: Topic) {
-    //alert(`${topic.hasAnswered ? 'Chỉnh sửa câu trả lời' : 'Trả lời'}: ${topic.id}`);
-this.router.navigate(['/voting',  topic.id]);
+  // 👉 Khi mở survey chi tiết, giao diện sẽ hiển thị theo 2 trường hợp:
+  // Nếu người dùng đã trả lời → hiển thị giao diện chỉ để xem lại (review) câu trả lời.
+  // Nếu người dùng chưa trả lời → hiển thị giao diện để thực hiện trả lời.
+  goToDetailSurvey(topic: Topic) {
+    if (topic.hasAnswered) {
+      this.router.navigate(['/survey-review', topic.id]);
+    } else {
+      this.router.navigate(['/voting', topic.id]);
+    }
   }
 
 }

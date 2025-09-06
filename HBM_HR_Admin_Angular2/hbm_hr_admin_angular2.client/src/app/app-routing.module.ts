@@ -11,6 +11,7 @@ import { VotePageComponent } from './voting/vote-page/vote-page.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { TopicListComponent } from './voting/topic-list/topic-list.component';
 import { UserLayoutComponent } from './layouts/user-layout/user-layout.component';
+import { SurveyReviewComponent } from './survey/survey-review/survey-review.component';
 
 const routes: Routes = [
   {
@@ -39,6 +40,7 @@ const routes: Routes = [
       { path: '', redirectTo: 'topic-list', pathMatch: 'full' },
       { path: 'topic-list', component: TopicListComponent },
       { path: 'voting/:topicId', component: VotePageComponent },
+      { path: 'survey-review/:topicId', component: SurveyReviewComponent },
     ],
     canActivate: [AuthGuard]
   },

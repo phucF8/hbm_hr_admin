@@ -21,7 +21,7 @@
     <div *ngFor="let topic of topics" class="topic-card" [ngClass]="topic.hasAnswered ? 'answered' : 'not-answered'">
       <div class="topic-header">
 
-        <div class="topic-info" (click)="answerSurvey(topic)">
+        <div class="topic-info" (click)="goToDetailSurvey(topic)">
           <div class="topic-title">{{ topic.title }}</div>
           <div class="topic-description" [innerHTML]="topic.description"></div>
           <div class="topic-dates">

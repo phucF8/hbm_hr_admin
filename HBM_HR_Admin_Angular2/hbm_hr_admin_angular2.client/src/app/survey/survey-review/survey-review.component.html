@@ -1,0 +1,58 @@
+<!-- vote-page.component.html -->
+<div class="vote-container">
+  <!-- Header Section -->
+  <div class="vote-header">
+    <div class="header-gradient"></div>
+    <div class="header-content">
+      <h1 class="poll-title">{{ pollTitle }}</h1>
+      <p class="poll-description">{{ pollDescription }}</p>
+    </div>
+  </div>
+
+  <!-- Questions Section -->
+  <div class="questions-container">
+    <div class="question-card" *ngFor="let question of questions; let i = index" [class.answered]="isQuestionAnswered(question)">
+
+      <!-- Question Header -->
+      <div class="question-header">
+        <div class="question-number">{{ i + 1 }}</div>
+        <div class="question-content">
+          <h3 class="question-text">{{ question.content }}</h3>
+          <!-- <span class="required-badge" *ngIf="question.required">Bắt buộc</span>
+          <span class="optional-badge" *ngIf="!question.required">Tùy chọn</span> -->
+        </div>
+      </div>
+
+      <!-- Multiple Choice Questions -->
+      <div class="choices-container" *ngIf="question.type === 'SingleChoice' || question.type === 'MultiChoice'">
+        <div class="choice-item" *ngFor="let choice of question.options"
+          [class.selected]="isChoiceSelected(question.id, choice.id)"
+        >
+
+          <div class="choice-input">
+            <div class="radio-checkbox" [class.radio]="question.type === 'SingleChoice'"
+              [class.checkbox]="question.type === 'MultiChoice'"
+              [class.checked]="isChoiceSelected(question.id, choice.id)">
+              <div class="inner-circle" *ngIf="question.type === 'SingleChoice'"></div>
+              <div class="checkmark" *ngIf="question.type === 'MultiChoice'">✓</div>
+            </div>
+          </div>
+
+          <label class="choice-label">{{ choice.content }}</label>
+
+          <div class="choice-animation"></div>
+        </div>
+      </div>
+
+      <!-- Text Input Questions -->
+      <div class="text-input-container" *ngIf="question.type === 'Essay'">
+        <textarea class="text-input" placeholder="Nhập câu trả lời của bạn..."
+          [value]="getTextAnswer(question.id)"
+        >
+        </textarea>
+      </div>
+    </div>
+  </div>
+
+
+
