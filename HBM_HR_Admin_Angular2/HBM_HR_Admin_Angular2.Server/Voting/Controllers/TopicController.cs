@@ -70,9 +70,9 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success(topic, "Thành công"));
         }
 
-        [HttpGet("review/{id}")]
-        public async Task<IActionResult> GetForReview(string id) {
-            var topic = await _service.GetTopicForReviewByIdAsync(id);
+        [HttpGet("review/{id}/{userId}")]
+        public async Task<IActionResult> GetForReview(string id,string userId) {
+            var topic = await _service.GetTopicForReviewByIdAsync(id,userId);
             if (topic == null)
                 return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề"));
             return Ok(ApiResponse<object>.Success(topic, "Thành công"));

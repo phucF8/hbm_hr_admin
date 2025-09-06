@@ -89,7 +89,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services
             return await _repository.GetByIdAsync(id);
         }
 
-        public async Task<TopicDto?> GetTopicForReviewByIdAsync(string id) {
+        public async Task<TopicDto?> GetTopicForReviewByIdAsync(string id, string userId) {
             var query = from t in _context.Topics
                         where t.Id == id
                         join created in _context.DbNhanVien on t.CreatedBy equals created.ID into createdGroup
@@ -123,12 +123,21 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services
                                             Id = o.Id,
                                             Content = o.Content,
                                             OrderNumber = o.OrderNumber
-                                        }).ToList()
+                                        }).ToList(),
+                                    // Thêm câu trả lời của user (nếu có)
+                                    UserAnswer = _context.BB_UserAnswers
+                                        .Where(a => a.QuestionId == q.Id && a.UserId == userId)
+                                        .Select(a => new UserAnswerDto {
+                                            OptionId = a.OptionId,
+                                            EssayAnswer = a.EssayAnswer
+                                        })
+                                        .FirstOrDefault()
                                 }).ToList()
                         };
 
             return await query.FirstOrDefaultAsync();
         }
+
     }
 
 
