@@ -6,13 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HBM_HR_Admin_Angular2.Server.Voting.Services
 {
-    public class TopicService : ITopicService
+    public class TopicService
     {
-        private readonly ITopicRepository _repository;
+        private readonly TopicRepository _repository;
+        private readonly ApplicationDbContext _context;
 
-        public TopicService(ITopicRepository repository)
+        public TopicService(TopicRepository repository, ApplicationDbContext context)
         {
             _repository = repository;
+            _context = context;
         }
 
         public async Task<Topic> CreateAsync(CreateTopicDto dto)
@@ -87,6 +89,46 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services
             return await _repository.GetByIdAsync(id);
         }
 
+        public async Task<TopicDto?> GetTopicForReviewByIdAsync(string id) {
+            var query = from t in _context.Topics
+                        where t.Id == id
+                        join created in _context.DbNhanVien on t.CreatedBy equals created.ID into createdGroup
+                        from createdUser in createdGroup.DefaultIfEmpty()
+                        join updated in _context.DbNhanVien on t.UpdatedBy equals updated.ID into updatedGroup
+                        from updatedUser in updatedGroup.DefaultIfEmpty()
+                        select new TopicDto {
+                            Id = t.Id,
+                            Title = t.Title,
+                            Description = t.Description,
+                            StartDate = t.StartDate,
+                            EndDate = t.EndDate,
+                            CreatedBy = createdUser.ID,
+                            UpdatedBy = updatedUser.ID,
+                            CreatedByName = createdUser.TenNhanVien,
+                            UpdatedByName = updatedUser.TenNhanVien,
+                            CreatedAt = t.CreatedAt,
+                            UpdatedAt = t.UpdatedAt,
+                            Questions = _context.Questions
+                                .Where(q => q.TopicId == t.Id)
+                                .OrderBy(q => q.OrderNumber)
+                                .Select(q => new QuestionDto {
+                                    Id = q.Id,
+                                    Content = q.Content,
+                                    Type = q.Type,
+                                    OrderNumber = q.OrderNumber,
+                                    Options = _context.Options
+                                        .Where(o => o.QuestionId == q.Id)
+                                        .OrderBy(o => o.OrderNumber)
+                                        .Select(o => new OptionDto {
+                                            Id = o.Id,
+                                            Content = o.Content,
+                                            OrderNumber = o.OrderNumber
+                                        }).ToList()
+                                }).ToList()
+                        };
+
+            return await query.FirstOrDefaultAsync();
+        }
     }
 
 

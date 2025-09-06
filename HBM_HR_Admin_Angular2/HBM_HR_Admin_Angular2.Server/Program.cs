@@ -36,8 +36,8 @@ builder.Services.AddScoped<IDebugRepository, DebugRepository>();
 builder.Services.AddScoped<IThongBaoService, ThongBaoService>();
 
 // Đăng ký DI
-builder.Services.AddScoped<ITopicService, TopicService>();
-builder.Services.AddScoped<ITopicRepository, TopicRepository>(); // nếu dùng
+builder.Services.AddScoped<TopicService>();
+builder.Services.AddScoped<TopicRepository>(); // nếu dùng
 
 //Đăng nh
 builder.Services.AddScoped<JwtTokenGenerator>();

@@ -33,11 +33,11 @@ export class SurveyReviewComponent {
   }
 
   ngOnInit(): void {
-    this.loadTopic();
+    this.loadTopicForReview();
   }
 
-  loadTopic() {
-    this.votingService.getVotingTopic(this.topicId).subscribe({
+  loadTopicForReview() {
+    this.votingService.getTopicForReview(this.topicId).subscribe({
       next: (data) => {
         this.topicData = data;
         this.pollTitle = data.title;

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
-    public class TopicRepository : ITopicRepository {
+    public class TopicRepository {
         private readonly ApplicationDbContext _context;
 
         public TopicRepository(ApplicationDbContext context) {

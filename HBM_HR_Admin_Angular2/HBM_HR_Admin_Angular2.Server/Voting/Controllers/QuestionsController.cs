@@ -15,7 +15,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public QuestionsController(ApplicationDbContext context, ITopicService service)
+        public QuestionsController(ApplicationDbContext context)
         {
             _context = context;
             //_service = service;

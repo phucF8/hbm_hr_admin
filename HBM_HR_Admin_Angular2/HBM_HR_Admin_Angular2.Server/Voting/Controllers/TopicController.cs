@@ -17,9 +17,9 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
     public class TopicController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ITopicService _service;
+        private readonly TopicService _service;
 
-        public TopicController(ApplicationDbContext context, ITopicService service)
+        public TopicController(ApplicationDbContext context, TopicService service)
         {
             _context = context;
             _service = service;
@@ -65,6 +65,14 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         public async Task<IActionResult> GetById(string id)
         {
             var topic = await _service.GetTopicByIdAsync(id);
+            if (topic == null)
+                return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề"));
+            return Ok(ApiResponse<object>.Success(topic, "Thành công"));
+        }
+
+        [HttpGet("review/{id}")]
+        public async Task<IActionResult> GetForReview(string id) {
+            var topic = await _service.GetTopicForReviewByIdAsync(id);
             if (topic == null)
                 return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề"));
             return Ok(ApiResponse<object>.Success(topic, "Thành công"));

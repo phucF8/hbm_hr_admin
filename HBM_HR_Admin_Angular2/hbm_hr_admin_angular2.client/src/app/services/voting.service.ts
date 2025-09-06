@@ -34,6 +34,11 @@ export class VotingService {
     return this.http.get<any>(url);
   }
 
+  getTopicForReview(topicId: string): Observable<any> {
+    const url = `${this.baseUrl}/topics/review/${topicId}`;
+    return this.http.get<any>(url);
+  }
+
   submitAnswers(answers: UserAnswerRequest[]): Observable<any> {
     const url = `${this.baseUrl}/topics/submit`;
     const token = localStorage.getItem('access_token'); // token lưu sau khi login
