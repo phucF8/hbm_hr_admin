@@ -40,10 +40,7 @@ export class VotingService {
     if (!token) {
       throw new Error('No access token found');
     }
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-    return this.http.post<any>(url, answers, { headers });
+    return this.http.post<any>(url, answers);
   }
 
   /** 🔹 Lấy danh sách topic theo userId */
@@ -53,10 +50,7 @@ export class VotingService {
     if (!token) {
       throw new Error('No access token found');
     }
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-    return this.http.get<ApiResponse<Topic[]>>(url, { headers });
+    return this.http.get<ApiResponse<Topic[]>>(url);
   }
 
 

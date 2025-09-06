@@ -7,6 +7,7 @@ import { ErrorService } from '@app/services/error.service';
 import { UserAnswerRequest, VotingService } from '@app/services/voting.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
 
 interface Option {
   id: string;
@@ -204,13 +205,14 @@ export class VotePageComponent implements OnInit {
       error: (err) => {
         this.isSubmitting = false;
         this.hasSubmitted = false;
-        if (err.err.message) {
-          this.errorService.showError([err.err.message]);
+        let errors: string[] = [];
+        if (err.error) {// Lỗi server trả về (backend trả JSON có message hoặc errors)
+            errors.push(err.error.message);
         }
-        if (err.message) {
-          this.errorService.showError([err.message]);
+        if (err.message) { // Lỗi hệ thống (Angular HttpClient)
+          errors.push(`System: ${err.message}`);
         }
-
+        this.errorService.showError([errors.join('\n')]);
       }
     });
   }
