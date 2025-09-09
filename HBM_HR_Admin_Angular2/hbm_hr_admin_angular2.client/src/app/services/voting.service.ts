@@ -15,6 +15,7 @@ export interface Topic {
 }
 
 export interface UserAnswerRequest {
+  topicId: string;
   questionId: string;
   optionId?: string;
   essayAnswer?: string;

@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorService } from '@app/services/error.service';
 import { VotingService } from '@app/services/voting.service';
+import Swal from 'sweetalert2';
 
 interface OptionDto {
   id: string;
@@ -29,17 +30,19 @@ interface QuestionDto {
   essayAnswers: EssayAnswerDto[];
 }
 
-interface TopicReportDto {
+export interface TopicReportDto {
   id: string;
   title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  createdAt: string;
-  updatedAt: string;
+  description?: string; // có thể null nên để optional
+  startDate: string;    // hoặc Date nếu bạn parse
+  endDate: string;      // hoặc Date nếu bạn parse
+  createdAt: string;    // hoặc Date
+  updatedAt?: string;   // có thể null
   hasAnswered: boolean;
+  totalParticipants: number; // sửa từ Int -> number
   questions: QuestionDto[];
 }
+
 
 
 
@@ -82,12 +85,26 @@ export class SurveyDetailReportComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Lỗi khi load báo cáo:', err);
-        this.errorService.showError([JSON.stringify(err)]);
+      error: (error) => {
         this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Đã xảy ra lỗi khi tải danh sách chủ đề',
+          html: error.status === 0
+            ? 'Không nhận được phản hồi từ server. Có thể server chưa chạy hoặc bị chặn kết nối.'
+            : error.message,
+          confirmButtonText: 'Đóng'
+        });
       }
     });
+  }
+
+  getOptionPercentage(
+    option: OptionDto,
+    totalParticipants: number
+  ): number {
+    if (!totalParticipants || totalParticipants === 0) return 0;
+    return (option.selectedCount / totalParticipants) * 100;
   }
 
 }

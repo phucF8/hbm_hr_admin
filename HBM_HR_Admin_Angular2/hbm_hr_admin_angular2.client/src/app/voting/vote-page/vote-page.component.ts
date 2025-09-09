@@ -160,6 +160,7 @@ export class VotePageComponent implements OnInit {
       if (vote.selectedChoices && vote.selectedChoices.length > 0) {
         vote.selectedChoices.forEach(choiceId => {
           answers.push({
+            topicId: this.topicId,
             questionId: vote.questionId,
             optionId: choiceId,
             essayAnswer: vote.textAnswer || ''
@@ -168,6 +169,7 @@ export class VotePageComponent implements OnInit {
       } else {
         // Nếu không có selectedChoices nhưng có textAnswer
         answers.push({
+          topicId: this.topicId,
           questionId: vote.questionId,
           essayAnswer: vote.textAnswer || ''
         });

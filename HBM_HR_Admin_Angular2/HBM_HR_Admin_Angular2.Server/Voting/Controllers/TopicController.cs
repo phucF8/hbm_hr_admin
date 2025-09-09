@@ -166,6 +166,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = userId,
+                    TopicId = ans.TopicId,
                     QuestionId = ans.QuestionId,
                     OptionId = ans.OptionId,
                     EssayAnswer = ans.EssayAnswer,

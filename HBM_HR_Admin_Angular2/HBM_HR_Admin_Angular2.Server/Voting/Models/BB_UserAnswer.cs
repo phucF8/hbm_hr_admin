@@ -4,6 +4,7 @@
     {
         public string Id { get; set; }
         public string UserId { get; set; }
+        public string TopicId { get; set; }
         public string QuestionId { get; set; }
         public string? OptionId { get; set; }
         public string EssayAnswer { get; set; }

@@ -15,7 +15,8 @@
         public DateTime? UpdatedAt { get; set; }
 
         public bool HasAnswered { get; set; }
-
+       
+        public int TotalParticipants { get; set; }  // Tổng số người đã tham gia trả lời phiếu điều tra
         public List<QuestionDto> Questions { get; set; } = new();
 
     }

@@ -143,6 +143,12 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
                             UpdatedByName = updatedUser.TenNhanVien,
                             CreatedAt = t.CreatedAt,
                             UpdatedAt = t.UpdatedAt,
+                            // Tổng số user đã tham gia trả lời phiếu điều tra
+                            TotalParticipants = _context.BB_UserAnswers 
+                            .Where(a => a.TopicId == t.Id)
+                            .Select(a => a.UserId)
+                            .Distinct()
+                            .Count(),
 
                             Questions = _context.Questions
                                 .Where(q => q.TopicId == t.Id)
@@ -152,7 +158,6 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
                                     Content = q.Content,
                                     Type = q.Type,
                                     OrderNumber = q.OrderNumber,
-
                                     Options = _context.Options
                                         .Where(o => o.QuestionId == q.Id)
                                         .OrderBy(o => o.OrderNumber)
@@ -164,7 +169,6 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
                                             SelectedCount = _context.BB_UserAnswers
                                                 .Count(a => a.OptionId == o.Id)
                                         }).ToList(),
-
                                     // Danh sách câu trả lời tự luận (nếu có)
                                     EssayAnswers = _context.BB_UserAnswers
                                         .Where(a => a.QuestionId == q.Id && !string.IsNullOrEmpty(a.EssayAnswer))
