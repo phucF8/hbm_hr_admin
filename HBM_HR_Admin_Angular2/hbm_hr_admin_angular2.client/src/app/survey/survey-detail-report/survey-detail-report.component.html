@@ -3,7 +3,8 @@
   <div class="header">
     <div class="header-info">
       <h1>{{ topicReport.title }}</h1>
-      <div class="header-meta">Tổng người trả lời: {{topicReport.totalParticipants}} • Ngày tạo: {{ topicReport.startDate | date }}</div>
+      <div class="header-meta">Tổng người trả lời: {{topicReport.totalParticipants}} • Ngày tạo: {{
+        topicReport.startDate | date }}</div>
     </div>
     <div class="header-actions">
       <!-- <a href="#" class="btn btn-primary"></a> -->
@@ -29,12 +30,15 @@
         <div *ngFor="let opt of q.options" class="option">
           <div class="option-label">{{opt.content}}</div>
           <div class="progress-bar">
-            <div class="progress-fill progress-blue" 
-            [style.width.%]="getOptionPercentage(opt,topicReport.totalParticipants)">
-          </div>
+            <div class="progress-fill progress-blue"
+              [style.width.%]="getOptionPercentage(opt,topicReport.totalParticipants)">
+            </div>
           </div>
           <div class="option-stats">
-            <span class="option-count">{{opt.selectedCount}}</span> • {{getOptionPercentage(opt,topicReport.totalParticipants)}}%
+            <div *ngIf="opt.selectedCount>0">
+              <span class="option-count">{{opt.selectedCount}}</span> •
+              {{getOptionPercentage(opt,topicReport.totalParticipants)}}%
+            </div>
           </div>
         </div>
 
@@ -49,7 +53,7 @@
             <div class="question-title">{{q.content}}</div>
             <div class="question-meta">Loại: Tự luận</div>
           </div>
-          
+
         </div>
 
         <!-- Comments Section -->

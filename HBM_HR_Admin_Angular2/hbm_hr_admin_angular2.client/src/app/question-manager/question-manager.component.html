@@ -24,8 +24,8 @@
         <button type="button" class="action-btn drag-handle" title="Kéo thả để sắp xếp" cdkDragHandle>
           ⋮⋮
         </button>
-        <label class="option-label">{{ question.get('orderNumber')?.value }}.</label>
-        <label class="option-label">{{ question.get('id')?.value }}.</label>
+        <!-- <label class="option-label">{{ question.get('orderNumber')?.value }}.</label> -->
+       
         <div class="question-content">
           <input type="text" 
           class="question-title" [formControlName]="'content'" placeholder="Nhập tiêu đề câu hỏi..." 
@@ -78,7 +78,7 @@
             <button type="button" class="drag-handle" cdkDragHandle title="Kéo để sắp xếp">
               ⋮⋮
             </button>
-            <label class="option-label">{{ option.get('orderNumber')?.value }}.</label>
+            <!-- <label class="option-label">{{ option.get('orderNumber')?.value }}.</label> -->
             <input type="text" class="option-input" formControlName="content" placeholder="Nhập nội dung lựa chọn..."
             [ngClass]="{ 'is-invalid': option.get('content')?.invalid && (option.get('content')?.touched || option.get('content')?.dirty) }" 
             >
