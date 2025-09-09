@@ -24,7 +24,7 @@ export interface UserAnswerRequest {
   providedIn: 'root'
 })
 export class VotingService {
-
+  
   private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
@@ -38,6 +38,10 @@ export class VotingService {
     var userId = localStorage.getItem('userID');
     const url = `${this.baseUrl}/topics/review/${topicId}/${userId}`;
     return this.http.get<any>(url);
+  }
+  
+  getSurveyDetailReport(topicId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/topics/survey-detail-report/${topicId}`);
   }
 
   submitAnswers(answers: UserAnswerRequest[]): Observable<any> {

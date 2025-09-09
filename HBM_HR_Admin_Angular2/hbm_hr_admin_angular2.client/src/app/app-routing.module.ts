@@ -12,6 +12,7 @@ import { MainLayoutComponent } from './layouts/main-layout/main-layout.component
 import { TopicListComponent } from './voting/topic-list/topic-list.component';
 import { UserLayoutComponent } from './layouts/user-layout/user-layout.component';
 import { SurveyReviewComponent } from './survey/survey-review/survey-review.component';
+import { SurveyDetailReportComponent } from './survey/survey-detail-report/survey-detail-report.component';
 
 const routes: Routes = [
   {
@@ -20,6 +21,7 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
       { path: 'thongbao', component: ThongBaoComponent, canActivate: [AuthGuard] },
+      { path: 'survey-detail-report/:topicId', component: SurveyDetailReportComponent, canActivate: [AuthGuard] },
       { path: 'admin', component: AdminComponent},
       {
         path: 'voting',

@@ -6,6 +6,7 @@ import { VotingListService } from '@app/voting/voting-list/voting-list.service';
 import { VotingListRP } from './responses/voting_list_rp';
 import { Observable } from 'rxjs/internal/Observable';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -25,6 +26,7 @@ export class VotingList {
   constructor(
     private service: VotingListService,
     private dialog: MatDialog,
+    private router: Router,
   ) { }
 
   @HostListener('document:click', ['$event'])
@@ -117,6 +119,10 @@ export class VotingList {
 
       }
     });
+  }
+
+  report(topicId: string) {
+    this.router.navigate(['/admin/survey-detail-report', topicId]);
   }
 
   openCreateTopicDialog() {

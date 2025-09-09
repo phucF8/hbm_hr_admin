@@ -78,6 +78,14 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success(topic, "Thành công"));
         }
 
+        [HttpGet("survey-detail-report/{id}")]
+        public async Task<IActionResult> GetDetailReport(string id) {
+            var topic = await _service.GetTopicDetailReportByIdAsync(id);
+            if (topic == null)
+                return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề"));
+            return Ok(ApiResponse<object>.Success(topic, "Thành công"));
+        }
+
         // DELETE: api/topics/DeleteList
         [HttpPost("DeleteList")]
         public async Task<IActionResult> DeleteTopics([FromBody] List<string> topicIds)

@@ -124,6 +124,61 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
             return await query.FirstOrDefaultAsync();
         }
 
+        public async Task<TopicDto?> GetTopicDetailReportByIdAsync(string id) {
+            var query = from t in _context.Topics
+                        where t.Id == id
+                        join created in _context.DbNhanVien on t.CreatedBy equals created.ID into createdGroup
+                        from createdUser in createdGroup.DefaultIfEmpty()
+                        join updated in _context.DbNhanVien on t.UpdatedBy equals updated.ID into updatedGroup
+                        from updatedUser in updatedGroup.DefaultIfEmpty()
+                        select new TopicDto {
+                            Id = t.Id,
+                            Title = t.Title,
+                            Description = t.Description,
+                            StartDate = t.StartDate,
+                            EndDate = t.EndDate,
+                            CreatedBy = createdUser.ID,
+                            UpdatedBy = updatedUser.ID,
+                            CreatedByName = createdUser.TenNhanVien,
+                            UpdatedByName = updatedUser.TenNhanVien,
+                            CreatedAt = t.CreatedAt,
+                            UpdatedAt = t.UpdatedAt,
+
+                            Questions = _context.Questions
+                                .Where(q => q.TopicId == t.Id)
+                                .OrderBy(q => q.OrderNumber)
+                                .Select(q => new QuestionDto {
+                                    Id = q.Id,
+                                    Content = q.Content,
+                                    Type = q.Type,
+                                    OrderNumber = q.OrderNumber,
+
+                                    Options = _context.Options
+                                        .Where(o => o.QuestionId == q.Id)
+                                        .OrderBy(o => o.OrderNumber)
+                                        .Select(o => new OptionDto {
+                                            Id = o.Id,
+                                            Content = o.Content,
+                                            OrderNumber = o.OrderNumber,
+                                            // Thống kê số người đã chọn option này
+                                            SelectedCount = _context.BB_UserAnswers
+                                                .Count(a => a.OptionId == o.Id)
+                                        }).ToList(),
+
+                                    // Danh sách câu trả lời tự luận (nếu có)
+                                    EssayAnswers = _context.BB_UserAnswers
+                                        .Where(a => a.QuestionId == q.Id && !string.IsNullOrEmpty(a.EssayAnswer))
+                                        .Select(a => new EssayAnswerDto {
+                                            UserId = a.UserId,
+                                            EssayAnswer = a.EssayAnswer,
+                                            CreatedAt = a.CreatedAt
+                                        }).ToList()
+                                }).ToList()
+                        };
+
+            return await query.FirstOrDefaultAsync();
+        }
+
     }
 
 
