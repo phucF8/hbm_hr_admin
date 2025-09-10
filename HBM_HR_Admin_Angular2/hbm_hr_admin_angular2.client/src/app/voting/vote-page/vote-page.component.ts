@@ -1,6 +1,6 @@
 // vote-page.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ErrorService } from '@app/services/error.service';
@@ -8,6 +8,7 @@ import { UserAnswerRequest, VotingService } from '@app/services/voting.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 interface Option {
   id: string;
@@ -60,12 +61,11 @@ export class VotePageComponent implements OnInit {
     private route: ActivatedRoute,
     private votingService: VotingService,
     private toastr: ToastrService,
+    private dialogRef: MatDialogRef<VotePageComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { topicId: string }
   ) {
-    this.topicId = this.route.snapshot.paramMap.get('topicId')!;
-  }
-
-  ngOnInit(): void {
-    // Initialize user votes object
+    // this.topicId = this.route.snapshot.paramMap.get('topicId')!;
+    this.topicId = data.topicId;
     this.questions.forEach(question => {
       this.userVotes[question.id] = {
         questionId: question.id,
@@ -73,8 +73,12 @@ export class VotePageComponent implements OnInit {
         textAnswer: ''
       };
     });
-
     this.loadTopic();
+  }
+
+  ngOnInit(): void {
+    // Initialize user votes object
+
 
   }
 
@@ -196,8 +200,9 @@ export class VotePageComponent implements OnInit {
           });
           this.isSubmitting = false;
           this.hasSubmitted = true;
-          console.log('✅', res.message);
-          this.router.navigate(['/topic-list']);
+          // console.log('✅', res.message);
+          // this.router.navigate(['/topic-list']);
+          this.dialogRef.close(res);
         } else {
           this.isSubmitting = false;
           this.hasSubmitted = false;
@@ -209,7 +214,7 @@ export class VotePageComponent implements OnInit {
         this.hasSubmitted = false;
         let errors: string[] = [];
         if (err.error) {// Lỗi server trả về (backend trả JSON có message hoặc errors)
-            errors.push(err.error.message);
+          errors.push(err.error.message);
         }
         if (err.message) { // Lỗi hệ thống (Angular HttpClient)
           errors.push(`System: ${err.message}`);
@@ -236,6 +241,10 @@ export class VotePageComponent implements OnInit {
       return this.userVotes[questionID].textAnswer || '';
     }
     return '';
+  }
+
+  onClose() {
+    this.dialogRef.close();
   }
 
 }

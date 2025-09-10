@@ -30,8 +30,71 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+
+
+.modal-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
+  background: #f9f9f9;
+  padding: 12px 16px;
+  /* border-bottom: 1px solid #ddd; */
+  /* flex: 0 0 auto; */
+  /* position: sticky;          giữ header cố định khi scroll */
+  /* top: 0; */
+  /* z-index: 10; */
+}
+
+.close_button {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid #ef4444;
+  /* mỏng hơn để hợp kích thước nhỏ */
+  border-radius: 50%;
+  font-size: 14px;
+  /* vừa vặn trong vòng tròn */
+  font-weight: bold;
+  color: #ef4444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  transition: all 0.2s ease-in-out;
+  z-index: 10;
+  line-height: 1;
+  /* tránh chữ lệch */
+}
+
+.close_button:hover {
+  background: #ef4444;
+  color: white;
+  transform: rotate(90deg);
+}
+
+
+.content {
+  flex: 1 1 auto;
+  /* phần này chiếm hết phần còn lại */
+  /* cố định chiều cao */
+  overflow-y: auto;
+  /* cho phép scroll dọc */
+  /* border: 1px solid #007aff; */
+  background: #fff;
+  padding: 10px;
+}
+
+
+
+
+
+
 // Main Container
 .vote-container {
+  display: flex;
+  flex-direction: column;
+  /* sắp xếp dọc */
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -52,7 +115,7 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+    background-color: white;
   }
 
   .header-content {
@@ -64,7 +127,7 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   .poll-title {
     font-size: 2.5rem;
     font-weight: 700;
-    color: white;
+    color: black;
     margin: 0 0 1rem;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     
@@ -75,7 +138,7 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 
   .poll-description {
     font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: black;
     margin: 0 0 2rem;
     line-height: 1.6;
   }

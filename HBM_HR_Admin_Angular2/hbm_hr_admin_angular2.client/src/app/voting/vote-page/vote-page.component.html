@@ -1,122 +1,131 @@
 <!-- vote-page.component.html -->
 <div class="vote-container">
-  <!-- Header Section -->
-  <div class="vote-header">
-    <div class="header-gradient"></div>
-    <div class="header-content">
-      <h1 class="poll-title">{{ pollTitle }}</h1>
-      <p class="poll-description">{{ pollDescription }}</p>
 
-      <!-- Progress Bar -->
-      <div class="progress-container">
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
-        </div>
-        <span class="progress-text">{{ getProgressPercentage() | number:'1.0-0' }}% hoàn thành</span>
-      </div>
-    </div>
+  <div class="modal-header">
+    <h2>THỰC HIỆN KHẢO SÁT</h2>
+    <button class="close_button" (click)="onClose()">✖</button>
+    <!-- <a href="#" class="btn btn-primary"></a> -->
+    <!-- <a href="#" class="btn btn-secondary"></a> -->
   </div>
 
-  <!-- Questions Section -->
-  <div class="questions-container">
-    <div class="question-card" *ngFor="let question of questions; let i = index"
-      [class.answered]="isQuestionAnswered(question)">
+  <div class="content">
+    <!-- Header Section -->
+    <div class="vote-header">
+      <div class="header-gradient"></div>
+      <div class="header-content">
+        <h1 class="poll-title">{{ pollTitle }}</h1>
+        <p class="poll-description">{{ pollDescription }}</p>
 
-      <!-- Question Header -->
-      <div class="question-header">
-        <div class="question-number">{{ i + 1 }}</div>
-        <div class="question-content">
-          <h3 class="question-text">{{ question.content }}</h3>
-          <!-- <span class="required-badge" *ngIf="question.required">Bắt buộc</span>
-          <span class="optional-badge" *ngIf="!question.required">Tùy chọn</span> -->
-        </div>
-      </div>
-
-      <!-- Multiple Choice Questions -->
-      <div class="choices-container" *ngIf="question.type === 'SingleChoice' || question.type === 'MultiChoice'">
-        <div class="choice-item" *ngFor="let choice of question.options"
-          [class.selected]="isChoiceSelected(question.id, choice.id)"
-          (click)="onChoiceSelect(question.id, choice.id, question.type === 'MultiChoice')">
-
-          <div class="choice-input">
-            <div class="radio-checkbox" [class.radio]="question.type === 'SingleChoice'"
-              [class.checkbox]="question.type === 'MultiChoice'"
-              [class.checked]="isChoiceSelected(question.id, choice.id)">
-              <div class="inner-circle" *ngIf="question.type === 'SingleChoice'"></div>
-              <div class="checkmark" *ngIf="question.type === 'MultiChoice'">✓</div>
-            </div>
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
           </div>
-
-          <label class="choice-label">{{ choice.content }}</label>
-
-          <div class="choice-animation"></div>
+          <span class="progress-text">{{ getProgressPercentage() | number:'1.0-0' }}% hoàn thành</span>
         </div>
       </div>
+    </div>
 
-      <!-- Text Input Questions -->
-      <div class="text-input-container" *ngIf="question.type === 'Essay'">
-        <textarea class="text-input" placeholder="Nhập câu trả lời của bạn..."
-          [value]="getTextAnswer(question.id)"
-          (input)="onTextChange(question.id, ($any($event.target)).value)" rows="4">
+    <!-- Questions Section -->
+    <div class="questions-container">
+      <div class="question-card" *ngFor="let question of questions; let i = index"
+        [class.answered]="isQuestionAnswered(question)">
+
+        <!-- Question Header -->
+        <div class="question-header">
+          <div class="question-number">{{ i + 1 }}</div>
+          <div class="question-content">
+            <h3 class="question-text">{{ question.content }}</h3>
+            <!-- <span class="required-badge" *ngIf="question.required">Bắt buộc</span>
+          <span class="optional-badge" *ngIf="!question.required">Tùy chọn</span> -->
+          </div>
+        </div>
+
+        <!-- Multiple Choice Questions -->
+        <div class="choices-container" *ngIf="question.type === 'SingleChoice' || question.type === 'MultiChoice'">
+          <div class="choice-item" *ngFor="let choice of question.options"
+            [class.selected]="isChoiceSelected(question.id, choice.id)"
+            (click)="onChoiceSelect(question.id, choice.id, question.type === 'MultiChoice')">
+
+            <div class="choice-input">
+              <div class="radio-checkbox" [class.radio]="question.type === 'SingleChoice'"
+                [class.checkbox]="question.type === 'MultiChoice'"
+                [class.checked]="isChoiceSelected(question.id, choice.id)">
+                <div class="inner-circle" *ngIf="question.type === 'SingleChoice'"></div>
+                <div class="checkmark" *ngIf="question.type === 'MultiChoice'">✓</div>
+              </div>
+            </div>
+
+            <label class="choice-label">{{ choice.content }}</label>
+
+            <div class="choice-animation"></div>
+          </div>
+        </div>
+
+        <!-- Text Input Questions -->
+        <div class="text-input-container" *ngIf="question.type === 'Essay'">
+          <textarea class="text-input" placeholder="Nhập câu trả lời của bạn..." [value]="getTextAnswer(question.id)"
+            (input)="onTextChange(question.id, ($any($event.target)).value)" rows="4">
         </textarea>
 
-        <div class="character-count">
-          {{ getTextAnswer(question.id).length }}/500
+          <div class="character-count">
+            {{ getTextAnswer(question.id).length }}/500
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Submit Section -->
+    <div class="submit-section">
+      <div class="submit-card">
+        <div class="submit-info" *ngIf="!canSubmit()">
+          <div class="info-icon">ⓘ</div>
+          <span>Vui lòng trả lời tất cả câu hỏi bắt buộc để gửi</span>
+        </div>
+
+        <button class="submit-btn" [class.loading]="isSubmitting" [class.success]="hasSubmitted"
+          [disabled]="!canSubmit() || isSubmitting" (click)="onSubmit()">
+
+          <div class="btn-content" *ngIf="!isSubmitting && !hasSubmitted">
+            <span>Gửi phiếu bình chọn</span>
+            <div class="btn-icon">→</div>
+          </div>
+
+          <div class="btn-loading" *ngIf="isSubmitting">
+            <div class="spinner"></div>
+            <span>Đang gửi...</span>
+          </div>
+
+          <div class="btn-success" *ngIf="hasSubmitted">
+            <div class="success-icon">✓</div>
+            <span>Đã gửi thành công!</span>
+          </div>
+        </button>
+
+        <button class="reset-btn" *ngIf="hasSubmitted" (click)="resetForm()">
+          Tạo phiếu mới
+        </button>
+      </div>
+    </div>
+
+    <!-- Success Animation Overlay -->
+    <div class="success-overlay" *ngIf="hasSubmitted">
+      <div class="success-animation">
+        <div class="success-circle">
+          <div class="success-checkmark">✓</div>
+        </div>
+        <h2>Cảm ơn bạn!</h2>
+        <p>Phiếu bình chọn của bạn đã được ghi nhận.</p>
       </div>
     </div>
   </div>
 
-  <!-- Submit Section -->
-  <div class="submit-section">
-    <div class="submit-card">
-      <div class="submit-info" *ngIf="!canSubmit()">
-        <div class="info-icon">ⓘ</div>
-        <span>Vui lòng trả lời tất cả câu hỏi bắt buộc để gửi</span>
-      </div>
-
-      <button class="submit-btn" [class.loading]="isSubmitting" [class.success]="hasSubmitted"
-        [disabled]="!canSubmit() || isSubmitting" (click)="onSubmit()">
-
-        <div class="btn-content" *ngIf="!isSubmitting && !hasSubmitted">
-          <span>Gửi phiếu bình chọn</span>
-          <div class="btn-icon">→</div>
-        </div>
-
-        <div class="btn-loading" *ngIf="isSubmitting">
-          <div class="spinner"></div>
-          <span>Đang gửi...</span>
-        </div>
-
-        <div class="btn-success" *ngIf="hasSubmitted">
-          <div class="success-icon">✓</div>
-          <span>Đã gửi thành công!</span>
-        </div>
-      </button>
-
-      <button class="reset-btn" *ngIf="hasSubmitted" (click)="resetForm()">
-        Tạo phiếu mới
-      </button>
-    </div>
-  </div>
-
-  <!-- Success Animation Overlay -->
-  <div class="success-overlay" *ngIf="hasSubmitted">
-    <div class="success-animation">
-      <div class="success-circle">
-        <div class="success-checkmark">✓</div>
-      </div>
-      <h2>Cảm ơn bạn!</h2>
-      <p>Phiếu bình chọn của bạn đã được ghi nhận.</p>
-    </div>
-  </div>
-</div>
-
-<!-- <div>
+  <!-- <div>
   <pre class="user-json">{{ topicData | json }}</pre>
 </div> -->
+
+</div>
 
 <div>
   <pre class="user-json">{{ debugAnswers | json }}</pre>
 </div>
-

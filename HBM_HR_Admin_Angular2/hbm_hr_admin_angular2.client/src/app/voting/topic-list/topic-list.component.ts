@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 import { SurveyDetailReportComponent } from '@app/survey/survey-detail-report/survey-detail-report.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SurveyReviewComponent } from '@app/survey/survey-review/survey-review.component';
+import { VotingModule } from '../voting-module';
+import { VotePageComponent } from '../vote-page/vote-page.component';
 
 interface Topic {
   id: string;
@@ -105,12 +107,20 @@ export class TopicListComponent implements OnInit {
         height: '100vh',
         maxWidth: '100vw'
       });
+    }else{
+      const dialogRef = this.dialog.open(VotePageComponent, {
+        data: {topicId: topic.id},
+        disableClose: true,
+        panelClass: 'err-report-detail-dialog',
+        width: '60vw',
+        height: '100vh',
+        maxWidth: '100vw'
+      });
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
           this.fetchTopics();
         }
       });
-      
     }
 
   }
