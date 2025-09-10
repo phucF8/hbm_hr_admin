@@ -139,8 +139,8 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
                             EndDate = t.EndDate,
                             CreatedBy = createdUser.ID,
                             UpdatedBy = updatedUser.ID,
-                            CreatedByName = createdUser.TenNhanVien,
-                            UpdatedByName = updatedUser.TenNhanVien,
+                            CreatedByName = createdUser.Username,
+                            UpdatedByName = updatedUser.Username,
                             CreatedAt = t.CreatedAt,
                             UpdatedAt = t.UpdatedAt,
                             // Tổng số user đã tham gia trả lời phiếu điều tra
@@ -170,13 +170,19 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
                                                 .Count(a => a.OptionId == o.Id)
                                         }).ToList(),
                                     // Danh sách câu trả lời tự luận (nếu có)
-                                    EssayAnswers = _context.BB_UserAnswers
-                                        .Where(a => a.QuestionId == q.Id && !string.IsNullOrEmpty(a.EssayAnswer))
-                                        .Select(a => new EssayAnswerDto {
-                                            UserId = a.UserId,
-                                            EssayAnswer = a.EssayAnswer,
-                                            CreatedAt = a.CreatedAt
-                                        }).ToList()
+                                    EssayAnswers = (from a in _context.BB_UserAnswers
+                                                    join nv in _context.DbNhanVien
+                                                        on a.UserId equals nv.UserID into gj
+                                                    from nv in gj.DefaultIfEmpty() // LEFT JOIN
+                                                    where a.QuestionId == q.Id && !string.IsNullOrEmpty(a.EssayAnswer)
+                                                    select new EssayAnswerDto {
+                                                        UserId = a.UserId,
+                                                        Username = nv.Username,      // lấy Username
+                                                        FullName = nv.TenNhanVien,   // hoặc lấy tên nhân viên
+                                                        EssayAnswer = a.EssayAnswer,
+                                                        CreatedAt = a.CreatedAt
+                                                    }).ToList(),
+
                                 }).ToList()
                         };
 

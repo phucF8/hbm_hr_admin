@@ -68,7 +68,7 @@
             <div *ngFor="let ans of q.essayAnswers">
               <div class="comment">
                 <div class="comment-meta">
-                  <div class="comment-author">{{ans.userId}}</div>
+                  <div class="comment-author">{{ans.username}}</div>
                   <div class="comment-date">{{ans.createdAt | date:'dd/MM/yyyy'}}</div>
                 </div>
                 <div class="comment-text">{{ans.essayAnswer}}.</div>

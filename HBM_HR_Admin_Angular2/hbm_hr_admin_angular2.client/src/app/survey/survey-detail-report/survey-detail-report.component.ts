@@ -17,10 +17,11 @@ interface OptionDto {
 
 interface EssayAnswerDto {
   userId: string;
+  username: string;
+  fullName: string;
   essayAnswer: string;
   createdAt: string;
 }
-
 interface QuestionDto {
   id: string;
   content: string;

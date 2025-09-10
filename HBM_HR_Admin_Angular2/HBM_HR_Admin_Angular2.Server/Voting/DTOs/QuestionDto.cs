@@ -24,9 +24,12 @@
 
     public class EssayAnswerDto {
         public string UserId { get; set; }
+        public string Username { get; set; }      // thêm dòng này
+        public string FullName { get; set; }      // nếu muốn
         public string EssayAnswer { get; set; }
         public DateTime? CreatedAt { get; set; }
     }
+
 
 
 }
