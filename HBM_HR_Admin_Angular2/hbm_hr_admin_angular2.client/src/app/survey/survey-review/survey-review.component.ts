@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ErrorService } from '@app/services/error.service';
 import { VotingService } from '@app/services/voting.service';
 import { Question } from '@app/voting/voting-list/responses/topic-detail.model';
@@ -24,16 +24,18 @@ export class SurveyReviewComponent {
   questions: Question[] = [];
 
   constructor(
-    private router: Router,
     private errorService: ErrorService,
-    private route: ActivatedRoute,
     private votingService: VotingService,
+    private dialogRef: MatDialogRef<SurveyReviewComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { topicId: string }
   ) {
-    this.topicId = this.route.snapshot.paramMap.get('topicId')!;
+    // this.topicId = this.route.snapshot.paramMap.get('topicId')!;
+    this.topicId = data.topicId;
+    this.loadTopicForReview();
   }
 
   ngOnInit(): void {
-    this.loadTopicForReview();
+
   }
 
   loadTopicForReview() {
@@ -66,11 +68,12 @@ export class SurveyReviewComponent {
     return question.userAnswers.some((ans: any) => ans.optionId === choiceId);
   }
 
-
-
   isQuestionAnswered(question: Question): boolean {
     return true;
   }
 
+  onClose() {
+    this.dialogRef.close();
+  }
 
 }

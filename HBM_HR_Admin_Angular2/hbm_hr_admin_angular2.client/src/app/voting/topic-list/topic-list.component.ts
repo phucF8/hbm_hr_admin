@@ -4,6 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { VotingService } from '@app/services/voting.service';
 import { Router } from '@angular/router';
+import { SurveyDetailReportComponent } from '@app/survey/survey-detail-report/survey-detail-report.component';
+import { MatDialog } from '@angular/material/dialog';
+import { SurveyReviewComponent } from '@app/survey/survey-review/survey-review.component';
 
 interface Topic {
   id: string;
@@ -36,7 +39,7 @@ export class TopicListComponent implements OnInit {
   constructor(
     private router: Router,
     private votingService: VotingService,
-    private http: HttpClient
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -88,11 +91,28 @@ export class TopicListComponent implements OnInit {
   // Nếu người dùng đã trả lời → hiển thị giao diện chỉ để xem lại (review) câu trả lời.
   // Nếu người dùng chưa trả lời → hiển thị giao diện để thực hiện trả lời.
   goToDetailSurvey(topic: Topic) {
+    // if (topic.hasAnswered) {
+    //   this.router.navigate(['/survey-review', topic.id]);
+    // } else {
+    //   this.router.navigate(['/voting', topic.id]);
+    // }
     if (topic.hasAnswered) {
-      this.router.navigate(['/survey-review', topic.id]);
-    } else {
-      this.router.navigate(['/voting', topic.id]);
+      const dialogRef = this.dialog.open(SurveyReviewComponent, {
+        data: {topicId: topic.id},
+        disableClose: true,
+        panelClass: 'err-report-detail-dialog',
+        width: '60vw',
+        height: '100vh',
+        maxWidth: '100vw'
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.fetchTopics();
+        }
+      });
+      
     }
+
   }
 
 }
