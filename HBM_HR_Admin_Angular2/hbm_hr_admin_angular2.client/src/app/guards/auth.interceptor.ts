@@ -8,11 +8,12 @@ import {
 } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private dialog: MatDialog) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Lấy token từ localStorage hoặc sessionStorage
@@ -25,14 +26,15 @@ export class AuthInterceptor implements HttpInterceptor {
       });
     }
     return next.handle(request).pipe(
+      // Kiểm tra lỗi 401 hoặc message từ backend
       catchError((error: HttpErrorResponse) => {
-        // Kiểm tra lỗi 401 hoặc message từ backend
         if (
           error.status === 401 ||
           error.error?.message?.includes('Không thể xác định danh tính')
         ) {
           localStorage.removeItem('access_token');// Xóa token cũ
           sessionStorage.removeItem('access_token');
+          this.dialog.closeAll();// Đóng tất cả dialog đang mở
           this.router.navigate(['login']);// Chuyển về trang login
         }
         return throwError(() => error);
