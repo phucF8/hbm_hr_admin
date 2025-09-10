@@ -24,12 +24,6 @@ export class VotingListService {
   }
 
   updateTopic(topic: TopicDetail): Observable<ApiResponse<any>> {
-    Swal.fire({
-          icon: 'error',
-          title: `${this.apiUrl}/update`,
-          html: `<pre style="text-align:left;">ERR: ${JSON.stringify(topic, null, 2)}</pre>`,
-          confirmButtonText: 'Đóng'
-        });
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/update`, topic);
   }
 

@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorService } from '@app/services/error.service';
 import { VotingService } from '@app/services/voting.service';
@@ -62,16 +63,17 @@ export class SurveyDetailReportComponent implements OnInit {
   topicId: string = '';
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
     private votingService: VotingService,
     private errorService: ErrorService,
-    private http: HttpClient) {
-    this.topicId = this.route.snapshot.paramMap.get('topicId')!;
+    private dialogRef: MatDialogRef<SurveyDetailReportComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { topicId: string }
+  ) {
+    this.topicId = data.topicId;
+    this.loadReport();
   }
 
   ngOnInit(): void {
-    this.loadReport();
+    // this.loadReport();
   }
 
   loadReport() {
@@ -105,6 +107,10 @@ export class SurveyDetailReportComponent implements OnInit {
   ): number {
     if (!totalParticipants || totalParticipants === 0) return 0;
     return (option.selectedCount / totalParticipants) * 100;
+  }
+
+  onClose() {
+    this.dialogRef.close();
   }
 
 }

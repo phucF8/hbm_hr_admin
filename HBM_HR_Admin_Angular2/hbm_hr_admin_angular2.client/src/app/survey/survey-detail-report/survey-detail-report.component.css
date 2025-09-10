@@ -1,21 +1,35 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.btn-close {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #ef4444;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ef4444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  transition: all 0.2s ease-in-out;
+  z-index: 10; /* nổi lên trên */
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: #f5f5f7;
-  color: #1d1d1f;
-  line-height: 1.6;
+.btn-close:hover {
+  background: #ef4444;
+  color: white;
+  transform: rotate(90deg);
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;        /* chiếm hết chiều rộng của cha */
+  margin: 0;          /* bỏ margin auto */
+  padding: 20px;      /* vẫn giữ padding nếu muốn */
+  background-color: #007AFF;
+  box-sizing: border-box; /* để padding không làm tràn ra ngoài */
 }
+
 
 .header {
   background: white;

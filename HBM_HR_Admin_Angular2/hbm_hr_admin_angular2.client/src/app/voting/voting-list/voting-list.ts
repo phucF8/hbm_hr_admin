@@ -7,6 +7,7 @@ import { VotingListRP } from './responses/voting_list_rp';
 import { Observable } from 'rxjs/internal/Observable';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { SurveyDetailReportComponent } from '@app/survey/survey-detail-report/survey-detail-report.component';
 
 
 @Component({
@@ -92,7 +93,6 @@ export class VotingList {
   view(id: string) {
     this.service.getDetail(id).subscribe({
       next: (topic) => {
-        console.log('Loaded report detail:', topic);
         this.dialog.open(TopicDetailComponent, {
           data: topic.data,
           disableClose: true,
@@ -122,7 +122,15 @@ export class VotingList {
   }
 
   report(topicId: string) {
-    this.router.navigate(['/admin/survey-detail-report', topicId]);
+    //this.router.navigate(['/admin/survey-detail-report', topicId]);
+    this.dialog.open(SurveyDetailReportComponent, {
+          data:{topicId: topicId},
+          disableClose: true,
+          panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
+          width: '60vw',
+          height: '100vh',
+          maxWidth: '100vw'
+        });
   }
 
   openCreateTopicDialog() {

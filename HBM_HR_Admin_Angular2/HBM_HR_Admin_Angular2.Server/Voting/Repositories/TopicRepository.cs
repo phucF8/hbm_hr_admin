@@ -176,9 +176,9 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
         public async Task<TopicDto?> GetByIdAsync(string id) {
             var query = from t in _context.Topics
                         where t.Id == id
-                        join created in _context.DbNhanVien on t.CreatedBy equals created.ID into createdGroup
+                        join created in _context.DbNhanVien on t.CreatedBy equals created.UserID into createdGroup
                         from createdUser in createdGroup.DefaultIfEmpty()
-                        join updated in _context.DbNhanVien on t.UpdatedBy equals updated.ID into updatedGroup
+                        join updated in _context.DbNhanVien on t.UpdatedBy equals updated.UserID into updatedGroup
                         from updatedUser in updatedGroup.DefaultIfEmpty()
                         select new TopicDto {
                             Id = t.Id,
