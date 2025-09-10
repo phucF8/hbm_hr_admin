@@ -1,10 +1,23 @@
-.btn-close {
-  position: fixed;
-  width: 36px;
-  height: 36px;
-  border: 2px solid #ef4444;
+.modal-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
+  background: #f9f9f9;
+  padding: 12px 16px;
+  /* border-bottom: 1px solid #ddd; */
+  /* flex: 0 0 auto; */
+  /* position: sticky;          giữ header cố định khi scroll */
+  /* top: 0; */
+  /* z-index: 10; */
+}
+
+.close_button {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid #ef4444;   /* mỏng hơn để hợp kích thước nhỏ */
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 14px;               /* vừa vặn trong vòng tròn */
   font-weight: bold;
   color: #ef4444;
   cursor: pointer;
@@ -13,21 +26,40 @@
   justify-content: center;
   background: white;
   transition: all 0.2s ease-in-out;
-  z-index: 10; /* nổi lên trên */
+  z-index: 10;
+  line-height: 1;                /* tránh chữ lệch */
 }
 
-.btn-close:hover {
+.close_button:hover {
   background: #ef4444;
   color: white;
   transform: rotate(90deg);
 }
 
+
+.content {
+  flex: 1 1 auto;
+  /* phần này chiếm hết phần còn lại */
+  /* cố định chiều cao */
+  overflow-y: auto;
+  /* cho phép scroll dọc */
+  /* border: 1px solid #007aff; */
+  background: #fff;
+  padding: 10px;
+}
+
 .container {
-  width: 100%;        /* chiếm hết chiều rộng của cha */
-  margin: 0;          /* bỏ margin auto */
-  padding: 20px;      /* vẫn giữ padding nếu muốn */
+  display: flex;
+  flex-direction: column;
+  /* sắp xếp dọc */
+  height: 100%;
+  /* giãn hết cha */
+  /*width: 100%;        /* chiếm hết chiều rộng của cha */
+  /*margin: 0;          /* bỏ margin auto */
+  padding: 0px;
+  /* vẫn giữ padding nếu muốn */
   background-color: #007AFF;
-  box-sizing: border-box; /* để padding không làm tràn ra ngoài */
+  /*box-sizing: border-box; /* để padding không làm tràn ra ngoài */
 }
 
 
@@ -58,6 +90,7 @@
 .header-actions {
   display: flex;
   gap: 12px;
+  background-color: #ef4444;
 }
 
 .btn {

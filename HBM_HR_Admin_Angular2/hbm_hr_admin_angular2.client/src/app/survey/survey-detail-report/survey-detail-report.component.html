@@ -1,85 +1,89 @@
 <div *ngIf="!loading && topicReport" class="container">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-info">
-      <h1>{{ topicReport.title }}</h1>
-      <div class="header-meta">Tổng người trả lời: {{topicReport.totalParticipants}} • Ngày tạo: {{topicReport.startDate | date: 'dd/MM/yyyy' }}</div>
-    </div>
-    <div class="header-actions">
-       <button class="btn-close" (click)="onClose()">✖</button>
-      <!-- <a href="#" class="btn btn-primary"></a> -->
-      <!-- <a href="#" class="btn btn-secondary"></a> -->
-    </div>
+  <div class="modal-header">
+    <h2 class="header-info">KẾT QUẢ KHẢO SÁT</h2>
+    <button class="close_button" (click)="onClose()">✖</button>
+    <!-- <a href="#" class="btn btn-primary"></a> -->
+    <!-- <a href="#" class="btn btn-secondary"></a> -->
   </div>
-
-  <div *ngFor="let q of topicReport.questions">
-    <!-- Câu hỏi trắc nghiệm -->
-    <div *ngIf="q.type === 'SingleChoice' || q.type === 'MultiChoice'">
-      <div class="question-block">
-        <div class="question-header">
-          <div>
-            <div class="question-title">{{q.content}}</div>
-            <div class="question-meta">Loại: Lựa chọn</div>
-          </div>
-          <div class="question-stats">
-            <div></div>
-            <div class="response-count"></div>
-          </div>
-        </div>
-
-        <div *ngFor="let opt of q.options" class="option">
-          <div class="option-label">{{opt.content}}</div>
-          <div class="progress-bar">
-            <div class="progress-fill progress-blue"
-              [style.width.%]="getOptionPercentage(opt,topicReport.totalParticipants)">
-            </div>
-          </div>
-          <div class="option-stats">
-            <div *ngIf="opt.selectedCount>0">
-              <span class="option-count">{{opt.selectedCount}}</span> •
-              {{getOptionPercentage(opt,topicReport.totalParticipants)}}%
-            </div>
-          </div>
-        </div>
-
+  <div class="content">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-info">
+        <h1>{{ topicReport.title }}</h1>
+        <div class="header-meta">Tổng người trả lời: {{topicReport.totalParticipants}} • Ngày tạo:
+          {{topicReport.startDate | date: 'dd/MM/yyyy' }}</div>
       </div>
     </div>
-    <!-- Câu hỏi tự luận -->
-    <div *ngIf="q.type === 'Essay'">
-      <!-- Question 2 -->
-      <div class="question-block">
-        <div class="question-header">
-          <div>
-            <div class="question-title">{{q.content}}</div>
-            <div class="question-meta">Loại: Tự luận</div>
+
+    <div *ngFor="let q of topicReport.questions">
+      <!-- Câu hỏi trắc nghiệm -->
+      <div *ngIf="q.type === 'SingleChoice' || q.type === 'MultiChoice'">
+        <div class="question-block">
+          <div class="question-header">
+            <div>
+              <div class="question-title">{{q.content}}</div>
+              <div class="question-meta">Loại: Lựa chọn</div>
+            </div>
+            <div class="question-stats">
+              <div></div>
+              <div class="response-count"></div>
+            </div>
           </div>
 
-        </div>
-
-        <!-- Comments Section -->
-        <div class="comments-section">
-          <div class="comments-header">
-            <div class="comments-title">Trả lời tự luận ({{q.essayAnswers.length}})</div>
-          </div>
-
-          <div *ngFor="let ans of q.essayAnswers">
-            <div class="comment">
-              <div class="comment-meta">
-                <div class="comment-author">{{ans.userId}}</div>
-                <div class="comment-date">{{ans.createdAt | date:'dd/MM/yyyy'}}</div>
+          <div *ngFor="let opt of q.options" class="option">
+            <div class="option-label">{{opt.content}}</div>
+            <div class="progress-bar">
+              <div class="progress-fill progress-blue"
+                [style.width.%]="getOptionPercentage(opt,topicReport.totalParticipants)">
               </div>
-              <div class="comment-text">{{ans.essayAnswer}}.</div>
+            </div>
+            <div class="option-stats">
+              <div *ngIf="opt.selectedCount>0">
+                <span class="option-count">{{opt.selectedCount}}</span> •
+                {{getOptionPercentage(opt,topicReport.totalParticipants)}}%
+              </div>
             </div>
           </div>
 
         </div>
       </div>
+      <!-- Câu hỏi tự luận -->
+      <div *ngIf="q.type === 'Essay'">
+        <!-- Question 2 -->
+        <div class="question-block">
+          <div class="question-header">
+            <div>
+              <div class="question-title">{{q.content}}</div>
+              <div class="question-meta">Loại: Tự luận</div>
+            </div>
+
+          </div>
+
+          <!-- Comments Section -->
+          <div class="comments-section">
+            <div class="comments-header">
+              <div class="comments-title">Trả lời tự luận ({{q.essayAnswers.length}})</div>
+            </div>
+
+            <div *ngFor="let ans of q.essayAnswers">
+              <div class="comment">
+                <div class="comment-meta">
+                  <div class="comment-author">{{ans.userId}}</div>
+                  <div class="comment-date">{{ans.createdAt | date:'dd/MM/yyyy'}}</div>
+                </div>
+                <div class="comment-text">{{ans.essayAnswer}}.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="width: 100px;height: 300px;">
 
     </div>
-  </div>
-
-  <div style="width: 100px;height: 300px;">
-
   </div>
 
 </div>

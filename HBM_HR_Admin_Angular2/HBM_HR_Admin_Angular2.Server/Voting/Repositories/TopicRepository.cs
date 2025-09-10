@@ -188,8 +188,8 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
                             EndDate = t.EndDate,
                             CreatedBy = createdUser.ID,
                             UpdatedBy = updatedUser.ID,
-                            CreatedByName = createdUser.TenNhanVien,
-                            UpdatedByName = updatedUser.TenNhanVien,
+                            CreatedByName = createdUser.Username,
+                            UpdatedByName = updatedUser.Username,
                             CreatedAt = t.CreatedAt,
                             UpdatedAt = t.UpdatedAt,
                             Questions = _context.Questions
