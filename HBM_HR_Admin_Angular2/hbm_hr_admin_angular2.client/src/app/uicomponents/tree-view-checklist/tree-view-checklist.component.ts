@@ -22,10 +22,11 @@ export interface TreeNode {
   styleUrls: ['./tree-view-checklist.component.css']
 })
 export class TreeViewChecklistComponent implements OnInit {
-   @Input() treeData: Array<
-    { id: string, 
-      idParent?: string; 
-      children?: any[] 
+  @Input() treeData: Array<
+    {
+      id: string,
+      idParent?: string;
+      children?: any[]
     }> = [];
 
   allNodes: { [id: string]: TreeNode } = {};
@@ -58,6 +59,17 @@ export class TreeViewChecklistComponent implements OnInit {
         this.allNodes[item.id].parent = this.allNodes[item.idParent];
       }
     });
+  }
+
+  ///trả về những mục user đã check chọn
+  getSelected(): any[] {
+    const selectedNodes: any[] = [];
+    Object.values(this.allNodes).forEach(node => {
+      if (node.selected) {
+        selectedNodes.push(node);
+      }
+    });
+    return selectedNodes;
   }
 
   toggleExpand(node: any) {

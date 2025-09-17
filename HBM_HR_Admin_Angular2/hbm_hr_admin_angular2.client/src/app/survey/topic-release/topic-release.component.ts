@@ -126,24 +126,25 @@ export class TopicReleaseComponent {
   }
 
   onSubmitRelease() {
+    const donviSelecteds = this.treeViewComp.getSelected();
+    if (donviSelecteds.length <= 0) return;
     const userID = localStorage.getItem('userID');
     if (!userID) {
       alert('Không tìm thấy userID trong localStorage!');
       return;
     }
-    const newRelease = {
+    const newReleases = donviSelecteds.map((item: any) => ({
       topicId: this.topic.id,
-      targetType: this.myForm.value.targetType,
-      targetId: this.myForm.value.targetId,
+      targetType: 'DONVI',
+      targetId: item.tag.id,
       releasedBy: userID,
       note: null,
-    };
-    console.log('Payload gửi đi:', JSON.stringify(newRelease, null, 2));
-    this.service.settingRelease(newRelease).subscribe({
+    }));
+    this.service.settingRelease(newReleases).subscribe({
       next: (res) => {
         if (res.success) {   // theo ApiResponse bạn code backend
           alert('Phát hành thành công!');
-          this.dialogRef.close(newRelease);
+          this.dialogRef.close(newReleases);
         } else {
           alert('Phát hành thất bại: ' + res.message);
         }

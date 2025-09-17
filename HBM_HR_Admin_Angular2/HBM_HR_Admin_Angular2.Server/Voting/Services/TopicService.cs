@@ -191,22 +191,31 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<BB_TopicRelease> SettingReleaseAsync(TopicReleaseRequest request) {
-            var release = new BB_TopicRelease {
-                Id = Guid.NewGuid().ToString(),
-                TopicId = request.TopicId,
-                TargetType = request.TargetType,
-                TargetId = request.TargetId,
-                ReleasedBy = request.ReleasedBy,
-                Note = request.Note,
-                CreatedAt = DateTime.Now
-            };
+        public async Task<object> SettingReleaseAsync(List<TopicReleaseRequest> requests) {
+            var results = new List<object>();
 
-            _context.BB_TopicRelease.Add(release);
+            foreach (var req in requests) {
+                // TODO: xử lý insert từng request vào DB
+                // Ví dụ:
+                var entity = new BB_TopicRelease {
+                    TopicId = req.TopicId,
+                    TargetType = req.TargetType,
+                    TargetId = req.TargetId,
+                    ReleasedBy = req.ReleasedBy,
+                    Note = req.Note,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                // Insert vào DB (giả sử có _dbContext)
+                _context.BB_TopicRelease.Add(entity);
+
+                results.Add(entity);
+            }
+
             await _context.SaveChangesAsync();
-
-            return release;
+            return results;
         }
+
 
 
     }
