@@ -92,7 +92,7 @@
                     <input type="checkbox"  (click)="$event.stopPropagation()" [(ngModel)]="tb.selected">
                     </td>
                     <td style="white-space: nowrap;">
-                    {{ tb.startDate | date:'HH:mm dd/MM/yyyy'}} - {{ tb.endDate | date:'HH:mm dd/MM/yyyy' }}
+                    {{ tb.startDate | date:'dd/MM/yyyy'}} - {{ tb.endDate | date:'dd/MM/yyyy' }}
                     </td>
                     <td>
                     {{ tb.title }}
@@ -110,8 +110,13 @@
                                 <div class="menu-text">Xem</div>
                             </div>
 
+                            <div class="menu-item view" (click)="thietLapPhatHanh(tb)">
+                                <i class="bi bi-megaphone"></i>
+                                <div class="menu-text">Thiết lập phát hành</div>
+                            </div>
+
                             <div class="menu-item view" (click)="report(tb.id)">
-                                <i class="bi bi-eye"></i>
+                                <i class="bi bi-bar-chart"></i>
                                 <div class="menu-text">báo cáo</div>
                             </div>
 

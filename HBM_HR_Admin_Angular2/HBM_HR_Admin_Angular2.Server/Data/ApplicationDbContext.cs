@@ -24,8 +24,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
-
         public DbSet<BB_UserAnswer> BB_UserAnswers { get; set; }
+        public DbSet<BB_TopicRelease> BB_TopicRelease { get; set; }
+        public DbSet<DM_ChiNhanh> DM_ChiNhanhs { get; set; }
+
 
 
 

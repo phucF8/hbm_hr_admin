@@ -1,0 +1,17 @@
+<div class="tree-node" *ngIf="node.visible" [ngClass]="'level-' + level">
+  <div class="tree-node-content">
+    <input type="checkbox" class="tree-checkbox" [(ngModel)]="node.selected" [indeterminate]="node.indeterminate"
+      (click)="toggleSelect()">
+    <span class="tree-node-label">{{ node.tag.tenChiNhanh }}</span>
+    <span class="tree-node-code" *ngIf="node.children.length">{{ node.children.length }}</span>
+    <div style="flex:1"></div>
+    <span class="tree-node-code">{{ node.tag.ma }}</span>
+    <span class="tree-expand-icon" *ngIf="node.children.length" [class.expanded]="node.expanded"
+      (click)="toggleExpand()">
+      ▶
+    </span>
+  </div>
+  <div class="tree-children" *ngIf="node.expanded">
+    <app-tree-node *ngFor="let child of node.children" [node]="child" [level]="level + 1"></app-tree-node>
+  </div>
+</div>

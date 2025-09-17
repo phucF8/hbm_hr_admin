@@ -1,4 +1,6 @@
 ﻿using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.DTOs;
+using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.Repositories;
@@ -171,23 +173,41 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
                                         }).ToList(),
                                     // Danh sách câu trả lời tự luận (nếu có)
                                     EssayAnswers = (from a in _context.BB_UserAnswers
-                                                    join nv in _context.DbNhanVien
-                                                        on a.UserId equals nv.UserID into gj
-                                                    from nv in gj.DefaultIfEmpty() // LEFT JOIN
-                                                    where a.QuestionId == q.Id && !string.IsNullOrEmpty(a.EssayAnswer)
-                                                    select new EssayAnswerDto {
-                                                        UserId = a.UserId,
-                                                        Username = nv.Username,      // lấy Username
-                                                        FullName = nv.TenNhanVien,   // hoặc lấy tên nhân viên
-                                                        EssayAnswer = a.EssayAnswer,
-                                                        CreatedAt = a.CreatedAt
-                                                    }).ToList(),
+                                        join nv in _context.DbNhanVien
+                                            on a.UserId equals nv.UserID into gj
+                                        from nv in gj.DefaultIfEmpty() // LEFT JOIN
+                                        where a.QuestionId == q.Id && !string.IsNullOrEmpty(a.EssayAnswer)
+                                        select new EssayAnswerDto {
+                                            UserId = a.UserId,
+                                            Username = nv.Username,      // lấy Username
+                                            FullName = nv.TenNhanVien,   // hoặc lấy tên nhân viên
+                                            EssayAnswer = a.EssayAnswer,
+                                            CreatedAt = a.CreatedAt
+                                        }).ToList(),
 
                                 }).ToList()
                         };
 
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<BB_TopicRelease> SettingReleaseAsync(TopicReleaseRequest request) {
+            var release = new BB_TopicRelease {
+                Id = Guid.NewGuid().ToString(),
+                TopicId = request.TopicId,
+                TargetType = request.TargetType,
+                TargetId = request.TargetId,
+                ReleasedBy = request.ReleasedBy,
+                Note = request.Note,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.BB_TopicRelease.Add(release);
+            await _context.SaveChangesAsync();
+
+            return release;
+        }
+
 
     }
 

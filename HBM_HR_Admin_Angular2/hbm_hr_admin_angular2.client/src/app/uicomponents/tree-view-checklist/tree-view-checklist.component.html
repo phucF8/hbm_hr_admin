@@ -1,0 +1,41 @@
+<div class="container">
+
+  <div class="controls">
+    <!-- <button class="btn btn-primary" (click)="selectAll()">✓ Chọn tất cả</button>
+    <button class="btn btn-secondary" (click)="unselectAll()">✗ Bỏ chọn tất cả</button>
+    <button class="btn btn-secondary" (click)="expandAll()">📂 Mở rộng tất cả</button>
+    <button class="btn btn-secondary" (click)="collapseAll()">📁 Thu gọn tất cả</button> -->
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" placeholder="Tìm kiếm..." [(ngModel)]="searchText"  (ngModelChange)="searchNodes($event)" />
+    </div>
+  </div>
+
+  <div class="tree-container">
+    <ng-container *ngFor="let root of (treeStructure | keyvalue)">
+      <app-tree-node [node]="root.value"></app-tree-node>
+    </ng-container>
+  </div>
+
+  <!-- <div class="summary">
+    <h3>📊 Thống kê</h3>
+    <div class="summary-stats">
+      <div class="stat-item">
+        <span class="stat-label">Tổng số node:</span>
+        <span class="stat-value">{{ totalCount }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Đã chọn:</span>
+        <span class="stat-value">{{ selectedCount }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Node gốc:</span>
+        <span class="stat-value">{{ rootCount }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Node con:</span>
+        <span class="stat-value">{{ childCount }}</span>
+      </div>
+    </div>
+  </div> -->
+</div>

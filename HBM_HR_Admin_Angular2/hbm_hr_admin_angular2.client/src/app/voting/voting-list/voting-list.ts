@@ -8,6 +8,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { SurveyDetailReportComponent } from '@app/survey/survey-detail-report/survey-detail-report.component';
+import { TopicReleaseComponent } from '@app/survey/topic-release/topic-release.component';
 
 
 @Component({
@@ -119,6 +120,17 @@ export class VotingList {
 
       }
     });
+  }
+
+  thietLapPhatHanh(tb: any) {
+        this.dialog.open(TopicReleaseComponent, {
+          data: tb,
+          disableClose: true,
+          panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
+          width: '60vw',
+          height: '100vh',
+          maxWidth: '100vw'
+        });
   }
 
   report(topicId: string) {

@@ -34,10 +34,14 @@ export class VotingListService {
     return this.http.post(url, topicIds, { headers }); // 👈 Sửa ở đây
   }
 
-
   createTopic(topic: any): Observable<any> {
     const url = `${this.apiUrl}/Create`;
     return this.http.post(url, topic);
+  }
+
+  //gửi thiết lập phát hành lên server
+  settingRelease(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/setting-release`, payload);
   }
 
 }

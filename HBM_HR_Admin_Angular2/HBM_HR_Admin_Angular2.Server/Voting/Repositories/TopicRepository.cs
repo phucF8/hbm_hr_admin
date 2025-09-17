@@ -87,7 +87,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
         }
 
         public async Task<Topic?> UpdateAsync(UpdateTopicDto dto) {
-            Topic topic = null;
+            Topic? topic = null;
             try {
                 topic = await _context.Topics.Include(t => t.Questions).ThenInclude(q => q.Options).FirstOrDefaultAsync(t => t.Id == dto.Id);
             }catch(Exception ex) {
@@ -170,8 +170,6 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
                 throw new Exception("Lỗi không xác định: " + ex.Message);
             }
         }
-
-
 
         public async Task<TopicDto?> GetByIdAsync(string id) {
             var query = from t in _context.Topics

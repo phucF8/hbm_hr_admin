@@ -1,0 +1,104 @@
+<div class="container">
+    <div class="header">
+        <h1>THIẾT LẬP PHÁT HÀNH</h1>
+        <button class="close_button" (click)="closePopup()">✖</button>
+    </div>
+
+    <div class="content">
+        <!-- Thông tin chung -->
+        <div class="form-section">
+            <div class="section-title">📋 {{topic.title}}</div>
+
+
+            <div class="form-group">
+
+                <textarea id="releaseNote" readonly>{{topic.description}}</textarea>
+            </div>
+        </div>
+
+        <!-- Chọn đối tượng -->
+        <div class="form-section">
+            <div class="section-title">🎯 Chọn đối tượng khảo sát</div>
+
+
+
+
+
+            <form [formGroup]="myForm" (ngSubmit)="onSubmitRelease()">
+                <div formArrayName="targets">
+                    <div *ngFor="let target of targets.controls; let i = index" [formGroupName]="i">
+                        <input formControlName="targetType" placeholder="Target Type">
+                        <input formControlName="targetId" placeholder="Target ID">
+                        <button type="button" (click)="removeTarget(i)">Xóa</button>
+                    </div>
+                </div>
+                <button type="button" (click)="addTarget()">Thêm target</button>
+                <button type="submit">Lưu</button>
+            </form>
+
+
+            <div class="target-selection">
+                <div class="target-types">
+                    <div class="target-type" data-type="NHANSU">
+                        <input type="button" id="nhan_su" name="targetType" (click)="showList('NHANSU')">
+                        <label for="targetDepartment">👥 Nhân sự</label>
+                    </div>
+
+                    <div class="target-type" data-type="PHONGBAN">
+                        <input type="button" id="targetDepartment" name="targetType" (click)="showList('PHONGBAN')">
+                        <label for="targetDepartment">🏢 Đơn vị</label>
+                    </div>
+
+                    <div class="target-type" data-type="CHUCDANH">
+                        <input type="button" id="targetPosition" name="targetType" (click)="showList('CHUCDANH')">
+                        <label for="targetPosition">💼 Chức danh</label>
+                    </div>
+
+                </div>
+
+                <app-tree-view-checklist   [treeData]="chiNhanhs" ></app-tree-view-checklist>
+
+                <!-- <div class="target-details">
+                    <div id="targetContent">
+                        <div class="search-box">
+                            <input type="text" id="searchTarget" placeholder="🔍 Tìm kiếm nhân viên...">
+                        </div>
+                        <div class="target-list">
+                            <div class="target-item" *ngFor="let dept of departments">
+                                <input type="checkbox" [id]="'dept' + dept.id" [value]="dept.id"
+                                    [(ngModel)]="dept.selected">
+                                <label [for]="'dept' + dept.id">{{ dept.name }}</label>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; text-align: right;">
+                            <span>Đã chọn:</span>
+                            <span class="selected-count" id="selectedCount">0</span>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+
+
+
+
+
+        
+
+
+        <!-- <h2>Danh sách chi nhánh</h2>
+        <ul>
+            <li *ngFor="let cn of chiNhanhs">
+                {{ cn.ma }} - {{ cn.tenChiNhanh }}
+            </li>
+        </ul> -->
+
+
+
+        <!-- Actions -->
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="resetForm()">🔄 Làm mới</button>
+            <button class="btn btn-primary" (click)="onSubmitRelease()">💾 Lưu cấu hình</button>
+        </div>
+    </div>
+</div>

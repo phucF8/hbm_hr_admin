@@ -13,6 +13,8 @@ import { TopicListComponent } from './voting/topic-list/topic-list.component';
 import { UserLayoutComponent } from './layouts/user-layout/user-layout.component';
 import { SurveyReviewComponent } from './survey/survey-review/survey-review.component';
 import { SurveyDetailReportComponent } from './survey/survey-detail-report/survey-detail-report.component';
+import { TopicReleaseComponent } from './survey/topic-release/topic-release.component';
+import { TreeViewChecklistComponent } from './uicomponents/tree-view-checklist/tree-view-checklist.component';
 
 const routes: Routes = [
   {
@@ -22,7 +24,9 @@ const routes: Routes = [
       { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
       { path: 'thongbao', component: ThongBaoComponent, canActivate: [AuthGuard] },
       { path: 'survey-detail-report/:topicId', component: SurveyDetailReportComponent, canActivate: [AuthGuard] },
+      { path: 'survey-release/:topicId', component: TopicReleaseComponent, canActivate: [AuthGuard] },
       { path: 'admin', component: AdminComponent},
+      { path: 'tree-view-checklist', component: TreeViewChecklistComponent},
       {
         path: 'voting',
         loadChildren: () => import('./voting/voting-module').then(m => m.VotingModule)
