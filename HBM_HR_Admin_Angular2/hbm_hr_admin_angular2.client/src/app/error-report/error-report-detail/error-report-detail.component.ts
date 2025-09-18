@@ -3,13 +3,16 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ErrUserReportDtail } from '../response/err_user_report_detail_rp';
 import { formatAndHighlightJson } from '@app/utils/json-utils';
 import { environment } from 'environments/environment';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-error-report-detail',
-  standalone: false,
+  standalone: true,
   templateUrl: './error-report-detail.component.html',
   styleUrls: ['./error-report-detail.component.css'],
+  imports: [CommonModule, FormsModule], 
 })
 export class ErrUserReportDetailPopupComponent {
 

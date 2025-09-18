@@ -1,12 +1,15 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedDataService } from '../services/shared-data.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-comp-a',
-  standalone: false,
+  standalone: true,
   templateUrl: './comp-a.component.html',
-  styleUrl: './comp-a.component.css'
+  styleUrl: './comp-a.component.css',
+  imports: [CommonModule, FormsModule, ReactiveFormsModule], 
 })
 export class CompAComponent {
 

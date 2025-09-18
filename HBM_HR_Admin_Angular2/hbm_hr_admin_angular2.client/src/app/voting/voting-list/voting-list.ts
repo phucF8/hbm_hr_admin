@@ -9,13 +9,19 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { SurveyDetailReportComponent } from '@app/survey/survey-detail-report/survey-detail-report.component';
 import { TopicReleaseComponent } from '@app/survey/topic-release/topic-release.component';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-voting-list',
-  standalone: false,
+  standalone: true,
   templateUrl: './voting-list.html',
-  styleUrl: './voting-list.css'
+  styleUrl: './voting-list.css',
+  imports:[
+    CommonModule, 
+    FormsModule,
+  ]
 })
 export class VotingList {
 

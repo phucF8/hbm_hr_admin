@@ -1,12 +1,14 @@
 
+import { CommonModule } from '@angular/common';
 import { Component, Input, forwardRef } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-one-select-form',
-  standalone: false,
+  standalone: true,
   templateUrl: './one-select-form.component.html',
   styleUrl: './one-select-form.component.css',
+  imports: [CommonModule, FormsModule],   // ✅ thêm FormsModule
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

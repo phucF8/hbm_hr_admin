@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-toast-test',
   templateUrl: './toast-test.component.html',
-  standalone: false,
+  standalone: true,
 })
 export class ToastTestComponent {
   constructor(private toastr: ToastrService) {}

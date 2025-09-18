@@ -3,12 +3,15 @@ import { Component, HostListener } from '@angular/core';
 import { ErrUserReportItem } from '../response/err_user_report_rp';
 import { ErrUserReportDetailPopupComponent } from '../error-report-detail/error-report-detail.component';
 import { ErrorReportService } from '../services/error-report.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-error-user-report',
-  standalone: false,
+  standalone: true,
   templateUrl: './error-user-report.component.html',
-  styleUrl: './error-user-report.component.css'
+  styleUrl: './error-user-report.component.css',
+  imports: [CommonModule, FormsModule], 
 })
 
 export class ErrorUserReportComponent {

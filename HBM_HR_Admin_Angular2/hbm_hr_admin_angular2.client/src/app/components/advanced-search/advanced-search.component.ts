@@ -1,11 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DebugUtils } from '@app/utils/debug-utils';
 
 @Component({
   selector: 'app-advanced-search',
-  standalone: false,
+  standalone: true,
   templateUrl: './advanced-search.component.html',
-  styleUrls: ['./advanced-search.component.css']
+  styleUrls: ['./advanced-search.component.css'],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule], 
 })
 export class AdvancedSearchComponent implements OnInit {
 

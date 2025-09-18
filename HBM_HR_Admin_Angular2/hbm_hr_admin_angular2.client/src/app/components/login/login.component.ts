@@ -11,12 +11,15 @@ import Swal from 'sweetalert2';
 import { UsersService } from '@app/services/users.service';
 import { Observable } from 'rxjs';
 import { ErrorService } from '@app/services/error.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule], 
 })
 export class LoginComponent implements OnInit {
   username: string = '';

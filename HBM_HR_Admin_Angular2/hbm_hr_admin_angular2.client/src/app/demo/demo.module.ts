@@ -10,9 +10,6 @@ import { CompTongComponent } from './comp-tong/comp-tong.component';
 
 @NgModule({
   declarations: [
-    CompAComponent,
-    CompBComponent,
-    CompTongComponent
   ],
   imports: [
     FormsModule,

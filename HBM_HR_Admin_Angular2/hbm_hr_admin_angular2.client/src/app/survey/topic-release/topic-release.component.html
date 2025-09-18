@@ -39,24 +39,21 @@
 
             <div class="target-selection">
                 <div class="target-types">
-                    <div class="target-type" data-type="NHANSU">
-                        <input type="button" id="nhan_su" name="targetType" (click)="showList('NHANSU')">
+                    <div class="target-type" data-type="NHANSU" (click)="showChonNhanSu()">
+                        <input type="button" id="nhan_su" name="targetType">
                         <label for="targetDepartment">👥 Nhân sự</label>
                     </div>
 
-                    <div class="target-type" data-type="PHONGBAN">
+                    <div class="target-type" data-type="PHONGBAN" (click)="showChonDonVi()">
                         <input type="button" id="targetDepartment" name="targetType" (click)="showList('PHONGBAN')">
                         <label for="targetDepartment">🏢 Đơn vị</label>
                     </div>
-
-                    <div class="target-type" data-type="CHUCDANH">
-                        <input type="button" id="targetPosition" name="targetType" (click)="showList('CHUCDANH')">
-                        <label for="targetPosition">💼 Chức danh</label>
-                    </div>
-
                 </div>
 
-                <app-tree-view-checklist   [treeData]="chiNhanhs" ></app-tree-view-checklist>
+                
+                <app-search-user-form  (selectedUsersChange)="ngTaoSelected($event)" *ngIf="showNhanSu"></app-search-user-form>
+                <app-tree-view-checklist [treeData]="chiNhanhs" *ngIf="showDonvi"></app-tree-view-checklist>
+
 
                 <!-- <div class="target-details">
                     <div id="targetContent">
@@ -83,7 +80,7 @@
 
 
 
-        
+
 
 
         <!-- <h2>Danh sách chi nhánh</h2>

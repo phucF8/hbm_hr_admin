@@ -1,16 +1,28 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ThongBaoService } from '../../services/thong-bao.service';
 import { MergedData } from '@app/models/thong-bao.model';
 import { finalize } from 'rxjs/operators';
 import { DonVi } from '@app/models/donvi';
 import { getFullImageUrl } from '@app/utils/url.utils';
+import { CommonModule } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatInputModule } from '@angular/material/input';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-search-user-form',
-  standalone: false,
+  standalone: true,
   templateUrl: './search-user-form.component.html',
-  styleUrl: './search-user-form.component.css'
+  styleUrl: './search-user-form.component.css',
+  imports: [
+      CommonModule, // đã bao gồm CommonModule
+      FormsModule,
+      ReactiveFormsModule,
+      MatTabsModule, // cần cho <mat-tab-group>, <mat-tab>
+      MatCheckboxModule, // cần cho <mat-checkbox>
+      MatInputModule,
+    ],
 })
 
 export class SearchUserFormComponent {

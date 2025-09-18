@@ -16,7 +16,7 @@ import { SurveyDetailReportComponent } from './survey/survey-detail-report/surve
 import { TopicReleaseComponent } from './survey/topic-release/topic-release.component';
 import { TreeViewChecklistComponent } from './uicomponents/tree-view-checklist/tree-view-checklist.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'admin',
     component: MainLayoutComponent,
@@ -72,8 +72,8 @@ const routes: Routes = [
 
 ];
 
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }
+// @NgModule({
+//   imports: [RouterModule.forRoot(routes)],
+//   exports: [RouterModule]
+// })
+// export class AppRoutingModule { }

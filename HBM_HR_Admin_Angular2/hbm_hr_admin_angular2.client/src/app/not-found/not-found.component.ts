@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-not-found',
-  standalone: false,
+  standalone: true,
   template: `
     <div class="not-found-container">
       <h1>404 - Không tìm thấy trang</h1>

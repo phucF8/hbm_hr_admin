@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-comp-tong',
-  standalone: false,
+  standalone: true,
   templateUrl: './comp-tong.component.html',
   styleUrl: './comp-tong.component.css'
 })

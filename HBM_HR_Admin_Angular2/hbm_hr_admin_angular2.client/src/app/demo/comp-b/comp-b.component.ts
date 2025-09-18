@@ -1,11 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-comp-b',
-  standalone: false,
+  standalone: true,
   templateUrl: './comp-b.component.html',
-  styleUrl: './comp-b.component.css'
+  styleUrl: './comp-b.component.css',
+  imports: [CommonModule, FormsModule, ReactiveFormsModule], 
 })
 export class CompBComponent {
 

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Input, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ThongBaoService, TestSendNotificationRequest} from '../../../services/thong-bao.service';
 import { NOTIFICATION_TYPES } from '../../../constants/notification-types';
@@ -11,13 +11,15 @@ import { DonVi } from '@app/models/donvi';
 import { DebugUtils } from '@app/utils/debug-utils';
 import { MergedData, DoLookupDatasRP } from '@app/models/thong-bao.model';
 import { getFullImageUrl } from '@app/utils/url.utils';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'chitiet-thong-bao',
   templateUrl: './tbchitiet.component.html',
   styleUrls: ['./tbchitiet.component.css'],
-  standalone: false,
-  providers: [ThongBaoService]
+  standalone: true,
+  providers: [ThongBaoService],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule], 
 })
 export class TbchitietComponent implements OnInit {
   @Input() notificationId: string = '';  // Nhận notificationId từ component cha

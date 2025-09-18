@@ -15,6 +15,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { ChiNhanh, ChiNhanhService } from '@app/services/chi-nhanh.service';
 import { TreeViewChecklistComponent } from "@app/uicomponents/tree-view-checklist/tree-view-checklist.component";
+import { SearchUserFormComponent } from '@app/uicomponents/search-user-form/search-user-form.component';
 
 
 @Component({
@@ -26,12 +27,14 @@ import { TreeViewChecklistComponent } from "@app/uicomponents/tree-view-checklis
     MatTabsModule, // cần cho <mat-tab-group>, <mat-tab>
     MatCheckboxModule, // cần cho <mat-checkbox>
     MatInputModule,
-    TreeViewChecklistComponent
+    TreeViewChecklistComponent,
+    SearchUserFormComponent,
   ],
   templateUrl: './topic-release.component.html',
   styleUrl: './topic-release.component.css'
 })
 export class TopicReleaseComponent {
+[x: string]: any;
 
   myForm!: FormGroup;
   selectedType: 'PhongBan' | 'ChucDanh' = 'PhongBan';
@@ -48,6 +51,8 @@ export class TopicReleaseComponent {
   ];
 
   chiNhanhs: ChiNhanh[] = [];
+  showDonvi = false;
+  showNhanSu = true;
 
   // Lấy instance của component con
   @ViewChild(TreeViewChecklistComponent)
@@ -98,6 +103,20 @@ export class TopicReleaseComponent {
         console.error('Lỗi khi gọi API', err);
       }
     });
+  }
+
+  showChonNhanSu() {
+    this.showDonvi = false;
+    this.showNhanSu = true;
+  }
+
+  showChonDonVi() {
+    this.showDonvi = true;
+    this.showNhanSu = false;
+  }
+
+  ngTaoSelected(users: any[]) {
+    
   }
 
 

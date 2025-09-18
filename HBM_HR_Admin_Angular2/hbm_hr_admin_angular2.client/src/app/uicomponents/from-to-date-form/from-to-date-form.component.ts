@@ -1,10 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-from-to-date-form',
-  standalone: false,
+  standalone: true,
   templateUrl: './from-to-date-form.component.html',
-  styleUrl: './from-to-date-form.component.css'
+  styleUrl: './from-to-date-form.component.css',
+  imports:[
+    CommonModule, 
+    FormsModule,
+  ]
 })
 export class FromToDateFormComponent {
   @Input() label: string = 'Thời gian tạo';

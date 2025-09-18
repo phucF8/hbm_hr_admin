@@ -1,7 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DebugUtils } from '@app/utils/debug-utils';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 
 
@@ -9,7 +10,8 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors }
   selector: 'app-xuat-file',
   templateUrl: './xuat-file.component.html',
   styleUrls: ['./xuat-file.component.css'],
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule], 
 })
 export class XuatFileComponent {
   xuatFileForm: FormGroup;

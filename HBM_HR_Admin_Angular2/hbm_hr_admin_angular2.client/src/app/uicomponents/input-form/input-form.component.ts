@@ -1,10 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-input-form',
-  standalone: false,
+  standalone: true,
   templateUrl: './input-form.component.html',
-  styleUrl: './input-form.component.css'
+  styleUrl: './input-form.component.css',
+  imports: [
+    CommonModule, 
+    FormsModule,
+  ]
 })
 
 export class InputFormComponent {
