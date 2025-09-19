@@ -46,21 +46,21 @@
                     style="display: -webkit-inline-box !important; padding-right: 15px !important">
 
                     <li class="nav-item nav-profile dropdown">
-                        <a class="nav-link" href="javascript:void(0)" data-toggle="dropdown" id="profileDropdown"
+                        <div class="nav-link" href="javascript:void(0)" data-toggle="dropdown" id="profileDropdown"
                             aria-expanded="false" (click)="togglePopup()" #button>
                             <img alt="" class="img-36" [src]="anhNhanVien">
                             <span class="pl-10 fs-14 ng-binding" ng-bind="NavigatorModel.ThongTinTK">{{tenNhanVien}} -
                                 {{maNhanVien}}</span>
                             <i class="bi bi-chevron-down"></i>
-                        </a>
+                        </div>
 
 
 
 
                         <div class="dropdown-menu_phuc" *ngIf="showSignoutPopup">
-                            <a href="#" class="dropdown-item logout" (click)="logout()">
+                            <div class="dropdown-item logout" (click)="logout()">
                                 <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                            </a>
+                            </div>
                         </div>
 
 

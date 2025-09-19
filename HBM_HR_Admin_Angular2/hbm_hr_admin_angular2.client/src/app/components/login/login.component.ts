@@ -13,44 +13,43 @@ import { Observable } from 'rxjs';
 import { ErrorService } from '@app/services/error.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TopicListComponent } from '@app/voting/topic-list/topic-list.component';
+import { ROUTE_PATHS } from '@app/app.routes';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule], 
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class LoginComponent implements OnInit {
   username: string = '';
   password: string = '';
   showPassword: boolean = false;
   errorMessage: string = '';
-  isLoading: Observable<boolean>;
+  // isLoading: Observable<boolean>;
 
   constructor(
-    private toastr: ToastrService,
-    private http: HttpClient,
+    // private toastr: ToastrService,
     private router: Router,
     private authService: AuthService,
-    private usersService: UsersService,
-    private loadingService: LoadingService,
-    private errorService: ErrorService,
+    // private usersService: UsersService,
+    // private loadingService: LoadingService,
+    // private errorService: ErrorService,
     private encryptionService: EncryptionService
   ) {
-    this.isLoading = loadingService.isLoading$
+    // this.isLoading = loadingService.isLoading$
   }
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['topic-list']).then(() => {
+      // this.router.navigate(['topic-list']).then(() => {
 
-      })
-        .catch(error => {
-          console.error('LoginComponent: Lỗi chuyển hướng:', error);
-        });
-    } else {
-      console.log('LoginComponent: Chưa có thông tin đăng nhập, hiển thị form đăng nhập');
+      // })
+        // .catch(error => {
+          // console.error('LoginComponent: Lỗi chuyển hướng:', error);
+        // });
     }
   }
 
@@ -67,66 +66,66 @@ export class LoginComponent implements OnInit {
     }
     // Encrypt password before sending
     const encryptedPassword = this.encryptionService.encrypt(this.password);
-    this.loadingService.show();
+    // this.loadingService.show();
     this.authService.login(this.username, encryptedPassword).subscribe({
-      next: (response) => {
-        this.loadingService.hide();
-        if (response.token != null) {
+    next: (response) => {
+      // this.loadingService.hide();
+      if (response.token != null) {
 
-          // ✅ Gọi API lưu username vào bảng Users
-          this.usersService.saveUser(this.username).subscribe({
-            next: () => {
-            },
-            error: (err) => {
-              console.error('Lỗi khi lưu user vào bảng Users:', err);
-            }
-          });
-          this.router.navigate(['topic-list']);
-        } else {
-          //this.toastr.error('Đã có lỗi xảy ra.', 'Lỗi');
-          this.toastr.error('ERROR', response.message, {
-            positionClass: 'toast-top-center'
-          });
+        // ✅ Gọi API lưu username vào bảng Users
+        // this.usersService.saveUser(this.username).subscribe({
+        //   next: () => {
+        //   },
+        //   error: (err) => {
+        //     console.error('Lỗi khi lưu user vào bảng Users:', err);
+        //   }
+        // });
+        this.router.navigate([ROUTE_PATHS.topic_list]);
+      } else {
+        //this.toastr.error('Đã có lỗi xảy ra.', 'Lỗi');
+        // this.toastr.error('ERROR', response.message, {
+          // positionClass: 'toast-top-center'
+        // });
 
-          const errorDetail = JSON.stringify(response) || '';
-
-          // Swal.fire({
-          //   icon: 'error',
-          //   title: 'Lỗi tải dữ liệu',
-          //   html: `
-          //           <p><b>Mã lỗi:</b> </p>
-          //           <p><b>Thông báo:</b> </p>
-          //           ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
-          //         `,
-          //   confirmButtonText: 'Đóng'
-          // });
-
-          this.errorService.showError([
-          response.message || '',
-          JSON.stringify(response) || ''
-        ]);
-
-        }
-      },
-      error: (error) => {
-        this.loadingService.hide();
-        this.errorService.showError([
-          error.status?.toString(),
-          error.message,
-          error.error?.message || JSON.stringify(error.error) || ''
-        ]);
+        // const errorDetail = JSON.stringify(response) || '';
 
         // Swal.fire({
         //   icon: 'error',
         //   title: 'Lỗi tải dữ liệu',
         //   html: `
-        //             <p><b>Mã lỗi:</b> ${errorStatus}</p>
-        //             <p><b>Thông báo:</b> ${errorMessage}</p>
-        //             ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
-        //           `,
+        //           <p><b>Mã lỗi:</b> </p>
+        //           <p><b>Thông báo:</b> </p>
+        //           ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
+        //         `,
         //   confirmButtonText: 'Đóng'
         // });
+
+        // this.errorService.showError([
+        // response.message || '',
+        // JSON.stringify(response) || ''
+      // ]);
+
       }
+    },
+    error: (error) => {
+      // this.loadingService.hide();
+      // this.errorService.showError([
+      //   error.status?.toString(),
+      //   error.message,
+      //   error.error?.message || JSON.stringify(error.error) || ''
+      // ]);
+
+      // Swal.fire({
+      //   icon: 'error',
+      //   title: 'Lỗi tải dữ liệu',
+      //   html: `
+      //             <p><b>Mã lỗi:</b> ${errorStatus}</p>
+      //             <p><b>Thông báo:</b> ${errorMessage}</p>
+      //             ${errorDetail ? `<pre style="text-align:left;white-space:pre-wrap">${errorDetail}</pre>` : ''}
+      //           `,
+      //   confirmButtonText: 'Đóng'
+      // });
+    }
     });
   }
 

@@ -20,7 +20,9 @@
     "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
-    "module": "ES2022"
+    "module": "ES2022",
+    "sourceMap": true,   // 👈 thêm dòng này
+     "inlineSources": true,
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

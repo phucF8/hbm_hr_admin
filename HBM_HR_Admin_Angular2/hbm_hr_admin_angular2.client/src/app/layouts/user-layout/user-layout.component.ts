@@ -9,16 +9,17 @@ import { LoadingService } from '@app/services/loading.service';
 import { Observable } from 'rxjs';
 import { AuthService } from '@app/services/auth.service';
 import { getFullImageUrl } from '@app/utils/url.utils';
+import { ROUTE_PATHS } from '@app/app.routes';
 
 
 @Component({
   selector: 'app-main-layout',
   templateUrl: './user-layout.component.html',
   styleUrls: ['./user-layout.component.css'],
-    imports:[
-        CommonModule,
-        RouterModule // ✅ bắt buộc có nếu dùng <router-outlet>
-    ]
+  imports: [
+    CommonModule,
+    RouterModule // ✅ bắt buộc có nếu dùng <router-outlet>
+  ]
 })
 export class UserLayoutComponent {
   isLoggedIn: boolean = false;
@@ -50,8 +51,8 @@ export class UserLayoutComponent {
     private loadingService: LoadingService,
     private router: Router) {
 
-    var token =  localStorage.getItem('access_token');
-    this.isLoggedIn = token!=null && token.trim() != '';
+    var token = localStorage.getItem('access_token');
+    this.isLoggedIn = token != null && token.trim() != '';
     this.tenNhanVien = localStorage.getItem('tenNhanVien') || '';
     this.anhNhanVien = getFullImageUrl(localStorage.getItem('anh') || '');
     this.maNhanVien = localStorage.getItem('maNhanVien') || '';
@@ -83,7 +84,7 @@ export class UserLayoutComponent {
   logout(): void {
     this.authService.logout();
     this.isLoggedIn = false;
-    this.router.navigate(['/login']);
+    this.router.navigate([ROUTE_PATHS.login]);
   }
 
   togglePopup() {

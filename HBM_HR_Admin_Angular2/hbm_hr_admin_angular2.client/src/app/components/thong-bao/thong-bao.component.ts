@@ -354,16 +354,6 @@ export class ThongBaoComponent implements OnInit {
 
 
 
-  logout() {
-    console.log('🚪 Logging out user');
-    this.authService.logout();
-    this.router.navigate(['/login']).then(() => {
-      console.log('✅ Successfully logged out and redirected to login page');
-    }).catch(error => {
-      console.error('❌ Error during logout:', error);
-    });
-  }
-
   deleteThongBao(id: string): void {
     if (confirm(`Bạn có chắc chắn muốn xóa thông báo này?`)) {
       console.log("Deleting notification with ID:", id);

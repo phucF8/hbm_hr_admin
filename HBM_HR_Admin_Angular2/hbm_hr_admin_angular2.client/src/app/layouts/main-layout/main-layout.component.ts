@@ -9,6 +9,7 @@ import { LoadingService } from '@app/services/loading.service';
 import { Observable } from 'rxjs';
 import { AuthService } from '@app/services/auth.service';
 import { getFullImageUrl } from '@app/utils/url.utils';
+import { ROUTE_PATHS } from '@app/app.routes';
 
 
 @Component({
@@ -85,7 +86,7 @@ export class MainLayoutComponent {
   logout(): void {
     this.authService.logout();
     this.isLoggedIn = false;
-    this.router.navigate(['/login']);
+    this.router.navigate([ROUTE_PATHS.login]);
   }
 
   togglePopup() {
