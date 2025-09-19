@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-search-user-form',
@@ -54,17 +55,17 @@ export class SearchUserFormComponent {
   constructor(
     private fb: FormBuilder,
     private thongBaoService: ThongBaoService,
+    private authService: AuthService,
   ) {
     this.searchUserForm = this.fb.group({
       search: ['']
     });
-    const currentUserStr = localStorage.getItem('currentUser');
-    if (currentUserStr) {
-      const currentUser = JSON.parse(currentUserStr);
-      var idKhoLamViec = currentUser.DataSets.Table[0].IDKhoLamViec;
+    const token = this.authService.getToken();
+    if (token) {
+      var idKhoLamViec = localStorage.getItem('idKhoLamViec');
       this.selectedDonVi = this.donvis.find(d => d.id === idKhoLamViec ) || null;
     } else {
-      console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!');
+      console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!!!');//Search user form component
     }
   }
 

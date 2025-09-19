@@ -59,8 +59,7 @@ export class TopicReleaseComponent {
   treeViewComp!: TreeViewChecklistComponent;
 
   constructor(
-    private toastr: ToastrService,
-    private cdRef: ChangeDetectorRef,
+    // private toastr: ToastrService,
     private service: VotingListService,
     private chiNhanhService: ChiNhanhService,
     private fb: FormBuilder,

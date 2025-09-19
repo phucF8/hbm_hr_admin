@@ -32,6 +32,7 @@ export interface UserInfo {
   DiDong: string;
   MaPhongBan: string;
   Anh: string;
+  IDKhoLamViec: string;
 }
 
 export interface UserPermission {
@@ -121,6 +122,7 @@ export interface LoginResponse {
 })
 export class AuthService {
   private baseUrl = environment.apiUrl;
+  private tokenKey = 'access_token';
 
   constructor(private http: HttpClient) {
 
@@ -150,12 +152,28 @@ export class AuthService {
               localStorage.setItem('diDong', res.nhanVien.diDong || '');
               localStorage.setItem('maPhongBan', res.nhanVien.maPhongBan || '');
               localStorage.setItem('anh', res.nhanVien.anh || '');
+
+              localStorage.setItem('idKhoLamViec', res.nhanVien.idKhoLamViec || '');
+
+
             }
           }
         })
       );
   }
 
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  setToken(token: string) {
+    localStorage.setItem(this.tokenKey, token);
+  }
+
+   removeToken() {
+    localStorage.removeItem(this.tokenKey);
+  }
 
   // login0(username: string, password: string): Observable<LoginResponse> {
   //   const request: LoginRequest = {
@@ -222,7 +240,8 @@ export class AuthService {
       TenDonVi: localStorage.getItem('tenDonVi') || '',
       DiDong: localStorage.getItem('diDong') || '',
       MaPhongBan: localStorage.getItem('maPhongBan') || '',
-      Anh: localStorage.getItem('anh') || ''
+      Anh: localStorage.getItem('anh') || '',
+      IDKhoLamViec: localStorage.getItem('idKhoLamViec') || '',
     };
   }
 

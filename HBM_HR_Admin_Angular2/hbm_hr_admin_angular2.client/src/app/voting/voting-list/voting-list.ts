@@ -18,8 +18,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   templateUrl: './voting-list.html',
   styleUrl: './voting-list.css',
-  imports:[
-    CommonModule, 
+  imports: [
+    CommonModule,
     FormsModule,
   ]
 })
@@ -129,26 +129,26 @@ export class VotingList {
   }
 
   thietLapPhatHanh(tb: any) {
-        this.dialog.open(TopicReleaseComponent, {
-          data: tb,
-          disableClose: true,
-          panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
-          width: '60vw',
-          height: '100vh',
-          maxWidth: '100vw'
-        });
+    this.dialog.open(TopicReleaseComponent, {
+      data: tb,
+      disableClose: true,
+      panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
+      width: '60vw',
+      height: '100vh',
+      maxWidth: '100vw'
+    });
   }
 
   report(topicId: string) {
     //this.router.navigate(['/admin/survey-detail-report', topicId]);
     this.dialog.open(SurveyDetailReportComponent, {
-          data:{topicId: topicId},
-          disableClose: true,
-          panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
-          width: '60vw',
-          height: '100vh',
-          maxWidth: '100vw'
-        });
+      data: { topicId: topicId },
+      disableClose: true,
+      panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
+      width: '60vw',
+      height: '100vh',
+      maxWidth: '100vw'
+    });
   }
 
   openCreateTopicDialog() {

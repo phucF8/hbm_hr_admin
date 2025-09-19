@@ -36,8 +36,7 @@ export class TopicDetailComponent implements OnInit {
   }
 
   constructor(
-    private toastr: ToastrService,
-    private cdRef: ChangeDetectorRef,
+    // private toastr: ToastrService,
     private service: VotingListService,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<TopicDetailComponent>,
@@ -280,14 +279,14 @@ export class TopicDetailComponent implements OnInit {
     this.service.updateTopic(updatedTopic).subscribe({
       next: (res) => {
         if (res.status === 'SUCCESS') {
-          this.toastr.success('Cập nhật thành công!', ``, {
-            positionClass: 'toast-top-right'
-          });
+          // this.toastr.success('Cập nhật thành công!', ``, {
+          //   positionClass: 'toast-top-right'
+          // });
           this.dialogRef.close(res);
         } else {
-          this.toastr.error('ERROR', 'Cập nhật thất bại: ' + res.message, {
-            positionClass: 'toast-top-right'
-          });
+          // this.toastr.error('ERROR', 'Cập nhật thất bại: ' + res.message, {
+          //   positionClass: 'toast-top-right'
+          // });
         }
       },
       error: (err) => {

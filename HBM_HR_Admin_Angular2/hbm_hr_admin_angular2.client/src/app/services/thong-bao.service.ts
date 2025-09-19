@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, catchError } from 'rxjs';
+import { Observable, catchError, tap, throwError} from 'rxjs';
 import { ThongBao } from '../models/thong-bao.model'; // Import the ThongBao interface
-import { environment } from '../../environments/environment'; 
+import { environment } from '../../environments/environment';
 import { DebugUtils } from '@app/utils/debug-utils';
 import { DoLookupDatasRP } from '@app/models/thong-bao.model'; // Import the DoLookupDatasRP interface
 import { ThongBaoItem, ThongBaoRP } from '@app/responses/thongbao_rp';
+import { AuthService } from './auth.service';
+import Swal from 'sweetalert2';
 
 export interface ThongBaoRecipient {
   notificationId: string;
@@ -58,8 +60,11 @@ export interface UpdateThongBaoRequest extends CreateThongBaoRequest {
 export class ThongBaoService {
 
   private apiUrl = `${environment.apiUrl}/thongbao`;  // Lấy apiUrl từ environment
-  
-  constructor(private http: HttpClient) { }
+
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+  ) { }
 
   getListThongBao(
     pageIndex: number = 1,
@@ -78,38 +83,38 @@ export class ThongBaoService {
     ngNhanIds?: string[],
   ): Observable<ThongBaoRP> {
     let params = new HttpParams()
-    if (pageIndex){
+    if (pageIndex) {
       console.log('Page Index:', pageIndex);
       params = params.set('pageIndex', pageIndex);
-    } 
-        
-    if (sortBy) 
+    }
+
+    if (sortBy)
       params = params.set('sortBy', sortBy);
-    if (ngayTaoTu) 
+    if (ngayTaoTu)
       params = params.set('ngayTaoTu', ngayTaoTu);
-    if (ngayTaoDen) 
+    if (ngayTaoDen)
       params = params.set('ngayTaoDen', ngayTaoDen);
     if (ngayGuiTu)
       params = params.set('ngayGuiTu', ngayGuiTu);
     if (ngayGuiDen)
       params = params.set('ngayGuiDen', ngayGuiDen);
-    if (trangThai !== null && trangThai !== undefined) 
+    if (trangThai !== null && trangThai !== undefined)
       params = params.set('trangThai', trangThai.toString());
-    if (notificationType !== null && notificationType !== undefined) 
+    if (notificationType !== null && notificationType !== undefined)
       params = params.set('notificationType', notificationType.toString());
-    if (isSentToAll !== null && isSentToAll !== undefined) 
+    if (isSentToAll !== null && isSentToAll !== undefined)
       params = params.set('isSentToAll', isSentToAll.toString());
-    if (loaiThongBao) 
+    if (loaiThongBao)
       params = params.set('loaiThongBao', loaiThongBao);
     if (ngTaoIds && ngTaoIds.length > 0)
       params = params.set('ngTaoIds', ngTaoIds.join(',')); // ← nối mảng thành chuỗi
     if (ngNhanIds && ngNhanIds.length > 0)
       params = params.set('ngNhanIds', ngNhanIds.join(',')); // ← nối mảng thành chuỗi
-    if (searchText) 
+    if (searchText)
       params = params.set('searchText', searchText);
-    if (isPlatform) 
+    if (isPlatform)
       params = params.set('platform', isPlatform);
-    
+
     // DebugUtils.openStringInNewWindow(`${this.apiUrl}?${params.toString()}`);
 
     return this.http.get<ThongBaoRP>(this.apiUrl, { params }).pipe(
@@ -119,7 +124,7 @@ export class ThongBaoService {
       })
     );
   }
-  
+
   getThongBaoByID(notificationID: string): Observable<ThongBaoItem> {
     const url = `${this.apiUrl}/${notificationID}`;
     // DebugUtils.openStringInNewWindow(`${url}`);
@@ -139,16 +144,16 @@ export class ThongBaoService {
       Username: '',
       IDKhoLamViec: ''
     };
-    if (currentUserStr) {
-      const currentUser = JSON.parse(currentUserStr);
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
       nhanVienInfo = {
-        ID: currentUser.DataSets.Table[0].ID,
-        UserID: currentUser.DataSets.Table[0].UserID,
-        Username: currentUser.DataSets.Table[0].Username,
-        IDKhoLamViec: currentUser.DataSets.Table[0].IDKhoLamViec
+        ID: currentUser.ID,
+        UserID: currentUser.UserID,
+        Username: currentUser.Username,
+        IDKhoLamViec: currentUser.IDKhoLamViec,
       };
     } else {
-      console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!');
+      console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!!');
     }
     const url = `https://apihr.hbm.vn:9004/api/hr/employee/DoLookupDatas`;
     const requestBody = {
@@ -160,14 +165,31 @@ export class ThongBaoService {
         KhoDuLieu: khoDuLieu,
       }
     };
+
+    // Swal.fire({
+    //       icon: 'error',
+    //       title: 'Lỗi tải dữ liệu',
+    //       html: `<pre style="text-align:left;">ERR: ${JSON.stringify(requestBody, null, 2)}</pre>`,
+    //       confirmButtonText: 'Đóng'
+    //     });
+
     return this.http.post<DoLookupDatasRP>(url, requestBody).pipe(
+      tap(response => {
+        // Xử lý khi request thành công
+        console.log('Search successful:', response);
+        // có thể set state, update UI hoặc gọi function khác
+      }),
       catchError(error => {
+        // Xử lý khi request thất bại
         console.error('Error searching users:', error);
-        throw error;
+        // Có thể show notification, set state lỗi...
+        // Phải throw lại nếu muốn tiếp tục propagate error
+        return throwError(() => error);
       })
     );
+
   }
-  
+
 
   createThongBao(request: CreateThongBaoRequest): Observable<ThongBao> {
     DebugUtils.openStringInNewWindow(`${JSON.stringify(request)}`);
@@ -192,7 +214,7 @@ export class ThongBaoService {
 
   deleteMultiThongBao(notificationIds: string[]): Observable<void> {
     console.log('Deleting multiple notifications:', notificationIds);
-    return this.http.delete<void>(`${this.apiUrl}/multi`, { 
+    return this.http.delete<void>(`${this.apiUrl}/multi`, {
       body: JSON.stringify(notificationIds), // Chuyển đổi sang JSON
       headers: {
         'Content-Type': 'application/json'
