@@ -51,8 +51,8 @@
                 </div>
 
                 
-                <app-search-user-form  (selectedUsersChange)="ngTaoSelected($event)" *ngIf="showNhanSu"></app-search-user-form>
-                <app-tree-view-checklist [treeData]="chiNhanhs" *ngIf="showDonvi"></app-tree-view-checklist>
+                <app-search-user-form  (selectedUsersChange)="nhanSuSelected($event)" [hidden]="!showNhanSu"></app-search-user-form>
+                <app-tree-view-checklist [treeData]="chiNhanhs" [hidden]="!showDonvi"></app-tree-view-checklist>
 
 
                 <!-- <div class="target-details">

@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { ChiNhanh, ChiNhanhService } from '@app/services/chi-nhanh.service';
 import { TreeViewChecklistComponent } from "@app/uicomponents/tree-view-checklist/tree-view-checklist.component";
 import { SearchUserFormComponent } from '@app/uicomponents/search-user-form/search-user-form.component';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -34,7 +35,7 @@ import { SearchUserFormComponent } from '@app/uicomponents/search-user-form/sear
   styleUrl: './topic-release.component.css'
 })
 export class TopicReleaseComponent {
-[x: string]: any;
+  [x: string]: any;
 
   myForm!: FormGroup;
   selectedType: 'PhongBan' | 'ChucDanh' = 'PhongBan';
@@ -53,6 +54,8 @@ export class TopicReleaseComponent {
   chiNhanhs: ChiNhanh[] = [];
   showDonvi = false;
   showNhanSu = true;
+
+  nhanSuSelecteds: any[] = [];
 
   // Lấy instance của component con
   @ViewChild(TreeViewChecklistComponent)
@@ -114,8 +117,8 @@ export class TopicReleaseComponent {
     this.showNhanSu = false;
   }
 
-  ngTaoSelected(users: any[]) {
-    
+  nhanSuSelected(users: any[]) {
+    this.nhanSuSelecteds = users;
   }
 
 
@@ -144,20 +147,38 @@ export class TopicReleaseComponent {
   }
 
   onSubmitRelease() {
-    const donviSelecteds = this.treeViewComp.getSelected();
-    if (donviSelecteds.length <= 0) return;
     const userID = localStorage.getItem('userID');
     if (!userID) {
       alert('Không tìm thấy userID trong localStorage!');
       return;
     }
-    const newReleases = donviSelecteds.map((item: any) => ({
-      topicId: this.topic.id,
-      targetType: 'DONVI',
-      targetId: item.tag.id,
-      releasedBy: userID,
-      note: null,
-    }));
+    const nhanSuSelecteds = this.nhanSuSelecteds || [];
+    let donviSelecteds: any[] = [];
+    if (this.treeViewComp && typeof this.treeViewComp.getSelected === 'function') {
+      donviSelecteds = this.treeViewComp.getSelected() || [];
+    }
+    const newReleases: any[] = [
+      ...donviSelecteds.map((item: any) => ({
+        topicId: this.topic.id,
+        targetType: 'DONVI',
+        targetId: item.tag.id,
+        releasedBy: userID,
+        note: null,
+      })),
+      ...nhanSuSelecteds.map((item: any) => ({
+        topicId: this.topic.id,
+        targetType: 'NHANSU',
+        targetId: item.ID,
+        releasedBy: userID,
+        note: null,
+      })),
+    ];
+    Swal.fire({
+                icon: 'error',
+                title: 'Lỗi tải dữ liệu',
+                html: `<pre style="text-align:left;">ERR: ${JSON.stringify(newReleases, null, 2)}</pre>`,
+                confirmButtonText: 'Đóng'
+              });
     this.service.settingRelease(newReleases).subscribe({
       next: (res) => {
         if (res.success) {   // theo ApiResponse bạn code backend
@@ -181,8 +202,6 @@ export class TopicReleaseComponent {
 
 
   }
-
-
 
   closePopup() {
     this.dialogRef.close();
