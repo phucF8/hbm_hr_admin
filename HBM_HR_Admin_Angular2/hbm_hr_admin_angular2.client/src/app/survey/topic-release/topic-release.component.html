@@ -24,7 +24,7 @@
 
 
 
-            <form [formGroup]="myForm" (ngSubmit)="onSubmitRelease()">
+            <!-- <form [formGroup]="myForm" (ngSubmit)="onSubmitRelease()">
                 <div formArrayName="targets">
                     <div *ngFor="let target of targets.controls; let i = index" [formGroupName]="i">
                         <input formControlName="targetType" placeholder="Target Type">
@@ -34,26 +34,42 @@
                 </div>
                 <button type="button" (click)="addTarget()">Thêm target</button>
                 <button type="submit">Lưu</button>
-            </form>
+            </form> -->
+
 
 
             <div class="target-selection">
                 <div class="target-types">
-                    <div class="target-type" data-type="NHANSU" (click)="showChonNhanSu()">
-                        <input type="button" id="nhan_su" name="targetType">
-                        <label for="targetDepartment">👥 Nhân sự</label>
+
+                    <div class="target-type" data-type="NHANSU">
+                        <div class="divLabel">
+                            
+                            <label for="targetDepartment">👥 Nhân sự</label>
+                        </div>
+                        <app-search-user-form (selectedUsersChange)="nhanSuSelected($event)"
+                            [hidden]="!showNhanSu"></app-search-user-form>
                     </div>
 
-                    <div class="target-type" data-type="PHONGBAN" (click)="showChonDonVi()">
-                        <input type="button" id="targetDepartment" name="targetType" (click)="showList('PHONGBAN')">
-                        <label for="targetDepartment">🏢 Đơn vị</label>
-                    </div>
                 </div>
 
-                
-                <app-search-user-form  (selectedUsersChange)="nhanSuSelected($event)" [hidden]="!showNhanSu"></app-search-user-form>
-                <app-tree-view-checklist [treeData]="chiNhanhs" [hidden]="!showDonvi"></app-tree-view-checklist>
+                <div style="display: flex;">
 
+                    <div class="target-type" data-type="PHONGBAN">
+                        <div class="divLabel">
+                            
+                            <label for="targetDepartment">🏢 Đơn vị</label>
+                        </div>
+                        <app-tree-view-checklist [treeData]="chiNhanhs" [hidden]="!showDonvi"></app-tree-view-checklist>
+                    </div>
+                    
+                    <!-- <ul>
+                        <li *ngFor="let cn of chiNhanhs">
+                            {{ cn.ma }} - {{ cn.tenChiNhanh }}
+                        </li>
+                    </ul> -->
+
+
+                </div>
 
                 <!-- <div class="target-details">
                     <div id="targetContent">
@@ -83,12 +99,7 @@
 
 
 
-        <!-- <h2>Danh sách chi nhánh</h2>
-        <ul>
-            <li *ngFor="let cn of chiNhanhs">
-                {{ cn.ma }} - {{ cn.tenChiNhanh }}
-            </li>
-        </ul> -->
+
 
 
 

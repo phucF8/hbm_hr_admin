@@ -52,7 +52,7 @@ export class TopicReleaseComponent {
   ];
 
   chiNhanhs: ChiNhanh[] = [];
-  showDonvi = false;
+  showDonvi = true;
   showNhanSu = true;
 
   nhanSuSelecteds: any[] = [];
@@ -153,10 +153,7 @@ export class TopicReleaseComponent {
       return;
     }
     const nhanSuSelecteds = this.nhanSuSelecteds || [];
-    let donviSelecteds: any[] = [];
-    if (this.treeViewComp && typeof this.treeViewComp.getSelected === 'function') {
-      donviSelecteds = this.treeViewComp.getSelected() || [];
-    }
+    const donviSelecteds = this.treeViewComp.getSelected() || [];
     const newReleases: any[] = [
       ...donviSelecteds.map((item: any) => ({
         topicId: this.topic.id,

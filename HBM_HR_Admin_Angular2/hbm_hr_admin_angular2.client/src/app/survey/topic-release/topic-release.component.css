@@ -574,3 +574,19 @@ body {
         justify-content: center;
     }
 }
+
+
+
+.target-type {
+  display: flex;
+  flex-direction: column; /* các div con theo dạng cột */
+  gap: 8px;               /* khoảng cách giữa các div con */
+  align-items: flex-start;  /* căn trái tất cả */
+}
+
+.divLabel {
+  display: flex;
+  align-items: center; /* căn giữa theo chiều dọc */
+  gap: 6px;            /* khoảng cách giữa checkbox và label */
+  justify-content: flex-start; /* căn trái */
+}
