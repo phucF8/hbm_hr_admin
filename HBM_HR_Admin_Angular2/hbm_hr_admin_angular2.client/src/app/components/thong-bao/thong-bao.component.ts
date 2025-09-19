@@ -116,7 +116,7 @@ export class ThongBaoComponent implements OnInit {
     private errorService: ErrorService,
     private router: Router,
     private authService: AuthService,
-    private toastr: ToastrService,
+    // private toastr: ToastrService,
   ) {
     this.searchUserForm = this.fb.group({
       search: ['', Validators.required]
@@ -517,11 +517,11 @@ export class ThongBaoComponent implements OnInit {
         console.error('Chọn phương thức xuất không hợp lệ');
     }
 
-    this.toastr.success('...', `${data.fromPage} - ${data.toPage}`, {
-      positionClass: 'toast-top-center',
-      timeOut: 5000, // 5s
-      progressBar: true
-    });
+    // this.toastr.success('...', `${data.fromPage} - ${data.toPage}`, {
+    //   positionClass: 'toast-top-center',
+    //   timeOut: 5000, // 5s
+    //   progressBar: true
+    // });
   }
 
   openXuatFile() {
