@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { showApiError, showJsonDebug } from '@app/utils/error-handler';
 
 interface Option {
   id: string;
@@ -64,7 +65,6 @@ export class VotePageComponent implements OnInit {
     private dialogRef: MatDialogRef<VotePageComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { topicId: string }
   ) {
-    // this.topicId = this.route.snapshot.paramMap.get('topicId')!;
     this.topicId = data.topicId;
     this.questions.forEach(question => {
       this.userVotes[question.id] = {
@@ -83,17 +83,16 @@ export class VotePageComponent implements OnInit {
   }
 
   loadTopic() {
-
     this.votingService.getVotingTopic(this.topicId).subscribe({
       next: (data) => {
-        this.topicData = data;
-        this.pollTitle = data.title;
-        this.pollDescription = data.description;
-        this.questions = data.questions;
+        // showJsonDebug(data.data.questions);
+        this.topicData = data.data;
+        this.pollTitle = data.data.title;
+        this.pollDescription = data.data.description;
+        this.questions = data.data.questions;
       },
       error: (err) => {
-        console.error('Lỗi khi load topic:', err);
-        this.errorService.showError([JSON.stringify(err)]);
+        showApiError(err,'Tải nội dung phiếu điều tra không thành công!');
       }
     });
   }

@@ -94,11 +94,6 @@ export class TopicListComponent implements OnInit {
   // Nếu người dùng đã trả lời → hiển thị giao diện chỉ để xem lại (review) câu trả lời.
   // Nếu người dùng chưa trả lời → hiển thị giao diện để thực hiện trả lời.
   goToDetailSurvey(topic: Topic) {
-    // if (topic.hasAnswered) {
-    //   this.router.navigate(['/survey-review', topic.id]);
-    // } else {
-    //   this.router.navigate(['/voting', topic.id]);
-    // }
     if (topic.hasAnswered) {
       const dialogRef = this.dialog.open(SurveyReviewComponent, {
         data: {topicId: topic.id},

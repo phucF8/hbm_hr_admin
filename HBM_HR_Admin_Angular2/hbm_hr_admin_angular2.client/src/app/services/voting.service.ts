@@ -33,8 +33,20 @@ export class VotingService {
   constructor(private http: HttpClient) { }
 
   getVotingTopic(topicId: string): Observable<any> {
-    const url = `${this.baseUrl}/topics/voting/${topicId}`;
-    return this.http.get<any>(url);
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      throw new Error('No access token found');
+    }
+    const userId = localStorage.getItem('id') || '';
+    const idKhoLamViec = localStorage.getItem('idKhoLamViec') || '';
+    const body = {
+      userId: userId,
+      idKhoLamViec: idKhoLamViec,
+      topicId: topicId,
+    };
+    // showJsonDebug(body);
+    const url = `${this.baseUrl}/topics/voting`;
+    return this.http.post<any>(url,body);
   }
 
   getTopicForReview(topicId: string): Observable<any> {
@@ -63,14 +75,11 @@ export class VotingService {
     if (!token) {
       throw new Error('No access token found');
     }
-
     const body = {
       userId: userId,
       idKhoLamViec: idKhoLamViec,
     };
-
-    showJsonDebug(body);
-
+    // showJsonDebug(body);
     return this.http.post<ApiResponse<Topic[]>>(url, body);
   }
 

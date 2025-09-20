@@ -2,6 +2,7 @@
 using HBM_HR_Admin_Angular2.Server.DTOs;
 using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
+using HBM_HR_Admin_Angular2.Server.Requesters;
 using HBM_HR_Admin_Angular2.Server.Voting.DTOs;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.Services;
@@ -107,19 +108,21 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success(topicsToDelete.Count,"Đã xoá thành công"));
         }
 
-        [HttpGet("voting/{id}")]
-        public async Task<ActionResult<TopicVotingDto>> GetTopicWithQuestions(string id)
-        {
+        [HttpPost("voting")]
+        public async Task<ActionResult<TopicVotingDto>> GetTopicWithQuestions([FromBody] TopicForUserRequest request) {
             var topic = await _context.Topics
                 .Include(t => t.Questions)
                     .ThenInclude(q => q.Options)
-                .FirstOrDefaultAsync(t => t.Id == id);
-
+                .Where(t => t.Id == request.TopicId &&
+                    _context.BB_TopicRelease.Any(r =>
+                        r.TopicId == t.Id &&
+                        ((r.TargetType == "NHANSU" && r.TargetId == request.UserId) ||
+                         (r.TargetType == "DONVI" && r.TargetId == request.IdKhoLamViec))
+                    ))
+                .FirstOrDefaultAsync();
             if (topic == null)
-                return NotFound();
-
-            var result = new TopicVotingDto
-            {
+                return NotFound(ApiResponse<string>.Error("Không tìm thấy topic hoặc bạn không có quyền truy cập."));
+            var result = new TopicVotingDto {
                 Id = topic.Id,
                 Title = topic.Title,
                 Description = topic.Description,
@@ -127,17 +130,14 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
                 EndDate = topic.EndDate,
                 Questions = topic.Questions
                     .OrderBy(q => q.OrderNumber)
-
-                    .Select(q => new QuestionDto
-                    {
+                    .Select(q => new QuestionDto {
                         Id = q.Id,
                         Content = q.Content,
                         Type = q.Type,
                         OrderNumber = q.OrderNumber,
                         Options = q.Options
                             .OrderBy(o => o.OrderNumber)
-                            .Select(o => new OptionDto
-                            {
+                            .Select(o => new OptionDto {
                                 Id = o.Id,
                                 Content = o.Content,
                                 OrderNumber = o.OrderNumber
@@ -145,8 +145,9 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
                     }).ToList()
             };
 
-            return Ok(result);
+            return Ok(ApiResponse<TopicVotingDto>.Success(result, "Lấy dữ liệu thành công."));
         }
+
 
         [HttpPost("submit")]
         public async Task<IActionResult> SubmitAnswers([FromBody] List<UserAnswerDto> answers)
