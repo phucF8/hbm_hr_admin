@@ -9,6 +9,7 @@ import {
 import { catchError, Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { showJsonDebug } from '@app/utils/error-handler';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {

@@ -9,6 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SurveyReviewComponent } from '@app/survey/survey-review/survey-review.component';
 import { VotingModule } from '../voting-module';
 import { VotePageComponent } from '../vote-page/vote-page.component';
+import { showApiBusinessError, showApiError, showJsonDebug } from '@app/utils/error-handler';
 
 interface Topic {
   id: string;
@@ -62,22 +63,22 @@ export class TopicListComponent implements OnInit {
 
   }
 
-
-
-
   fetchTopics() {
-    const userId = localStorage.getItem('id') || '';
+    const idUser = localStorage.getItem('id') || '';
     const idKhoLamViec = localStorage.getItem('idKhoLamViec') || '';
-    this.votingService.getTopicsByUser(userId,idKhoLamViec).subscribe({
+    this.votingService.getTopicsByUser(idUser, idKhoLamViec).subscribe({
       next: (res) => {
         this.loading = false;
         if (res.status === 'SUCCESS') {
           this.topics = res.data;
+          showJsonDebug(res.data);
+        } else {
+          showApiBusinessError(res.message, 'Tải danh sách phiếu điều tra thất bại');
         }
       },
       error: (err) => {
         this.loading = false;
-        console.error('Error fetching topics:', err);
+        showApiError(err);
       }
     });
   }
@@ -96,16 +97,16 @@ export class TopicListComponent implements OnInit {
   goToDetailSurvey(topic: Topic) {
     if (topic.hasAnswered) {
       const dialogRef = this.dialog.open(SurveyReviewComponent, {
-        data: {topicId: topic.id},
+        data: { topicId: topic.id },
         disableClose: true,
         panelClass: 'err-report-detail-dialog',
         width: '60vw',
         height: '100vh',
         maxWidth: '100vw'
       });
-    }else{
+    } else {
       const dialogRef = this.dialog.open(VotePageComponent, {
-        data: {topicId: topic.id},
+        data: { topicId: topic.id },
         disableClose: true,
         panelClass: 'err-report-detail-dialog',
         width: '60vw',

@@ -35,7 +35,7 @@ export function showApiBusinessError(
     title,
     html: `
       <div style="text-align:left; font-family:monospace; font-size:0.9em; color:#e67e22;">
-        <strong>Lỗi nghiệp vụ:</strong> ${message} <br/>
+        <strong>${message}</strong><br/>
         ${code ? `<strong>Mã lỗi:</strong> ${code} <br/>` : ''}
         <strong>Thời gian:</strong> ${time}
       </div>

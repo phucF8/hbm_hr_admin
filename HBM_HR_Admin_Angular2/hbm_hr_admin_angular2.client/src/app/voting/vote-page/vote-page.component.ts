@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { showApiError, showJsonDebug } from '@app/utils/error-handler';
+import { showApiBusinessError, showApiError, showJsonDebug } from '@app/utils/error-handler';
 
 interface Option {
   id: string;
@@ -199,26 +199,17 @@ export class VotePageComponent implements OnInit {
           });
           this.isSubmitting = false;
           this.hasSubmitted = true;
-          // console.log('✅', res.message);
-          // this.router.navigate(['/topic-list']);
           this.dialogRef.close(res);
         } else {
           this.isSubmitting = false;
           this.hasSubmitted = false;
-          this.errorService.showError([res.message]);
+          showApiBusinessError(res.message,'Gửi kết quả tham gia phiếu điều tra thất bại');
         }
       },
       error: (err) => {
         this.isSubmitting = false;
         this.hasSubmitted = false;
-        let errors: string[] = [];
-        if (err.error) {// Lỗi server trả về (backend trả JSON có message hoặc errors)
-          errors.push(err.error.message);
-        }
-        if (err.message) { // Lỗi hệ thống (Angular HttpClient)
-          errors.push(`System: ${err.message}`);
-        }
-        this.errorService.showError([errors.join('\n')]);
+        showApiError(err,'Gửi kết quả tham gia phiếu điều tra thất bại');
       }
     });
   }

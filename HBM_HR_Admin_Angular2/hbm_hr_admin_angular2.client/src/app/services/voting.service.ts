@@ -50,8 +50,8 @@ export class VotingService {
   }
 
   getTopicForReview(topicId: string): Observable<any> {
-    var userId = localStorage.getItem('userID');
-    const url = `${this.baseUrl}/topics/review/${topicId}/${userId}`;
+    var idUser = localStorage.getItem('id');
+    const url = `${this.baseUrl}/topics/review/${topicId}/${idUser}`;
     return this.http.get<any>(url);
   }
 

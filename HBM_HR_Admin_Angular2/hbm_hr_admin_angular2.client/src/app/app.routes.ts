@@ -59,12 +59,12 @@ export const routes: Routes = [
     path: '',
     component: UserLayoutComponent,
     children: [
-  //     { path: '', redirectTo: 'topic-list', pathMatch: 'full' },
+      { path: '', redirectTo: 'topic-list', pathMatch: 'full' },
       { path: ROUTE_PATHS.topic_list, component: TopicListComponent },
   //     { path: 'voting/:topicId', component: VotePageComponent },
   //     { path: 'survey-review/:topicId', component: SurveyReviewComponent },
     ],
-  //   // canActivate: [AuthGuard]
+    canActivate: [AuthGuard]
   },
 
   // {

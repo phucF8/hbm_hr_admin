@@ -11,6 +11,7 @@ import { SurveyDetailReportComponent } from '@app/survey/survey-detail-report/su
 import { TopicReleaseComponent } from '@app/survey/topic-release/topic-release.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { showJsonDebug } from '@app/utils/error-handler';
 
 
 @Component({
@@ -58,12 +59,10 @@ export class VotingList {
 
   loadList() {
     // this.loadingService.show();
-    this.service.getList(
-    ).subscribe({
+    this.service.getList().subscribe({
       next: (data) => {
+        showJsonDebug(data);
         this.listItem = data;
-        // console.log('Loaded notifications:', this.listItem.length);
-        // this.loadingService.hide();
       },
       error: (error) => {
         const errorStatus = error.status;

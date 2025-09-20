@@ -156,8 +156,8 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             {
                 return BadRequest(new { message = "Không có câu trả lời nào được gửi" });
             }
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
+            var idUser = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (idUser == null)
             {
                 return NotFound(new { message = "Không thể xác định danh tính người dùng. Vui lòng đăng nhập lại." });
             }
@@ -167,13 +167,13 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
                 var entity = new BB_UserAnswer
                 {
                     Id = Guid.NewGuid().ToString(),
-                    UserId = userId,
+                    UserId = idUser,
                     TopicId = ans.TopicId,
                     QuestionId = ans.QuestionId,
                     OptionId = ans.OptionId,
                     EssayAnswer = ans.EssayAnswer,
                     AnsweredAt = now,
-                    CreatedBy = userId,
+                    CreatedBy = idUser,
                     CreatedAt = now
                 };
                 _context.BB_UserAnswers.Add(entity);
@@ -196,10 +196,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
                     Description = t.Description,
                     StartDate = t.StartDate,
                     EndDate = t.EndDate,
-                    HasAnswered = _context.BB_UserAnswers
-                        .Any(ua => ua.UserId == request.UserId
-                                   && _context.Questions
-                                       .Any(q => q.Id == ua.QuestionId && q.TopicId == t.Id))
+                    HasAnswered = _context.BB_UserAnswers.Any(ua => ua.UserId == request.UserId && ua.TopicId == t.Id)
                 })
                 .ToListAsync();
             return Ok(ApiResponse<object>.Success(data: topics, message: ""));

@@ -19,7 +19,7 @@ import Swal from 'sweetalert2';
 import { safeStringify } from '@app/utils/json-utils';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
-import { showApiBusinessError, showApiError } from '@app/utils/error-handler';
+import { showApiBusinessError, showApiError, showJsonDebug } from '@app/utils/error-handler';
 
 
 @Component({
@@ -230,41 +230,36 @@ export class TopicReleaseComponent {
   }
 
   onSubmitRelease() {
-    const userID = localStorage.getItem('userID');
-    if (!userID) {
+    const idUser = localStorage.getItem('id');
+    if (!idUser) {
       alert('Không tìm thấy userID trong localStorage!');
       return;
     }
     //const nhanSuSelecteds = this.nhanSuSelecteds || [];
     const nhanSuSelecteds = this.searchUserComp.getSelected();
     const donviSelecteds = this.treeViewComp.getSelected() || [];
-    const newReleases: any[] = [
+    const body: any[] = [
       ...donviSelecteds.map((item: any) => ({
         topicId: this.topic.id,
         targetType: 'DONVI',
         targetId: item.tag.id,
-        releasedBy: userID,
+        releasedBy: idUser,
         note: null,
       })),
       ...nhanSuSelecteds.map((item: any) => ({
         topicId: this.topic.id,
         targetType: 'NHANSU',
         targetId: item.ID,
-        releasedBy: userID,
+        releasedBy: idUser,
         note: null,
       })),
     ];
-    // Swal.fire({
-    //   icon: 'error',
-    //   title: 'Lỗi tải dữ liệu',
-    //   html: `<pre style="text-align:left;">ERR: ${JSON.stringify(newReleases, null, 2)}</pre>`,
-    //   confirmButtonText: 'Đóng'
-    // });
-    this.service.settingRelease(this.topic.id,newReleases).subscribe({
+    showJsonDebug(body);
+    this.service.settingRelease(this.topic.id,body).subscribe({
       next: (res) => {
         if (res.status === 'SUCCESS') {
           this.toastr.success('', res.message || 'Lưu thiết lập thành công');
-          this.dialogRef.close(newReleases);
+          this.dialogRef.close(body);
         } else {
           showApiBusinessError(res.message,'Lưu tiết lập thất bại');
         }
