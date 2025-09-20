@@ -56,10 +56,13 @@ export class TopicReleaseComponent {
   showNhanSu = true;
 
   nhanSuSelecteds: any[] = [];
+  topicReleases: any[] = [];
 
   // Lấy instance của component con
   @ViewChild(TreeViewChecklistComponent)
   treeViewComp!: TreeViewChecklistComponent;
+
+  @ViewChild('searchUserComp') searchUserComp!: SearchUserFormComponent;
 
   constructor(
     // private toastr: ToastrService,
@@ -89,23 +92,100 @@ export class TopicReleaseComponent {
     //   });
     // }
 
-    this.loadChiNhanhs();
+    this.loadingData(topic);
 
   }
 
-  loadChiNhanhs() {
-    this.chiNhanhService.getChiNhanhs().subscribe({
-      next: (data) => {
-        this.chiNhanhs = data;
-        if (this.treeViewComp) {
-          this.treeViewComp.buildTree(data);
+  async loadingData(topic: TopicDetail) {
+    await this.loadChiNhanhs();
+    this.loadSettingRelease(topic.id);
+  }
+
+  // async loadChiNhanhs() {
+  //   await this.chiNhanhService.getChiNhanhs().subscribe({
+  //     next: (data) => {
+  //       this.chiNhanhs = data;
+  //       if (this.treeViewComp) {
+  //         this.treeViewComp.buildTree(data);
+  //       }
+  //     },
+  //     error: (err) => {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'Lỗi tải dữ liệu',
+  //         html: `<pre style="text-align:left;">ERR: ${JSON.stringify(err, null, 2)}</pre>`,
+  //         confirmButtonText: 'Đóng'
+  //       });
+  //     }
+  //   });
+  // }
+
+  loadChiNhanhs(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.chiNhanhService.getChiNhanhs().subscribe({
+        next: (data) => {
+          this.chiNhanhs = data;
+          if (this.treeViewComp) {
+            this.treeViewComp.buildTree(data);
+          }
+          resolve(); // ✅ báo đã xong
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Lỗi tải dữ liệu',
+            html: `<pre style="text-align:left;">ERR: ${JSON.stringify(err, null, 2)}</pre>`,
+            confirmButtonText: 'Đóng'
+          });
+          reject(err); // báo lỗi
         }
+      });
+    });
+  }
+
+  loadSettingRelease(topicId: string) {
+    this.service.getSettingRelease(topicId).subscribe({
+      next: (data) => {
+        this.topicReleases = data;
+        const selectedUsers = data
+          .filter(u => u.targetType === "NHANSU")   // chỉ lấy targetType = NHANSU
+          .map(u => ({
+            ID: u.targetId,
+            MaNhanVien: u.maNhanVien,
+            Anh: u.anh?.startsWith('http')
+              ? u.anh
+              : `https://workhub.hbm.vn${u.anh}`,
+            TenNhanVien: u.tenNhanVien,
+            TenPhongBan: u.tenPhongBan,
+            TenChucDanh: u.tenChucDanh,
+            status: 0
+          }));
+        this.searchUserComp.setSelectedUsers(selectedUsers);
+        const selectedChiNhanh = data
+          .filter(u => u.targetType === "DONVI")   // chỉ lấy targetType = DONVI
+          .map(u => ({
+            ID: u.targetId,
+          }));
+        this.treeViewComp.setSelectedNode(selectedChiNhanh);
+        // Swal.fire({
+        //   icon: 'error',
+        //   title: 'Lỗi tải dữ liệu',
+        //   html: `<pre style="text-align:left;">ERR: ${JSON.stringify(data, null, 2)}</pre>`,
+        //   confirmButtonText: 'Đóng'
+        // });
       },
       error: (err) => {
-        console.error('Lỗi khi gọi API', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi tải dữ liệu',
+          html: `<pre style="text-align:left;">ERR: ${JSON.stringify(err, null, 2)}</pre>`,
+          confirmButtonText: 'Đóng'
+        });
       }
     });
   }
+
+
 
   showChonNhanSu() {
     this.showDonvi = false;
@@ -152,7 +232,8 @@ export class TopicReleaseComponent {
       alert('Không tìm thấy userID trong localStorage!');
       return;
     }
-    const nhanSuSelecteds = this.nhanSuSelecteds || [];
+    //const nhanSuSelecteds = this.nhanSuSelecteds || [];
+    const nhanSuSelecteds = this.searchUserComp.getSelected();
     const donviSelecteds = this.treeViewComp.getSelected() || [];
     const newReleases: any[] = [
       ...donviSelecteds.map((item: any) => ({
@@ -171,11 +252,11 @@ export class TopicReleaseComponent {
       })),
     ];
     Swal.fire({
-                icon: 'error',
-                title: 'Lỗi tải dữ liệu',
-                html: `<pre style="text-align:left;">ERR: ${JSON.stringify(newReleases, null, 2)}</pre>`,
-                confirmButtonText: 'Đóng'
-              });
+      icon: 'error',
+      title: 'Lỗi tải dữ liệu',
+      html: `<pre style="text-align:left;">ERR: ${JSON.stringify(newReleases, null, 2)}</pre>`,
+      confirmButtonText: 'Đóng'
+    });
     this.service.settingRelease(newReleases).subscribe({
       next: (res) => {
         if (res.success) {   // theo ApiResponse bạn code backend

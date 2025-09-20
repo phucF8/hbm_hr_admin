@@ -44,4 +44,10 @@ export class VotingListService {
     return this.http.post<any>(`${this.apiUrl}/setting-release`, payload);
   }
 
+  getSettingRelease(topicId: string): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/get-setting-release/${topicId}`
+    );
+  }
+
 }

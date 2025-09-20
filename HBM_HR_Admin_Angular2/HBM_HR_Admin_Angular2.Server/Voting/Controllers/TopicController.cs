@@ -215,6 +215,34 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             }
         }
 
+        [HttpGet("get-setting-release/{topicId}")]
+        public async Task<ActionResult<List<TopicReleaseDto>>> GetSettingReleaseByTopicId(string topicId) {
+            var releases = await (from r in _context.BB_TopicRelease
+                                  where r.TopicId == topicId
+                                  join nv in _context.DbNhanVien
+                                      on r.TargetId equals nv.ID into nvJoin
+                                  from nv in nvJoin.DefaultIfEmpty()
+                                  select new TopicReleaseDto {
+                                      Id = r.Id,
+                                      TopicId = r.TopicId,
+                                      TargetType = r.TargetType,
+                                      TargetId = r.TargetId,
+                                      ReleasedBy = r.ReleasedBy,
+                                      Note = r.Note,
+                                      CreatedAt = r.CreatedAt,
+
+                                      Anh = r.TargetType == "NHANSU" ? nv.Anh : null,
+                                      TenNhanVien = r.TargetType == "NHANSU" ? nv.TenNhanVien : null,
+                                      TenPhongBan = r.TargetType == "NHANSU" ? nv.TenPhongBan : null,
+                                      TenChucDanh = r.TargetType == "NHANSU" ? nv.TenChucDanh : null,
+                                      MaNhanVien = r.TargetType == "NHANSU" ? nv.MaNhanVien : null
+                                  }).ToListAsync();
+
+            return Ok(releases);
+        }
+
+
+
 
     }
 

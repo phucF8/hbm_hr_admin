@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 
 })
 export class TreeNodeComponent {
+[x: string]: any;
   @Input() node!: any;
   @Input() level: number = 0;
 

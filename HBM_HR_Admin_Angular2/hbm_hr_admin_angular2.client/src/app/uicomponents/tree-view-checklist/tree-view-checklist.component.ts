@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { TreeNodeComponent } from './tree-node/tree-node.component';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { safeStringify } from '@app/utils/json-utils';
 
 export interface TreeNode {
   idParent?: string | null;
@@ -71,6 +73,26 @@ export class TreeViewChecklistComponent implements OnInit {
     });
     return selectedNodes;
   }
+
+  setSelectedNode(selectedChiNhanh: { ID: string }[]) {
+    // const firstNode = Object.values(this.allNodes)[0];
+    // Swal.fire({
+    //   icon: 'error',
+    //   title: 'Lỗi tải dữ liệu',
+    //   html: `<pre style="text-align:left;">ERR: ${safeStringify(firstNode, 2)}</pre>`,
+    //   confirmButtonText: 'Đóng'
+    // });
+    const selectedIds = new Set(selectedChiNhanh.map(x => x.ID));
+    Object.values(this.allNodes).forEach(node => {
+      if (selectedIds.has(node.tag?.id)) {
+        node.selected = true;
+      } else {
+        node.selected = false; // nếu muốn reset lại trạng thái
+      }
+    });
+  }
+
+
 
   toggleExpand(node: any) {
     node.expanded = !node.expanded;

@@ -34,3 +34,17 @@ function escapeHtml(str: string): string {
     "'": '&#39;'
   }[m]!));
 }
+
+export function safeStringify(obj: any, space: number = 2): string {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (value === null) return null;        // giữ nguyên null
+    if (typeof value === "object") {
+      if (seen.has(value)) {
+        return "[Circular]";                // tránh vòng lặp
+      }
+      seen.add(value);
+    }
+    return value;
+  }, space);
+}

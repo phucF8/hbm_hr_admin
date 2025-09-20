@@ -10,6 +10,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import { AuthService } from '@app/services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-search-user-form',
@@ -17,19 +18,19 @@ import { AuthService } from '@app/services/auth.service';
   templateUrl: './search-user-form.component.html',
   styleUrl: './search-user-form.component.css',
   imports: [
-      CommonModule, // đã bao gồm CommonModule
-      FormsModule,
-      ReactiveFormsModule,
-      MatTabsModule, // cần cho <mat-tab-group>, <mat-tab>
-      MatCheckboxModule, // cần cho <mat-checkbox>
-      MatInputModule,
-    ],
+    CommonModule, // đã bao gồm CommonModule
+    FormsModule,
+    ReactiveFormsModule,
+    MatTabsModule, // cần cho <mat-tab-group>, <mat-tab>
+    MatCheckboxModule, // cần cho <mat-checkbox>
+    MatInputModule,
+  ],
 })
 
 export class SearchUserFormComponent {
   @Input() label: string = ''; // Nhận label từ component cha
   @Output() selectedUsersChange = new EventEmitter<any[]>(); // ✅ thêm dòng này
-  
+
   searchUserForm: FormGroup;
   isFocused: boolean = false;
   showDonVisPopup: boolean = false;
@@ -63,7 +64,7 @@ export class SearchUserFormComponent {
     const token = this.authService.getToken();
     if (token) {
       var idKhoLamViec = localStorage.getItem('idKhoLamViec');
-      this.selectedDonVi = this.donvis.find(d => d.id === idKhoLamViec ) || null;
+      this.selectedDonVi = this.donvis.find(d => d.id === idKhoLamViec) || null;
     } else {
       console.warn('Chưa đăng nhập hoặc thiếu thông tin người dùng!!!');//Search user form component
     }
@@ -71,38 +72,38 @@ export class SearchUserFormComponent {
 
   onSubmit() {
     const searchValue = this.searchUserForm.value.search;
-      if (!searchValue) {
-        this.filteredUsers = []; // Đặt về null nếu không có từ khóa tìm kiếm
-        return;
-      }
-      this.isSearching = true;
-      this.filteredUsers = []; // Reset trước khi tìm kiếm
-      this.thongBaoService.searchUsers(searchValue, this.selectedDonVi?.id || '')
-        .pipe(finalize(() => this.isSearching = false)) // Đảm bảo luôn thực hiện
-        .subscribe({
-          next: (response) => {
-            this.filteredUsers = (response?.DatasLookup || []).map(user => ({
-              ID: user.ID,
-              MaNhanVien: user.MaNhanVien,
-              Anh : getFullImageUrl(user.Anh),
-              TenNhanVien: user.TenNhanVien,
-              TenPhongBan: user.TenPhongBan,
-              TenChucDanh: user.TenChucDanh,
-              status: 0 // Gán giá trị mặc định vì DoLookupData không có "status"
-            })) as MergedData[];
-          },
-          error: (error) => {
-            console.error('Lỗi tìm kiếm người dùng:', error);
-            this.filteredUsers = []; // Tránh giữ kết quả sai
-          }
-        });
+    if (!searchValue) {
+      this.filteredUsers = []; // Đặt về null nếu không có từ khóa tìm kiếm
+      return;
+    }
+    this.isSearching = true;
+    this.filteredUsers = []; // Reset trước khi tìm kiếm
+    this.thongBaoService.searchUsers(searchValue, this.selectedDonVi?.id || '')
+      .pipe(finalize(() => this.isSearching = false)) // Đảm bảo luôn thực hiện
+      .subscribe({
+        next: (response) => {
+          this.filteredUsers = (response?.DatasLookup || []).map(user => ({
+            ID: user.ID,
+            MaNhanVien: user.MaNhanVien,
+            Anh: getFullImageUrl(user.Anh),
+            TenNhanVien: user.TenNhanVien,
+            TenPhongBan: user.TenPhongBan,
+            TenChucDanh: user.TenChucDanh,
+            status: 0 // Gán giá trị mặc định vì DoLookupData không có "status"
+          })) as MergedData[];
+        },
+        error: (error) => {
+          console.error('Lỗi tìm kiếm người dùng:', error);
+          this.filteredUsers = []; // Tránh giữ kết quả sai
+        }
+      });
   }
 
   selectDonVi(item: any): void {
-      // this.donViSelected.emit(item);
-      this.selectedDonVi = item;
-      this.showDonVisPopup = false;
-    }
+    // this.donViSelected.emit(item);
+    this.selectedDonVi = item;
+    this.showDonVisPopup = false;
+  }
 
   selectUser(user: any) {
     if (!this.selectedUsers.find(u => u.ID === user.ID)) {
@@ -111,17 +112,37 @@ export class SearchUserFormComponent {
     this.searchUserForm.get('search')?.setValue(''); // Xóa nội dung tìm kiếm sau khi chọn user
     this.filteredUsers = []; // Ẩn danh sách gợi ý
     this.selectedUsersChange.emit(this.selectedUsers);
-     this.isFocused = true; // Đặt lại trạng thái focus
-
-
+    this.isFocused = true; // Đặt lại trạng thái focus
     if (this.selectedUsers.length > 0) {
       for (let i = 0; i < this.selectedUsers.length; i++) {
         const user = this.selectedUsers[i];
         console.log('SELECT User', i + 1, ':', user);
-      } 
+      }
     }
-    
+  }
 
+  // Hàm public để cha gọi
+  setSelectedUsers(users: any[]) {
+    // Swal.fire({
+    //   icon: 'error',
+    //   title: 'Lỗi tải dữ liệu',
+    //   html: `<pre style="text-align:left;">ERR: ${JSON.stringify(users, null, 2)}</pre>`,
+    //   confirmButtonText: 'Đóng'
+    // });
+    // this.selectedUsers = users.map(u => ({
+    //   ID: u.targetId,                // map từ targetId
+    //   MaNhanVien: u.maNhanVien,      // map từ maNhanVien
+    //   Anh: u.anh,
+    //   // ?.startsWith('http')
+    //   //   ? u.anh
+    //   //   : `https://workhub.hbm.vn${u.anh}`, // đảm bảo full URL
+    //   TenNhanVien: u.tenNhanVien,
+    //   TenPhongBan: u.tenPhongBan,
+    //   TenChucDanh: u.tenChucDanh,
+    //   status: 0                      // default = 0
+    // }));
+    this.selectedUsers = users;
+    // this.selectedUsersChange.emit(this.selectedUsers);
   }
 
   removeUser(user: any) {
@@ -135,10 +156,13 @@ export class SearchUserFormComponent {
     setTimeout(() => {
       this.isFocused = false;
       if (value.trim() === '') {
-        this.filteredUsers  = []; // Đặt về null nếu không có từ khóa tìm kiếm
+        this.filteredUsers = []; // Đặt về null nếu không có từ khóa tìm kiếm
       }
     }, 200); // 200ms hoặc thời gian bạn mong muốn
   }
 
+  getSelected() {
+    return this.selectedUsers;
+  }
 
 }

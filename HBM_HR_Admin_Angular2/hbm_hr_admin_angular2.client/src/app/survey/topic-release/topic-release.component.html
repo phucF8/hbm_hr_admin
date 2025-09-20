@@ -43,25 +43,22 @@
 
                     <div class="target-type" data-type="NHANSU">
                         <div class="divLabel">
-                            
-                            <label for="targetDepartment">👥 Nhân sự</label>
+                            <label for="targetDepartment">👥 Theo nhân sự</label>
                         </div>
-                        <app-search-user-form (selectedUsersChange)="nhanSuSelected($event)"
+                        <app-search-user-form #searchUserComp (selectedUsersChange)="nhanSuSelected($event)"
                             [hidden]="!showNhanSu"></app-search-user-form>
                     </div>
 
                 </div>
 
                 <div style="display: flex;">
-
                     <div class="target-type" data-type="PHONGBAN">
                         <div class="divLabel">
-                            
-                            <label for="targetDepartment">🏢 Đơn vị</label>
+                            <label for="targetDepartment">🏢 Theo chi nhánh</label>
                         </div>
                         <app-tree-view-checklist [treeData]="chiNhanhs" [hidden]="!showDonvi"></app-tree-view-checklist>
                     </div>
-                    
+
                     <!-- <ul>
                         <li *ngFor="let cn of chiNhanhs">
                             {{ cn.ma }} - {{ cn.tenChiNhanh }}
