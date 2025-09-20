@@ -5,7 +5,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TopicDetailComponent } from '@app/voting/topic-detail/topic-detail.component';
 import { TopicDetail } from '@app/voting/voting-list/responses/topic-detail.model';
 import { VotingListService } from '@app/voting/voting-list/voting-list.service';
-import { ToastrService } from 'ngx-toastr';
 
 import { MatTabGroup } from '@angular/material/tabs';
 
@@ -17,6 +16,10 @@ import { ChiNhanh, ChiNhanhService } from '@app/services/chi-nhanh.service';
 import { TreeViewChecklistComponent } from "@app/uicomponents/tree-view-checklist/tree-view-checklist.component";
 import { SearchUserFormComponent } from '@app/uicomponents/search-user-form/search-user-form.component';
 import Swal from 'sweetalert2';
+import { safeStringify } from '@app/utils/json-utils';
+import { ToastrService } from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
+import { showApiBusinessError, showApiError } from '@app/utils/error-handler';
 
 
 @Component({
@@ -65,7 +68,7 @@ export class TopicReleaseComponent {
   @ViewChild('searchUserComp') searchUserComp!: SearchUserFormComponent;
 
   constructor(
-    // private toastr: ToastrService,
+    private toastr: ToastrService,
     private service: VotingListService,
     private chiNhanhService: ChiNhanhService,
     private fb: FormBuilder,
@@ -251,27 +254,23 @@ export class TopicReleaseComponent {
         note: null,
       })),
     ];
-    Swal.fire({
-      icon: 'error',
-      title: 'Lỗi tải dữ liệu',
-      html: `<pre style="text-align:left;">ERR: ${JSON.stringify(newReleases, null, 2)}</pre>`,
-      confirmButtonText: 'Đóng'
-    });
-    this.service.settingRelease(newReleases).subscribe({
+    // Swal.fire({
+    //   icon: 'error',
+    //   title: 'Lỗi tải dữ liệu',
+    //   html: `<pre style="text-align:left;">ERR: ${JSON.stringify(newReleases, null, 2)}</pre>`,
+    //   confirmButtonText: 'Đóng'
+    // });
+    this.service.settingRelease(this.topic.id,newReleases).subscribe({
       next: (res) => {
-        if (res.success) {   // theo ApiResponse bạn code backend
-          alert('Phát hành thành công!');
+        if (res.status === 'SUCCESS') {
+          this.toastr.success('', res.message || 'Lưu thiết lập thành công');
           this.dialogRef.close(newReleases);
         } else {
-          alert('Phát hành thất bại: ' + res.message);
+          showApiBusinessError(res.message,'Lưu tiết lập thất bại');
         }
       },
-      error: (err) => {
-        const errorMsg =
-          err?.error?.message ||
-          err?.message ||
-          'Đã xảy ra lỗi không xác định';
-        alert('Lỗi phát hành: ' + errorMsg);
+      error: (err: HttpErrorResponse) => {
+        showApiError(err, 'Lưu thiết lập thất bại');
       }
     });
   }
@@ -287,3 +286,5 @@ export class TopicReleaseComponent {
 
 
 }
+
+

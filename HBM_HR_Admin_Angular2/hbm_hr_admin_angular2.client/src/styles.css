@@ -153,7 +153,6 @@ body {
 .search-box {
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 16px;
@@ -465,4 +464,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-mdc-dialog-surface {
   background-color: transparent !important;
   color: #000; /* nếu muốn text rõ hơn */
+}
+
+
+
+.swal2-border-api {
+  border: 2px solid #c0392b;
+  border-radius: 8px;
+}
+
+.swal2-border-business {
+  border: 2px solid #e67e22;
+  border-radius: 12px;
 }

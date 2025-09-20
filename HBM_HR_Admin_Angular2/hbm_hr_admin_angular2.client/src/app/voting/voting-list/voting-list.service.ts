@@ -40,8 +40,8 @@ export class VotingListService {
   }
 
   //gửi thiết lập phát hành lên server
-  settingRelease(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/setting-release`, payload);
+  settingRelease(topicId: string, payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/setting-release/${topicId}`, payload);
   }
 
   getSettingRelease(topicId: string): Observable<any[]> {

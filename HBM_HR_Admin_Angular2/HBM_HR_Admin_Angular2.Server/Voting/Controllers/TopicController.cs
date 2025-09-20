@@ -202,14 +202,11 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(ApiResponse<object>.Success(data: topics,message:""));
         }
 
-        [HttpPost("setting-release")]
-        public async Task<IActionResult> SettingRelease([FromBody] List<TopicReleaseRequest> requests) {
-            if (requests == null || !requests.Any())
-                return BadRequest(ApiResponse<string>.Error("Danh sách dữ liệu không hợp lệ"));
-
+        [HttpPost("setting-release/{topicId}")]
+        public async Task<IActionResult> SettingRelease(string topicId, [FromBody] List<TopicReleaseRequest> requests) {
             try {
-                var release = await _service.SettingReleaseAsync(requests);
-                return Ok(ApiResponse<object>.Success(release, "Phát hành thành công"));
+                var release = await _service.SettingReleaseAsync(topicId, requests);
+                return Ok(ApiResponse<object>.Success(release, "Lưu thiết lập thành công!"));
             } catch (Exception ex) {
                 return StatusCode(500, ApiResponse<string>.Error("Lỗi hệ thống: " + ex.Message));
             }

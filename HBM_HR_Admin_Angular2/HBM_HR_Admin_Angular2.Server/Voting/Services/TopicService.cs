@@ -191,18 +191,15 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<object> SettingReleaseAsync(List<TopicReleaseRequest> requests) {
+        public async Task<object> SettingReleaseAsync(string topicId, List<TopicReleaseRequest> requests) {
             var results = new List<object>();
-            if (requests == null || !requests.Any())
-                return results;
-            var topicId = requests.First().TopicId;
             // Xoá tất cả record cũ theo TopicId
             var oldRecords = _context.BB_TopicRelease.Where(x => x.TopicId == topicId);
             _context.BB_TopicRelease.RemoveRange(oldRecords);
             // Thêm record mới
             foreach (var req in requests) {
                 var entity = new BB_TopicRelease {
-                    TopicId = req.TopicId,
+                    TopicId = topicId, // sử dụng topicId truyền vào
                     TargetType = req.TargetType,
                     TargetId = req.TargetId,
                     ReleasedBy = req.ReleasedBy,
@@ -215,6 +212,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Services {
             await _context.SaveChangesAsync();
             return results;
         }
+
 
     }
 
