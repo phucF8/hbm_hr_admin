@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { formatDateTime } from './datetime-utils';
+import { safeStringify } from './json-utils';
 
 export function showApiError(err: any, title: string = 'Lỗi') {
   const apiMessage = err?.error?.message;
@@ -22,8 +23,6 @@ export function showApiError(err: any, title: string = 'Lỗi') {
     }
   });
 }
-
-
 
 export function showApiBusinessError(
   message: string,
@@ -48,3 +47,12 @@ export function showApiBusinessError(
   });
 }
 
+export function showJsonDebug(data: any) {
+  Swal.fire({
+    icon: 'info',
+    title: 'DEBUG',
+    html: `<pre style="text-align:left; font-family: monospace; font-size: 0.85em; white-space: pre-wrap;">${safeStringify(data)}</pre>`,
+    confirmButtonText: 'Đóng',
+    width: 600,
+  });
+}

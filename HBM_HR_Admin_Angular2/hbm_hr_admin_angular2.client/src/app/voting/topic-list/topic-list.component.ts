@@ -66,8 +66,9 @@ export class TopicListComponent implements OnInit {
 
 
   fetchTopics() {
-    const userId = localStorage.getItem('userID') || '';
-    this.votingService.getTopicsByUser(userId).subscribe({
+    const userId = localStorage.getItem('id') || '';
+    const idKhoLamViec = localStorage.getItem('idKhoLamViec') || '';
+    this.votingService.getTopicsByUser(userId,idKhoLamViec).subscribe({
       next: (res) => {
         this.loading = false;
         if (res.status === 'SUCCESS') {

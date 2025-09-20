@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
 import { ApiResponse } from '@app/voting/voting-list/responses/api-response.model';
+import Swal from 'sweetalert2';
+import { showJsonDebug } from '@app/utils/error-handler';
 
 export interface Topic {
   id: string;
@@ -25,7 +27,7 @@ export interface UserAnswerRequest {
   providedIn: 'root'
 })
 export class VotingService {
-  
+
   private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
@@ -40,7 +42,7 @@ export class VotingService {
     const url = `${this.baseUrl}/topics/review/${topicId}/${userId}`;
     return this.http.get<any>(url);
   }
-  
+
   getSurveyDetailReport(topicId: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/topics/survey-detail-report/${topicId}`);
   }
@@ -55,13 +57,21 @@ export class VotingService {
   }
 
   /** 🔹 Lấy danh sách topic theo userId */
-  getTopicsByUser(userId: string): Observable<ApiResponse<Topic[]>> {
-    const url = `${this.baseUrl}/topics/topic-list/${userId}`;
+  getTopicsByUser(userId: string, idKhoLamViec: string): Observable<ApiResponse<Topic[]>> {
+    const url = `${this.baseUrl}/topics/topic-list`;
     const token = localStorage.getItem('access_token');
     if (!token) {
       throw new Error('No access token found');
     }
-    return this.http.get<ApiResponse<Topic[]>>(url);
+
+    const body = {
+      userId: userId,
+      idKhoLamViec: idKhoLamViec,
+    };
+
+    showJsonDebug(body);
+
+    return this.http.post<ApiResponse<Topic[]>>(url, body);
   }
 
 

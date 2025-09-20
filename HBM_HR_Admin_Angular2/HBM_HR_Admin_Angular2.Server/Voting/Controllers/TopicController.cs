@@ -181,25 +181,27 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(new { status = "SUCCESS", message = "Lưu câu trả lời thành công" });
         }
 
-        [HttpGet("topic-list/{userId}")]
-        public async Task<ActionResult<IEnumerable<TopicDto>>> GetTopics(string userId)
-        {
+        [HttpPost("topic-list")]
+        public async Task<ActionResult<IEnumerable<TopicDto>>> GetTopics([FromBody] GetTopicsRequest request) {
             var topics = await _context.Topics
-                .Select(t => new TopicDto
-                {
+                .Where(t => _context.BB_TopicRelease.Any(r =>
+                    r.TopicId == t.Id &&
+                    ((r.TargetType == "NHANSU" && r.TargetId == request.UserId) ||
+                     (r.TargetType == "DONVI" && r.TargetId == request.IdKhoLamViec))
+                ))
+                .Select(t => new TopicDto {
                     Id = t.Id,
                     Title = t.Title,
                     Description = t.Description,
                     StartDate = t.StartDate,
                     EndDate = t.EndDate,
                     HasAnswered = _context.BB_UserAnswers
-                        .Any(ua => ua.UserId == userId
+                        .Any(ua => ua.UserId == request.UserId
                                    && _context.Questions
                                        .Any(q => q.Id == ua.QuestionId && q.TopicId == t.Id))
                 })
                 .ToListAsync();
-
-            return Ok(ApiResponse<object>.Success(data: topics,message:""));
+            return Ok(ApiResponse<object>.Success(data: topics, message: ""));
         }
 
         [HttpPost("setting-release/{topicId}")]
