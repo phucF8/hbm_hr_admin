@@ -254,7 +254,7 @@ export class TopicReleaseComponent {
         note: null,
       })),
     ];
-    showJsonDebug(body);
+    // showJsonDebug(body);
     this.service.settingRelease(this.topic.id,body).subscribe({
       next: (res) => {
         if (res.status === 'SUCCESS') {

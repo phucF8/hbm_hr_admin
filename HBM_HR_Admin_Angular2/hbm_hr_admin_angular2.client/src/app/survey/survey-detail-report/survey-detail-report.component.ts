@@ -1,4 +1,6 @@
 import { CommonModule } from '@angular/common';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -6,6 +8,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorService } from '@app/services/error.service';
 import { VotingService } from '@app/services/voting.service';
+import { showJsonDebug } from '@app/utils/error-handler';
 import Swal from 'sweetalert2';
 
 interface OptionDto {
@@ -83,6 +86,7 @@ export class SurveyDetailReportComponent implements OnInit {
       next: (res) => {
         if (res.status === 'SUCCESS') {
           this.topicReport = res.data;
+          showJsonDebug(this.topicReport);
         } else {
           this.errorService.showError([res.message || 'Không tải được báo cáo']);
         }
@@ -100,6 +104,52 @@ export class SurveyDetailReportComponent implements OnInit {
         });
       }
     });
+  }
+
+  exportToExcel() {
+    this._exportToExcel(this.topicReport);
+  }
+
+  _exportToExcel(topicReport: any) {
+    // Chuẩn bị dữ liệu để xuất
+    const exportData: any[] = [];
+
+    // Thêm thông tin chung
+    exportData.push({
+      'Chủ đề': topicReport.title,
+      'Mô tả': topicReport.description,
+      'Ngày bắt đầu': topicReport.startDate,
+      'Ngày kết thúc': topicReport.endDate,
+      'Tổng người trả lời': topicReport.totalParticipants
+    });
+
+    exportData.push({}); // dòng trống
+
+    // Thêm danh sách câu hỏi + lựa chọn
+    topicReport.questions.forEach((q: any, index: number) => {
+      exportData.push({ 'Câu hỏi': `${index + 1}. ${q.content}` });
+
+      q.options.forEach((opt: any) => {
+        exportData.push({
+          '  Lựa chọn': opt.content,
+          '  Số người chọn': opt.selectedCount
+        });
+      });
+
+      exportData.push({}); // dòng trống sau mỗi câu hỏi
+    });
+
+    // Tạo worksheet và workbook
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Báo cáo': worksheet },
+      SheetNames: ['Báo cáo']
+    };
+
+    // Xuất file
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const data: Blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    FileSaver.saveAs(data, `${topicReport.title}.xlsx`);
   }
 
   getOptionPercentage(

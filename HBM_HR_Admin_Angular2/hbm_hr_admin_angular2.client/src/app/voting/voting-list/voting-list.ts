@@ -61,7 +61,7 @@ export class VotingList {
     // this.loadingService.show();
     this.service.getList().subscribe({
       next: (data) => {
-        showJsonDebug(data);
+        // showJsonDebug(data);
         this.listItem = data;
       },
       error: (error) => {

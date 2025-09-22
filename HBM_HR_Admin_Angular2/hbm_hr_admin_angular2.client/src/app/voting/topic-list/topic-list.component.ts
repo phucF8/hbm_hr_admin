@@ -71,7 +71,7 @@ export class TopicListComponent implements OnInit {
         this.loading = false;
         if (res.status === 'SUCCESS') {
           this.topics = res.data;
-          showJsonDebug(res.data);
+          // showJsonDebug(res.data);
         } else {
           showApiBusinessError(res.message, 'Tải danh sách phiếu điều tra thất bại');
         }

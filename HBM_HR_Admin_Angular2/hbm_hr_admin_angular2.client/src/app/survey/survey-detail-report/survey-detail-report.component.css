@@ -312,3 +312,19 @@
     margin: 0;
   }
 }
+
+
+.export-btn {
+  background-color: #28a745; /* xanh lá */
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.export-btn:hover {
+  background-color: #218838;
+}

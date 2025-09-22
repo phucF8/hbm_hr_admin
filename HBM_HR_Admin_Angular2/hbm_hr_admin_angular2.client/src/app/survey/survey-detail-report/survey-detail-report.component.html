@@ -13,6 +13,11 @@
         <div class="header-meta">Tổng người trả lời: {{topicReport.totalParticipants}} • Ngày tạo:
           {{topicReport.startDate | date: 'dd/MM/yyyy' }}</div>
       </div>
+
+      <button class="export-btn" (click)="exportToExcel()">
+        Xuất Excel
+      </button>
+
     </div>
 
     <div *ngFor="let q of topicReport.questions">
