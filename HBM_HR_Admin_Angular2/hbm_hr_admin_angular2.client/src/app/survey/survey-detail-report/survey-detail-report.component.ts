@@ -135,6 +135,7 @@ export class SurveyDetailReportComponent implements OnInit {
           cell.value = cell.value
             .replace('{{title}}', topicReport.title ?? '')
             .replace('{{description}}', topicReport.description ?? '')
+            .replace('{{totalParticip}}', String(topicReport.totalParticipants))
             .replace('{{startDate}}', topicReport.startDate ? new Date(topicReport.startDate).toLocaleDateString('vi-VN') : '')
             .replace('{{endDate}}', topicReport.endDate ? new Date(topicReport.endDate).toLocaleDateString('vi-VN') : '');
         }
@@ -170,30 +171,43 @@ export class SurveyDetailReportComponent implements OnInit {
         })
         let blockOpt = getBlockRows(worksheet, 'options');
         if (blockOpt) {
-          ques.options.forEach((opt, index) => {
-            let newBlockOpt
-            if (index < ques.options.length - 1) {
-              newBlockOpt = insertBlockRows(
-                worksheet,
-                findRowIndexByKey(worksheet, '/options'),
-                blockOpt!.rows
-              )
-            }
-            // worksheet.spliceRows(findRowIndexByKey(worksheet, '#options'), 1);
-            // worksheet.spliceRows(findRowIndexByKey(worksheet, '/options'), 1);
+          if (ques.options.length > 0) {
+            ques.options.forEach((opt, index) => {
+              let newBlockOpt
+              if (index < ques.options.length - 1) {
+                newBlockOpt = insertBlockRows(
+                  worksheet,
+                  findRowIndexByKey(worksheet, '/options'),
+                  blockOpt!.rows
+                )
+              }
+              // worksheet.spliceRows(findRowIndexByKey(worksheet, '#options'), 1);
+              // worksheet.spliceRows(findRowIndexByKey(worksheet, '/options'), 1);
+              blockOpt!.rows.forEach((row) => {
+                row.eachCell((cell) => {
+                  if (typeof cell.value === 'string') {
+                    cell.value = cell.value.replace('{{optionContent}}', opt.content ?? '');
+                    cell.value = cell.value.replace('{{selectedCount}}', String(opt.selectedCount ?? ''));
+                    cell.value = cell.value.replace('{{#options}}', '');
+                    cell.value = cell.value.replace('{{/options}}', '');
+                  }
+                });
+              });
+              if (newBlockOpt)
+                blockOpt = newBlockOpt;
+            })
+          } else {
             blockOpt!.rows.forEach((row) => {
               row.eachCell((cell) => {
                 if (typeof cell.value === 'string') {
-                  cell.value = cell.value.replace('{{optionContent}}', opt.content ?? '');
-                  cell.value = cell.value.replace('{{selectedCount}}', String(opt.selectedCount ?? ''));
+                  cell.value = cell.value.replace('{{optionContent}}','Tự luận');
+                  cell.value = cell.value.replace('{{selectedCount}}',String(ques.essayAnswers.length));
                   cell.value = cell.value.replace('{{#options}}', '');
                   cell.value = cell.value.replace('{{/options}}', '');
                 }
               });
             });
-            if (newBlockOpt)
-              blockOpt = newBlockOpt;
-          })
+          }
         }
         // 3. Cập nhật lại blockQues để chèn tiếp
         if (newBlockQues)
