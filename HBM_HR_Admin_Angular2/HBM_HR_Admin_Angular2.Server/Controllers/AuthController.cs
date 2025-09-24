@@ -43,6 +43,25 @@
                 return Unauthorized(new { message = hrResult?.Message ?? "Invalid username or password" });
             }
             var nhanVien = hrResult.DataSets?.Table?.FirstOrDefault();// Lấy thông tin nhân viên từ API HR
+            var existingUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == request.Username);
+            if (existingUser == null) {
+                // Tạo mới record
+                var newUser = new User {
+                    Id = Guid.NewGuid(),
+                    Username = request.Username,
+                    FullName = nhanVien?.TenNhanVien ?? "",
+                    AvatarUrl = nhanVien?.Anh,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Users.Add(newUser);
+                await _context.SaveChangesAsync();
+            } else {
+                // Nếu muốn, có thể update FullName/AvatarUrl
+                existingUser.FullName = nhanVien?.TenNhanVien ?? existingUser.FullName;
+                existingUser.AvatarUrl = nhanVien?.Anh ?? existingUser.AvatarUrl;
+                await _context.SaveChangesAsync();
+            }
             var token = await GenerateJwtToken(request.Username, nhanVien);// Nếu login HR thành công -> tạo JWT riêng
             return Ok(new
             {
