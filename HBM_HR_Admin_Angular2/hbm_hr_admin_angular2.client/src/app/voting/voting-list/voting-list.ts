@@ -254,6 +254,35 @@ export class VotingList {
     });
   }
 
+  /** Huỷ phát hành phiếu điều tra */
+  onCancelPublish(tb: any): void {
+  Swal.fire({
+    title: 'Xác nhận huỷ phát hành?',
+    text: 'Bạn có chắc muốn huỷ phát hành phiếu điều tra này?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Huỷ phát hành',
+    cancelButtonText: 'Đóng'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const request: PublishTopicRequest = {
+        topicId: tb.id,
+        userId: localStorage.getItem('userID') ?? '',
+        note: ''
+      };
+
+      this.topicService.cancelPublishTopic(request).subscribe(result => {
+        if (result.status === 'SUCCESS') {
+          this.loadList();
+        } else {
+        }
+      });
+    }
+  });
+}
+
+
+  
 
 
 }

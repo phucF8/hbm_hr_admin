@@ -105,7 +105,7 @@
                 <span *ngIf="tb.status === 1" class="badge bg-warning">Sửa đổi</span>
                 <span *ngIf="tb.status === 2" class="badge bg-danger">Phát hành</span>
                 <span *ngIf="tb.status === 3" class="badge bg-info">Huỷ phát hành</span>
-                
+
               </td>
               <td>
                 <div class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">
@@ -124,9 +124,16 @@
                       <div class="menu-text">Thiết lập phát hành</div>
                     </div>
 
-                    <div class="menu-item view" (click)="onPublish(tb)">
+                    <div class="menu-item view" (click)="tb.status === 2 ? onCancelPublish(tb) : onPublish(tb)">
 
-                      <div class="menu-text">🚀 Phát hành</div>
+                      <div class="menu-text">
+                        <ng-container *ngIf="tb.status === 2; else publishText">
+                          ❌ Huỷ phát hành
+                        </ng-container>
+                        <ng-template #publishText>
+                          🚀 Phát hành
+                        </ng-template>
+                      </div>
                     </div>
 
                     <div class="menu-item view" (click)="report(tb.id)">

@@ -26,6 +26,7 @@
     "file-saver": "^2.0.5",
     "flatpickr": "^4.6.13",
     "jest-editor-support": "*",
+    "jwt-decode": "^4.0.0",
     "md5": "^2.3.0",
     "ngx-editor": "^19.0.0-beta.1",
     "ngx-quill": "^27.0.2",

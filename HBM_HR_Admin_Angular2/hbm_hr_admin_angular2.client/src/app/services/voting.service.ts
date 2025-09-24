@@ -113,5 +113,24 @@ export class VotingService {
     );
   }
 
+  cancelPublishTopic(request: PublishTopicRequest): Observable<any> {
+    // showJsonDebug(request);
+    return this.http.post<any>(`${this.baseUrl}/topics/cancel-publish`, request).pipe(
+      map((res) => {
+        // showJsonDebug(res)
+        if (res.status === 'SUCCESS') {
+          this.toastr.success('', res.message || 'Phiếu điều tra đã được huỷ phát hành.');
+        } else {
+          showApiBusinessError(res.message, 'Không thể huỷ phát hành. Vui lòng thử lại');
+        }
+        return res;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        showApiError(err, 'Không thể huỷ phát hành. Vui lòng thử lại');
+        return throwError(() => err);
+      })
+    );
+  }
+
 
 }

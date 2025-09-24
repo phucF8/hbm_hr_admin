@@ -16,6 +16,7 @@ import { SurveyDetailReportComponent } from './survey/survey-detail-report/surve
 import { TopicReleaseComponent } from './survey/topic-release/topic-release.component';
 import { TreeViewChecklistComponent } from './uicomponents/tree-view-checklist/tree-view-checklist.component';
 import { CompAComponent } from './demo/comp-a/comp-a.component';
+import { AdminGuard } from './guards/admin.guard';
 
 export const ROUTE_PATHS = {
   login: 'login',
@@ -28,6 +29,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: MainLayoutComponent,
+    canActivate: [AdminGuard], // chỉ admin mới vào
     children: [
       { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
       {
@@ -58,13 +60,14 @@ export const routes: Routes = [
   {
     path: '',
     component: UserLayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'topic-list', pathMatch: 'full' },
       { path: ROUTE_PATHS.topic_list, component: TopicListComponent },
   //     { path: 'voting/:topicId', component: VotePageComponent },
   //     { path: 'survey-review/:topicId', component: SurveyReviewComponent },
     ],
-    canActivate: [AuthGuard]
+    
   },
 
   // {

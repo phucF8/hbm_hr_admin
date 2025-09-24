@@ -254,6 +254,29 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers {
             });
         }
 
+        // POST: api/topics/cancel-publish
+        [HttpPost("cancel-publish")]
+        public async Task<IActionResult> CancelPublish([FromBody] PublishTopicRequest request) {
+            var topic = await _context.Topics.FindAsync(request.TopicId);
+            if (topic == null) {
+                return NotFound(new {
+                    status = "ERROR",
+                    message = "Không tìm thấy topic."
+                });
+            }
+
+            // Giả sử status = 1 (đang phát hành), status = 0 (chưa phát hành / huỷ phát hành)
+            topic.Status = 3;
+            topic.UpdatedBy = request.UserId;
+            topic.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new {
+                status = "SUCCESS",
+                message = "Huỷ phát hành thành công."
+            });
+        }
 
 
 
