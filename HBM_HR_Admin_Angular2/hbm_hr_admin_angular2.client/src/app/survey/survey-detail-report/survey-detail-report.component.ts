@@ -114,111 +114,303 @@ export class SurveyDetailReportComponent implements OnInit {
     this.exportReport(this.topicReport!);
   }
 
-
-
-  async exportReport(topicReport: TopicReportDto) {
-    // 1. Load file template
-    const response = await fetch('/assets/template.xlsx');
-    if (!response.ok) {
-      alert(`Không tìm thấy template.xlsx`);
-      return;
-    }
+  /**Hàm load template */
+  async loadTemplate(path: string): Promise<ExcelJS.Workbook> {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(`Không tìm thấy ${path}`);
     const arrayBuffer = await response.arrayBuffer();
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(arrayBuffer);
-    const worksheet = workbook.worksheets[0];
+    return workbook;
+  }
 
-    // 2. Thay thế field đơn
+  /**Hàm thay thế field đơn (flat placeholders) */
+  replaceSimpleFields(worksheet: ExcelJS.Worksheet, data: Record<string, any>) {
     worksheet.eachRow((row) => {
       row.eachCell((cell) => {
         if (typeof cell.value === 'string') {
-          cell.value = cell.value
-            .replace('{{title}}', topicReport.title ?? '')
-            .replace('{{description}}', topicReport.description ?? '')
-            .replace('{{totalParticip}}', String(topicReport.totalParticipants))
-            .replace('{{startDate}}', topicReport.startDate ? new Date(topicReport.startDate).toLocaleDateString('vi-VN') : '')
-            .replace('{{endDate}}', topicReport.endDate ? new Date(topicReport.endDate).toLocaleDateString('vi-VN') : '');
+          Object.keys(data).forEach((key) => {
+            const placeholder = `{{${key}}}`;
+            cell.value = (cell.value as string).replace(placeholder, String(data[key] ?? ''));
+          });
         }
       });
     });
+  }
 
-    //xác định khối nhiều dòng bởi key
-    let blockQues = getBlockRows(worksheet, 'questions');
-    if (blockQues) {
-      topicReport.questions.forEach((ques, index) => {
-        // 1. Chỉ insert nếu chưa phải phần tử cuối
-        let newBlockQues
-        if (index < topicReport.questions.length - 1) {
-          newBlockQues = insertBlockRows(
+  fillBlock(
+    worksheet: ExcelJS.Worksheet,
+    key: string,
+    items: any[],
+  ) {
+    let block = getBlockRows(worksheet, key);
+    if (!block) return;
+
+    items.forEach((item, index) => {
+      let newBlock;
+      if (index < items.length - 1) {
+        newBlock = insertBlockRows(
+          worksheet,
+          findRowIndexByKey(worksheet, `/${key}`),
+          block!.rows
+        );
+      }
+
+      // Thay giá trị cho block hiện tại
+      block!.rows.forEach((row) => {
+        row.eachCell((cell) => {
+          if (typeof cell.value === 'string') {
+            // Thay các field đơn trong item
+            Object.keys(item).forEach((k) => {
+              const placeholder = `{{${k}}}`;
+              const val = Array.isArray(item[k]) ? '' : String(item[k] ?? '');
+              cell.value = (cell.value as string).replace(placeholder, val);
+            });
+
+            // Xoá marker block
+            cell.value = (cell.value as string)
+              .replace(`{{#${key}}}`, '')
+              .replace(`{{/${key}}}`, '');
+          }
+        });
+      });
+
+      // Đệ quy cho field mảng con
+      Object.keys(item).forEach((k) => {
+        if (Array.isArray(item[k])) {
+          this.fillBlock(worksheet, k, item[k]); // xử lý lồng nhau
+        }
+      });
+
+      if (newBlock) block = newBlock;
+    });
+  }
+
+  buildReportData(topicReport: TopicReportDto) {
+    if (!topicReport) return;
+    return {
+      title: topicReport.title ?? '',
+      description: topicReport.description ?? '',
+      totalParticip: String(topicReport.totalParticipants),
+      startDate: topicReport.startDate
+        ? new Date(topicReport.startDate).toLocaleDateString('vi-VN')
+        : '',
+      endDate: topicReport.endDate
+        ? new Date(topicReport.endDate).toLocaleDateString('vi-VN')
+        : '',
+      questions: topicReport.questions.map((q) => ({
+        questionContent: q.content ?? '',
+        options: q.options.length
+          ? q.options.map((o) => ({
+            optionContent: o.content ?? '',
+            selectedCount: String(o.selectedCount ?? ''),
+          }))
+          : [
+            {
+              optionContent: 'Tự luận',
+              selectedCount: String(q.essayAnswers.length),
+            },
+          ],
+      })),
+    };
+  }
+
+  fillBlockRecursive(
+    worksheet: ExcelJS.Worksheet,
+    key: string,
+    data: any
+  ) {
+    const block = getBlockRows(worksheet, key);
+    if (!block) return;
+
+    if (Array.isArray(data)) {
+      data.forEach((item, index) => {
+        let newBlock: typeof block | null = null;
+        if (index < data.length - 1) {
+          newBlock = insertBlockRows(
             worksheet,
-            findRowIndexByKey(worksheet, '/questions'),
-            blockQues!.rows
+            block.endRow,
+            block.rows
           );
         }
 
-        // worksheet.spliceRows(findRowIndexByKey(worksheet, '#questions'), 1);
-        // worksheet.spliceRows(findRowIndexByKey(worksheet, '/questions'), 1);
-
-        // 2. Replace placeholder trong block vừa chèn
-        blockQues!.rows.forEach((row) => {
-          row.eachCell((cell) => {
-            if (typeof cell.value === 'string') {
-              cell.value = cell.value.replace('{{questionContent}}', ques.content ?? '');
-              cell.value = cell.value.replace('{{#questions}}', '');
-              cell.value = cell.value.replace('{{/questions}}', '');
-            }
-          });
-        })
-        let blockOpt = getBlockRows(worksheet, 'options');
-        if (blockOpt) {
-          if (ques.options.length > 0) {
-            ques.options.forEach((opt, index) => {
-              let newBlockOpt
-              if (index < ques.options.length - 1) {
-                newBlockOpt = insertBlockRows(
-                  worksheet,
-                  findRowIndexByKey(worksheet, '/options'),
-                  blockOpt!.rows
-                )
-              }
-              // worksheet.spliceRows(findRowIndexByKey(worksheet, '#options'), 1);
-              // worksheet.spliceRows(findRowIndexByKey(worksheet, '/options'), 1);
-              blockOpt!.rows.forEach((row) => {
-                row.eachCell((cell) => {
-                  if (typeof cell.value === 'string') {
-                    cell.value = cell.value.replace('{{optionContent}}', opt.content ?? '');
-                    cell.value = cell.value.replace('{{selectedCount}}', String(opt.selectedCount ?? ''));
-                    cell.value = cell.value.replace('{{#options}}', '');
-                    cell.value = cell.value.replace('{{/options}}', '');
-                  }
-                });
-              });
-              if (newBlockOpt)
-                blockOpt = newBlockOpt;
-            })
-          } else {
-            blockOpt!.rows.forEach((row) => {
-              row.eachCell((cell) => {
-                if (typeof cell.value === 'string') {
-                  cell.value = cell.value.replace('{{optionContent}}','Tự luận');
-                  cell.value = cell.value.replace('{{selectedCount}}',String(ques.essayAnswers.length));
-                  cell.value = cell.value.replace('{{#options}}', '');
-                  cell.value = cell.value.replace('{{/options}}', '');
-                }
-              });
-            });
-          }
+        this.fillBlockRecursive(worksheet, key, item);
+        if (newBlock) {
+          block.rows = newBlock.rows;
         }
-        // 3. Cập nhật lại blockQues để chèn tiếp
-        if (newBlockQues)
-          blockQues = newBlockQues;
-      })
+      });
+    } else if (typeof data === 'object') {
+      block.rows.forEach((row) => {
+        row.eachCell((cell) => {
+          if (typeof cell.value === 'string') {
+            // thay thế field đơn
+            Object.keys(data).forEach((k) => {
+              if (typeof data[k] !== 'object') {
+                const placeholder = `{{${key}.${k}}}`;
+                cell.value = (cell.value as string).replace(
+                  placeholder,
+                  String(data[k] ?? '')
+                );
+              }
+            });
+
+            // bỏ marker
+            cell.value = (cell.value as string)
+              .replace(`{{#${key}}}`, '')
+              .replace(`{{/${key}}}`, '');
+          }
+        });
+      });
+
+      // tiếp tục đệ quy cho nested object/array
+      Object.keys(data).forEach((k) => {
+        if (typeof data[k] === 'object') {
+          this.fillBlockRecursive(worksheet, k, data[k]);
+        }
+      });
     }
+  }
+
+  async exportReport(topicReport: TopicReportDto) {
+    // 1. Load template
+    const workbook = await this.loadTemplate('/assets/template.xlsx');
+    const worksheet = workbook.worksheets[0];
+
+    // 2. Thay thế field đơn
+    this.replaceSimpleFields(worksheet, {
+      title: topicReport.title,
+      description: topicReport.description,
+      totalParticip: topicReport.totalParticipants,
+      startDate: topicReport.startDate ? new Date(topicReport.startDate).toLocaleDateString('vi-VN') : '',
+      endDate: topicReport.endDate ? new Date(topicReport.endDate).toLocaleDateString('vi-VN') : ''
+    });
+
+    // 3. Đổ dữ liệu cho các block mảng
+    // this.fillBlock(worksheet, 'questions', topicReport.questions);
+
+    // 2. Chuẩn hóa dữ liệu
+    const reportData = this.buildReportData(topicReport);
+    if (!reportData) return;
+
+    // 3. Fill dữ liệu
+
+    this.fillBlock(worksheet,'questions',reportData.questions);
+
+    // this.fillBlockRecursive(worksheet, 'title', reportData.title);
+    // this.fillBlockRecursive(worksheet, 'description', reportData.description);
+    // this.fillBlockRecursive(worksheet, 'totalParticip', reportData.totalParticip);
+    // this.fillBlockRecursive(worksheet, 'startDate', reportData.startDate);
+    // this.fillBlockRecursive(worksheet, 'endDate', reportData.endDate);
+    // this.fillBlockRecursive(worksheet, 'questions', reportData.questions);
 
     // 4. Xuất file
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), 'BaoCao.xlsx');
   }
+
+  // async exportReport(topicReport: TopicReportDto) {
+  //   // 1. Load file template
+  //   const response = await fetch('/assets/template.xlsx');
+  //   if (!response.ok) {
+  //     alert(`Không tìm thấy template.xlsx`);
+  //     return;
+  //   }
+  //   const arrayBuffer = await response.arrayBuffer();
+  //   const workbook = new ExcelJS.Workbook();
+  //   await workbook.xlsx.load(arrayBuffer);
+  //   const worksheet = workbook.worksheets[0];
+
+  //   // 2. Thay thế field đơn
+  //   worksheet.eachRow((row) => {
+  //     row.eachCell((cell) => {
+  //       if (typeof cell.value === 'string') {
+  //         cell.value = cell.value
+  //           .replace('{{title}}', topicReport.title ?? '')
+  //           .replace('{{description}}', topicReport.description ?? '')
+  //           .replace('{{totalParticip}}', String(topicReport.totalParticipants))
+  //           .replace('{{startDate}}', topicReport.startDate ? new Date(topicReport.startDate).toLocaleDateString('vi-VN') : '')
+  //           .replace('{{endDate}}', topicReport.endDate ? new Date(topicReport.endDate).toLocaleDateString('vi-VN') : '');
+  //       }
+  //     });
+  //   });
+
+  //   //xác định khối nhiều dòng bởi key
+  //   let blockQues = getBlockRows(worksheet, 'questions');
+  //   if (blockQues) {
+  //     topicReport.questions.forEach((ques, index) => {
+  //       // 1. Chỉ insert nếu chưa phải phần tử cuối
+  //       let newBlockQues
+  //       if (index < topicReport.questions.length - 1) {
+  //         newBlockQues = insertBlockRows(
+  //           worksheet,
+  //           findRowIndexByKey(worksheet, '/questions'),
+  //           blockQues!.rows
+  //         );
+  //       }
+
+  //       // worksheet.spliceRows(findRowIndexByKey(worksheet, '#questions'), 1);
+  //       // worksheet.spliceRows(findRowIndexByKey(worksheet, '/questions'), 1);
+
+  //       // 2. Replace placeholder trong block vừa chèn
+  //       blockQues!.rows.forEach((row) => {
+  //         row.eachCell((cell) => {
+  //           if (typeof cell.value === 'string') {
+  //             cell.value = cell.value.replace('{{questionContent}}', ques.content ?? '');
+  //             cell.value = cell.value.replace('{{#questions}}', '');
+  //             cell.value = cell.value.replace('{{/questions}}', '');
+  //           }
+  //         });
+  //       })
+  //       let blockOpt = getBlockRows(worksheet, 'options');
+  //       if (blockOpt) {
+  //         if (ques.options.length > 0) {
+  //           ques.options.forEach((opt, index) => {
+  //             let newBlockOpt
+  //             if (index < ques.options.length - 1) {
+  //               newBlockOpt = insertBlockRows(
+  //                 worksheet,
+  //                 findRowIndexByKey(worksheet, '/options'),
+  //                 blockOpt!.rows
+  //               )
+  //             }
+  //             // worksheet.spliceRows(findRowIndexByKey(worksheet, '#options'), 1);
+  //             // worksheet.spliceRows(findRowIndexByKey(worksheet, '/options'), 1);
+  //             blockOpt!.rows.forEach((row) => {
+  //               row.eachCell((cell) => {
+  //                 if (typeof cell.value === 'string') {
+  //                   cell.value = cell.value.replace('{{optionContent}}', opt.content ?? '');
+  //                   cell.value = cell.value.replace('{{selectedCount}}', String(opt.selectedCount ?? ''));
+  //                   cell.value = cell.value.replace('{{#options}}', '');
+  //                   cell.value = cell.value.replace('{{/options}}', '');
+  //                 }
+  //               });
+  //             });
+  //             if (newBlockOpt)
+  //               blockOpt = newBlockOpt;
+  //           })
+  //         } else {
+  //           blockOpt!.rows.forEach((row) => {
+  //             row.eachCell((cell) => {
+  //               if (typeof cell.value === 'string') {
+  //                 cell.value = cell.value.replace('{{optionContent}}', 'Tự luận');
+  //                 cell.value = cell.value.replace('{{selectedCount}}', String(ques.essayAnswers.length));
+  //                 cell.value = cell.value.replace('{{#options}}', '');
+  //                 cell.value = cell.value.replace('{{/options}}', '');
+  //               }
+  //             });
+  //           });
+  //         }
+  //       }
+  //       // 3. Cập nhật lại blockQues để chèn tiếp
+  //       if (newBlockQues)
+  //         blockQues = newBlockQues;
+  //     })
+  //   }
+
+  //   // 4. Xuất file
+  //   const buffer = await workbook.xlsx.writeBuffer();
+  //   saveAs(new Blob([buffer]), 'BaoCao.xlsx');
+  // }
 
 
 
