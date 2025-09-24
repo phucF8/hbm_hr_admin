@@ -19,6 +19,8 @@
         public int TotalParticipants { get; set; }  // Tổng số người đã tham gia trả lời phiếu điều tra
         public List<QuestionDto> Questions { get; set; } = new();
 
+        public byte Status { get; set; } = 0;
+
     }
 
     public class TopicVotingDto

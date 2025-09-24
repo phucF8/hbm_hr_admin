@@ -12,24 +12,20 @@ using System;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
-namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
-{
+namespace HBM_HR_Admin_Angular2.Server.Voting.controllers {
     [ApiController]
     [Route("api/topics")]
-    public class TopicController : ControllerBase
-    {
+    public class TopicController : ControllerBase {
         private readonly ApplicationDbContext _context;
         private readonly TopicService _service;
 
-        public TopicController(ApplicationDbContext context, TopicService service)
-        {
+        public TopicController(ApplicationDbContext context, TopicService service) {
             _context = context;
             _service = service;
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateTopic([FromBody] CreateTopicDto dto)
-        {
+        public async Task<IActionResult> CreateTopic([FromBody] CreateTopicDto dto) {
             var topic = await _service.CreateAsync(dto);
             if (topic == null)
                 return BadRequest(ApiResponse<string>.Error("Tạo chủ đề thất bại"));
@@ -37,15 +33,13 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPagedTopics([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-        {
+        public async Task<IActionResult> GetPagedTopics([FromQuery] int page = 1, [FromQuery] int pageSize = 10) {
             var result = await _service.GetPagedTopicsAsync(page, pageSize);
             return Ok(ApiResponse<object>.Success(result));
         }
 
         [HttpPost("{id}")]
-        public async Task<IActionResult> DeleteTopic(string id)
-        {
+        public async Task<IActionResult> DeleteTopic(string id) {
             var success = await _service.DeleteTopicAsync(id);
             if (!success)
                 return NotFound(ApiResponse<string>.Error("Topic not found"));
@@ -54,8 +48,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         }
 
         [HttpPost("update")]
-        public async Task<IActionResult> UpdateTopic([FromBody] UpdateTopicDto dto)
-        {
+        public async Task<IActionResult> UpdateTopic([FromBody] UpdateTopicDto dto) {
             var updated = await _service.UpdateTopicAsync(dto);
             if (updated == null)
                 return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề cần sửa"));
@@ -64,8 +57,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
-        {
+        public async Task<IActionResult> GetById(string id) {
             var topic = await _service.GetTopicByIdAsync(id);
             if (topic == null)
                 return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề"));
@@ -73,8 +65,8 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         }
 
         [HttpGet("review/{id}/{userId}")]
-        public async Task<IActionResult> GetForReview(string id,string userId) {
-            var topic = await _service.GetTopicForReviewByIdAsync(id,userId);
+        public async Task<IActionResult> GetForReview(string id, string userId) {
+            var topic = await _service.GetTopicForReviewByIdAsync(id, userId);
             if (topic == null)
                 return NotFound(ApiResponse<string>.Error("Không tìm thấy chủ đề"));
             return Ok(ApiResponse<object>.Success(topic, "Thành công"));
@@ -90,8 +82,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
 
         // DELETE: api/topics/DeleteList
         [HttpPost("DeleteList")]
-        public async Task<IActionResult> DeleteTopics([FromBody] List<string> topicIds)
-        {
+        public async Task<IActionResult> DeleteTopics([FromBody] List<string> topicIds) {
             if (topicIds == null || topicIds.Count == 0)
                 return BadRequest("Danh sách Id rỗng.");
 
@@ -105,7 +96,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             _context.Topics.RemoveRange(topicsToDelete);
             await _context.SaveChangesAsync();
 
-            return Ok(ApiResponse<object>.Success(topicsToDelete.Count,"Đã xoá thành công"));
+            return Ok(ApiResponse<object>.Success(topicsToDelete.Count, "Đã xoá thành công"));
         }
 
         [HttpPost("voting")]
@@ -150,22 +141,17 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
 
 
         [HttpPost("submit")]
-        public async Task<IActionResult> SubmitAnswers([FromBody] List<UserAnswerDto> answers)
-        {
-            if (answers == null || !answers.Any())
-            {
+        public async Task<IActionResult> SubmitAnswers([FromBody] List<UserAnswerDto> answers) {
+            if (answers == null || !answers.Any()) {
                 return BadRequest(new { message = "Không có câu trả lời nào được gửi" });
             }
             var idUser = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (idUser == null)
-            {
+            if (idUser == null) {
                 return NotFound(new { message = "Không thể xác định danh tính người dùng. Vui lòng đăng nhập lại." });
             }
             var now = DateTime.UtcNow;
-            foreach (var ans in answers)
-            {
-                var entity = new BB_UserAnswer
-                {
+            foreach (var ans in answers) {
+                var entity = new BB_UserAnswer {
                     Id = Guid.NewGuid().ToString(),
                     UserId = idUser,
                     TopicId = ans.TopicId,
@@ -185,11 +171,16 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
         [HttpPost("topic-list")]
         public async Task<ActionResult<IEnumerable<TopicDto>>> GetTopics([FromBody] GetTopicsRequest request) {
             var topics = await _context.Topics
-                .Where(t => _context.BB_TopicRelease.Any(r =>
-                    r.TopicId == t.Id &&
-                    ((r.TargetType == "NHANSU" && r.TargetId == request.UserId) ||
-                     (r.TargetType == "DONVI" && r.TargetId == request.IdKhoLamViec))
-                ))
+                 .Where(t =>
+                    t.Status == 2 && // ✅ chỉ lấy topic đang phát hành
+                    _context.BB_TopicRelease.Any(r =>
+                        r.TopicId == t.Id &&
+                        (
+                            (r.TargetType == "NHANSU" && r.TargetId == request.UserId) ||
+                            (r.TargetType == "DONVI" && r.TargetId == request.IdKhoLamViec)
+                        )
+                    )
+                )
                 .Select(t => new TopicDto {
                     Id = t.Id,
                     Title = t.Title,
@@ -256,7 +247,7 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             _context.Topics.Update(topic);
             await _context.SaveChangesAsync();
 
-            return Ok(new  {
+            return Ok(new {
                 Status = "SUCCESS",
                 message = "Phát hành thành công.",
                 topicId = topic.Id,

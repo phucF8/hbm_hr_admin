@@ -244,8 +244,8 @@ export class VotingList {
         };
 
         this.topicService.publishTopic(request).subscribe(result => {
-          if (result.success) {
-
+          if (result.status == 'SUCCESS') {
+            this.loadList();
           } else {
 
           }

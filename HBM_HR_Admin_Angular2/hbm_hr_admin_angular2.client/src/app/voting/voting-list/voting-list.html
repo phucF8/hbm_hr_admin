@@ -51,13 +51,13 @@
         <div><strong>BẢN GHI</strong></div>
         <div class="search-container">
 
-                    <div class="buttons-container">
-                      <div class="right-buttons">
-                        <button *ngIf="hasSelected()" class="btn" (click)="deleteListSelected()">
-                          <i class="bi bi-trash"></i> Xóa những mục đã chọn
-                        </button>
-                      </div>
-                    </div>
+          <div class="buttons-container">
+            <div class="right-buttons">
+              <button *ngIf="hasSelected()" class="btn" (click)="deleteListSelected()">
+                <i class="bi bi-trash"></i> Xóa những mục đã chọn
+              </button>
+            </div>
+          </div>
 
 
         </div>
@@ -80,62 +80,71 @@
               <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
             </th>
             <th style="width: 10%;white-space: nowrap;text-align: center;">Thời gian</th>
-            <th style="width: 30%;white-space: nowrap;text-align: center;">Tiêu đề</th>
+            <th style="width: 20%;white-space: nowrap;text-align: center;">Tiêu đề</th>
             <th style="white-space: nowrap;text-align: center;">Mô tả</th>
+            <th style="width: 10%;white-space: nowrap;text-align: center;">Trạng thái</th>
             <th style="width: 5%;"></th>
           </tr>
         </thead>
         <tbody>
-            <ng-container *ngIf="listItem && listItem.data && listItem.data.items">
-                <tr *ngFor="let tb of listItem.data.items" (click)="view(tb.id)" >
-                    <td>
-                    <input type="checkbox"  (click)="$event.stopPropagation()" [(ngModel)]="tb.selected">
-                    </td>
-                    <td style="white-space: nowrap;">
-                    {{ tb.startDate | date:'dd/MM/yyyy'}} - {{ tb.endDate | date:'dd/MM/yyyy' }}
-                    </td>
-                    <td>
-                    {{ tb.title }}
-                    </td>
-                    <td style="text-align: justify;">{{ tb.description }}</td>
-                    <td>
-                        <div class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()" >
-                            <div class="dropdown-button">
-                            <div class="arrow-down"></div>
-                            </div>
-                            <div class="popup-menu" *ngIf="openedMenuId === tb.id">
+          <ng-container *ngIf="listItem && listItem.data && listItem.data.items">
+            <tr *ngFor="let tb of listItem.data.items" (click)="view(tb.id)">
+              <td>
+                <input type="checkbox" (click)="$event.stopPropagation()" [(ngModel)]="tb.selected">
+              </td>
+              <td style="white-space: nowrap;">
+                {{ tb.startDate | date:'dd/MM/yyyy'}} - {{ tb.endDate | date:'dd/MM/yyyy' }}
+              </td>
+              <td>
+                {{ tb.title }}
+              </td>
+              <td style="text-align: justify;">{{ tb.description }}</td>
+              <td style="text-align:center;">
+                <!-- Hiển thị theo số trong DB -->
+                <span *ngIf="tb.status === 0" class="badge bg-secondary">Soạn thảo</span>
+                <span *ngIf="tb.status === 1" class="badge bg-warning">Sửa đổi</span>
+                <span *ngIf="tb.status === 2" class="badge bg-danger">Phát hành</span>
+                <span *ngIf="tb.status === 3" class="badge bg-info">Huỷ phát hành</span>
+                
+              </td>
+              <td>
+                <div class="dropdown-wrapper" (click)="toggleMenu(tb); $event.stopPropagation()">
+                  <div class="dropdown-button">
+                    <div class="arrow-down"></div>
+                  </div>
+                  <div class="popup-menu" *ngIf="openedMenuId === tb.id">
 
-                            <div class="menu-item view" (click)="view(tb.id)">
-                                <i class="bi bi-eye"></i>
-                                <div class="menu-text">Xem</div>
-                            </div>
+                    <div class="menu-item view" (click)="view(tb.id)">
+                      <i class="bi bi-eye"></i>
+                      <div class="menu-text">Xem</div>
+                    </div>
 
-                            <div class="menu-item view" (click)="thietLapPhatHanh(tb)">
-                                <i class="bi bi-megaphone"></i>
-                                <div class="menu-text">Thiết lập phát hành</div>
-                            </div>
+                    <div class="menu-item view" (click)="thietLapPhatHanh(tb)">
+                      <i class="bi bi-megaphone"></i>
+                      <div class="menu-text">Thiết lập phát hành</div>
+                    </div>
 
-                            <div class="menu-item view" (click)="onPublish(tb)">
-                               
-                                <div class="menu-text">🚀 Phát hành</div>
-                            </div>
+                    <div class="menu-item view" (click)="onPublish(tb)">
 
-                            <div class="menu-item view" (click)="report(tb.id)">
-                                <i class="bi bi-bar-chart"></i>
-                                <div class="menu-text">báo cáo</div>
-                            </div>
+                      <div class="menu-text">🚀 Phát hành</div>
+                    </div>
 
-                            <!-- <div class="menu-item delete" (click)="delete(tb.id)">
+                    <div class="menu-item view" (click)="report(tb.id)">
+                      <i class="bi bi-bar-chart"></i>
+                      <div class="menu-text">báo cáo</div>
+                    </div>
+
+                    <!-- <div class="menu-item delete" (click)="delete(tb.id)">
                                 <i class="bi bi-trash"></i>
                                 <div class="menu-text">Xóa</div>
                             </div> -->
-                            </div>
+                  </div>
 
 
-                        </div>
-                    </td>
-                </tr>
-            </ng-container>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
       <!-- Pagination section -->

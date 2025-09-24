@@ -59,7 +59,8 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Repositories {
                             StartDate = t.StartDate,
                             EndDate = t.EndDate,
                             CreatedByName = createdUser.TenNhanVien,
-                            UpdatedByName = updatedUser.TenNhanVien
+                            UpdatedByName = updatedUser.TenNhanVien,
+                            Status = t.Status,
                         };
 
             var totalItems = await query.CountAsync();

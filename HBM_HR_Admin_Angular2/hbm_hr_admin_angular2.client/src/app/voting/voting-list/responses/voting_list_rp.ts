@@ -17,5 +17,6 @@ export interface Item {
   description: string
   startDate: string
   endDate: string
-  selected: boolean
+  selected: boolean,
+  status: number,
 }
