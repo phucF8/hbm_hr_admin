@@ -12,6 +12,7 @@ import { TopicReleaseComponent } from '@app/survey/topic-release/topic-release.c
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { showJsonDebug } from '@app/utils/error-handler';
+import { PublishTopicRequest, VotingService } from '@app/services/voting.service';
 
 
 @Component({
@@ -34,6 +35,7 @@ export class VotingList {
 
   constructor(
     private service: VotingListService,
+    private topicService: VotingService,
     private dialog: MatDialog,
     private router: Router,
   ) { }
@@ -222,6 +224,37 @@ export class VotingList {
       });
     }
   }
+
+
+  /** Phát hành phiếu điều tra */
+  onPublish(tb: any): void {
+    Swal.fire({
+      title: 'Xác nhận phát hành?',
+      text: 'Bạn có chắc muốn phát hành phiếu điều tra này?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Phát hành',
+      cancelButtonText: 'Hủy'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const request: PublishTopicRequest = {
+          topicId: tb.id,
+          userId: localStorage.getItem('userID') ?? '',
+          note: ''
+        };
+
+        this.topicService.publishTopic(request).subscribe(result => {
+          if (result.success) {
+
+          } else {
+
+          }
+        });
+      }
+    });
+  }
+
+
 
 }
 

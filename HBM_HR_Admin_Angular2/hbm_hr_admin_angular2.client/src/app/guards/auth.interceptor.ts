@@ -6,10 +6,11 @@ import {
   HttpEvent,
   HttpErrorResponse
 } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { showJsonDebug } from '@app/utils/error-handler';
+import { showApiError, showJsonDebug } from '@app/utils/error-handler';
+import Swal from 'sweetalert2';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -27,6 +28,9 @@ export class AuthInterceptor implements HttpInterceptor {
       });
     }
     return next.handle(request).pipe(
+      tap(() => {
+        // có thể show success khi cần (nếu backend trả về status OK)
+      }),
       // Kiểm tra lỗi 401 hoặc message từ backend
       catchError((error: HttpErrorResponse) => {
         if (

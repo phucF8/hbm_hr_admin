@@ -4,18 +4,25 @@ import { formatDateTime } from './datetime-utils';
 import { safeStringify } from './json-utils';
 
 export function showApiError(err: any, title: string = 'Lỗi') {
-  const apiMessage = err?.error?.message;
   const time = formatDateTime();
+  // Thông điệp từ payload API (nếu có)
+  const apiStatus = err?.error?.Status || err?.status; // ví dụ FAIL hoặc 500
+  const apiMessage = err?.error?.Message || err?.error?.message;
+  // Thông điệp mặc định từ HttpErrorResponse
+  const httpMessage = err?.message;
   Swal.fire({
     icon: 'error',
     title,
     html: `
-    <div>
-        <h1>${apiMessage}</h1>
-        <strong>${err.message}</strong><br/>
-        <strong>Thời gian:</strong> ${time}
-        <br/><small style="color:gray;">URL: ${err?.url || '-'}</small>
-    </div>
+  <div style="text-align:left; font-family:monospace; font-size:0.9em;">
+      <h1 style="color:#c00; font-size:1.1em; margin-bottom:4px;">${apiMessage}</h1>
+      <hr/>
+      <strong>HTTP Message:</strong> ${httpMessage ?? '-'} <br/>
+      <hr/>
+      <strong>Thời gian:</strong> ${time} <br/>
+      <hr/>
+      <small style="color:gray;">URL: ${err?.url || '-'}</small>
+  </div>
     `,
     confirmButtonText: 'Đóng',
     customClass: {

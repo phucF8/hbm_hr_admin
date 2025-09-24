@@ -238,6 +238,31 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.controllers
             return Ok(releases);
         }
 
+        [HttpPost("publish")]
+        public async Task<IActionResult> PublishTopic([FromBody] PublishTopicRequest request) {
+            var topic = await _context.Topics.FindAsync(request.TopicId);
+
+            if (topic == null)
+                return NotFound(new { message = "Topic không tồn tại." });
+
+            // chỉ cho phép từ Draft(0), Editing(1), Cancelled(3) -> Published(2)
+            if (topic.Status != 0 && topic.Status != 1 && topic.Status != 3)
+                return BadRequest(new { message = "Phiếu điều tra hiện tại không thể phát hành." });
+
+            topic.Status = 2; // Published
+            topic.PublishedAt = DateTime.UtcNow; // nếu có cột thời gian phát hành
+            topic.PublishedBy = request.UserId; // nếu có cột lưu người phát hành
+
+            _context.Topics.Update(topic);
+            await _context.SaveChangesAsync();
+
+            return Ok(new  {
+                Status = "SUCCESS",
+                message = "Phát hành thành công.",
+                topicId = topic.Id,
+            });
+        }
+
 
 
 

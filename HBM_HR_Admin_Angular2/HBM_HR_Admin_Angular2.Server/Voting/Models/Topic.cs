@@ -16,5 +16,20 @@ namespace HBM_HR_Admin_Angular2.Server.Voting.Models
         public DateTime? UpdatedAt { get; set; }
 
         public ICollection<Question> Questions { get; set; }
+
+        /// <summary>
+        /// 0 = Draft, 1 = Editing, 2 = Published, 3 = Cancelled
+        /// </summary>
+        public byte Status { get; set; } = 0;
+
+        /// <summary>
+        /// Thời gian phát hành
+        /// </summary>
+        public DateTime? PublishedAt { get; set; }
+
+        /// <summary>
+        /// Người phát hành
+        /// </summary>
+        public string? PublishedBy { get; set; }
     }
 }

@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from 'environments/environment';
 import { ApiResponse } from '@app/voting/voting-list/responses/api-response.model';
 import Swal from 'sweetalert2';
-import { showJsonDebug } from '@app/utils/error-handler';
+import { showApiBusinessError, showApiError, showJsonDebug } from '@app/utils/error-handler';
+import { ToastrService } from 'ngx-toastr';
 
 export interface Topic {
   id: string;
@@ -23,6 +24,12 @@ export interface UserAnswerRequest {
   essayAnswer?: string;
 }
 
+export interface PublishTopicRequest {
+  topicId: string;
+  userId: string;
+  note?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -30,7 +37,10 @@ export class VotingService {
 
   private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private toastr: ToastrService,
+  ) { }
 
   getVotingTopic(topicId: string): Observable<any> {
     const token = localStorage.getItem('access_token');
@@ -46,7 +56,7 @@ export class VotingService {
     };
     // showJsonDebug(body);
     const url = `${this.baseUrl}/topics/voting`;
-    return this.http.post<any>(url,body);
+    return this.http.post<any>(url, body);
   }
 
   getTopicForReview(topicId: string): Observable<any> {
@@ -81,6 +91,26 @@ export class VotingService {
     };
     // showJsonDebug(body);
     return this.http.post<ApiResponse<Topic[]>>(url, body);
+  }
+
+  /** Phát hành phiếu điều tra */
+  publishTopic(request: PublishTopicRequest): Observable<any> {
+    // showJsonDebug(request);
+    return this.http.post<any>(`${this.baseUrl}/topics/publish`, request).pipe(
+      map((res) => {
+        // showJsonDebug(res)
+        if (res.status === 'SUCCESS') {
+          this.toastr.success('', res.message || 'Phát hành thành công');
+        } else {
+          showApiBusinessError(res.message, 'Phát hành thất bại');
+        }
+        return res;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        showApiError(err, 'Phát hành thất bại');
+        return throwError(() => err);
+      })
+    );
   }
 
 
