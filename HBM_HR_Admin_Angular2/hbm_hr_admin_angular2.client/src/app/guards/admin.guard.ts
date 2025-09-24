@@ -25,15 +25,15 @@ export class AdminGuard implements CanActivate {
       this.router.navigate(['/login']);
       return false;
     }
-
     const decoded: any = jwtDecode(token);
     const roleClaim = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];  // lấy role từ claim chuẩn của ASP.NET
     const roles = Array.isArray(roleClaim) ? roleClaim : [roleClaim];
-    console.log("Roles:", roles);
-    if (roles.includes('Admin')) {
+    // console.log("Roles:", safeStringify( decoded ));
+    if (roles.includes('ADMIN_VOTE')) {
       return true;
     }
     this.router.navigate(['/forbidden']); // trang báo lỗi
     return false;
   }
+
 }

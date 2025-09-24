@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import { environment } from '../../environments/environment';
 import { API_CONSTANTS } from '../constants/api.constants';
@@ -8,6 +8,7 @@ import { DebugUtils } from '@app/utils/debug-utils';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { of, throwError } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
+import { showApiError, showJsonDebug } from '@app/utils/error-handler';
 
 export interface NhanVienInfo {
   Username: string;
@@ -133,6 +134,7 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, body)
       .pipe(
         tap(res => {
+          // showJsonDebug(res);
           if (res && res.token) {
             // Lưu token và thông tin cơ bản
             localStorage.setItem('access_token', res.token);
@@ -155,10 +157,13 @@ export class AuthService {
 
               localStorage.setItem('idKhoLamViec', res.nhanVien.idKhoLamViec || '');
 
-
             }
           }
-        })
+        }),
+        catchError((err: HttpErrorResponse) => {
+        showApiError(err, 'Đăng nhập thất bại');
+        return throwError(() => err);
+      })
       );
   }
 

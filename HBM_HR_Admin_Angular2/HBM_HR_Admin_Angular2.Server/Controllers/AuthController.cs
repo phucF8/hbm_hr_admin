@@ -2,14 +2,17 @@
 {
     using Azure.Core;
     using HBM_HR_Admin_Angular2.Server.constance;
+    using HBM_HR_Admin_Angular2.Server.Data;
     using HBM_HR_Admin_Angular2.Server.Models;
     using HBM_HR_Admin_Angular2.Server.Services;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.IdentityModel.Tokens;
     using System.Collections.Generic;
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using System.Text;
+    using System.Threading.Tasks;
 
     [Route("api/auth")]
     [ApiController]
@@ -19,9 +22,11 @@
 
         private readonly HrAuthService _hrAuthService;
         private readonly IConfiguration _config;
+        private readonly ApplicationDbContext _context;
 
-        public AuthController(JwtTokenGenerator jwtTokenGenerator, HrAuthService hrAuthService, IConfiguration config)
+        public AuthController(ApplicationDbContext context,JwtTokenGenerator jwtTokenGenerator, HrAuthService hrAuthService, IConfiguration config)
         {
+            _context = context;
             _jwtTokenGenerator = jwtTokenGenerator;
             _hrAuthService = hrAuthService;
             _config = config;
@@ -38,7 +43,7 @@
                 return Unauthorized(new { message = hrResult?.Message ?? "Invalid username or password" });
             }
             var nhanVien = hrResult.DataSets?.Table?.FirstOrDefault();// Lấy thông tin nhân viên từ API HR
-            var token = GenerateJwtToken(request.Username, nhanVien);// Nếu login HR thành công -> tạo JWT riêng
+            var token = await GenerateJwtToken(request.Username, nhanVien);// Nếu login HR thành công -> tạo JWT riêng
             return Ok(new
             {
                 token,
@@ -50,20 +55,35 @@
 
         }
 
-        private string GenerateJwtToken(string username, HrAuthService.EmployeeInfo? nhanVien)
+        private async Task<string> GenerateJwtToken(string username, HrAuthService.EmployeeInfo? nhanVien)
         {
             var jwtSettings = _config.GetSection("JwtSettings");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, nhanVien.ID.ToString()), // cần claim này
                 new Claim(JwtRegisteredClaimNames.Sub, username),
-                new Claim(ClaimTypes.Role, "Admin"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            // Tìm UserId từ bảng Users theo username
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user != null) {
+                // Lấy danh sách quyền
+                var permissions = await _context.UserPermissions
+                    .Where(up => up.UserId == user.Id)
+                    .Join(_context.Permissions,
+                          up => up.PermissionId,
+                          p => p.Id,
+                          (up, p) => p.Code)
+                    .ToListAsync();
+
+                foreach (var permission in permissions) {
+                    claims.Add(new Claim(ClaimTypes.Role, permission));
+                }
+            }
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],
