@@ -1,88 +1,88 @@
+<div class="container">
+    <div class="modal-header">
+        <h1>🔐 Thiết lập quyền truy cập</h1>
+        <button class="close_button" (click)="onClose()">✖</button>
+        <!-- <a href="#" class="btn btn-primary"></a> -->
+        <!-- <a href="#" class="btn btn-secondary"></a> -->
+    </div>
 
-    <div class="container">
-        <div class="header">
-            <h1>🔐 Thiết lập quyền truy cập</h1>
-            
-        </div>
-
-        <div class="contentdlg">
-            <div class="user-info">
-                <div class="user-card">
-                    <div class="avatar-container">
-                        <img [src]="BASE_URL + user.avatarUrl" alt="User Avatar" class="avatar">
-                        
-                    </div>
-                    <div class="user-name">{{data.user.fullName}}</div>
-                    <div class="username">{{data.user.username}}</div>
+    <div class="contentdlg">
+        <div class="user-info">
+            <div class="user-card">
+                <div class="avatar-container">
+                    <img [src]="BASE_URL + user.avatarUrl" alt="User Avatar" class="avatar"
+                        (error)="onAvatarError($event)" />
                 </div>
-
-                
+                <div class="user-name">{{data.user.fullName}}</div>
+                <div class="username">{{data.user.username}}</div>
             </div>
 
-            <div class="permissions-section">
-                <div class="section-title">
-                    <svg class="section-icon" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"/>
-                    </svg>
-                    Danh sách quyền truy cập
-                </div>
 
-                <div class="permissions-grid">
-                    <div class="permission-category">
-                        <div class="category-header">
-                            <svg class="category-icon" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            
-                        </div>
+        </div>
+
+        <div class="permissions-section">
+            <div class="section-title">
+                <svg class="section-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" />
+                </svg>
+                Danh sách quyền truy cập
+            </div>
+
+            <div class="permissions-grid">
+                <div class="permission-category">
+                    <div class="category-header">
+                        <svg class="category-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+
+                    </div>
 
 
-                        <div class="permission-list">
+                    <div class="permission-list">
 
-                            <div class="permission-item" *ngFor="let p of permissions">
-                                <div class="permission-label">
-                                    <div class="permission-name">{{p.name}}</div>
-                                    <div class="permission-desc">{{p.code}}</div>
-                                </div>
-                                
-                                <button
-                                    type="button"
-                                    [class.active]="p.hasPermission"
-                                    class="permission-toggle"
-                                    (click)="togglePermission(p)">
-                                    </button>
-
+                        <div class="permission-item" *ngFor="let p of permissions">
+                            <div class="permission-label">
+                                <div class="permission-name">{{p.name}}</div>
+                                <div class="permission-desc">{{p.code}}</div>
                             </div>
 
-                            
+                            <button type="button" [class.active]="p.hasPermission" class="permission-toggle"
+                                (click)="togglePermission(p)">
+                            </button>
+
                         </div>
+
+
                     </div>
-
-                    
-
-
                 </div>
-            </div>
-        </div>
 
-        <div class="actions">
-            <div class="changes-summary" id="changesSummary" style="display: none;">
-                <strong>📝 Có thay đổi chưa lưu:</strong> <span id="changesCount">0</span> quyền đã được thay đổi
-            </div>
-            
-            <div style="display: flex; gap: 16px;">
-                
-                <button class="btn btn-primary" (click)="saveChanges()">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-                    </svg>
-                    Lưu thay đổi
-                </button>
+
+
+
             </div>
         </div>
     </div>
 
-    <div>
+    <div class="actions">
+        <div class="changes-summary" id="changesSummary" style="display: none;">
+            <strong>📝 Có thay đổi chưa lưu:</strong> <span id="changesCount">0</span> quyền đã được thay đổi
+        </div>
+
+        <div style="display: flex; gap: 16px;">
+
+            <button class="btn btn-primary" (click)="saveChanges()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                </svg>
+                Lưu thay đổi
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- <div>
         <pre class="user-json">{{ data | json }}</pre>
         <ul>
             <li *ngFor="let p of permissions">
@@ -94,5 +94,4 @@
                 {{ up }}
             </li>
         </ul>
-    </div>
-   
+    </div> -->

@@ -15,6 +15,12 @@
         public string Username { get; set; } = null!;
         public string FullName { get; set; } = null!;
         public string AvatarUrl { get; set; } = null!;
+        public List<PermissionDto> Permissions { get; set; }
+    }
+
+    public class PermissionDto {
+        public int PermissionId { get; set; }
+        public string PermissionName { get; set; }
     }
 
     public class SaveUserRequest

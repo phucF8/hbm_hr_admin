@@ -54,15 +54,14 @@
                             <i class="bi bi-chevron-down"></i>
                         </div>
 
-
-
-
                         <div class="dropdown-menu_phuc" *ngIf="showSignoutPopup">
+                            <div class="dropdown-item" (click)="goToAdmin()" *ngIf="permissions.length>0">
+                                <i class="bi bi-gear"></i> Quản trị
+                            </div>
                             <div class="dropdown-item logout" (click)="logout()">
                                 <i class="bi bi-box-arrow-right"></i> Đăng xuất
                             </div>
                         </div>
-
 
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown mt-0"
                             aria-labelledby="profileDropdown" x-placement="bottom-end"

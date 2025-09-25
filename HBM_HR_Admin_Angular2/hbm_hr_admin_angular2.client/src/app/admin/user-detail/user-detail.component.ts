@@ -81,8 +81,6 @@ export class UserDetailComponent implements OnInit {
       });
   }
 
-
-
   togglePermission(permission: any) {
     permission.hasPermission = !permission.hasPermission;
     console.log('XIN CHAO');
@@ -97,12 +95,7 @@ export class UserDetailComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.status === 'SUCCESS') {
-            this.toastr.success('', res.message || 'Lưu quyền thành công', {
-              positionClass: 'toast-top-center',
-              timeOut: 1000, // 5s
-              progressBar: true
-            });
-            this.dialogRef.close();
+            this.dialogRef.close(true);
           } else {
             alert('Lưu quyền thất bại');
           }
@@ -129,6 +122,15 @@ export class UserDetailComponent implements OnInit {
 
   cancel(): void {
     this.dialogRef.close();
+  }
+
+  onClose() {
+    this.dialogRef.close();
+  }
+
+  onAvatarError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'images/avatar_default.png';
   }
 
 }

@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from '@app/services/auth.service';
 import { getFullImageUrl } from '@app/utils/url.utils';
 import { ROUTE_PATHS } from '@app/app.routes';
+import { getLocal } from '@app/utils/json-utils';
 
 
 @Component({
@@ -30,6 +31,7 @@ export class UserLayoutComponent {
   showSignoutPopup = false;
 
   isLoading: Observable<boolean>;
+  permissions: number[] = [];
 
 
   @ViewChild('popup') popupRef!: ElementRef;
@@ -70,15 +72,8 @@ export class UserLayoutComponent {
     this.isLoading = this.loadingService.isLoading$;
   }
 
-
   ngOnInit() {
-    // this.isLoggedIn = this.authService.isLoggedIn();
-    // if (this.isLoggedIn) {
-    //   this.tenNhanVien = this.authService.getCurrentUser()?.TenNhanVien || '';
-    //   this.anhNhanVien = this.authService.getCurrentUser()?.Anh || '';
-    //   this.anhNhanVien = getFullImageUrl(this.anhNhanVien);
-    //   this.maNhanVien = this.authService.getCurrentUser()?.MaNhanVien || '';
-    // }
+    this.permissions = getLocal<number[]>('permissions', []);
   }
 
   logout(): void {
@@ -89,6 +84,10 @@ export class UserLayoutComponent {
 
   togglePopup() {
     this.showSignoutPopup = !this.showSignoutPopup;
+  }
+
+  goToAdmin() {
+    this.router.navigate([ROUTE_PATHS.admin]);
   }
 
   title = 'hbm_hr_admin_angular2.client';

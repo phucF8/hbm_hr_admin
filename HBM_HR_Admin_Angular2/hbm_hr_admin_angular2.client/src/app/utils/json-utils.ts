@@ -48,3 +48,12 @@ export function safeStringify(obj: any, space: number = 2): string {
     return value;
   }, space);
 }
+
+export function setLocal(key: string, value: any) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+export function getLocal<T>(key: string, defaultValue: T): T {
+  const item = localStorage.getItem(key);
+  return item ? JSON.parse(item) : defaultValue;
+}

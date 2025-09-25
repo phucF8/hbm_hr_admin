@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from 'environments/environment';
+import { showApiBusinessError, showApiError } from '@app/utils/error-handler';
+import { ToastrService } from 'ngx-toastr';
 
 export interface Permission {
   id: number;
@@ -16,7 +18,10 @@ export interface Permission {
 export class PermissionsService {
   private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+  private toastr: ToastrService,
+  ) {}
 
   getPermissions(): Observable<Permission[]> {
     return this.http.get<Permission[]>(`${this.baseUrl}/Permissions`);
@@ -33,7 +38,23 @@ export class PermissionsService {
       userId: userId,
       permissionIds: permissionIds
     };
-    return this.http.post(url, body);
+
+    return this.http.post<any>(url, body).pipe(
+      map((res) => {
+        // showJsonDebug(res)
+        if (res.status === 'SUCCESS') {
+          this.toastr.success('', res.message || 'Phân quyền thành công');
+        } else {
+          showApiBusinessError(res.message, 'Phân quyền thất bại');
+        }
+        return res;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        showApiError(err, 'Phân quyền thất bại');
+        return throwError(() => err);
+      })
+    );
+
   }
 
 }

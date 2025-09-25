@@ -16,9 +16,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             _context = context;
         }
 
-
-
-
         [HttpPost]
         public async Task<IActionResult> SaveUser([FromBody] SaveUserRequest request)
         {
@@ -48,20 +45,29 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
 
         [HttpPost("GetAllUsers")]
-        public ActionResult<IEnumerable<UserDto>> GetAllUsers()
-        {
+        public ActionResult<IEnumerable<UserDto>> GetAllUsers() {
             var users = _context.Users
-                                .Select(u => new UserDto
-                                {
-                                    Id = u.Id,
-                                    Username = u.Username,
-                                    FullName = u.FullName,
-                                    AvatarUrl = u.AvatarUrl
+                .Select(u => new UserDto {
+                    Id = u.Id,
+                    Username = u.Username,
+                    FullName = u.FullName,
+                    AvatarUrl = u.AvatarUrl,
+                    Permissions = _context.UserPermissions
+                        .Where(up => up.UserId == u.Id)
+                        .Join(_context.Permissions,
+                                up => up.PermissionId,
+                                p => p.Id,
+                                (up, p) => new PermissionDto {
+                                    PermissionId = p.Id,
+                                    PermissionName = p.Name
                                 })
-                                .ToList();
+                        .ToList()
+                })
+                .ToList();
 
             return Ok(users);
         }
+
 
         //[HttpPost("assign")]
         //public IActionResult AssignPermissions([FromBody] AssignPermissionsDto request)

@@ -1,7 +1,7 @@
 <div class="container">
   <div class="page-header">
 
-    <div class="search-title">Tiêu chí tìm kiếm</div>
+    <!-- <div class="search-title">Tiêu chí tìm kiếm</div>
     <div class="search-filters">
       <div class="filter-group">
         <label class="filter-label">Tìm kiếm user</label>
@@ -10,7 +10,7 @@
       <div class="action-buttons">
         <button class="btn btn-search">🔍 Tìm kiếm</button>
       </div>
-    </div>
+    </div> -->
 
   </div>
 
@@ -27,39 +27,43 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th><input type="checkbox" class="checkbox"></th>
+          <th><input type="checkbox" class="checkbox" (click)="toggleAll($event)"></th>
+          
           <th>#</th>
           <th>Thông tin user</th>
           <th>Vai trò</th>
-
-
-
-          <th>Nền tảng</th>
+          <th>Thiết lập</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of users; let i = index" (click)="viewUser(user)">
+        <tr *ngFor="let user of users; let i = index">
           <td><input type="checkbox" class="checkbox"></td>
           <td>{{i+1}}</td>
           <td>
             <div class="user-info-cell">
-              <img [src]="BASE_URL + user.avatarUrl" alt="User Avatar" class="user-avatar-img" />
-
+              <img [src]="BASE_URL + user.avatarUrl" alt="User Avatar" class="user-avatar-img"
+                (error)="onAvatarError($event)" />
               <div class="user-details">
                 <div class="user-name">{{user.fullName}}</div>
                 <div class="user-email">{{user.username}}</div>
               </div>
             </div>
           </td>
-          <td><span class="role-badge role-admin">Admin</span></td>
+          <td>
+            <span *ngFor="let p of user.permissions" class="role-badge role-admin">
+              {{p.permissionName}}
+            </span>
+          </td>
+
 
 
 
           <td>
-            <div class="action-icons">
-              <span class="action-icon" title="Phân quyền">🔑</span>
-            </div>
+            <button class="btn btn-permission" title="Phân quyền" (click)="viewUser(user)">
+              🔑 Phân quyền
+            </button>
           </td>
+
         </tr>
 
 

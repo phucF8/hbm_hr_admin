@@ -8,6 +8,7 @@ import { UserDetailComponent } from './user-detail/user-detail.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UsersService } from '@app/services/users.service';
 import Swal from 'sweetalert2';
+import { showJsonDebug } from '@app/utils/error-handler';
 
 @Component({
   selector: 'app-admin',
@@ -18,7 +19,6 @@ import Swal from 'sweetalert2';
 
 })
 export class AdminComponent implements OnInit {
-
   users: any[] = [];
   permissions: any[] = [];
   selectedUsername: string = '';
@@ -40,41 +40,51 @@ export class AdminComponent implements OnInit {
   }
 
   loadUsers() {
-      this.userService.getAll().subscribe({
-        next: (data) => {
-                this.users = data;
-              },
-              error: (err) => {
-                this.strErr = err;
-              }
-      }); 
-    }
+    this.userService.getAll().subscribe({
+      next: (data) => {
+        // showJsonDebug(data);
+        this.users = data;
+      },
+      error: (err) => {
+        this.strErr = err;
+      }
+    });
+  }
 
+  loadPermissions() {
+    this.http.get<any[]>(`${this.host}/permissions`).subscribe(res => {
+      this.permissions = res.map(p => ({ ...p, selected: false }));
+    });
+  }
 
-    loadPermissions() {
-      this.http.get<any[]>(`${this.host}/permissions`).subscribe(res => {
-        this.permissions = res.map(p => ({ ...p, selected: false }));
+  viewUser(user: any) {
+
+    this.dialog.open(UserDetailComponent, {
+      data: {
+        user: user
+      },
+      disableClose: false,
+      panelClass: 'my-dialog', // Thêm class để tùy chỉnh CSS
+      width: '80vw',
+      height: '80vh',
+      maxWidth: '100vw'
+    })
+      .afterClosed().subscribe(result => {
+        if (result) {
+          this.loadUsers();
+        }
       });
-    }
-
-    viewUser(user: any) {
-
-      this.dialog.open(UserDetailComponent, {
-        data: {
-          user: user
-        },
-        disableClose: false,
-        panelClass: 'my-dialog', // Thêm class để tùy chỉnh CSS
-        width: '80vw',
-        height: '80vh',
-        maxWidth: '100vw'
-      })
-        .afterClosed().subscribe(result => {
-          if (result) {
-            //this.loadList();
-          }
-        });
-
-    }
 
   }
+
+  onAvatarError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'images/avatar_default.png';
+  }
+
+  toggleAll($event: Event) {
+    // const checked = (event.target as HTMLInputElement).checked;
+    // this.items.forEach(item => (item.checked = checked));
+  }
+
+}

@@ -28,7 +28,7 @@ export class AdminGuard implements CanActivate {
     const decoded: any = jwtDecode(token);
     const roleClaim = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];  // lấy role từ claim chuẩn của ASP.NET
     const roles = Array.isArray(roleClaim) ? roleClaim : [roleClaim];
-    // console.log("Roles:", safeStringify( decoded ));
+    console.log("Roles:", safeStringify( decoded ));
     if (roles.includes('ADMIN_VOTE')) {
       return true;
     }

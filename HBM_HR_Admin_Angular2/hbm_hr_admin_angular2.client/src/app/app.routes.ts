@@ -21,13 +21,15 @@ import { AdminGuard } from './guards/admin.guard';
 export const ROUTE_PATHS = {
   login: 'login',
   topic_list: 'topic-list',
+  admin: 'admin',
+  home: '',
 };
 
 export const routes: Routes = [
   { path: ROUTE_PATHS.login, component: LoginComponent },
   { path: 'test', component: CompAComponent },
   {
-    path: 'admin',
+    path: ROUTE_PATHS.admin,
     component: MainLayoutComponent,
     canActivate: [AdminGuard], // chỉ admin mới vào
     children: [

@@ -16,10 +16,10 @@ import { ROUTE_PATHS } from '@app/app.routes';
   selector: 'app-main-layout',
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.css'],
-    imports:[
-        CommonModule,
-        RouterModule // ✅ bắt buộc có nếu dùng <router-outlet>
-    ]
+  imports: [
+    CommonModule,
+    RouterModule // ✅ bắt buộc có nếu dùng <router-outlet>
+  ]
 })
 export class MainLayoutComponent {
   isLoggedIn: boolean = false;
@@ -52,8 +52,8 @@ export class MainLayoutComponent {
     private loadingService: LoadingService,
     private router: Router) {
 
-    var token =  localStorage.getItem('access_token');
-    this.isLoggedIn = token!=null && token.trim() != '';
+    var token = localStorage.getItem('access_token');
+    this.isLoggedIn = token != null && token.trim() != '';
     this.tenNhanVien = localStorage.getItem('tenNhanVien') || '';
     this.anhNhanVien = getFullImageUrl(localStorage.getItem('anh') || '');
     this.maNhanVien = localStorage.getItem('maNhanVien') || '';
@@ -91,6 +91,14 @@ export class MainLayoutComponent {
 
   togglePopup() {
     this.showSignoutPopup = !this.showSignoutPopup;
+  }
+
+  goToAdmin() {
+    this.router.navigate([ROUTE_PATHS.admin]);
+  }
+
+  goToHome() {
+    this.router.navigate([ROUTE_PATHS.home]);
   }
 
   title = 'hbm_hr_admin_angular2.client';

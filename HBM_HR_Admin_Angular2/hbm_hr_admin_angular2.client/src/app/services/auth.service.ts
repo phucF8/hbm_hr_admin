@@ -9,6 +9,7 @@ import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { of, throwError } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 import { showApiError, showJsonDebug } from '@app/utils/error-handler';
+import { setLocal } from '@app/utils/json-utils';
 
 export interface NhanVienInfo {
   Username: string;
@@ -102,17 +103,7 @@ export interface NhanVien {
 export interface LoginResponse {
   token: string;
   username: string;
-  role: string;
-  expiresIn: number;
-  message?: string; // Có thể null nếu login thành công
-  nhanVien: NhanVien;
-}
-
-
-export interface LoginResponse {
-  token: string;
-  username: string;
-  role: string;
+  permissions: number[];   // thay role bằng mảng quyền
   expiresIn: number;
   message?: string; // Có thể null nếu login thành công
   nhanVien: NhanVien;
@@ -134,13 +125,13 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, body)
       .pipe(
         tap(res => {
-          // showJsonDebug(res);
+          showJsonDebug(res);
           if (res && res.token) {
             // Lưu token và thông tin cơ bản
             localStorage.setItem('access_token', res.token);
             localStorage.setItem('username', res.username);
-            localStorage.setItem('role', res.role);
-
+            localStorage.setItem('permissions', JSON.stringify(res.permissions));
+            setLocal('permissions',res.permissions);
             // Lưu thông tin nhân viên đầy đủ cho UserInfo
             if (res.nhanVien) {
               localStorage.setItem('id', res.nhanVien.id || '');
