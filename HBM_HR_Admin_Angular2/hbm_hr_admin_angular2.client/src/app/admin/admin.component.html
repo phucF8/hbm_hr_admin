@@ -27,11 +27,12 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th><input type="checkbox" class="checkbox" (click)="toggleAll($event)"></th>
-          
+          <!-- <input type="checkbox" class="checkbox" (click)="toggleAll($event)"> -->
+          <th></th>
           <th>#</th>
           <th>Thông tin user</th>
           <th>Vai trò</th>
+          <th>Truy cập</th>
           <th>Thiết lập</th>
         </tr>
       </thead>
@@ -55,8 +56,9 @@
             </span>
           </td>
 
-
-
+          <td>
+            <div class="user-email">{{user.lastAccessAt | date:'dd/MM/yyyy HH:mm'}}</div>
+          </td>
 
           <td>
             <button class="btn btn-permission" title="Phân quyền" (click)="viewUser(user)">

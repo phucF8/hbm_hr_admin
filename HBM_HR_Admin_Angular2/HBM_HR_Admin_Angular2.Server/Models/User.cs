@@ -7,6 +7,7 @@
         public string FullName { get; set; } = string.Empty; // NOT NULL
         public string? AvatarUrl { get; set; } // NULLABLE
         public DateTime CreatedAt { get; set; }
+        public DateTime? LastAccessAt { get; set; } // NULLABLE, lưu thời điểm truy cập cuối
     }
 
     public class UserDto
@@ -16,6 +17,7 @@
         public string FullName { get; set; } = null!;
         public string AvatarUrl { get; set; } = null!;
         public List<PermissionDto> Permissions { get; set; }
+        public DateTime? LastAccessAt { get; set; } // NULLABLE, lưu thời điểm truy cập cuối
     }
 
     public class PermissionDto {

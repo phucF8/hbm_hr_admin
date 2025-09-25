@@ -53,7 +53,8 @@
                     Username = request.Username,
                     FullName = nhanVien?.TenNhanVien ?? "",
                     AvatarUrl = nhanVien?.Anh,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    LastAccessAt = DateTime.UtcNow
                 };
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
@@ -61,6 +62,7 @@
                 // Nếu muốn, có thể update FullName/AvatarUrl
                 existingUser.FullName = nhanVien?.TenNhanVien ?? existingUser.FullName;
                 existingUser.AvatarUrl = nhanVien?.Anh ?? existingUser.AvatarUrl;
+                existingUser.LastAccessAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
                 user = existingUser;
             }
@@ -118,7 +120,8 @@
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(jwtSettings.GetValue<int>("ExpiryMinutes")),
+                //expires: DateTime.UtcNow.AddMinutes(jwtSettings.GetValue<int>("ExpiryMinutes")),
+                   expires: DateTime.UtcNow.AddMinutes(3), // hết hạn sau 3 phút
                 signingCredentials: creds
             );
 

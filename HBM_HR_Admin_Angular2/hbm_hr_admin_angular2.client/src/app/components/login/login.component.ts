@@ -35,7 +35,6 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     // private usersService: UsersService,
-    // private loadingService: LoadingService,
     // private errorService: ErrorService,
     private encryptionService: EncryptionService
   ) {
@@ -69,7 +68,7 @@ export class LoginComponent implements OnInit {
     // this.loadingService.show();
     this.authService.login(this.username, encryptedPassword).subscribe({
     next: (response) => {
-      // this.loadingService.hide();
+      
       if (response.token != null) {
 
         // ✅ Gọi API lưu username vào bảng Users

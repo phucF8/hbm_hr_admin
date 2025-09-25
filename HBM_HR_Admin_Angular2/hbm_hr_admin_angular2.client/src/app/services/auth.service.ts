@@ -7,9 +7,11 @@ import { DebugUtils } from '@app/utils/debug-utils';
 
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { of, throwError } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { switchMap, catchError, finalize } from 'rxjs/operators';
 import { showApiError, showJsonDebug } from '@app/utils/error-handler';
 import { setLocal } from '@app/utils/json-utils';
+import { LoadingService } from './loading.service';
+import { jwtDecode } from 'jwt-decode';
 
 export interface NhanVienInfo {
   Username: string;
@@ -116,22 +118,26 @@ export class AuthService {
   private baseUrl = environment.apiUrl;
   private tokenKey = 'access_token';
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private loadingService: LoadingService,
+  ) {
 
   }
 
   login(username: string, password: string): Observable<LoginResponse> {
+    this.loadingService.show();
     const body = { username, password };
     return this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, body)
       .pipe(
         tap(res => {
-          showJsonDebug(res);
+          // showJsonDebug(res);
           if (res && res.token) {
             // Lưu token và thông tin cơ bản
             localStorage.setItem('access_token', res.token);
             localStorage.setItem('username', res.username);
             localStorage.setItem('permissions', JSON.stringify(res.permissions));
-            setLocal('permissions',res.permissions);
+            setLocal('permissions', res.permissions);
             // Lưu thông tin nhân viên đầy đủ cho UserInfo
             if (res.nhanVien) {
               localStorage.setItem('id', res.nhanVien.id || '');
@@ -152,9 +158,12 @@ export class AuthService {
           }
         }),
         catchError((err: HttpErrorResponse) => {
-        showApiError(err, 'Đăng nhập thất bại');
-        return throwError(() => err);
-      })
+          showApiError(err, 'Đăng nhập thất bại');
+          return throwError(() => err);
+        }),
+        finalize(() => {
+          this.loadingService.hide(); // luôn được gọi dù success hay error
+        })
       );
   }
 
@@ -167,45 +176,23 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, token);
   }
 
-   removeToken() {
+  removeToken() {
     localStorage.removeItem(this.tokenKey);
   }
 
-  // login0(username: string, password: string): Observable<LoginResponse> {
-  //   const request: LoginRequest = {
-  //     AccessToken: API_CONSTANTS.ACCESS_TOKEN,
-  //     NhanVienInfo: {
-  //       Username: username,
-  //       Password: password
-  //     }
-  //   };
-
-  //   return this.http.post<LoginResponse>(`${API_CONSTANTS.LOGIN_BASE_URL}/DoCheckLogin`, request).pipe(
-  //     switchMap(response => {
-  //       if (response.Status === 'SUCCESS') {
-  //         return this.http.post<LoginAdminResponse>(`${API_CONSTANTS.AUTH_URL}/login`, {Username: 'admin',password:'123456'}).pipe(// Gọi API từ server khác tại đây, ví dụ:
-  //           tap(secondResponse => {
-  //             if (secondResponse.status === 'SUCCESS') {
-  //               localStorage.setItem('currentUser', JSON.stringify(response));
-  //               localStorage.setItem('accessToken', secondResponse.token);
-  //               this.currentUserSubject.next(response);
-  //             } else {
-  //               throw new Error(secondResponse.message || 'Login failed');
-  //             }
-  //           }),
-  //           switchMap(() => of(response)) // Đảm bảo trả về `response` để không làm hỏng kiểu trả về của Observable
-  //         );
-  //       } else {
-  //         return throwError(() => new Error(response.Message));
-  //       }
-  //     }),
-  //     catchError(error => {
-  //       console.error('Login failed:', error);
-  //       return throwError(() => error);
-  //     })
-  //   );
-  // }
-
+  isTokenExpired(): boolean {
+    const token = localStorage.getItem('access_token');
+    if (!token) return true;
+    try {
+      const decoded: any = jwtDecode(token);
+      if (!decoded.exp) return true;
+      // exp trong JWT là số giây kể từ 1970-01-01
+      const expiry = decoded.exp * 1000; 
+      return Date.now() > expiry;
+    } catch (e) {
+      return true;
+    }
+  }
 
   logout(): void {
     localStorage.clear();// Xóa toàn bộ dữ liệu trong localStorage

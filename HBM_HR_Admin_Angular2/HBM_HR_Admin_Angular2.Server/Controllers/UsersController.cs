@@ -52,6 +52,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     Username = u.Username,
                     FullName = u.FullName,
                     AvatarUrl = u.AvatarUrl,
+                    LastAccessAt = u.LastAccessAt,
                     Permissions = _context.UserPermissions
                         .Where(up => up.UserId == u.Id)
                         .Join(_context.Permissions,
