@@ -32,6 +32,7 @@ export class AuthInterceptor implements HttpInterceptor {
       headers.Authorization = `Bearer ${token}`;
     }
     request = request.clone({ setHeaders: headers });
+
     return next.handle(request).pipe(
       tap(() => {
         // có thể show success khi cần (nếu backend trả về status OK)
