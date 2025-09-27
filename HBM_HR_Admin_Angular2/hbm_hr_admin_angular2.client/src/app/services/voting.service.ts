@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import { catchError, finalize, map, Observable, throwError } from 'rxjs';
 import { environment } from 'environments/environment';
 import { ApiResponse } from '@app/voting/voting-list/responses/api-response.model';
 import Swal from 'sweetalert2';
 import { showApiBusinessError, showApiError, showJsonDebug } from '@app/utils/error-handler';
 import { ToastrService } from 'ngx-toastr';
+import { LoadingService } from './loading.service';
 
 export interface Topic {
   id: string;
@@ -40,6 +41,7 @@ export class VotingService {
   constructor(
     private http: HttpClient,
     private toastr: ToastrService,
+    private loadingService: LoadingService,
   ) { }
 
   getVotingTopic(topicId: string): Observable<any> {
@@ -62,7 +64,25 @@ export class VotingService {
   getTopicForReview(topicId: string): Observable<any> {
     var idUser = localStorage.getItem('id');
     const url = `${this.baseUrl}/topics/review/${topicId}/${idUser}`;
-    return this.http.get<any>(url);
+    this.loadingService.hide();
+    return this.http.get<any>(url).pipe(
+      map((res) => {
+        // showJsonDebug(res)
+        if (res.status === 'SUCCESS') {
+          
+        } else {
+          showApiBusinessError(res.message, 'Tải nội dung phiếu điều tra thất bại');
+        }
+        return res;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        showApiError(err, 'Tải nội dung phiếu điều tra thất bại');
+        return throwError(() => err);
+      }),
+      finalize(() => {
+          this.loadingService.hide(); // luôn được gọi dù success hay error
+        })
+    );
   }
 
   getSurveyDetailReport(topicId: string): Observable<any> {

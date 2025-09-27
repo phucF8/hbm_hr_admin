@@ -121,7 +121,7 @@
                 audience: jwtSettings["Audience"],
                 claims: claims,
                 //expires: DateTime.UtcNow.AddMinutes(jwtSettings.GetValue<int>("ExpiryMinutes")),
-                   expires: DateTime.UtcNow.AddMinutes(3), // hết hạn sau 3 phút
+                   expires: DateTime.UtcNow.AddMinutes(60), // hết hạn sau 3 phút
                 signingCredentials: creds
             );
 

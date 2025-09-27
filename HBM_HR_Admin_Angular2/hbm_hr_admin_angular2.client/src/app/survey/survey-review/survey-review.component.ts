@@ -46,10 +46,6 @@ export class SurveyReviewComponent {
         this.pollDescription = this.topicData.description;
         this.questions = this.topicData.questions;
       },
-      error: (err) => {
-        console.error('Lỗi khi load topic:', err);
-        this.errorService.showError([JSON.stringify(err)]);
-      }
     });
   }
 

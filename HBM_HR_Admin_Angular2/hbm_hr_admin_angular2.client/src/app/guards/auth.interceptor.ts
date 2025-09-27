@@ -11,22 +11,27 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { showApiError, showJsonDebug } from '@app/utils/error-handler';
 import Swal from 'sweetalert2';
+import { AuthService } from '@app/services/auth.service';
+import { environment } from 'environments/environment';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private router: Router, private dialog: MatDialog) { }
+  constructor(
+    private router: Router,
+    private dialog: MatDialog,
+    private authService: AuthService,
+  ) { }
 
+  /**gọi mỗi lần request api */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Lấy token từ localStorage hoặc sessionStorage
+    // Nếu token còn hạn thì gắn Authorization Header
     const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    let headers: any = { 'X-App-Token': environment.appToken };
     if (token) {
-      request = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      headers.Authorization = `Bearer ${token}`;
     }
+    request = request.clone({ setHeaders: headers });
     return next.handle(request).pipe(
       tap(() => {
         // có thể show success khi cần (nếu backend trả về status OK)

@@ -116,6 +116,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware< HBM_HR_Admin_Angular2.Server.Middleware.AppTokenMiddleware>();
 
 
 

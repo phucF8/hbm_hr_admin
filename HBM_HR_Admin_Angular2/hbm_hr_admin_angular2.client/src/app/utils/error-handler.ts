@@ -15,13 +15,13 @@ export function showApiError(err: any, title: string = 'Lỗi') {
     title,
     html: `
   <div style="text-align:left; font-family:monospace; font-size:0.9em;">
-      <h1 style="color:#c00; font-size:1.1em; margin-bottom:4px;">${apiMessage}</h1>
+      <h1 style="color:#c00; font-size:1.1em; margin-bottom:4px;">${apiMessage || ''}</h1>
       <hr/>
-      <strong>HTTP Message:</strong> ${httpMessage ?? '-'} <br/>
+      <strong>HTTP Message:</strong> ${httpMessage || ''} <br/>
       <hr/>
       <strong>Thời gian:</strong> ${time} <br/>
       <hr/>
-      <small style="color:gray;">URL: ${err?.url || '-'}</small>
+      <small style="color:gray;">URL: ${err?.url || ''}</small>
   </div>
     `,
     confirmButtonText: 'Đóng',

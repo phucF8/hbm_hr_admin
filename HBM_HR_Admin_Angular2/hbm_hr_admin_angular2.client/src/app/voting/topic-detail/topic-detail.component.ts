@@ -100,7 +100,6 @@ export class TopicDetailComponent implements OnInit {
     }));
   }
 
-
   // getter tiện dùng trong HTML
   get questionsFormArray(): FormArray {
     return this.myForm.get('questions') as FormArray;
@@ -166,16 +165,6 @@ export class TopicDetailComponent implements OnInit {
     );
     this.myForm.setControl('questions', questionsFormArray);
   }
-
-
-
-
-
-
-
-
-
-
 
   closePopup() {
     this.dialogRef.close();
@@ -249,10 +238,6 @@ export class TopicDetailComponent implements OnInit {
     }
   }
 
-
-
-
-
   onSubmitUpdate() {
     const idUser = localStorage.getItem('id')
     // Xử lý giá trị rỗng thành null
@@ -299,7 +284,6 @@ export class TopicDetailComponent implements OnInit {
     });
   }
 
-
   onSubmitCreate() {
     const idUser = localStorage.getItem('id')
     const newTopic: TopicDetail = {
@@ -340,7 +324,5 @@ export class TopicDetailComponent implements OnInit {
   get titleControl(): FormControl {
     return this.myForm.get('title') as FormControl;
   }
-
-
 
 }
