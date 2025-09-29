@@ -130,6 +130,46 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(gopy);
         }
 
+        [HttpPost("GetGopYsByNhanVien")]
+        public async Task<ActionResult<PagedResultGopY>> GetGopYsByNhanVien([FromBody] GopYByNhanVienRequest request) {
+            if (request.PageNumber <= 0) request.PageNumber = 1;
+            if (request.PageSize <= 0) request.PageSize = 10;
+
+            var query = _context.GY_GopYs.AsQueryable();
+
+            // lọc theo NhanVienID
+            query = query.Where(g => g.NhanVienID == request.NhanVienID);
+
+            // tìm kiếm theo nội dung (nếu có)
+            if (!string.IsNullOrWhiteSpace(request.Search)) {
+                query = query.Where(g => g.NoiDung.Contains(request.Search));
+            }
+
+            var totalItems = await query.LongCountAsync();
+
+            var items = await query
+                .OrderByDescending(g => g.NgayGui)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(g => new GopYResponse {
+                    ID = g.ID,
+                    NhanVienID = g.NhanVienID,
+                    NoiDung = g.NoiDung,
+                    NgayGui = g.NgayGui,
+                    TrangThai = g.TrangThai
+                })
+                .ToListAsync();
+
+            var result = new PagedResultGopY {
+                TotalItems = totalItems,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                Items = items
+            };
+
+            return Ok(result);
+        }
+
 
     }
 
