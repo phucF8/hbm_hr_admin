@@ -27,12 +27,9 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<BB_UserAnswer> BB_UserAnswers { get; set; }
         public DbSet<BB_TopicRelease> BB_TopicRelease { get; set; }
         public DbSet<DM_ChiNhanh> DM_ChiNhanhs { get; set; }
+        public DbSet<GY_GopY> GY_GopYs { get; set; }
 
-
-
-
-
-
+        public DbSet<GY_FileDinhKem> GY_Files { get; set; }
     }
 
 

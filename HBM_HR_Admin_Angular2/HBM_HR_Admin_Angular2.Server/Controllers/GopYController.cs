@@ -1,6 +1,9 @@
-﻿using HBM_HR_Admin_Angular2.Server.Requesters;
+﻿using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.Models;
+using HBM_HR_Admin_Angular2.Server.Requesters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers {
     [ApiController]
@@ -9,7 +12,12 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         private readonly IConfiguration _config;
         private readonly string _connectionString;
 
-        public GopYController(IConfiguration config) {
+        private readonly ApplicationDbContext _context;
+
+        public GopYController(
+            ApplicationDbContext context,
+            IConfiguration config) {
+            _context = context;
             _config = config;
             _connectionString = _config.GetConnectionString("DefaultConnection");
         }
@@ -19,53 +27,110 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             var id = Guid.NewGuid();
             var maTraCuu = $"GY-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6]}";
 
-            using (var conn = new SqlConnection(_connectionString)) {
-                await conn.OpenAsync();
-                var sql = @"
-                INSERT INTO GY_GopYs (ID, TieuDe, NoiDung, NhanVienID, MaTraCuu, TrangThai, NgayGui)
-                VALUES (@ID, @TieuDe, @NoiDung, @NhanVienID, @MaTraCuu, N'Chưa phản hồi', GETDATE())";
+            var gopY = new GY_GopY {
+                ID = id,
+                TieuDe = request.TieuDe,
+                NoiDung = request.NoiDung,
+                NhanVienID = string.IsNullOrEmpty(request.NhanVienID) ? null : request.NhanVienID,
+                MaTraCuu = maTraCuu,
+                TrangThai = "Chưa phản hồi",
+                NgayGui = DateTime.Now
+            };
 
-                using (var cmd = new SqlCommand(sql, conn)) {
-                    cmd.Parameters.AddWithValue("@ID", id);
-                    cmd.Parameters.AddWithValue("@TieuDe", request.TieuDe);
-                    cmd.Parameters.AddWithValue("@NoiDung", request.NoiDung);
-                    cmd.Parameters.AddWithValue("@NhanVienID", (object?)request.NhanVienID ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@MaTraCuu", maTraCuu);
-
-                    await cmd.ExecuteNonQueryAsync();
-                }
-            }
-
-            // Lưu file đính kèm (nếu có)
+            // Lưu file đính kèm nếu có
             if (request.Files != null && request.Files.Any()) {
                 foreach (var file in request.Files) {
                     var fileId = Guid.NewGuid();
                     var filePath = Path.Combine("Uploads/GopY", fileId + Path.GetExtension(file.FileName));
 
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+
                     using (var stream = new FileStream(filePath, FileMode.Create)) {
                         await file.CopyToAsync(stream);
                     }
 
-                    using (var conn = new SqlConnection(_connectionString)) {
-                        await conn.OpenAsync();
-                        var sql = @"
-                        INSERT INTO GY_FileDinhKems (ID, GopYID, TenFile, DuongDan, NgayTai)
-                        VALUES (@ID, @GopYID, @TenFile, @DuongDan, GETDATE())";
-
-                        using (var cmd = new SqlCommand(sql, conn)) {
-                            cmd.Parameters.AddWithValue("@ID", fileId);
-                            cmd.Parameters.AddWithValue("@GopYID", id);
-                            cmd.Parameters.AddWithValue("@TenFile", file.FileName);
-                            cmd.Parameters.AddWithValue("@DuongDan", filePath);
-                            await cmd.ExecuteNonQueryAsync();
-                        }
-                    }
+                    gopY.Files.Add(new GY_FileDinhKem {
+                        ID = fileId,
+                        GopYID = id,
+                        TenFile = file.FileName,
+                        DuongDan = filePath,
+                        NgayTai = DateTime.Now
+                    });
                 }
             }
 
+            // Thêm vào DbContext và lưu
+            _context.GY_GopYs.Add(gopY);
+            await _context.SaveChangesAsync();
+
             return Ok(new { Success = true, GopYID = id, MaTraCuu = maTraCuu });
         }
+
+
+        [HttpPost("GetGopYs")]
+        public async Task<ActionResult<PagedResultGopY>> GetGopYs([FromBody] GopYQueryRequest request) {
+            if (request.PageNumber <= 0) request.PageNumber = 1;
+            if (request.PageSize <= 0) request.PageSize = 10;
+
+            var query = _context.GY_GopYs.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(request.Search)) {
+                query = query.Where(g => g.NoiDung.Contains(request.Search));
+            }
+
+            var totalItems = await query.LongCountAsync();
+
+            var items = await query
+                .OrderByDescending(g => g.NgayGui)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(g => new GopYResponse {
+                    ID = g.ID,
+                    NhanVienID = g.NhanVienID,
+                    NoiDung = g.NoiDung,
+                    NgayGui = g.NgayGui,
+                    TrangThai = g.TrangThai
+                })
+                .ToListAsync();
+
+            var result = new PagedResultGopY {
+                TotalItems = totalItems,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                Items = items
+            };
+
+            return Ok(result);
+        }
+
+        [HttpPost("GetChiTiet")]
+        public async Task<IActionResult> GetChiTiet([FromBody] GopYChiTietRequest request) {
+            if (request == null || request.Id == Guid.Empty)
+                return BadRequest("Id không hợp lệ.");
+
+            var gopy = await _context.GY_GopYs
+                .Where(x => x.ID == request.Id)
+                .Select(x => new GopYChiTietDto {
+                    Id = x.ID,
+                    NoiDung = x.NoiDung,
+                    NhanVienId = x.NhanVienID,
+                    CreatedDate = x.NgayGui,
+                    Files = _context.GY_Files
+                                .Where(f => f.GopYID == x.ID)
+                                .Select(f => new FileDto {
+                                    FileName = f.TenFile,
+                                    FileUrl = f.DuongDan
+                                }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (gopy == null)
+                return NotFound("Không tìm thấy góp ý.");
+
+            return Ok(gopy);
+        }
+
+
     }
 
 }
