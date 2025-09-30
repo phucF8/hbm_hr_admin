@@ -1,0 +1,109 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2 class="modal-title">Chi tiết Ý kiến {{ opinion.code }}</h2>
+        <p class="modal-subtitle">{{ opinion.title }}</p>
+      </div>
+      <button class="close-button" (click)="closeModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-body">
+      <!-- Nội dung ý kiến -->
+      <div class="section">
+        <div class="section-header">
+          <div class="icon-box icon-blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <h3 class="section-title">Nội dung ý kiến</h3>
+        </div>
+        <div class="content-box">
+          <p class="content-text">{{ opinion.content }}</p>
+          <p class="content-date">Gửi lúc: {{ opinion.sentDate }}</p>
+        </div>
+      </div>
+
+      <!-- File đính kèm -->
+      <div class="section">
+        <div class="section-header">
+          <div class="icon-box icon-blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <h3 class="section-title">File đính kèm</h3>
+        </div>
+        <div class="attachments-list">
+          <div class="attachment-item" *ngFor="let file of opinion.attachments">
+            <div class="attachment-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </div>
+            <div class="attachment-info">
+              <p class="attachment-name">{{ file.name }}</p>
+            </div>
+            <span class="attachment-size">{{ file.size }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trạng thái hiện tại -->
+      <div class="section">
+        <div class="section-header">
+          <div class="icon-box icon-blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h3 class="section-title">Trạng thái hiện tại</h3>
+        </div>
+        <div class="status-box">
+          <div class="status-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="status-icon">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span class="status-text">Đã xem xét</span>
+          </div>
+          <p class="status-date">Cập nhật lần cuối: {{ opinion.lastUpdate }}</p>
+        </div>
+      </div>
+
+      <!-- Phản hồi từ lãnh đạo -->
+      <div class="section">
+        <div class="section-header">
+          <div class="icon-box icon-blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <h3 class="section-title">Phản hồi từ lãnh đạo</h3>
+        </div>
+        <div class="empty-state" *ngIf="!opinion.response">
+          Chưa có phản hồi
+        </div>
+        <div class="response-box" *ngIf="opinion.response">
+          <p class="response-text">{{ opinion.response }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
