@@ -21,11 +21,39 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
     [Table("GY_FileDinhKems")]
     public class GY_FileDinhKem {
         [Key]
-        public Guid ID { get; set; }
-        public Guid GopYID { get; set; }
+        public Guid ID { get; set; }            // Primary key
+
+        public Guid? GopYID { get; set; }       // Có thể null nếu file thuộc về phản hồi
+        public Guid? PhanHoiID { get; set; }    // Có thể null nếu file thuộc về góp ý
+
+        [Required]
+        [MaxLength(255)]
         public string TenFile { get; set; }
+
+        [Required]
+        [MaxLength(500)]
         public string DuongDan { get; set; }
-        public DateTime NgayTai { get; set; }
+
+        public DateTime? NgayTai { get; set; }  // Cho phép null như DB
+    }
+
+
+    [Table("GY_PhanHois")]
+    public class GY_PhanHoi {
+        [Key]
+        public Guid ID { get; set; }              // Khóa chính
+
+        public Guid GopYID { get; set; }          // Liên kết tới góp ý nào
+        public Guid? NhanVienID { get; set; }     // Người phản hồi (có thể null nếu hệ thống phản hồi tự động)
+
+        [Required]
+        [MaxLength(500)]
+        public string NoiDung { get; set; }       // Nội dung phản hồi
+
+        public DateTime NgayGui { get; set; }     // Ngày phản hồi
+
+        // Nếu bạn muốn lấy kèm file thì có thể định nghĩa navigation property:
+        public ICollection<GY_FileDinhKem> FileDinhKems { get; set; }
     }
 
 }

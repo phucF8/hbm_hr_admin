@@ -115,7 +115,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     NoiDung = x.NoiDung,
                     NhanVienId = x.NhanVienID,
                     CreatedDate = x.NgayGui,
-                    Files = _context.GY_Files
+                    Files = _context.GY_FileDinhKems
                                 .Where(f => f.GopYID == x.ID)
                                 .Select(f => new FileDto {
                                     FileName = f.TenFile,
@@ -170,6 +170,77 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(result);
         }
 
+        [HttpPost("PhanHoi")]
+        public async Task<IActionResult> PhanHoi([FromForm] CreatePhanHoiRequest request) {
+            var id = Guid.NewGuid();
+
+            // 1. Lưu phản hồi
+            var phanHoi = new GY_PhanHoi {
+                ID = id,
+                GopYID = request.GopYID,
+                NhanVienID = request.NhanVienID,
+                NoiDung = request.NoiDung,
+                NgayGui = DateTime.Now
+            };
+
+            _context.GY_PhanHois.Add(phanHoi);
+
+            // 2. Lưu file đính kèm (nếu có)
+            if (request.Files != null && request.Files.Any()) {
+                foreach (var file in request.Files) {
+                    var fileId = Guid.NewGuid();
+                    var filePath = Path.Combine("Uploads/PhanHoi", fileId + Path.GetExtension(file.FileName));
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                    using (var stream = new FileStream(filePath, FileMode.Create)) {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    var fileEntity = new GY_FileDinhKem {
+                        ID = fileId,
+                        GopYID = request.GopYID,
+                        PhanHoiID = id,
+                        TenFile = file.FileName,
+                        DuongDan = filePath,
+                        NgayTai = DateTime.Now
+                    };
+
+                    _context.GY_FileDinhKems.Add(fileEntity);
+                }
+            }
+
+            // Lưu vào DB
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Success = true, PhanHoiID = id });
+        }
+
+        [HttpPost("Delete")]
+        public async Task<IActionResult> Delete([FromBody] DeleteGopYRequest request) {
+            var gopY = await _context.GY_GopYs.FindAsync(request.ID);
+
+            if (gopY == null) {
+                return NotFound(new { Success = false, Message = "Không tìm thấy góp ý." });
+            }
+
+            // Xoá luôn file đính kèm và phản hồi liên quan (nếu muốn)
+            var files = _context.GY_FileDinhKems.Where(f => f.GopYID == request.ID);
+            _context.GY_FileDinhKems.RemoveRange(files);
+
+            var phanHois = _context.GY_PhanHois.Where(p => p.GopYID == request.ID).ToList();
+            foreach (var ph in phanHois) {
+                var filesPh = _context.GY_FileDinhKems.Where(f => f.PhanHoiID == ph.ID);
+                _context.GY_FileDinhKems.RemoveRange(filesPh);
+            }
+            _context.GY_PhanHois.RemoveRange(phanHois);
+
+            // Xoá góp ý
+            _context.GY_GopYs.Remove(gopY);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Success = true, Message = "Xoá góp ý thành công." });
+        }
 
     }
 
