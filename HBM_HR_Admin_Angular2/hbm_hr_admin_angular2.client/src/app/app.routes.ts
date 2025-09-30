@@ -17,6 +17,7 @@ import { TopicReleaseComponent } from './survey/topic-release/topic-release.comp
 import { TreeViewChecklistComponent } from './uicomponents/tree-view-checklist/tree-view-checklist.component';
 import { CompAComponent } from './demo/comp-a/comp-a.component';
 import { AdminGuard } from './guards/admin.guard';
+import { FeedbackManagementComponent } from './gopy/feedback-management/feedback-management.component';
 
 export const ROUTE_PATHS = {
   login: 'login',
@@ -28,6 +29,7 @@ export const ROUTE_PATHS = {
 export const routes: Routes = [
   { path: ROUTE_PATHS.login, component: LoginComponent },
   { path: 'test', component: CompAComponent },
+  { path: 'gopy', component: FeedbackManagementComponent },
   {
     path: ROUTE_PATHS.admin,
     component: MainLayoutComponent,

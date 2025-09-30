@@ -1,0 +1,126 @@
+<div class="feedback-container">
+  <div class="header">
+    <h1>Quản lý Ý kiến Đã Gửi</h1>
+    <p class="subtitle">Theo dõi và xử lý các ý kiến, góp ý từ người dùng</p>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <div class="filter-header">
+      <span class="filter-icon">⚙</span>
+      <span class="filter-title">Bộ lọc</span>
+    </div>
+
+    <div class="filter-content">
+      <!-- Search -->
+      <div class="filter-group">
+        <input 
+          type="text" 
+          class="filter-input" 
+          placeholder="Tìm kiếm theo tiêu đề..."
+          [(ngModel)]="searchText"
+          (input)="applyFilters()">
+      </div>
+
+      <!-- Type Filter -->
+      <div class="filter-group">
+        <select 
+          class="filter-select" 
+          [(ngModel)]="selectedType"
+          (change)="applyFilters()">
+          <option value="">Tất cả loại</option>
+          <option value="Góp ý">Góp ý</option>
+          <option value="Báo lỗi">Báo lỗi</option>
+          <option value="Đề xuất tính năng">Đề xuất tính năng</option>
+          <option value="Khiếu nại">Khiếu nại</option>
+          <option value="Báo mật">Báo mật</option>
+        </select>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="filter-group">
+        <select 
+          class="filter-select" 
+          [(ngModel)]="selectedStatus"
+          (change)="applyFilters()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="pending">Chờ xử lý</option>
+          <option value="processing">Đang xử lý</option>
+          <option value="resolved">Đã giải quyết</option>
+          <option value="rejected">Đã từ chối</option>
+        </select>
+      </div>
+
+      <!-- Date Range -->
+      <div class="filter-group">
+        <input 
+          type="date" 
+          class="filter-date"
+          [(ngModel)]="startDate"
+          (change)="applyFilters()">
+      </div>
+
+      <div class="filter-group">
+        <input 
+          type="date" 
+          class="filter-date"
+          [(ngModel)]="endDate"
+          (change)="applyFilters()">
+      </div>
+
+      <!-- Clear Filter Button -->
+      <div class="filter-actions">
+        <button class="btn-clear" (click)="clearFilters()">
+          Xóa tất cả bộ lọc
+        </button>
+        <span class="result-count">Hiển thị {{ filteredFeedbacks.length }} / {{ feedbacks.length }} ý kiến</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-container">
+    <table class="feedback-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>TIÊU ĐỀ</th>
+          <th>LOẠI</th>
+          <th>NGÀY GỬI</th>
+          <th>TRẠNG THÁI</th>
+          <th>HÀNH ĐỘNG</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let feedback of filteredFeedbacks">
+          <td>#{{ feedback.id }}</td>
+          <td>{{ feedback.title }}</td>
+          <td>{{ feedback.type }}</td>
+          <td>{{ feedback.dateSubmitted | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="status-badge status-{{ feedback.status }}">
+              {{ getStatusLabel(feedback.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-icon btn-view" (click)="viewFeedback(feedback.id)" title="Xem">
+                👁
+              </button>
+              <button class="btn-icon btn-edit" (click)="editFeedback(feedback.id)" title="Chỉnh sửa">
+                ✏
+              </button>
+              <button class="btn-icon btn-delete" (click)="deleteFeedback(feedback.id)" title="Xóa">
+                🗑
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredFeedbacks.length === 0" class="no-results">
+      <p>Không tìm thấy ý kiến nào phù hợp với bộ lọc.</p>
+    </div>
+  </div>
+</div>
