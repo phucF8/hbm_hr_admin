@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HBM_HR_Admin_Angular2.Server.Models {
@@ -35,6 +36,10 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
         public string DuongDan { get; set; }
 
         public DateTime? NgayTai { get; set; }  // Cho phép null như DB
+
+        // Navigation properties
+        public GY_GopY? GopY { get; set; }
+        public GY_PhanHoi? PhanHoi { get; set; }
     }
 
 
@@ -56,4 +61,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
         public ICollection<GY_FileDinhKem> FileDinhKems { get; set; }
     }
 
-}
+    
+
+
+    }

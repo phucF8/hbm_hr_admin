@@ -1,4 +1,4 @@
-using HBM_HR_Admin_Angular2.Server.Models;
+﻿using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +31,26 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public DbSet<GY_FileDinhKem> GY_FileDinhKems { get; set; }
         public DbSet<GY_PhanHoi> GY_PhanHois { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            // File đính kèm có thể thuộc Góp ý
+            modelBuilder.Entity<GY_FileDinhKem>()
+                .HasOne(f => f.GopY)
+                .WithMany(g => g.Files)
+                .HasForeignKey(f => f.GopYID)
+                .OnDelete(DeleteBehavior.Restrict); // tránh cascade conflict
+
+            // File đính kèm có thể thuộc Phản hồi
+            modelBuilder.Entity<GY_FileDinhKem>()
+                .HasOne(f => f.PhanHoi)
+                .WithMany(p => p.FileDinhKems)
+                .HasForeignKey(f => f.PhanHoiID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            base.OnModelCreating(modelBuilder);
+        }
+
+
     }
 
 

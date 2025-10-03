@@ -23,8 +23,10 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromForm] CreateGopYRequest request) {
-            var id = Guid.NewGuid();
+        public async Task<IActionResult> Create([FromBody] CreateGopYRequest request) {
+            var id = (request.Id != null && request.Id != Guid.Empty)
+        ? request.Id
+        : Guid.NewGuid();
             var maTraCuu = $"GY-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6]}";
 
             var gopY = new GY_GopY {
@@ -34,37 +36,48 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 NhanVienID = string.IsNullOrEmpty(request.NhanVienID) ? null : request.NhanVienID,
                 MaTraCuu = maTraCuu,
                 TrangThai = "Chưa phản hồi",
-                NgayGui = DateTime.Now
+                NgayGui = DateTime.Now,
+                Files = new List<GY_FileDinhKem>()
             };
 
-            // Lưu file đính kèm nếu có
+            // Nếu có file trong request thì xử lý
             if (request.Files != null && request.Files.Any()) {
-                foreach (var file in request.Files) {
+                foreach (var f in request.Files) {
                     var fileId = Guid.NewGuid();
-                    var filePath = Path.Combine("Uploads/GopY", fileId + Path.GetExtension(file.FileName));
+                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+                    var tmpPath = Path.Combine(Directory.GetCurrentDirectory(), f.DuongDan);
 
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                    if (!Directory.Exists(uploadsPath))
+                        Directory.CreateDirectory(uploadsPath);
 
-                    using (var stream = new FileStream(filePath, FileMode.Create)) {
-                        await file.CopyToAsync(stream);
-                    }
+                    var destFile = Path.Combine(uploadsPath, f.TenFile);
+
+                    // Copy từ tmp → uploads
+                    if (System.IO.File.Exists(tmpPath))
+                        System.IO.File.Move(tmpPath, destFile, true);
 
                     gopY.Files.Add(new GY_FileDinhKem {
                         ID = fileId,
                         GopYID = id,
-                        TenFile = file.FileName,
-                        DuongDan = filePath,
+                        PhanHoiID = null, // vì file này thuộc về góp ý
+                        TenFile = f.TenFile,
+                        DuongDan = Path.Combine("uploads", f.TenFile),
                         NgayTai = DateTime.Now
                     });
                 }
             }
 
-            // Thêm vào DbContext và lưu
             _context.GY_GopYs.Add(gopY);
             await _context.SaveChangesAsync();
 
-            return Ok(new { Success = true, GopYID = id, MaTraCuu = maTraCuu });
+            return Ok(new {
+                Success = true,
+                GopYID = id,
+                MaTraCuu = maTraCuu
+            });
         }
+
+
 
 
         [HttpPost("GetGopYs")]
