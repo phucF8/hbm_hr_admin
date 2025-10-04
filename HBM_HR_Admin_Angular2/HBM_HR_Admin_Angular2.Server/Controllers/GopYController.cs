@@ -74,9 +74,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(ApiResponse<string>.Success("Tạo góp ý thành công"));
         }
 
-
-
-
         [HttpPost("GetGopYs")]
         public async Task<ActionResult<PagedResultGopY>> GetGopYs([FromBody] GopYQueryRequest request) {
             if (request.PageNumber <= 0) request.PageNumber = 1;
@@ -124,6 +121,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 .Where(x => x.ID == request.Id)
                 .Select(x => new GopYChiTietDto {
                     Id = x.ID,
+                    TieuDe = x.TieuDe,
                     NoiDung = x.NoiDung,
                     NhanVienId = x.NhanVienID,
                     CreatedDate = x.NgayGui,
@@ -137,9 +135,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 .FirstOrDefaultAsync();
 
             if (gopy == null)
-                return NotFound("Không tìm thấy góp ý.");
+                return NotFound(ApiResponse<GopYChiTietDto>.Error("Không tìm thấy thông tin chi tiết về góp ý này."));
 
-            return Ok(gopy);
+            return Ok(ApiResponse<GopYChiTietDto>.Success(gopy));
         }
 
         [HttpPost("GetGopYsByNhanVien")]
@@ -190,9 +188,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             var phanHoi = new GY_PhanHoi {
                 ID = id,
                 GopYID = request.GopYID,
-                NhanVienID = request.NhanVienID,
+                NguoiPhanHoiID = request.NhanVienID,
                 NoiDung = request.NoiDung,
-                NgayGui = DateTime.Now
+                NgayPhanHoi = DateTime.Now
             };
 
             _context.GY_PhanHois.Add(phanHoi);
@@ -232,7 +230,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             var gopY = await _context.GY_GopYs.FindAsync(request.ID);
 
             if (gopY == null) {
-                return NotFound(new { Success = false, Message = "Không tìm thấy góp ý." });
+                return NotFound(ApiResponse<String>.Error("Xoá góp ý thất bại"));
             }
 
             // Xoá luôn file đính kèm và phản hồi liên quan (nếu muốn)
@@ -251,7 +249,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
             await _context.SaveChangesAsync();
 
-            return Ok(new { Success = true, Message = "Xoá góp ý thành công." });
+            return Ok(ApiResponse<String>.Success("Xoá góp ý thành công."));
         }
 
     }

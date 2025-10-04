@@ -49,13 +49,13 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
         public Guid ID { get; set; }              // Khóa chính
 
         public Guid GopYID { get; set; }          // Liên kết tới góp ý nào
-        public Guid? NhanVienID { get; set; }     // Người phản hồi (có thể null nếu hệ thống phản hồi tự động)
+        public Guid? NguoiPhanHoiID { get; set; }     // Người phản hồi (có thể null nếu hệ thống phản hồi tự động)
 
         [Required]
         [MaxLength(500)]
         public string NoiDung { get; set; }       // Nội dung phản hồi
 
-        public DateTime NgayGui { get; set; }     // Ngày phản hồi
+        public DateTime NgayPhanHoi { get; set; }     // Ngày phản hồi
 
         // Nếu bạn muốn lấy kèm file thì có thể định nghĩa navigation property:
         public ICollection<GY_FileDinhKem> FileDinhKems { get; set; }

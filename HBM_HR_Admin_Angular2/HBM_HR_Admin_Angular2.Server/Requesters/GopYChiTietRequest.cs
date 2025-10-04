@@ -10,6 +10,7 @@
 
     public class GopYChiTietDto {
         public Guid Id { get; set; }
+        public string TieuDe { get; set; }
         public string NoiDung { get; set; }
         public string NhanVienId { get; set; }
         public DateTime CreatedDate { get; set; }
