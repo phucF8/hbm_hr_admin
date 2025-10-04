@@ -1,5 +1,6 @@
 ﻿using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Models;
+using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Requesters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -70,11 +71,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             _context.GY_GopYs.Add(gopY);
             await _context.SaveChangesAsync();
 
-            return Ok(new {
-                Success = true,
-                GopYID = id,
-                MaTraCuu = maTraCuu
-            });
+            return Ok(ApiResponse<string>.Success("Tạo góp ý thành công"));
         }
 
 
@@ -99,10 +96,12 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 .Take(request.PageSize)
                 .Select(g => new GopYResponse {
                     ID = g.ID,
+                    TieuDe = g.TieuDe,
                     NhanVienID = g.NhanVienID,
                     NoiDung = g.NoiDung,
                     NgayGui = g.NgayGui,
-                    TrangThai = g.TrangThai
+                    TrangThai = g.TrangThai,
+                    MaTraCuu = g.MaTraCuu,
                 })
                 .ToListAsync();
 
@@ -113,7 +112,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 Items = items
             };
 
-            return Ok(result);
+            return Ok(ApiResponse<PagedResultGopY>.Success(result));
         }
 
         [HttpPost("GetChiTiet")]

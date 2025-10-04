@@ -9,10 +9,12 @@
     // Dữ liệu trả về
     public class GopYResponse {
         public Guid ID { get; set; }
+        public string TieuDe { get; set; }
         public string? NhanVienID { get; set; }   // NULL nếu nặc danh
         public string NoiDung { get; set; }
         public DateTime NgayGui { get; set; }
         public string TrangThai { get; set; }
+        public string MaTraCuu { get; set; }
     }
 
     // Kết quả phân trang chung

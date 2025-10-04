@@ -9,6 +9,7 @@
         public static ApiResponse<T> Success(T data, string message = "Thành công") => new ApiResponse<T> { Status = "SUCCESS", Message = message, Data = data };
 
         public static ApiResponse<T> Error(string message) => new ApiResponse<T> { Status = "FAIL", Message = message, Data = default };
+        
     }
 
 }

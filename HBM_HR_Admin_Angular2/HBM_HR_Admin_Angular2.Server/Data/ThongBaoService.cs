@@ -1,4 +1,5 @@
 using HBM_HR_Admin_Angular2.Server.Models;
+using HBM_HR_Admin_Angular2.Server.Models.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
     public interface IThongBaoService
     {
         Task<PagedResult<ThongBaoDto>> getListThongBao(NotificationPagingRequest param);
-        Task<ApiResponse> nguoiNhanThongBaoUpdateStatus(string idThongBao, string idNhanVien,byte status);
+        Task<ApiResponse<String>> nguoiNhanThongBaoUpdateStatus(string idThongBao, string idNhanVien,byte status);
 
     }
 
@@ -22,13 +23,11 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public async Task<PagedResult<ThongBaoDto>> getListThongBao(NotificationPagingRequest param)
         {
-            
             var query = _context.DbThongBao
                 .Join(_context.DbNhanVien,
                     tb => tb.NguoiTao,
                     nv => nv.ID,
                     (tb, nv) => new { tb, nv });
-
             // Áp dụng lọc ID người tạo (sau khi kiểm tra null)
             if (!string.IsNullOrWhiteSpace(param.NgTaoIds))
             {
@@ -141,7 +140,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
             };
         }
 
-        public async Task<ApiResponse> nguoiNhanThongBaoUpdateStatus(string idThongBao, string idNhanVien, byte status)
+        public async Task<ApiResponse<String>> nguoiNhanThongBaoUpdateStatus(string idThongBao, string idNhanVien, byte status)
         {
             // Tìm bản ghi phù hợp
             var record = await _context.DbThongBaoNguoiNhan
@@ -149,11 +148,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
             if (record == null)
             {
-                return new ApiResponse
-                {
-                    Status = "FAIL",
-                    Message = "Không tìm thấy bản ghi phù hợp."
-                };
+                return ApiResponse<String>.Error("Không tìm thấy bản ghi phù hợp.");
             }
 
             // Cập nhật trạng thái
@@ -164,11 +159,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
             await _context.SaveChangesAsync();
 
-            return new ApiResponse
-            {
-                Status = "FAIL",
-                Message = "Không tìm thấy bản ghi phù hợp."
-            };
+            return ApiResponse<String>.Error("Không tìm thấy bản ghi phù hợp.");
 
         }
 
