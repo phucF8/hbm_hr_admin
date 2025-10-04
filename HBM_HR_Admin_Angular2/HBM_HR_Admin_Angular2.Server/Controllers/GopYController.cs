@@ -188,7 +188,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             var phanHoi = new GY_PhanHoi {
                 ID = id,
                 GopYID = request.GopYID,
-                NguoiPhanHoiID = request.NhanVienID,
+                NguoiPhanHoiID = request.NguoiPhanHoiID,
                 NoiDung = request.NoiDung,
                 NgayPhanHoi = DateTime.Now
             };
@@ -196,28 +196,28 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             _context.GY_PhanHois.Add(phanHoi);
 
             // 2. Lưu file đính kèm (nếu có)
-            if (request.Files != null && request.Files.Any()) {
-                foreach (var file in request.Files) {
-                    var fileId = Guid.NewGuid();
-                    var filePath = Path.Combine("Uploads/PhanHoi", fileId + Path.GetExtension(file.FileName));
+            //if (request.Files != null && request.Files.Any()) {
+            //    foreach (var file in request.Files) {
+            //        var fileId = Guid.NewGuid();
+            //        var filePath = Path.Combine("Uploads/", fileId + Path.GetExtension(file.TenFile));
 
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-                    using (var stream = new FileStream(filePath, FileMode.Create)) {
-                        await file.CopyToAsync(stream);
-                    }
+            //        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+            //        using (var stream = new FileStream(filePath, FileMode.Create)) {
+            //            await file.CopyToAsync(stream);
+            //        }
 
-                    var fileEntity = new GY_FileDinhKem {
-                        ID = fileId,
-                        GopYID = request.GopYID,
-                        PhanHoiID = id,
-                        TenFile = file.FileName,
-                        DuongDan = filePath,
-                        NgayTai = DateTime.Now
-                    };
+            //        var fileEntity = new GY_FileDinhKem {
+            //            ID = fileId,
+            //            GopYID = request.GopYID,
+            //            PhanHoiID = id,
+            //            TenFile = file.FileName,
+            //            DuongDan = filePath,
+            //            NgayTai = DateTime.Now
+            //        };
 
-                    _context.GY_FileDinhKems.Add(fileEntity);
-                }
-            }
+            //        _context.GY_FileDinhKems.Add(fileEntity);
+            //    }
+            //}
 
             // Lưu vào DB
             await _context.SaveChangesAsync();
@@ -250,6 +250,43 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             await _context.SaveChangesAsync();
 
             return Ok(ApiResponse<String>.Success("Xoá góp ý thành công."));
+        }
+
+        [HttpPost("create-phanhoi")]
+        public async Task<IActionResult> CreatePhanHoi([FromBody] CreatePhanHoiRequest request) {
+            using var transaction = _context.Database.BeginTransaction();
+            try {
+                var phanHoi = new GY_PhanHoi {
+                    ID = Guid.NewGuid(),
+                    GopYID = request.GopYID,
+                    NoiDung = request.NoiDung,
+                    NguoiPhanHoiID = request.NguoiPhanHoiID,
+                    NgayPhanHoi = DateTime.Now
+                };
+                _context.GY_PhanHois.Add(phanHoi);
+                await _context.SaveChangesAsync();
+                foreach (var fileName in request.Files) {
+                    var fileRecord = new GY_FileDinhKem {
+                        ID = Guid.NewGuid(),
+                        PhanHoiID = phanHoi.ID,
+                        TenFile = fileName.TenFile,
+                        DuongDan = $"uploads/{fileName.TenFile}",
+                        NgayTai = DateTime.Now
+                    };
+                    _context.GY_FileDinhKems.Add(fileRecord);
+                    var srcPath = Path.Combine("tmp", fileName.TenFile);
+                    var destPath = Path.Combine("uploads", fileName.TenFile);
+                    if (System.IO.File.Exists(srcPath)) {
+                        System.IO.File.Move(srcPath, destPath, overwrite: true);
+                    }
+                }
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return Ok(ApiResponse<GY_PhanHoi>.Success(phanHoi));
+            } catch (Exception ex) {
+                await transaction.RollbackAsync();
+                return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
+            }
         }
 
     }
