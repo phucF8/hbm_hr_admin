@@ -279,11 +279,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             _context.GY_PhanHois.Add(phanHoi);
             await _context.SaveChangesAsync();
 
-            return Ok(new {
-                success = true,
-                message = "Tạo phản hồi thành công.",
-                data = phanHoi
-            });
+            return Ok(ApiResponse<String>.Success("Tạo phản hồi thành công."));
         }
 
     }
