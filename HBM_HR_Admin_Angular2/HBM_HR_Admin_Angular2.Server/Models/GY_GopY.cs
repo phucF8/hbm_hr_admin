@@ -49,7 +49,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
         public Guid ID { get; set; }              // Khóa chính
 
         public Guid GopYID { get; set; }          // Liên kết tới góp ý nào
-        public Guid? NguoiPhanHoiID { get; set; }     // Người phản hồi (có thể null nếu hệ thống phản hồi tự động)
+        public string? NguoiPhanHoiID { get; set; }     // Người phản hồi (có thể null nếu hệ thống phản hồi tự động)
 
         [Required]
         [MaxLength(500)]

@@ -180,51 +180,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(result);
         }
 
-        [HttpPost("PhanHoi")]
-        public async Task<IActionResult> PhanHoi([FromForm] CreatePhanHoiRequest request) {
-            var id = Guid.NewGuid();
-
-            // 1. Lưu phản hồi
-            var phanHoi = new GY_PhanHoi {
-                ID = id,
-                GopYID = request.GopYID,
-                NguoiPhanHoiID = request.NguoiPhanHoiID,
-                NoiDung = request.NoiDung,
-                NgayPhanHoi = DateTime.Now
-            };
-
-            _context.GY_PhanHois.Add(phanHoi);
-
-            // 2. Lưu file đính kèm (nếu có)
-            //if (request.Files != null && request.Files.Any()) {
-            //    foreach (var file in request.Files) {
-            //        var fileId = Guid.NewGuid();
-            //        var filePath = Path.Combine("Uploads/", fileId + Path.GetExtension(file.TenFile));
-
-            //        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-            //        using (var stream = new FileStream(filePath, FileMode.Create)) {
-            //            await file.CopyToAsync(stream);
-            //        }
-
-            //        var fileEntity = new GY_FileDinhKem {
-            //            ID = fileId,
-            //            GopYID = request.GopYID,
-            //            PhanHoiID = id,
-            //            TenFile = file.FileName,
-            //            DuongDan = filePath,
-            //            NgayTai = DateTime.Now
-            //        };
-
-            //        _context.GY_FileDinhKems.Add(fileEntity);
-            //    }
-            //}
-
-            // Lưu vào DB
-            await _context.SaveChangesAsync();
-
-            return Ok(new { Success = true, PhanHoiID = id });
-        }
-
         [HttpPost("Delete")]
         public async Task<IActionResult> Delete([FromBody] DeleteGopYRequest request) {
             var gopY = await _context.GY_GopYs.FindAsync(request.ID);
@@ -287,6 +242,48 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 await transaction.RollbackAsync();
                 return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
             }
+        }
+
+        [HttpPost("phanhoi/list")]
+        public IActionResult PhanhoiList([FromBody] GopyPhanhoiListRequest request) {
+            try {
+                var query = _context.GY_PhanHois.AsQueryable();
+
+                if (request.GopYID.HasValue && request.GopYID.Value != Guid.Empty) {
+                    query = query.Where(x => x.GopYID == request.GopYID.Value);
+                }
+
+                var list = query
+                    .OrderByDescending(x => x.NgayPhanHoi)
+                    .ToList();
+
+                return Ok(ApiResponse<List<GY_PhanHoi>>.Success(list));
+            } catch (Exception ex) {
+                return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
+            }
+        }
+
+        [HttpPost("phanhoi/create")]
+        public async Task<IActionResult> CreatePhanHoi([FromBody] PhanHoiCreateRequest request) {
+            if (request == null || string.IsNullOrWhiteSpace(request.NoiDung))
+                return BadRequest("Nội dung phản hồi không được để trống.");
+
+            var phanHoi = new GY_PhanHoi {
+                ID = Guid.NewGuid(),
+                GopYID = request.GopYID,
+                NoiDung = request.NoiDung.Trim(),
+                NguoiPhanHoiID = request.NguoiPhanHoiID,
+                NgayPhanHoi = DateTime.Now
+            };
+
+            _context.GY_PhanHois.Add(phanHoi);
+            await _context.SaveChangesAsync();
+
+            return Ok(new {
+                success = true,
+                message = "Tạo phản hồi thành công.",
+                data = phanHoi
+            });
         }
 
     }
