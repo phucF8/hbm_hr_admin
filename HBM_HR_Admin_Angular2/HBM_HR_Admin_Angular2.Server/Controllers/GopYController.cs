@@ -25,9 +25,11 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateGopYRequest request) {
-            var id = (request.Id != null && request.Id != Guid.Empty)
-        ? request.Id
-        : Guid.NewGuid();
+            var id = (request.Id != null && request.Id != Guid.Empty)? request.Id : Guid.NewGuid();
+            var nguoiNhanID = request.NguoiNhanID;
+            if (nguoiNhanID == null) {
+                return BadRequest(ApiResponse<String>.Error("Người nhận góp ý không xác định"));
+            }
             var maTraCuu = $"GY-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6]}";
 
             var gopY = new GY_GopY {
@@ -35,6 +37,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 TieuDe = request.TieuDe,
                 NoiDung = request.NoiDung,
                 NhanVienID = string.IsNullOrEmpty(request.NhanVienID) ? null : request.NhanVienID,
+                NguoiNhanID = request.NguoiNhanID,
                 MaTraCuu = maTraCuu,
                 TrangThai = "Chưa phản hồi",
                 NgayGui = DateTime.Now,
@@ -87,11 +90,15 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
             var totalItems = await query.LongCountAsync();
 
-            var items = await query
-                .OrderByDescending(g => g.NgayGui)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .Select(g => new GopYResponse {
+            // JOIN lấy thêm tên + chức danh + ảnh người gửi và nhận
+            var items = await (
+                from g in query
+                join nvGui in _context.DbNhanVien on g.NhanVienID equals nvGui.ID into nvGuiJoin
+                from nvGui in nvGuiJoin.DefaultIfEmpty()
+                join nvNhan in _context.DbNhanVien on g.NguoiNhanID equals nvNhan.ID into nvNhanJoin
+                from nvNhan in nvNhanJoin.DefaultIfEmpty()
+                orderby g.NgayGui descending
+                select new GopYResponse {
                     ID = g.ID,
                     TieuDe = g.TieuDe,
                     NhanVienID = g.NhanVienID,
@@ -99,8 +106,21 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     NgayGui = g.NgayGui,
                     TrangThai = g.TrangThai,
                     MaTraCuu = g.MaTraCuu,
-                })
-                .ToListAsync();
+
+                    // Người gửi
+                    TenNguoiGui = nvGui != null ? nvGui.TenNhanVien : (g.NhanVienID == null ? "Nặc danh" : null),
+                    AnhNguoiGui = nvGui != null ? nvGui.Anh : null,
+                    TenChucDanhNguoiGui = nvGui != null ? nvGui.TenChucDanh : null,
+
+                    // Người nhận
+                    TenNguoiNhan = nvNhan != null ? nvNhan.TenNhanVien : null,
+                    AnhNguoiNhan = nvNhan != null ? nvNhan.Anh : null,
+                    TenChucDanhNguoiNhan = nvNhan != null ? nvNhan.TenChucDanh : null
+                }
+            )
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync();
 
             var result = new PagedResultGopY {
                 TotalItems = totalItems,
@@ -117,28 +137,46 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             if (request == null || request.Id == Guid.Empty)
                 return BadRequest("Id không hợp lệ.");
 
-            var gopy = await _context.GY_GopYs
-                .Where(x => x.ID == request.Id)
-                .Select(x => new GopYChiTietDto {
+            var gopy = await (
+                from x in _context.GY_GopYs
+                join nvGui in _context.DbNhanVien on x.NhanVienID equals nvGui.ID into nvGuiJoin
+                from nvGui in nvGuiJoin.DefaultIfEmpty()
+                join nvNhan in _context.DbNhanVien on x.NguoiNhanID equals nvNhan.ID into nvNhanJoin
+                from nvNhan in nvNhanJoin.DefaultIfEmpty()
+                where x.ID == request.Id
+                select new GopYChiTietDto {
                     Id = x.ID,
                     TieuDe = x.TieuDe,
                     NoiDung = x.NoiDung,
                     NhanVienId = x.NhanVienID,
                     CreatedDate = x.NgayGui,
+
+                    // 👇 Người gửi
+                    TenNguoiGui = nvGui != null ? nvGui.TenNhanVien : (x.NhanVienID == null ? "Nặc danh" : null),
+                    AnhNguoiGui = nvGui != null ? nvGui.Anh : null,
+                    TenChucDanhNguoiGui = nvGui != null ? nvGui.TenChucDanh : null,
+
+                    // 👇 Người nhận
+                    TenNguoiNhan = nvNhan != null ? nvNhan.TenNhanVien : null,
+                    AnhNguoiNhan = nvNhan != null ? nvNhan.Anh : null,
+                    TenChucDanhNguoiNhan = nvNhan != null ? nvNhan.TenChucDanh : null,
+
+                    // 👇 File đính kèm
                     Files = _context.GY_FileDinhKems
                                 .Where(f => f.GopYID == x.ID)
                                 .Select(f => new FileDto {
                                     FileName = f.TenFile,
                                     FileUrl = f.DuongDan
                                 }).ToList()
-                })
-                .FirstOrDefaultAsync();
+                }
+            ).FirstOrDefaultAsync();
 
             if (gopy == null)
                 return NotFound(ApiResponse<GopYChiTietDto>.Error("Không tìm thấy thông tin chi tiết về góp ý này."));
 
             return Ok(ApiResponse<GopYChiTietDto>.Success(gopy));
         }
+
 
         [HttpPost("GetGopYsByNhanVien")]
         public async Task<ActionResult<PagedResultGopY>> GetGopYsByNhanVien([FromBody] GopYByNhanVienRequest request) {

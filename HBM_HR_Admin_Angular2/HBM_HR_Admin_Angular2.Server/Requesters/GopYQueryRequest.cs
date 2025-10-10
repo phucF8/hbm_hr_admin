@@ -15,6 +15,15 @@
         public DateTime NgayGui { get; set; }
         public string TrangThai { get; set; }
         public string MaTraCuu { get; set; }
+
+        // 👇 vì cần hiển thị tên, ảnh, chức danh người nhận & người gửi
+        public string? TenNguoiGui { get; set; }
+        public string? AnhNguoiGui { get; set; }
+        public string? TenChucDanhNguoiGui { get; set; }
+
+        public string? TenNguoiNhan { get; set; }
+        public string? AnhNguoiNhan { get; set; }
+        public string? TenChucDanhNguoiNhan { get; set; }
     }
 
     // Kết quả phân trang chung

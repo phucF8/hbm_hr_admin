@@ -15,6 +15,16 @@
         public string NhanVienId { get; set; }
         public DateTime CreatedDate { get; set; }
         public List<FileDto> Files { get; set; }
+
+        // 👇 Thông tin người gửi
+        public string? TenNguoiGui { get; set; }
+        public string? AnhNguoiGui { get; set; }
+        public string? TenChucDanhNguoiGui { get; set; }
+
+        // 👇 Thông tin người nhận
+        public string? TenNguoiNhan { get; set; }
+        public string? AnhNguoiNhan { get; set; }
+        public string? TenChucDanhNguoiNhan { get; set; }
     }
 }
 

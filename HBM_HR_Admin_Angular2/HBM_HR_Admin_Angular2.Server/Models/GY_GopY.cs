@@ -12,6 +12,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
         public string TieuDe { get; set; }
         public string NoiDung { get; set; }
         public string? NhanVienID { get; set; }
+        public string NguoiNhanID { get; set; } // 👈 vì góp ý thì phải gửi cho ai đó
         public string MaTraCuu { get; set; }
         public string TrangThai { get; set; }
         public DateTime NgayGui { get; set; }
