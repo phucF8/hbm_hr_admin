@@ -24,6 +24,45 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             _connectionString = _config.GetConnectionString("DefaultConnection");
         }
 
+
+        private string? MoveFileFromTmpToUploads(string duongDanTuClient) {
+            try {
+                // Chuẩn hóa lại đường dẫn tương đối (bỏ dấu "/" đầu nếu có)
+                var relativePath = duongDanTuClient.TrimStart('/', '\\');
+
+                // Xác định thư mục wwwroot
+                var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+
+                // Đường dẫn vật lý gốc của file trong tmp
+                var sourcePath = Path.Combine(wwwrootPath, relativePath);
+
+                // Tên file thực tế (đã đổi tên khi upload)
+                var fileName = Path.GetFileName(sourcePath);
+
+                // Thư mục đích uploads
+                var uploadDir = Path.Combine(wwwrootPath, "uploads");
+                if (!Directory.Exists(uploadDir))
+                    Directory.CreateDirectory(uploadDir);
+
+                var destPath = Path.Combine(uploadDir, fileName);
+
+                // Di chuyển file
+                if (System.IO.File.Exists(sourcePath)) {
+                    System.IO.File.Move(sourcePath, destPath, true);
+                    // Trả về đường dẫn tương đối (để lưu DB)
+                    return Path.Combine("uploads", fileName).Replace("\\", "/");
+                }
+
+                Console.WriteLine($"⚠️ Không tìm thấy file: {sourcePath}");
+                return null;
+            } catch (Exception ex) {
+                Console.WriteLine($"❌ Lỗi khi di chuyển file {duongDanTuClient}: {ex.Message}");
+                return null;
+            }
+        }
+
+
+
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateGopYRequest request) {
             var id = (request.Id != null && request.Id != Guid.Empty)? request.Id : Guid.NewGuid();
@@ -49,24 +88,14 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             if (request.Files != null && request.Files.Any()) {
                 foreach (var f in request.Files) {
                     var fileId = Guid.NewGuid();
-                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
-                    var tmpPath = Path.Combine(Directory.GetCurrentDirectory(), f.DuongDan);
-
-                    if (!Directory.Exists(uploadsPath))
-                        Directory.CreateDirectory(uploadsPath);
-
-                    var destFile = Path.Combine(uploadsPath, f.TenFile);
-
-                    // Copy từ tmp → uploads
-                    if (System.IO.File.Exists(tmpPath))
-                        System.IO.File.Move(tmpPath, destFile, true);
+                    var relativePath = MoveFileFromTmpToUploads(f.DuongDan);
 
                     gopY.Files.Add(new GY_FileDinhKem {
                         ID = fileId,
                         GopYID = id,
-                        PhanHoiID = null, // vì file này thuộc về góp ý
+                        PhanHoiID = null,
                         TenFile = f.TenFile,
-                        DuongDan = Path.Combine("uploads", f.TenFile),
+                        DuongDan = relativePath ?? Path.Combine("tmp", f.TenFile).Replace("\\", "/"),
                         NgayTai = DateTime.Now
                     });
                 }
@@ -74,7 +103,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
             _context.GY_GopYs.Add(gopY);
             await _context.SaveChangesAsync();
-
             return Ok(ApiResponse<string>.Success("Tạo góp ý thành công"));
         }
 

@@ -26,3 +26,4 @@ obj/
 FileListAbsolute.txt
 HBM_HR_Admin_Angular2/HBM_HR_Admin_Angular2.Server/appsettings/serviceAccountKey.json
 /HBM_HR_Admin_Angular2/HBM_HR_Admin_Angular2.Server/wwwroot/tmp
+/HBM_HR_Admin_Angular2/HBM_HR_Admin_Angular2.Server/wwwroot/uploads
