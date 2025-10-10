@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using HBM_HR_Admin_Angular2.Server.Models.Common;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
@@ -30,31 +31,40 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         }
 
         [HttpPost("upload")]
-        [RequestSizeLimit(long.MaxValue)] // rely on config-based limits; you can remove or adjust
+        [RequestSizeLimit(long.MaxValue)]
         public async Task<IActionResult> UploadSingle(IFormFile file) {
-            if (file == null) return BadRequest(new { error = "No file provided." });
-            if (file.Length == 0) return BadRequest(new { error = "Empty file." });
-            if (file.Length > _maxFileSizeBytes) {
-                return BadRequest(new { error = $"File too large. Max allowed: {_maxFileSizeBytes / (1024 * 1024)} MB." });
-            }
+            if (file == null)
+                return BadRequest(ApiResponse<object>.Error("No file provided."));
+            if (file.Length == 0)
+                return BadRequest(ApiResponse<object>.Error("Empty file."));
+            if (file.Length > _maxFileSizeBytes)
+                return BadRequest(ApiResponse<object>.Error(
+                    $"File too large. Max allowed: {_maxFileSizeBytes / (1024 * 1024)} MB."));
+
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!_allowedExtensions.Contains(ext)) {
-                return BadRequest(new { error = $"Extension '{ext}' not allowed." });
-            }
+            if (!_allowedExtensions.Contains(ext))
+                return BadRequest(ApiResponse<object>.Error($"Extension '{ext}' not allowed."));
+
             var savedFileName = $"{Guid.NewGuid()}{ext}".Replace("\"", string.Empty);
             var savePath = Path.Combine(_uploadRoot, savedFileName);
-            // Stream to disk to avoid buffering whole file in memory
+
+            // ✅ Ghi file ra đĩa
             await using (var stream = System.IO.File.Create(savePath)) {
                 await file.CopyToAsync(stream);
             }
-            var fileUrl = $"/{UploadFolderName}/{savedFileName}"; // assuming static files served from wwwroot
-            return Ok(new {
-            originalName = file.FileName,
-                storedName = savedFileName,
-                size = file.Length,
+
+            var fileUrl = $"/{UploadFolderName}/{savedFileName}";
+
+            // ✅ Tạo object dữ liệu trả về đúng yêu cầu
+            var fileInfo = new {
+                tenFile = file.FileName,
                 url = fileUrl
-            });
+            };
+
+            // ✅ Trả về theo ApiResponse<T>
+            return Ok(ApiResponse<object>.Success(fileInfo, "Tải lên thành công"));
         }
+
 
         [HttpPost("upload-multi")]
         public async Task<IActionResult> UploadMultiple(List<IFormFile> files) {
