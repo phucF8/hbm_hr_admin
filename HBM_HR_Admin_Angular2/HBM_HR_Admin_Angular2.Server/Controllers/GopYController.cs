@@ -1,4 +1,5 @@
 ﻿using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.DTOs;
 using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Requesters;
@@ -291,15 +292,39 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     query = query.Where(x => x.GopYID == request.GopYID.Value);
                 }
 
-                var list = query
-                    .OrderByDescending(x => x.NgayPhanHoi)
-                    .ToList();
+                var list = (
+                    from ph in query
+                    join nv in _context.DbNhanVien on ph.NguoiPhanHoiID equals nv.ID into nvJoin
+                    from nv in nvJoin.DefaultIfEmpty()
+                    orderby ph.NgayPhanHoi descending
+                    select new GopYPhanHoiDto {
+                        ID = ph.ID,
+                        GopYID = ph.GopYID,
+                        NoiDung = ph.NoiDung,
+                        NgayPhanHoi = ph.NgayPhanHoi,
+                        NhanVienID = ph.NguoiPhanHoiID,
 
-                return Ok(ApiResponse<List<GY_PhanHoi>>.Success(list));
+                        // 👇 Thông tin người phản hồi
+                        TenNguoiGui = nv != null ? nv.TenNhanVien : (ph.NguoiPhanHoiID == null ? "Nặc danh" : null),
+                        AnhNguoiGui = nv != null ? nv.Anh : null,
+                        TenChucDanhNguoiGui = nv != null ? nv.TenChucDanh : null,
+
+                        // 👇 Nếu có bảng file đính kèm phản hồi
+                        Files = _context.GY_FileDinhKems
+                                .Where(f => f.PhanHoiID == ph.ID)
+                                .Select(f => new FileDto {
+                                    FileName = f.TenFile,
+                                    FileUrl = f.DuongDan
+                                }).ToList()
+                    }
+                ).ToList();
+
+                return Ok(ApiResponse<List<GopYPhanHoiDto>>.Success(list));
             } catch (Exception ex) {
                 return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
             }
         }
+
 
         [HttpPost("phanhoi/create")]
         public async Task<IActionResult> CreatePhanHoi([FromBody] PhanHoiCreateRequest request) {
