@@ -25,15 +25,21 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         }
 
 
+        /// <summary>
+        /// copy file từ thư mục wwwroot/tmp sang thư mục wwwroot/uploads, ko xoá file trong tmp ngay vì tránh lỗi lock file
+        /// quá trình xoá sẽ được thực hiện tự động vào 12h pm cùng ngày
+        /// </summary>
+        /// <param name="duongDanTuClient"></param>
+        /// <returns></returns>
         private string? MoveFileFromTmpToUploads(string duongDanTuClient) {
             try {
-                // Chuẩn hóa lại đường dẫn tương đối (bỏ dấu "/" đầu nếu có)
+                // Chuẩn hóa lại đường dẫn (bỏ dấu "/" đầu nếu có)
                 var relativePath = duongDanTuClient.TrimStart('/', '\\');
 
-                // Xác định thư mục wwwroot
+                // Xác định thư mục gốc wwwroot
                 var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 
-                // Đường dẫn vật lý gốc của file trong tmp
+                // Đường dẫn vật lý của file trong tmp
                 var sourcePath = Path.Combine(wwwrootPath, relativePath);
 
                 // Tên file thực tế (đã đổi tên khi upload)
@@ -46,22 +52,32 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
                 var destPath = Path.Combine(uploadDir, fileName);
 
-                // Di chuyển file
-                if (System.IO.File.Exists(sourcePath)) {
-                    System.IO.File.Move(sourcePath, destPath, true);
-                    // Trả về đường dẫn tương đối (để lưu DB)
-                    return Path.Combine("uploads", fileName).Replace("\\", "/");
+                // ✅ Thêm retry khi file còn bị lock (file đang được ghi)
+                for (int i = 0; i < 5; i++) {
+                    try {
+                        if (!System.IO.File.Exists(sourcePath)) {
+                            Console.WriteLine($"⚠️ File không tồn tại: {sourcePath}");
+                            return null;
+                        }
+
+                        // ✅ Copy thay vì Move — không xóa file gốc
+                        System.IO.File.Copy(sourcePath, destPath, true);
+
+                        // Trả về đường dẫn tương đối để lưu DB
+                        return Path.Combine("uploads", fileName).Replace("\\", "/");
+                    } catch (IOException ioEx) when (ioEx.Message.Contains("being used by another process")) {
+                        // File đang bị lock → đợi 200ms rồi thử lại
+                        Thread.Sleep(200);
+                    }
                 }
 
-                Console.WriteLine($"⚠️ Không tìm thấy file: {sourcePath}");
+                Console.WriteLine($"⚠️ Hết thời gian chờ, file vẫn bị lock: {sourcePath}");
                 return null;
             } catch (Exception ex) {
-                Console.WriteLine($"❌ Lỗi khi di chuyển file {duongDanTuClient}: {ex.Message}");
+                Console.WriteLine($"❌ Lỗi khi copy file {duongDanTuClient}: {ex.Message}");
                 return null;
             }
         }
-
-
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateGopYRequest request) {
@@ -112,6 +128,28 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             if (request.PageSize <= 0) request.PageSize = 10;
 
             var query = _context.GY_GopYs.AsQueryable();
+            var currentUserId = request.userId;
+
+            /*var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == null) {
+                return NotFound(ApiResponse<String>.Error("Không thể xác định danh tính người dùng. Vui lòng đăng nhập lại."));
+            }*/
+
+            // Lọc theo loại yêu cầu
+            if (!string.IsNullOrWhiteSpace(request.TypeRequest)) {
+                switch (request.TypeRequest.ToUpper()) {
+                    case "BY_ME": // Góp ý do tôi gửi
+                        query = query.Where(g => g.NhanVienID == currentUserId);
+                        break;
+
+                    case "TO_ME": // Góp ý gửi tới tôi
+                        query = query.Where(g => g.NguoiNhanID == currentUserId);
+                        break;
+
+                    default:
+                        return BadRequest(ApiResponse<string>.Error("Giá trị TypeRequest không hợp lệ (BY_ME hoặc TO_ME)"));
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(request.Search)) {
                 query = query.Where(g => g.NoiDung.Contains(request.Search));
