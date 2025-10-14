@@ -422,11 +422,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         public async Task<IActionResult> CreatePhanHoi([FromBody] PhanHoiCreateRequest request) {
             if (request == null || string.IsNullOrWhiteSpace(request.NoiDung))
                 return BadRequest(ApiResponse<string>.Error("Nội dung phản hồi không được để trống."));
-
             using var transaction = await _context.Database.BeginTransactionAsync();
             try {
                 var phanHoiId = Guid.NewGuid();
-
                 var phanHoi = new GY_PhanHoi {
                     ID = phanHoiId,
                     GopYID = request.GopYID,
@@ -434,16 +432,13 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     NguoiPhanHoiID = request.NguoiPhanHoiID,
                     NgayPhanHoi = DateTime.Now
                 };
-
                 _context.GY_PhanHois.Add(phanHoi);
                 await _context.SaveChangesAsync();
-
                 // Nếu có file đính kèm thì xử lý
                 if (request.Files != null && request.Files.Any()) {
                     foreach (var f in request.Files) {
                         var fileId = Guid.NewGuid();
                         var relativePath = MoveFileFromTmpToUploads(f.DuongDan);
-
                         _context.GY_FileDinhKems.Add(new GY_FileDinhKem {
                             ID = fileId,
                             GopYID = request.GopYID,
@@ -453,18 +448,22 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                             NgayTai = DateTime.Now
                         });
                     }
-
                     await _context.SaveChangesAsync();
                 }
-
                 await transaction.CommitAsync();
+                /*var data = new Dictionary<string, string>();
+                data["Role"] = "GY";
+                data["Type"] = "gy";
+                data["ID"] = phanHoi.GopYID.ToString() ?? "";
+                data["messageId"] = "";
+                var result = _firebaseService.SendNotificationToEmployeesAsync(nguoiNhanID, "Phản hồi", request.NoiDung, data, _firebaseService, _repository);*/
+               
                 return Ok(ApiResponse<string>.Success("Tạo phản hồi thành công."));
             } catch (Exception ex) {
                 await transaction.RollbackAsync();
                 return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
             }
         }
-
 
     }
 
