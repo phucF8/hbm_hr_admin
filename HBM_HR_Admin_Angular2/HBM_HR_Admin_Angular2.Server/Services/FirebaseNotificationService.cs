@@ -1,6 +1,7 @@
 using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
+using HBM_HR_Admin_Angular2.Server.Data;
 
 public class FirebaseNotificationService
 {
@@ -135,6 +136,45 @@ public class FirebaseNotificationService
     }
 
 
+    public async Task<(int successCount, int totalCount, Dictionary<string, (int success, int total)>)> 
+        SendNotificationToEmployeesAsync(
+    string idNhanViens,
+    string title,
+    string body,
+    Dictionary<string, string> data,
+    FirebaseNotificationService firebaseService,
+    NotificationRepository repository) {
+        int successCount = 0;
+        int totalCount = 0;
+        var userStats = new Dictionary<string, (int success, int total)>();
+
+        foreach (var id in idNhanViens.Split(',')) {
+            if (string.IsNullOrWhiteSpace(id))
+                continue;
+
+            var deviceTokens = await repository.GetDeviceTokenByEmployeeId(id);
+            if (deviceTokens == null || !deviceTokens.Any()) {
+                
+                continue;
+            }
+
+            int userSuccessCount = 0;
+            int userTotalCount = deviceTokens.Count();
+            var tokens = deviceTokens.Select(dt => dt.DeviceToken).ToList();
+
+            var result = await firebaseService.SendNotificationAsync(tokens, title, body, data);
+
+            if (result) {
+                userSuccessCount = userTotalCount;
+            }
+
+            userStats[id] = (userSuccessCount, userTotalCount);
+            successCount += userSuccessCount;
+            totalCount += userTotalCount;
+        }
+
+        return (successCount, totalCount, userStats);
+    }
 
 
 

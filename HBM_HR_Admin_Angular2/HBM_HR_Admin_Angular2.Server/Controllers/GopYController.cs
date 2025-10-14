@@ -6,6 +6,7 @@ using HBM_HR_Admin_Angular2.Server.Requesters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers {
     [ApiController]
@@ -16,13 +17,23 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
         private readonly ApplicationDbContext _context;
 
+        private readonly FirebaseNotificationService _firebaseService;
+        private readonly NotificationRepository _repository;
+
         public GopYController(
             ApplicationDbContext context,
+            FirebaseNotificationService firebaseService,
+            NotificationRepository repository,
             IConfiguration config) {
             _context = context;
             _config = config;
             _connectionString = _config.GetConnectionString("DefaultConnection");
+
+            _firebaseService = firebaseService;
+            _repository = repository;
         }
+
+
 
 
         /// <summary>
@@ -119,6 +130,22 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
             _context.GY_GopYs.Add(gopY);
             await _context.SaveChangesAsync();
+
+            var data = new Dictionary<string, string>();
+            data["Role"] = "GY";
+            data["Type"] = "gy";
+            data["ID"] = gopY?.ID.ToString() ?? "";
+            data["messageId"] = "";
+            
+
+            var result = _firebaseService.SendNotificationToEmployeesAsync(nguoiNhanID, request.TieuDe, request.NoiDung, data, _firebaseService, _repository);
+
+
+            //var result = await _firebaseService.SendNotificationAsync(
+            //            "eoH2qtsyQweYoK_KsCV1Q7:APA91bEp8Un_Sb77MDQ_prldsqTQNBi_q28g12AQVD1Jzmrj6Q4cIoQNnP6pB_H43XZIvnHrNnlLGzMheJ1mn90pzWW5CmrHWiMPp2DCMcohWn57kaX0txM",
+            //            "TEST",
+            //            "NỘI DUNG");
+
             return Ok(ApiResponse<string>.Success("Tạo góp ý thành công"));
         }
 
@@ -312,7 +339,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(ApiResponse<String>.Success("Xoá góp ý thành công."));
         }
 
-        [HttpPost("create-phanhoi")]
+        [HttpPost("create-phanhoi_ko_dung")]
         public async Task<IActionResult> CreatePhanHoi([FromBody] CreatePhanHoiRequest request) {
             using var transaction = _context.Database.BeginTransaction();
             try {
@@ -324,20 +351,19 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     NgayPhanHoi = DateTime.Now
                 };
                 _context.GY_PhanHois.Add(phanHoi);
-                await _context.SaveChangesAsync();
-                foreach (var fileName in request.Files) {
-                    var fileRecord = new GY_FileDinhKem {
-                        ID = Guid.NewGuid(),
-                        PhanHoiID = phanHoi.ID,
-                        TenFile = fileName.TenFile,
-                        DuongDan = $"uploads/{fileName.TenFile}",
-                        NgayTai = DateTime.Now
-                    };
-                    _context.GY_FileDinhKems.Add(fileRecord);
-                    var srcPath = Path.Combine("tmp", fileName.TenFile);
-                    var destPath = Path.Combine("uploads", fileName.TenFile);
-                    if (System.IO.File.Exists(srcPath)) {
-                        System.IO.File.Move(srcPath, destPath, overwrite: true);
+                // Xử lý danh sách file đính kèm
+                if (request.Files != null && request.Files.Any()) {
+                    foreach (var f in request.Files) {
+                        var fileId = Guid.NewGuid();
+                        var relativePath = MoveFileFromTmpToUploads(f.DuongDan);
+                        _context.GY_FileDinhKems.Add(new GY_FileDinhKem {
+                            ID = fileId,
+                            GopYID = request.GopYID,
+                            PhanHoiID = phanHoi.ID,
+                            TenFile = f.TenFile,
+                            DuongDan = relativePath ?? Path.Combine("tmp", f.TenFile).Replace("\\", "/"),
+                            NgayTai = DateTime.Now
+                        });
                     }
                 }
                 await _context.SaveChangesAsync();
@@ -395,21 +421,50 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         [HttpPost("phanhoi/create")]
         public async Task<IActionResult> CreatePhanHoi([FromBody] PhanHoiCreateRequest request) {
             if (request == null || string.IsNullOrWhiteSpace(request.NoiDung))
-                return BadRequest("Nội dung phản hồi không được để trống.");
+                return BadRequest(ApiResponse<string>.Error("Nội dung phản hồi không được để trống."));
 
-            var phanHoi = new GY_PhanHoi {
-                ID = Guid.NewGuid(),
-                GopYID = request.GopYID,
-                NoiDung = request.NoiDung.Trim(),
-                NguoiPhanHoiID = request.NguoiPhanHoiID,
-                NgayPhanHoi = DateTime.Now
-            };
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try {
+                var phanHoiId = Guid.NewGuid();
 
-            _context.GY_PhanHois.Add(phanHoi);
-            await _context.SaveChangesAsync();
+                var phanHoi = new GY_PhanHoi {
+                    ID = phanHoiId,
+                    GopYID = request.GopYID,
+                    NoiDung = request.NoiDung.Trim(),
+                    NguoiPhanHoiID = request.NguoiPhanHoiID,
+                    NgayPhanHoi = DateTime.Now
+                };
 
-            return Ok(ApiResponse<String>.Success("Tạo phản hồi thành công."));
+                _context.GY_PhanHois.Add(phanHoi);
+                await _context.SaveChangesAsync();
+
+                // Nếu có file đính kèm thì xử lý
+                if (request.Files != null && request.Files.Any()) {
+                    foreach (var f in request.Files) {
+                        var fileId = Guid.NewGuid();
+                        var relativePath = MoveFileFromTmpToUploads(f.DuongDan);
+
+                        _context.GY_FileDinhKems.Add(new GY_FileDinhKem {
+                            ID = fileId,
+                            GopYID = request.GopYID,
+                            PhanHoiID = phanHoiId,
+                            TenFile = f.TenFile,
+                            DuongDan = relativePath ?? Path.Combine("tmp", f.TenFile).Replace("\\", "/"),
+                            NgayTai = DateTime.Now
+                        });
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
+
+                await transaction.CommitAsync();
+                return Ok(ApiResponse<string>.Success("Tạo phản hồi thành công."));
+            } catch (Exception ex) {
+                await transaction.RollbackAsync();
+                return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
+            }
         }
+
 
     }
 

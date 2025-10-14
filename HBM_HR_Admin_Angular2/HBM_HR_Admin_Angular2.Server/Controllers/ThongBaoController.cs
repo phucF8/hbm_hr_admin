@@ -32,6 +32,12 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         }
 
+
+
+
+
+
+
         // API GET /api/thongbao - Lấy danh sách thông báo
         [HttpGet("api/thongbao/getnoti-dungsp")]
         public async Task<ActionResult<PagedResult<ThongBao>>> GetNotifications_dungSP(
