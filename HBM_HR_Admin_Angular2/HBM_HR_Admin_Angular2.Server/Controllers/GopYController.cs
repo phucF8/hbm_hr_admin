@@ -230,6 +230,38 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(ApiResponse<int>.Success(count));
         }
 
+        [HttpPost("AddGopyItem")]
+        public async Task<IActionResult> GetGopYById([FromBody] AddGopyItemRequest request) {
+            if (request == null || request.Id == Guid.Empty) {
+                return BadRequest(ApiResponse<string>.Error("ID không hợp lệ"));
+            }
+            var gopy = await (from g in _context.GY_GopYs
+                              join ng in _context.DbNhanVien on g.NhanVienID equals ng.ID into nguoiGuiGroup
+                              from nguoiGui in nguoiGuiGroup.DefaultIfEmpty()
+                              join nn in _context.DbNhanVien on g.NguoiNhanID equals nn.ID into nguoiNhanGroup
+                              from nguoiNhan in nguoiNhanGroup.DefaultIfEmpty()
+                              where g.ID == request.Id
+                              select new {
+                                  id = g.ID,
+                                  tieuDe = g.TieuDe,
+                                  nhanVienID = g.NhanVienID,
+                                  noiDung = g.NoiDung,
+                                  ngayGui = g.NgayGui,
+                                  trangThai = g.TrangThai,
+                                  maTraCuu = g.MaTraCuu,
+                                  tenNguoiGui = nguoiGui != null ? nguoiGui.TenNhanVien : null,
+                                  anhNguoiGui = nguoiGui != null ? nguoiGui.Anh : null,
+                                  tenChucDanhNguoiGui = nguoiGui != null ? nguoiGui.TenChucDanh : null,
+                                  tenNguoiNhan = nguoiNhan != null ? nguoiNhan.TenNhanVien : null,
+                                  anhNguoiNhan = nguoiNhan != null ? nguoiNhan.Anh : null,
+                                  tenChucDanhNguoiNhan = nguoiNhan != null ? nguoiNhan.TenChucDanh : null,
+                              }).FirstOrDefaultAsync();
+            if (gopy == null)
+                return NotFound(ApiResponse<string>.Error("Không tìm thấy góp ý"));
+            return Ok(ApiResponse<object>.Success(gopy, "Thành công"));
+        }
+
+
         [HttpPost("GetChiTiet")]
         public async Task<IActionResult> GetChiTiet([FromBody] GopYChiTietRequest request) {
             if (request == null || request.Id == Guid.Empty)

@@ -12,7 +12,11 @@
     public class GopYUnreadCountRequest {
         public string userId { get; set; }          //vì tạm thời chưa gửi dio.options.headers['Authorization'] = 'Bearer $token'; mỗi lần request nên truyền userId theo
     }
-    
+
+    public class AddGopyItemRequest {
+        public Guid Id { get; set; }          //vì tạm thời chưa gửi dio.options.headers['Authorization'] = 'Bearer $token'; mỗi lần request nên truyền userId theo
+    }
+
 
     // Dữ liệu trả về
     public class GopYResponse {
