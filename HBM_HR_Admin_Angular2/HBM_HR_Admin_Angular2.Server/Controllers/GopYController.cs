@@ -106,7 +106,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 NhanVienID = string.IsNullOrEmpty(request.NhanVienID) ? null : request.NhanVienID,
                 NguoiNhanID = request.NguoiNhanID,
                 MaTraCuu = maTraCuu,
-                TrangThai = "Chưa phản hồi",
+                TrangThai = "GY_CD",
                 NgayGui = DateTime.Now,
                 Files = new List<GY_FileDinhKem>()
             };
@@ -153,38 +153,33 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         public async Task<ActionResult<PagedResultGopY>> GetGopYs([FromBody] GopYQueryRequest request) {
             if (request.PageNumber <= 0) request.PageNumber = 1;
             if (request.PageSize <= 0) request.PageSize = 10;
-
             var query = _context.GY_GopYs.AsQueryable();
             var currentUserId = request.userId;
-
-            /*var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (currentUserId == null) {
-                return NotFound(ApiResponse<String>.Error("Không thể xác định danh tính người dùng. Vui lòng đăng nhập lại."));
-            }*/
-
             // Lọc theo loại yêu cầu
             if (!string.IsNullOrWhiteSpace(request.TypeRequest)) {
                 switch (request.TypeRequest.ToUpper()) {
                     case "BY_ME": // Góp ý do tôi gửi
                         query = query.Where(g => g.NhanVienID == currentUserId);
                         break;
-
                     case "TO_ME": // Góp ý gửi tới tôi
                         query = query.Where(g => g.NguoiNhanID == currentUserId);
                         break;
-
                     default:
                         return BadRequest(ApiResponse<string>.Error("Giá trị TypeRequest không hợp lệ (BY_ME hoặc TO_ME)"));
                 }
             }
-
-            if (!string.IsNullOrWhiteSpace(request.Search)) {
-                query = query.Where(g => g.NoiDung.Contains(request.Search));
+            // 🟢 Lọc theo trạng thái (CD, DD, XL, HUY, v.v.)
+            if (!string.IsNullOrWhiteSpace(request.TrangThai)) {
+                query = query.Where(g => g.TrangThai == request.TrangThai);
             }
-
+            // 🔍 Lọc theo từ khóa tìm kiếm
+            if (!string.IsNullOrWhiteSpace(request.Search)) {
+                query = query.Where(g => g.NoiDung.Contains(request.Search)
+                                      || g.TieuDe.Contains(request.Search)
+                                      || g.MaTraCuu.Contains(request.Search));
+            }
             var totalItems = await query.LongCountAsync();
-
-            // JOIN lấy thêm tên + chức danh + ảnh người gửi và nhận
+            // JOIN lấy thêm thông tin người gửi & người nhận
             var items = await (
                 from g in query
                 join nvGui in _context.DbNhanVien on g.NhanVienID equals nvGui.ID into nvGuiJoin
@@ -200,12 +195,10 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     NgayGui = g.NgayGui,
                     TrangThai = g.TrangThai,
                     MaTraCuu = g.MaTraCuu,
-
                     // Người gửi
                     TenNguoiGui = nvGui != null ? nvGui.TenNhanVien : (g.NhanVienID == null ? "Nặc danh" : null),
                     AnhNguoiGui = nvGui != null ? nvGui.Anh : null,
                     TenChucDanhNguoiGui = nvGui != null ? nvGui.TenChucDanh : null,
-
                     // Người nhận
                     TenNguoiNhan = nvNhan != null ? nvNhan.TenNhanVien : null,
                     AnhNguoiNhan = nvNhan != null ? nvNhan.Anh : null,
@@ -215,22 +208,32 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync();
-
             var result = new PagedResultGopY {
                 TotalItems = totalItems,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
                 Items = items
             };
-
             return Ok(ApiResponse<PagedResultGopY>.Success(result));
+        }
+
+        [HttpPost("unreadGopY")]
+        public async Task<ActionResult<int>> GetSoLuongGopYChuaDoc([FromBody] GopYUnreadCountRequest request) {
+            if (string.IsNullOrWhiteSpace(request.userId)) {
+                return BadRequest(ApiResponse<string>.Error("Không xác định được người dùng."));
+            }
+            var currentUserId = request.userId;
+            // Đếm số lượng góp ý gửi đến tôi và có trạng thái "GY_CD"
+            var count = await _context.GY_GopYs
+                .Where(g => g.NguoiNhanID == currentUserId && g.TrangThai == "GY_CD")
+                .CountAsync();
+            return Ok(ApiResponse<int>.Success(count));
         }
 
         [HttpPost("GetChiTiet")]
         public async Task<IActionResult> GetChiTiet([FromBody] GopYChiTietRequest request) {
             if (request == null || request.Id == Guid.Empty)
                 return BadRequest("Id không hợp lệ.");
-
             var gopy = await (
                 from x in _context.GY_GopYs
                 join nvGui in _context.DbNhanVien on x.NhanVienID equals nvGui.ID into nvGuiJoin
@@ -244,17 +247,14 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     NoiDung = x.NoiDung,
                     NhanVienId = x.NhanVienID,
                     CreatedDate = x.NgayGui,
-
                     // 👇 Người gửi
                     TenNguoiGui = nvGui != null ? nvGui.TenNhanVien : (x.NhanVienID == null ? "Nặc danh" : null),
                     AnhNguoiGui = nvGui != null ? nvGui.Anh : null,
                     TenChucDanhNguoiGui = nvGui != null ? nvGui.TenChucDanh : null,
-
                     // 👇 Người nhận
                     TenNguoiNhan = nvNhan != null ? nvNhan.TenNhanVien : null,
                     AnhNguoiNhan = nvNhan != null ? nvNhan.Anh : null,
                     TenChucDanhNguoiNhan = nvNhan != null ? nvNhan.TenChucDanh : null,
-
                     // 👇 File đính kèm
                     Files = _context.GY_FileDinhKems
                                 .Where(f => f.GopYID == x.ID)
@@ -264,9 +264,15 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                                 }).ToList()
                 }
             ).FirstOrDefaultAsync();
-
             if (gopy == null)
                 return NotFound(ApiResponse<GopYChiTietDto>.Error("Không tìm thấy thông tin chi tiết về góp ý này."));
+            // ✅ Nếu trạng thái hiện tại là "CD" → cập nhật thành "DD"
+            var gopyEntity = await _context.GY_GopYs.FindAsync(request.Id);
+            if (gopyEntity != null && gopyEntity.TrangThai == "GY_CD") {
+                gopyEntity.TrangThai = "GY_DD";
+                _context.GY_GopYs.Update(gopyEntity);
+                await _context.SaveChangesAsync();
+            }
 
             return Ok(ApiResponse<GopYChiTietDto>.Success(gopy));
         }

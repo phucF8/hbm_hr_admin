@@ -6,7 +6,13 @@
         public int PageNumber { get; set; } = 1;   // Trang hiện tại
         public int PageSize { get; set; } = 10;    // Số bản ghi mỗi trang
         public string? Search { get; set; }        // Từ khóa tìm kiếm (nếu có)
+        public string? TrangThai { get; set; }
     }
+
+    public class GopYUnreadCountRequest {
+        public string userId { get; set; }          //vì tạm thời chưa gửi dio.options.headers['Authorization'] = 'Bearer $token'; mỗi lần request nên truyền userId theo
+    }
+    
 
     // Dữ liệu trả về
     public class GopYResponse {
