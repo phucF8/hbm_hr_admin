@@ -4,6 +4,7 @@ using HBM_HR_Admin_Angular2.Server.DTOs;
 using HBM_HR_Admin_Angular2.Server.Helpers;
 using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
+using HBM_HR_Admin_Angular2.Server.Requesters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -444,52 +445,58 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
 
 
-        //[HttpPost("GetThongBaos")]
-        //public async Task<ActionResult<ApiResponse<object>>> GetThongBaos([FromBody] ThongBaoQueryRequest request) {
-        //    if (request.PageNumber <= 0) request.PageNumber = 1;
-        //    if (request.PageSize <= 0) request.PageSize = 20;
+        [HttpPost("notification_list")]
+        public async Task<ActionResult<ApiResponse<object>>> GetThongBaos([FromBody] NotificationListRequest request) {
+            if (request.PageNumber <= 0) request.PageNumber = 1;
+            if (request.PageSize <= 0) request.PageSize = 20;
 
-        //    // Lấy danh sách thông báo có join thông tin người gửi
-        //    var query = from tb in _context.AD_ThongBao
-        //                join nv in _context.DbNhanVien on tb.IDNguoiGui equals nv.ID into nvGroup
-        //                from nv in nvGroup.DefaultIfEmpty()
-        //                select new ThongBaoItemResponse {
-        //                    ID = tb.ID,
-        //                    TieuDe = tb.TieuDe,
-        //                    NoiDung = tb.NoiDung,
-        //                    NhomThongBao = tb.NhomThongBao,
-        //                    TrangThai = tb.TrangThai,
-        //                    NgayGui = tb.NgayGui,
-        //                    TenNguoiGui = nv != null ? nv.TenNhanVien : null,
-        //                    AnhNguoiGui = nv != null ? nv.Anh : null
-        //                };
+            // Lấy danh sách ID thông báo mà người dùng được nhận
+            var listThongBaoIDs = await _context.AD_ThongBao_NguoiNhan
+                .Where(x => x.IDNhanSu == request.UserID)
+                .Select(x => x.IDThongBao.ToString())
+                .ToListAsync();
 
-        //    // Lọc theo nhóm hoặc trạng thái nếu có
-        //    if (!string.IsNullOrEmpty(request.NhomThongBao))
-        //        query = query.Where(x => x.NhomThongBao == request.NhomThongBao);
+            // Lọc các thông báo đó
+            var query = _context.AD_ThongBao
+                .Where(tb => listThongBaoIDs.Contains(tb.ID));
 
-        //    if (!string.IsNullOrEmpty(request.TrangThai))
-        //        query = query.Where(x => x.TrangThai == request.TrangThai);
+            // Lọc thêm nếu có
+            if (!string.IsNullOrEmpty(request.NhomThongBao))
+                query = query.Where(x => x.NhomThongBao == request.NhomThongBao);
 
-        //    // Đếm tổng
-        //    var totalCount = await query.CountAsync();
+            if (!string.IsNullOrEmpty(request.TrangThai))
+                query = query.Where(x => x.TrangThai == request.TrangThai);
 
-        //    // Phân trang
-        //    var items = await query
-        //        .OrderByDescending(x => x.NgayGui)
-        //        .Skip((request.PageNumber - 1) * request.PageSize)
-        //        .Take(request.PageSize)
-        //        .ToListAsync();
+            // Đếm tổng
+            var totalCount = await query.CountAsync();
 
-        //    var result = new {
-        //        TotalCount = totalCount,
-        //        PageNumber = request.PageNumber,
-        //        PageSize = request.PageSize,
-        //        Items = items
-        //    };
+            // Phân trang
+            var items = await query
+                .OrderByDescending(x => x.NgayGui)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(tb => new ThongBaoItemResponse {
+                    ID = tb.ID,
+                    TieuDe = tb.TieuDe,
+                    NoiDung = tb.NoiDung,
+                    NhomThongBao = tb.NhomThongBao,
+                    TrangThai = tb.TrangThai,
+                    NgayGui = tb.NgayGui,
+                    TenNguoiGui = "", // Nếu cần có tên người gửi thì tra riêng bảng nhân viên
+                    AnhNguoiGui = ""
+                })
+                .ToListAsync();
 
-        //    return Ok(ApiResponse<object>.Success(result, "Thành công"));
-        //}
+            var result = new {
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                Items = items
+            };
+
+            return Ok(ApiResponse<object>.Success(result, "Thành công"));
+        }
+
 
 
 
