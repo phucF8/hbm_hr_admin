@@ -3,6 +3,7 @@ using HBM_HR_Admin_Angular2.Server.DTOs;
 using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Requesters;
+using HBM_HR_Admin_Angular2.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -19,16 +20,18 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
         private readonly FirebaseNotificationService _firebaseService;
         private readonly NotificationRepository _repository;
+        private readonly NotificationService _notificationService;
 
         public GopYController(
             ApplicationDbContext context,
             FirebaseNotificationService firebaseService,
             NotificationRepository repository,
+            NotificationService notificationService,
             IConfiguration config) {
             _context = context;
             _config = config;
             _connectionString = _config.GetConnectionString("DefaultConnection");
-
+            _notificationService = notificationService;
             _firebaseService = firebaseService;
             _repository = repository;
         }
@@ -130,6 +133,13 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
             _context.GY_GopYs.Add(gopY);
             await _context.SaveChangesAsync();
+
+            await _notificationService.CreateThongBaoAsync(
+                request.TieuDe,
+                request.NoiDung,
+                request.NhanVienID ?? "",
+                new List<string> { request.NguoiNhanID! }
+            );
 
             var data = new Dictionary<string, string>();
             data["Role"] = "GY";

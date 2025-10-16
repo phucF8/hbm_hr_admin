@@ -34,6 +34,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddScoped<NotificationRepository>();
 builder.Services.AddScoped<IDebugRepository, DebugRepository>();
 builder.Services.AddScoped<IThongBaoService, ThongBaoService>();
+builder.Services.AddScoped<NotificationService>();
 
 // Đăng ký DI
 builder.Services.AddScoped<TopicService>();

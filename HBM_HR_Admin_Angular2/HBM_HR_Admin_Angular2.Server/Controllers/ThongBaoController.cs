@@ -1,9 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+using Google.Api.Gax;
 using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.DTOs;
 using HBM_HR_Admin_Angular2.Server.Helpers;
 using HBM_HR_Admin_Angular2.Server.Models;
-using Google.Api.Gax;
+using HBM_HR_Admin_Angular2.Server.Models.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers
 {
@@ -17,12 +20,16 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         private readonly IThongBaoService _notificationService;
         private readonly ILogger<ThongBaoController> _logger;
 
+        private readonly ApplicationDbContext _context;
+
         public ThongBaoController(
+            ApplicationDbContext context,
             FirebaseNotificationService firebaseService,
             NotificationRepository repository,
             IThongBaoService notificationService,
             ILogger<ThongBaoController> logger)
         {
+            _context = context;
             _firebaseService = firebaseService;
             _repository = repository;
             _logger = logger;
@@ -437,7 +444,52 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
 
 
+        //[HttpPost("GetThongBaos")]
+        //public async Task<ActionResult<ApiResponse<object>>> GetThongBaos([FromBody] ThongBaoQueryRequest request) {
+        //    if (request.PageNumber <= 0) request.PageNumber = 1;
+        //    if (request.PageSize <= 0) request.PageSize = 20;
 
+        //    // Lấy danh sách thông báo có join thông tin người gửi
+        //    var query = from tb in _context.AD_ThongBao
+        //                join nv in _context.DbNhanVien on tb.IDNguoiGui equals nv.ID into nvGroup
+        //                from nv in nvGroup.DefaultIfEmpty()
+        //                select new ThongBaoItemResponse {
+        //                    ID = tb.ID,
+        //                    TieuDe = tb.TieuDe,
+        //                    NoiDung = tb.NoiDung,
+        //                    NhomThongBao = tb.NhomThongBao,
+        //                    TrangThai = tb.TrangThai,
+        //                    NgayGui = tb.NgayGui,
+        //                    TenNguoiGui = nv != null ? nv.TenNhanVien : null,
+        //                    AnhNguoiGui = nv != null ? nv.Anh : null
+        //                };
+
+        //    // Lọc theo nhóm hoặc trạng thái nếu có
+        //    if (!string.IsNullOrEmpty(request.NhomThongBao))
+        //        query = query.Where(x => x.NhomThongBao == request.NhomThongBao);
+
+        //    if (!string.IsNullOrEmpty(request.TrangThai))
+        //        query = query.Where(x => x.TrangThai == request.TrangThai);
+
+        //    // Đếm tổng
+        //    var totalCount = await query.CountAsync();
+
+        //    // Phân trang
+        //    var items = await query
+        //        .OrderByDescending(x => x.NgayGui)
+        //        .Skip((request.PageNumber - 1) * request.PageSize)
+        //        .Take(request.PageSize)
+        //        .ToListAsync();
+
+        //    var result = new {
+        //        TotalCount = totalCount,
+        //        PageNumber = request.PageNumber,
+        //        PageSize = request.PageSize,
+        //        Items = items
+        //    };
+
+        //    return Ok(ApiResponse<object>.Success(result, "Thành công"));
+        //}
 
 
 
