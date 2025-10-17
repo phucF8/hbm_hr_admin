@@ -3,7 +3,8 @@
 namespace HBM_HR_Admin_Angular2.Server.Models {
     
     public class AD_ThongBao {
-        public string ID { get; set; }
+        public Guid ID { get; set; }
+        public bool AnDanh { get; set; } = false;
         public string? IDNotify { get; set; }
         public string? IDNguoiGui { get; set; }
         public DateTime NgayGui { get; set; }

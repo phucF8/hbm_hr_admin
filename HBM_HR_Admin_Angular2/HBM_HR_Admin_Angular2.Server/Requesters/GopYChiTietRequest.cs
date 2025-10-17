@@ -13,6 +13,7 @@
         public string TieuDe { get; set; }
         public string NoiDung { get; set; }
         public string NhanVienId { get; set; }
+        public bool AnDanh { get; set; }
         public DateTime CreatedDate { get; set; }
         public List<FileDto> Files { get; set; }
 

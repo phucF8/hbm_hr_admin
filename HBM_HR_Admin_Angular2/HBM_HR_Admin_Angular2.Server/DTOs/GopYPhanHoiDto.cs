@@ -7,7 +7,7 @@ namespace HBM_HR_Admin_Angular2.Server.DTOs {
         public string? NoiDung { get; set; }
         public DateTime NgayPhanHoi { get; set; }
 
-        public string? NhanVienID { get; set; }
+        public string? NguoiPhanHoiID { get; set; }
 
         // 👇 Thông tin người gửi phản hồi
         public string? TenNguoiGui { get; set; }

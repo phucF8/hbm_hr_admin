@@ -7,6 +7,7 @@ namespace HBM_HR_Admin_Angular2.Server.Requesters {
         public string NguoiNhanID { get; set; }  // vì tạo góp ý là phải gửi cho ai đó nên không thể null
         public string TieuDe { get; set; } = string.Empty;
         public string NoiDung { get; set; } = string.Empty;
+        public bool AnDanh { get; set; } = false;
         public List<GY_FileDinhKem>? Files { get; set; }  // chỉ metadata
     }
 }

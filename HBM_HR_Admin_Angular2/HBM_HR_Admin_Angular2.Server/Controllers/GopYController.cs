@@ -95,68 +95,65 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateGopYRequest request) {
-            var id = (request.Id != null && request.Id != Guid.Empty)? request.Id : Guid.NewGuid();
-            var nguoiNhanID = request.NguoiNhanID;
-            if (nguoiNhanID == null) {
-                return BadRequest(ApiResponse<String>.Error("Người nhận góp ý không xác định"));
-            }
-            var maTraCuu = $"GY-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6]}";
-
-            var gopY = new GY_GopY {
-                ID = id,
-                TieuDe = request.TieuDe,
-                NoiDung = request.NoiDung,
-                NhanVienID = string.IsNullOrEmpty(request.NhanVienID) ? null : request.NhanVienID,
-                NguoiNhanID = request.NguoiNhanID,
-                MaTraCuu = maTraCuu,
-                TrangThai = "GY_CD",
-                NgayGui = DateTime.Now,
-                Files = new List<GY_FileDinhKem>()
-            };
-
-            // Nếu có file trong request thì xử lý
-            if (request.Files != null && request.Files.Any()) {
-                foreach (var f in request.Files) {
-                    var fileId = Guid.NewGuid();
-                    var relativePath = MoveFileFromTmpToUploads(f.DuongDan);
-
-                    gopY.Files.Add(new GY_FileDinhKem {
-                        ID = fileId,
-                        GopYID = id,
-                        PhanHoiID = null,
-                        TenFile = f.TenFile,
-                        DuongDan = relativePath ?? Path.Combine("tmp", f.TenFile).Replace("\\", "/"),
-                        NgayTai = DateTime.Now
-                    });
+            try {
+                var gopyID = (request.Id != null && request.Id != Guid.Empty)? request.Id : Guid.NewGuid();
+                var nguoiNhanID = request.NguoiNhanID;
+                if (nguoiNhanID == null) {
+                    return BadRequest(ApiResponse<String>.Error("Người nhận góp ý không xác định"));
                 }
+                var maTraCuu = $"GY-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6]}";
+                var gopY = new GY_GopY {
+                    ID = gopyID,
+                    TieuDe = request.TieuDe,
+                    NoiDung = request.NoiDung,
+                    AnDanh = request.AnDanh,
+                    NhanVienID = string.IsNullOrEmpty(request.NhanVienID) ? null : request.NhanVienID,
+                    NguoiNhanID = request.NguoiNhanID,
+                    MaTraCuu = maTraCuu,
+                    TrangThai = "GY_CD",
+                    NgayGui = DateTime.Now,
+                    Files = new List<GY_FileDinhKem>()
+                };
+                if (request.Files != null && request.Files.Any()) {
+                    foreach (var f in request.Files) {
+                        var fileId = Guid.NewGuid();
+                        var relativePath = MoveFileFromTmpToUploads(f.DuongDan);
+
+                        gopY.Files.Add(new GY_FileDinhKem {
+                            ID = fileId,
+                            GopYID = gopyID,
+                            PhanHoiID = null,
+                            TenFile = f.TenFile,
+                            DuongDan = relativePath ?? Path.Combine("tmp", f.TenFile).Replace("\\", "/"),
+                            NgayTai = DateTime.Now
+                        });
+                    }
+                }// Nếu có file trong request thì xử lý
+                _context.GY_GopYs.Add(gopY);
+                await _context.SaveChangesAsync();
+                await _notificationService.CreateThongBaoAsync(
+                    gopyID,
+                    request.AnDanh,
+                    request.TieuDe,
+                    request.NoiDung,
+                    request.NhanVienID ?? "",
+                    new List<string> { request.NguoiNhanID! }
+                );
+                var data = new Dictionary<string, string>();
+                data["Role"] = "GY";
+                data["Type"] = "gy";
+                data["ID"] = gopY?.ID.ToString() ?? "";
+                data["messageId"] = "";
+                var result = _firebaseService.SendNotificationToEmployeesAsync(nguoiNhanID, request.TieuDe, request.NoiDung, data, _firebaseService, _repository);
+                //var result = await _firebaseService.SendNotificationAsync(
+                //            "eoH2qtsyQweYoK_KsCV1Q7:APA91bEp8Un_Sb77MDQ_prldsqTQNBi_q28g12AQVD1Jzmrj6Q4cIoQNnP6pB_H43XZIvnHrNnlLGzMheJ1mn90pzWW5CmrHWiMPp2DCMcohWn57kaX0txM",
+                //            "TEST",
+                //            "NỘI DUNG");
+                return Ok(ApiResponse<string>.Success("Tạo góp ý thành công"));
+            } catch (Exception ex) {
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(ApiResponse<string>.Error(innerMessage));
             }
-
-            _context.GY_GopYs.Add(gopY);
-            await _context.SaveChangesAsync();
-
-            await _notificationService.CreateThongBaoAsync(
-                request.TieuDe,
-                request.NoiDung,
-                request.NhanVienID ?? "",
-                new List<string> { request.NguoiNhanID! }
-            );
-
-            var data = new Dictionary<string, string>();
-            data["Role"] = "GY";
-            data["Type"] = "gy";
-            data["ID"] = gopY?.ID.ToString() ?? "";
-            data["messageId"] = "";
-            
-
-            var result = _firebaseService.SendNotificationToEmployeesAsync(nguoiNhanID, request.TieuDe, request.NoiDung, data, _firebaseService, _repository);
-
-
-            //var result = await _firebaseService.SendNotificationAsync(
-            //            "eoH2qtsyQweYoK_KsCV1Q7:APA91bEp8Un_Sb77MDQ_prldsqTQNBi_q28g12AQVD1Jzmrj6Q4cIoQNnP6pB_H43XZIvnHrNnlLGzMheJ1mn90pzWW5CmrHWiMPp2DCMcohWn57kaX0txM",
-            //            "TEST",
-            //            "NỘI DUNG");
-
-            return Ok(ApiResponse<string>.Success("Tạo góp ý thành công"));
         }
 
         [HttpPost("GetGopYs")]
@@ -205,6 +202,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     NgayGui = g.NgayGui,
                     TrangThai = g.TrangThai,
                     MaTraCuu = g.MaTraCuu,
+                    AnDanh = g.AnDanh,
                     // Người gửi
                     TenNguoiGui = nvGui != null ? nvGui.TenNhanVien : (g.NhanVienID == null ? "Nặc danh" : null),
                     AnhNguoiGui = nvGui != null ? nvGui.Anh : null,
@@ -288,6 +286,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     TieuDe = x.TieuDe,
                     NoiDung = x.NoiDung,
                     NhanVienId = x.NhanVienID,
+                    AnDanh = x.AnDanh,
                     CreatedDate = x.NgayGui,
                     // 👇 Người gửi
                     TenNguoiGui = nvGui != null ? nvGui.TenNhanVien : (x.NhanVienID == null ? "Nặc danh" : null),
@@ -442,7 +441,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                         GopYID = ph.GopYID,
                         NoiDung = ph.NoiDung,
                         NgayPhanHoi = ph.NgayPhanHoi,
-                        NhanVienID = ph.NguoiPhanHoiID,
+                        NguoiPhanHoiID = ph.NguoiPhanHoiID,
 
                         // 👇 Thông tin người phản hồi
                         TenNguoiGui = nv != null ? nv.TenNhanVien : (ph.NguoiPhanHoiID == null ? "Nặc danh" : null),

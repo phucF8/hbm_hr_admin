@@ -27,6 +27,7 @@
         public DateTime NgayGui { get; set; }
         public string TrangThai { get; set; }
         public string MaTraCuu { get; set; }
+        public bool AnDanh { get; set; }
 
         // 👇 vì cần hiển thị tên, ảnh, chức danh người nhận & người gửi
         public string? TenNguoiGui { get; set; }

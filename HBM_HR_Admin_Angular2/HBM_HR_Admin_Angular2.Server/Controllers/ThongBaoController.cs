@@ -446,44 +446,49 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
 
         [HttpPost("notification_list")]
-        public async Task<ActionResult<ApiResponse<object>>> GetThongBaos([FromBody] NotificationListRequest request) {
+        public async Task<ActionResult<ApiResponse<object>>> NotificationList([FromBody] NotificationListRequest request) {
             if (request.PageNumber <= 0) request.PageNumber = 1;
             if (request.PageSize <= 0) request.PageSize = 20;
 
             // Lấy danh sách ID thông báo mà người dùng được nhận
             var listThongBaoIDs = await _context.AD_ThongBao_NguoiNhan
                 .Where(x => x.IDNhanSu == request.UserID)
-                .Select(x => x.IDThongBao.ToString())
+                .Select(x => x.IDThongBao)
                 .ToListAsync();
 
             // Lọc các thông báo đó
-            var query = _context.AD_ThongBao
-                .Where(tb => listThongBaoIDs.Contains(tb.ID));
+            var query = from tb in _context.AD_ThongBao
+                        join nv in _context.DbNhanVien on tb.IDNguoiGui equals nv.ID into gj
+                        from nguoiGui in gj.DefaultIfEmpty()
+                        where listThongBaoIDs.Contains(tb.ID)
+                        select new { tb, nguoiGui };
 
             // Lọc thêm nếu có
             if (!string.IsNullOrEmpty(request.NhomThongBao))
-                query = query.Where(x => x.NhomThongBao == request.NhomThongBao);
+                query = query.Where(x => x.tb.NhomThongBao == request.NhomThongBao);
 
             if (!string.IsNullOrEmpty(request.TrangThai))
-                query = query.Where(x => x.TrangThai == request.TrangThai);
+                query = query.Where(x => x.tb.TrangThai == request.TrangThai);
 
             // Đếm tổng
             var totalCount = await query.CountAsync();
 
             // Phân trang
             var items = await query
-                .OrderByDescending(x => x.NgayGui)
+                .OrderByDescending(x => x.tb.NgayGui)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .Select(tb => new ThongBaoItemResponse {
-                    ID = tb.ID,
-                    TieuDe = tb.TieuDe,
-                    NoiDung = tb.NoiDung,
-                    NhomThongBao = tb.NhomThongBao,
-                    TrangThai = tb.TrangThai,
-                    NgayGui = tb.NgayGui,
-                    TenNguoiGui = "", // Nếu cần có tên người gửi thì tra riêng bảng nhân viên
-                    AnhNguoiGui = ""
+                .Select(x => new ThongBaoItemResponse {
+                    ID = x.tb.ID,
+                    IDNotify = x.tb.IDNotify,
+                    TieuDe = x.tb.TieuDe,
+                    NoiDung = x.tb.NoiDung,
+                    NhomThongBao = x.tb.NhomThongBao,
+                    TrangThai = x.tb.TrangThai,
+                    AnDanh = x.tb.AnDanh,
+                    NgayGui = x.tb.NgayGui,
+                    TenNguoiGui = x.nguoiGui != null ? x.nguoiGui.TenNhanVien : "",
+                    AnhNguoiGui = x.nguoiGui != null ? x.nguoiGui.Anh : ""
                 })
                 .ToListAsync();
 
@@ -497,6 +502,27 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(ApiResponse<object>.Success(result, "Thành công"));
         }
 
+        /// <summary>
+        /// Đánh dấu thông báo là đã đọc (TrangThai = 1, cập nhật NgayDoc)
+        /// </summary>
+        [HttpPost("notification_mark_read")]
+        public async Task<IActionResult> MarkAsRead([FromBody] UpdateTrangThaiNotificationRequest request) {
+            if (request == null || request.IDThongBao == Guid.Empty || string.IsNullOrWhiteSpace(request.IDNhanSu))
+                return BadRequest(ApiResponse<string>.Error("Dữ liệu không hợp lệ"));
+
+            var record = await _context.AD_ThongBao_NguoiNhan
+                .FirstOrDefaultAsync(x => x.IDThongBao == request.IDThongBao && x.IDNhanSu == request.IDNhanSu);
+
+            if (record == null)
+                return NotFound(ApiResponse<string>.Error("Không tìm thấy bản ghi thông báo"));
+
+            record.TrangThai = 1;
+            record.NgayDoc = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(ApiResponse<string>.Success("Đã đánh dấu là đã đọc"));
+        }
 
 
 

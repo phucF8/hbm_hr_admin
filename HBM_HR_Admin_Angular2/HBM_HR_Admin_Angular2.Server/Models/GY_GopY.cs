@@ -15,6 +15,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
         public string MaTraCuu { get; set; }
         public string TrangThai { get; set; }
         public DateTime NgayGui { get; set; }
+        public bool AnDanh { get; set; } = false;
 
         public ICollection<GY_FileDinhKem> Files { get; set; } = new List<GY_FileDinhKem>();
     }
