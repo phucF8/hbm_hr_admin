@@ -450,18 +450,22 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             if (request.PageNumber <= 0) request.PageNumber = 1;
             if (request.PageSize <= 0) request.PageSize = 20;
 
-            // Lấy danh sách ID thông báo mà người dùng được nhận
-            var listThongBaoIDs = await _context.AD_ThongBao_NguoiNhan
+            // Lấy danh sách bản ghi nhận thông báo của người dùng
+            var listThongBaoNguoiNhan = await _context.AD_ThongBao_NguoiNhan
                 .Where(x => x.IDNhanSu == request.UserID)
-                .Select(x => x.IDThongBao)
+                .Select(x => new { x.IDThongBao, x.TrangThai })
                 .ToListAsync();
 
-            // Lọc các thông báo đó
+            var listThongBaoIDs = listThongBaoNguoiNhan.Select(x => x.IDThongBao).ToList();
+
+            // Lọc các thông báo tương ứng
             var query = from tb in _context.AD_ThongBao
                         join nv in _context.DbNhanVien on tb.IDNguoiGui equals nv.ID into gj
                         from nguoiGui in gj.DefaultIfEmpty()
-                        where listThongBaoIDs.Contains(tb.ID)
-                        select new { tb, nguoiGui };
+                        join nn in _context.AD_ThongBao_NguoiNhan
+                            on tb.ID equals nn.IDThongBao
+                        where nn.IDNhanSu == request.UserID
+                        select new { tb, nguoiGui, nn };
 
             // Lọc thêm nếu có
             if (!string.IsNullOrEmpty(request.NhomThongBao))
@@ -488,7 +492,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     AnDanh = x.tb.AnDanh,
                     NgayGui = x.tb.NgayGui,
                     TenNguoiGui = x.nguoiGui != null ? x.nguoiGui.TenNhanVien : "",
-                    AnhNguoiGui = x.nguoiGui != null ? x.nguoiGui.Anh : ""
+                    AnhNguoiGui = x.nguoiGui != null ? x.nguoiGui.Anh : "",
+                    // 🆕 Lấy trạng thái đọc từ AD_ThongBao_NguoiNhan
+                    IsRead = x.nn.TrangThai == 1
                 })
                 .ToListAsync();
 
@@ -501,6 +507,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
             return Ok(ApiResponse<object>.Success(result, "Thành công"));
         }
+
 
         /// <summary>
         /// Đánh dấu thông báo là đã đọc (TrangThai = 1, cập nhật NgayDoc)
