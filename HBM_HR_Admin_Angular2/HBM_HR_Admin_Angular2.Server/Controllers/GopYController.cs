@@ -4,6 +4,7 @@ using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Requesters;
 using HBM_HR_Admin_Angular2.Server.Services;
+using HBM_HR_Admin_Angular2.Server.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -102,10 +103,11 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     return BadRequest(ApiResponse<String>.Error("Người nhận góp ý không xác định"));
                 }
                 var maTraCuu = $"GY-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6]}";
+                string enrNoiDung = EncryptUtil.Encrypt(request.NoiDung);
                 var gopY = new GY_GopY {
                     ID = gopyID,
                     TieuDe = request.TieuDe,
-                    NoiDung = request.NoiDung,
+                    NoiDung = enrNoiDung,
                     AnDanh = request.AnDanh,
                     NhanVienID = string.IsNullOrEmpty(request.NhanVienID) ? null : request.NhanVienID,
                     NguoiNhanID = request.NguoiNhanID,
@@ -135,7 +137,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     gopyID,
                     request.AnDanh,
                     request.TieuDe,
-                    request.NoiDung,
                     request.NhanVienID ?? "",
                     new List<string> { request.NguoiNhanID! }
                 );
@@ -284,7 +285,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 select new GopYChiTietDto {
                     Id = x.ID,
                     TieuDe = x.TieuDe,
-                    NoiDung = x.NoiDung,
+                    NoiDung = EncryptUtil.Decrypt(x.NoiDung),
                     NhanVienId = x.NhanVienID,
                     AnDanh = x.AnDanh,
                     CreatedDate = x.NgayGui,

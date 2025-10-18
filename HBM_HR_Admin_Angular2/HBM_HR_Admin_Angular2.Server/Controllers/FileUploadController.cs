@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
+﻿using HBM_HR_Admin_Angular2.Server.Models.Common;
+using HBM_HR_Admin_Angular2.Server.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using HBM_HR_Admin_Angular2.Server.Models.Common;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
@@ -16,8 +18,10 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
     public class FileUploadController : ControllerBase {
         private readonly long _maxFileSizeBytes;
         private readonly string[] _allowedExtensions;
-        private readonly string _uploadRoot;
+        private readonly string _uploadRoot,_uploadPublic;
         private const string UploadFolderName = "tmp";
+
+        private const string UploadPublicFolderName = "uploads";
 
 
         public FileUploadController(IConfiguration config, IWebHostEnvironment env) {
@@ -28,6 +32,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             _allowedExtensions = section.GetSection("AllowedExtensions").Get<string[]>() ?? new[] { ".jpg", ".png", ".pdf", ".docx" };
             _uploadRoot = Path.Combine(env.WebRootPath ?? Path.Combine(env.ContentRootPath, "wwwroot"), UploadFolderName);
             if (!Directory.Exists(_uploadRoot)) Directory.CreateDirectory(_uploadRoot);
+            _uploadPublic = Path.Combine(env.WebRootPath ?? Path.Combine(env.ContentRootPath, "wwwroot"), UploadPublicFolderName);
+            if (!Directory.Exists(_uploadPublic)) Directory.CreateDirectory(_uploadPublic);
         }
 
         [HttpPost("upload")]
@@ -45,15 +51,32 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             if (!_allowedExtensions.Contains(ext))
                 return BadRequest(ApiResponse<object>.Error($"Extension '{ext}' not allowed."));
 
-            var savedFileName = $"{Guid.NewGuid()}{ext}".Replace("\"", string.Empty);
+            var savedFileName = $"{Guid.NewGuid()}.{ext}".Replace("\"", string.Empty);
             var savePath = Path.Combine(_uploadRoot, savedFileName);
 
-            // ✅ Ghi file ra đĩa
-            await using (var stream = System.IO.File.Create(savePath)) {
+            string originalFilePath = Path.Combine(_uploadRoot, savedFileName);
+            //string encryptedFileName = $"{Path.GetFileNameWithoutExtension(savedFileName)}.enc";
+            string encryptedFileName = $"{savedFileName}.enc";
+            string encryptedFilePath = Path.Combine(_uploadRoot, encryptedFileName);
+
+            // 1️.Lưu file gốc tạm
+            using (var stream = new FileStream(originalFilePath, FileMode.Create)) {
                 await file.CopyToAsync(stream);
             }
 
-            var fileUrl = $"/{UploadFolderName}/{savedFileName}";
+            // 2️.Mã hoá file
+            await EncryptUtil.EncryptFileAsync(originalFilePath, encryptedFilePath);
+
+            // 3️.Xoá file gốc sau khi mã hoá
+            System.IO.File.Delete(originalFilePath);
+
+            //// ✅ Ghi file ra đĩa
+            //await using (var stream = System.IO.File.Create(savePath)) {
+            //    await file.CopyToAsync(stream);
+            //}
+
+            //var fileUrl = $"/{UploadFolderName}/{savedFileName}";
+            var fileUrl = $"/{UploadFolderName}/{encryptedFileName}";
 
             // ✅ Tạo object dữ liệu trả về đúng yêu cầu
             var fileInfo = new {
@@ -64,6 +87,40 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             // ✅ Trả về theo ApiResponse<T>
             return Ok(ApiResponse<object>.Success(fileInfo, "Tải lên thành công"));
         }
+
+        [AllowAnonymous]
+        [HttpGet("ViewFile")]
+        public async Task<IActionResult> ViewFile(string fileName) {
+            string encryptedPath = Path.Combine(_uploadPublic, fileName);
+
+            if (!System.IO.File.Exists(encryptedPath))
+                return NotFound();
+
+            // Tạo file tạm để chứa file đã giải mã
+            string tempFile = Path.GetTempFileName();
+
+            try {
+                await EncryptUtil.DecryptFileAsync(encryptedPath, tempFile);
+
+                await using var memoryStream = new MemoryStream(await System.IO.File.ReadAllBytesAsync(tempFile));
+                memoryStream.Position = 0;
+
+                string originalExt = Path.GetExtension(fileName.Replace(".enc", "")).ToLower();
+                string contentType = originalExt switch {
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    ".png" => "image/png",
+                    ".pdf" => "application/pdf",
+                    _ => "application/octet-stream"
+                };
+
+                return File(memoryStream.ToArray(), contentType);
+            } finally {
+                // Xóa file tạm
+                if (System.IO.File.Exists(tempFile))
+                    System.IO.File.Delete(tempFile);
+            }
+        }
+
 
 
         [HttpPost("upload-multi")]

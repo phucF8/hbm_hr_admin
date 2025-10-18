@@ -10,13 +10,13 @@ namespace HBM_HR_Admin_Angular2.Server.Services {
             _context = context;
         }
 
-        public async Task CreateThongBaoAsync(Guid IDNotify,bool isAnDanh, string tieuDe, string noiDung, string idNguoiGui, List<string> danhSachNguoiNhan) {
+        public async Task CreateThongBaoAsync(Guid IDNotify,bool isAnDanh, string tieuDe, string idNguoiGui, List<string> danhSachNguoiNhan) {
             var thongBaoId = Guid.NewGuid();
             var thongBao = new AD_ThongBao {
                 ID = thongBaoId,
                 IDNguoiGui = idNguoiGui,
                 NgayGui = DateTime.Now,
-                NoiDung = noiDung,
+                NoiDung = "",
                 NgayTao = DateTime.Now,
                 NguoiTao = idNguoiGui,
                 BusinessId = "GY", // hoặc tùy theo loại nghiệp vụ

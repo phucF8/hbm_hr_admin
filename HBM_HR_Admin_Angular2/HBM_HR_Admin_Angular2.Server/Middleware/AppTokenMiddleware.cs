@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,6 +15,12 @@ namespace HBM_HR_Admin_Angular2.Server.Middleware {
         }
 
         public async Task Invoke(HttpContext context) {
+            var path = context.Request.Path.Value?.ToLower();
+            // Bỏ qua xác thực nếu là API ViewFile
+            if (path != null && path.Contains("/api/fileupload/viewfile")) {
+                await _next(context);
+                return;
+            }
             var appToken = _config["AppSettings:AppToken"];
             var requestToken = context.Request.Headers["X-App-Token"].FirstOrDefault();
 
