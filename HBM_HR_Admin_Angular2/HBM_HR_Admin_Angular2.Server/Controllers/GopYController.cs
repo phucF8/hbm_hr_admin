@@ -310,7 +310,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 return NotFound(ApiResponse<GopYChiTietDto>.Error("Không tìm thấy thông tin chi tiết về góp ý này."));
             // ✅ Nếu trạng thái hiện tại là "CD" → cập nhật thành "DD"
             var gopyEntity = await _context.GY_GopYs.FindAsync(request.Id);
-            if (gopyEntity != null && gopyEntity.TrangThai == "GY_CD") {
+            if (gopyEntity != null && gopyEntity.TrangThai == "GY_CD" && request.UserID != gopyEntity.NhanVienID) {
                 gopyEntity.TrangThai = "GY_DD";
                 _context.GY_GopYs.Update(gopyEntity);
                 await _context.SaveChangesAsync();
@@ -365,9 +365,14 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             var gopY = await _context.GY_GopYs.FindAsync(request.ID);
 
             if (gopY == null) {
-                return NotFound(ApiResponse<String>.Error("Xoá góp ý thất bại"));
+                return NotFound(ApiResponse<String>.Error("Góp ý không tồn tại trên hệ thống"));
             }
-
+            if (gopY.TrangThai != "GY_CD") {
+                return NotFound(ApiResponse<string>.Error("Góp ý này đã được người nhận xem, bạn không thể chỉnh sửa hoặc xoá."));
+            }
+            if (gopY.NhanVienID != request.UserID) {
+                return NotFound(ApiResponse<string>.Error("Chỉ người đã tạo góp ý này mới có thể xoá nó."));
+            }
             // Xoá luôn file đính kèm và phản hồi liên quan (nếu muốn)
             var files = _context.GY_FileDinhKems.Where(f => f.GopYID == request.ID);
             _context.GY_FileDinhKems.RemoveRange(files);
