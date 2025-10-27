@@ -3,6 +3,7 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using Dapper;
 using HBM_HR_Admin_Angular2.Server.Models;
+using HBM_HR_Admin_Angular2.Server.DTOs;
 
 namespace HBM_HR_Admin_Angular2.Server.Data
 {

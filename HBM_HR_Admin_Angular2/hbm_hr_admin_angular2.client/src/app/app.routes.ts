@@ -59,7 +59,8 @@ export const routes: Routes = [
       {
         path: 'error-report',
         loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
-      }
+      },
+      { path: 'gopy', component: FeedbackManagementComponent },
     ]
   },
 

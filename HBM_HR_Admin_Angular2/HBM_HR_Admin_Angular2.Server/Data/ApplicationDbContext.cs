@@ -53,6 +53,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public DbSet<AD_ThongBao> AD_ThongBao { get; set; }
         public DbSet<AD_ThongBao_NguoiNhan> AD_ThongBao_NguoiNhan { get; set; }
+        public DbSet<NV_NhacViec> NV_NhacViec { get; set; }
 
 
     }

@@ -45,11 +45,7 @@ public class V_NS_ADTB_NhanThongBao
 
 
 
-public class PagedResult<T>
-{
-    public List<T> items { get; set; } = new();
-    public int TotalCount { get; set; }
-}
+
 
 
 
