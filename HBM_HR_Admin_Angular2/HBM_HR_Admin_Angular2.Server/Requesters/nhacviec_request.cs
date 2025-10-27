@@ -6,6 +6,7 @@
         public DateTime? DenNgay { get; set; }
         public string TrangThai { get; set; }
         public string Filter { get; set; }
+        public string KeySearch { get; set; }
 
         // 👉 Thêm cho phân trang
         public int PageNumber { get; set; } = 1;

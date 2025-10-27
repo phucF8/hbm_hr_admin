@@ -28,21 +28,28 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 string trangThaiFilter = filter.Filter;
                 int pageNumber = filter.PageNumber <= 0 ? 1 : filter.PageNumber;
                 int pageSize = filter.PageSize <= 0 ? 20 : filter.PageSize;
-                var query = _db.NV_NhacViec.Where(n => n.UserID == userId && !n.DaXoa);
+                string keySearch = filter.KeySearch?.Trim().ToLower();
+
+                var query = _db.NV_NhacViec
+                    .Where(n => n.UserID == userId && !n.DaXoa);
+
                 DateTime today = DateTime.Today;
-                // Lọc theo trạng thái all, today, thisWeek, completed, overdue
+
+                // 🔹 Lọc theo trạng thái
                 if (trangThaiFilter == "today") {
-                    query = query.Where(n => n.NgayGioNhac.HasValue && n.NgayGioNhac.Value.Date == today);
+                    query = query.Where(n => n.NgayGioNhac.HasValue &&
+                                             n.NgayGioNhac.Value.Date == today);
                 } else if (trangThaiFilter == "thisWeek") {
                     DateTime startOfWeek = today.AddDays(-(int)today.DayOfWeek);
                     DateTime endOfWeek = startOfWeek.AddDays(6);
                     query = query.Where(n => n.NgayGioNhac.HasValue &&
                                              n.NgayGioNhac.Value.Date >= startOfWeek &&
                                              n.NgayGioNhac.Value.Date <= endOfWeek);
-                } else if (trangThaiFilter == "completed") { 
+                } else if (trangThaiFilter == "completed") {
                     query = query.Where(n => n.TrangThai == "HoanThanh");
                 } else if (trangThaiFilter == "overdue") {
-                    query = query.Where(n => n.TrangThai != "HoanThanh" && 
+                    query = query.Where(n =>
+                        n.TrangThai != "HoanThanh" &&
                         n.NgayGioNhac.HasValue &&
                         n.NgayGioNhac.Value.Date < today);
                 } else {
@@ -54,12 +61,18 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                         n.NgayGioNhac.Value.Date <= denNgay);
                 }
 
+                // 🔹 Lọc theo từ khóa (KeySearch)
+                if (!string.IsNullOrEmpty(keySearch)) {
+                    query = query.Where(n =>
+                        (n.TieuDe ?? "").ToLower().Contains(keySearch) ||
+                        (n.Tag ?? "").ToLower().Contains(keySearch) ||
+                        (n.GhiChu ?? "").ToLower().Contains(keySearch));
+                }
 
+                // 🔹 Đếm tổng số bản ghi
+                int totalCount = await query.CountAsync();
 
-                    // Đếm tổng số bản ghi
-                    int totalCount = await query.CountAsync();
-
-                // Lấy dữ liệu 1 trang
+                // 🔹 Lấy dữ liệu 1 trang
                 var items = await query
                     .OrderByDescending(n => n.NgayGioNhac)
                     .Skip((pageNumber - 1) * pageSize)
@@ -78,6 +91,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 return ApiResponse<PagedResult<NV_NhacViec>>.Error(ex.InnerException?.Message ?? ex.Message);
             }
         }
+
 
 
         // 2. Tạo nhắc việc
