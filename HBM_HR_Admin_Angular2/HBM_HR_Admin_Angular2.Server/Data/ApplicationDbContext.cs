@@ -2,7 +2,6 @@
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace HBM_HR_Admin_Angular2.Server.Data
 {
     public class ApplicationDbContext : DbContext
@@ -54,6 +53,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<AD_ThongBao> AD_ThongBao { get; set; }
         public DbSet<AD_ThongBao_NguoiNhan> AD_ThongBao_NguoiNhan { get; set; }
         public DbSet<NV_NhacViec> NV_NhacViec { get; set; }
+
+        public DbSet<NS_NhanVien_DeviceTokens> NS_NhanVien_DeviceTokens { get; set; }
 
 
     }

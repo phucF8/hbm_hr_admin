@@ -17,5 +17,8 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
         public bool DaXoa { get; set; } = false;       // Xóa mềm
         public DateTime NgayTao { get; set; } = DateTime.Now;      // Ngày tạo
         public DateTime NgayCapNhat { get; set; } = DateTime.Now;  // Ngày cập nhật
+        
+        // ✅ Thêm cột IsSent
+        public bool IsSent { get; set; }
     }
 }

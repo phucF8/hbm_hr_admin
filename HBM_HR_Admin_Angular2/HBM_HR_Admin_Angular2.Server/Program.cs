@@ -1,3 +1,4 @@
+using Hangfire;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using HBM_HR_Admin_Angular2.Server.constance;
@@ -95,8 +96,26 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
+// ✅ Thêm đoạn Hangfire ở đây, trước builder.Build()
+builder.Services.AddHangfire(config => {
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+          .UseSimpleAssemblyNameTypeSerializer()
+          .UseRecommendedSerializerSettings()
+          .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new Hangfire.SqlServer.SqlServerStorageOptions {
+              CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+              SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+              QueuePollInterval = TimeSpan.Zero,
+              UseRecommendedIsolationLevel = true,
+              DisableGlobalLocks = true
+          });
+});
+
+builder.Services.AddHangfireServer(); // chạy Hangfire server
 
 var app = builder.Build();
+
+// Hangfire Dashboard
+app.UseHangfireDashboard("/hangfire");
 
 // Áp dụng CORS
 app.UseCors("AllowAngular");
@@ -126,5 +145,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+// Đăng ký job định kỳ mỗi phút
+RecurringJob.AddOrUpdate<ReminderJob>(
+    "send-reminders",
+    job => job.CheckAndSendReminders(),
+    "*/1 * * * *" // chạy mỗi phút
+);
 
 app.Run();

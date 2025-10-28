@@ -55,7 +55,6 @@ public class FirebaseNotificationService
         }
     }
 
-
     public async Task<bool> SendNotificationAsync(List<string> deviceTokens, string title, string body, object data = null)
     {
         try
@@ -97,8 +96,6 @@ public class FirebaseNotificationService
         }
     }
 
-
-
     public async Task<bool> TestNotificationAsync(string deviceToken, string title, string body, int badge)
     {
         try
@@ -134,7 +131,6 @@ public class FirebaseNotificationService
             return false;
         }
     }
-
 
     public async Task<(int successCount, int totalCount, Dictionary<string, (int success, int total)>)> 
         SendNotificationToEmployeesAsync(
@@ -175,7 +171,5 @@ public class FirebaseNotificationService
 
         return (successCount, totalCount, userStats);
     }
-
-
 
 }
