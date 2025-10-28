@@ -14,9 +14,12 @@ namespace HBM_HR_Admin_Angular2.Server.Utility {
                 var iv = aes.IV;
 
                 using (var encryptor = aes.CreateEncryptor(aes.Key, iv)) {
-                    byte[] encrypted = encryptor.TransformFinalBlock(
-                        Encoding.UTF8.GetBytes(plainText), 0, plainText.Length);
-                    return Convert.ToBase64String(iv.Concat(encrypted).ToArray());
+                    byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+                    byte[] encrypted = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
+
+                    // Ghép IV + ciphertext rồi mã hóa base64
+                    byte[] fullCipher = iv.Concat(encrypted).ToArray();
+                    return Convert.ToBase64String(fullCipher);
                 }
             }
         }
