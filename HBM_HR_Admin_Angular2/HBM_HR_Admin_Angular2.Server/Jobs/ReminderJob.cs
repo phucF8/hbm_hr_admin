@@ -20,16 +20,26 @@ public class ReminderJob {
             .ToListAsync();
         if (!dueReminders.Any())
             return;
+        
         foreach (var reminder in dueReminders) {
             var tokens = await _db.NS_NhanVien_DeviceTokens
                 .Where(u => u.IDNhanVien == reminder.UserID)
                 .Select(u => u.DeviceToken)
                 .ToListAsync();
+            // Chuẩn bị payload dữ liệu bổ sung
+            var dataPayload = new Dictionary<string, string>
+            {
+            { "Role", "QL" },
+            { "Type", "nv" },
+            { "ID", reminder.ID.ToString() },
+            { "messageId", "" }
+        };
             foreach (var token in tokens) {
                 await _firebase.SendNotificationAsync(
                     token,
                     reminder.TieuDe,
-                    reminder.GhiChu
+                    reminder.GhiChu,
+                    dataPayload
                 );
             }
             reminder.IsSent = true; // Đánh dấu đã gửi

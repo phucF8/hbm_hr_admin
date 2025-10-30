@@ -20,7 +20,19 @@
         public string ID { get; set; }
     }
 
+    public class NhacViecDeleteListRequest {
+        public List<string> IDs { get; set; } = new List<string>();
+    }
+
+
     public class MarkCompleteRequest {
         public string ID { get; set; }
+        public string TrangThai { get; set; } // ví dụ: "DangLam", "HoanThanh", "Huy"
     }
+
+    public class MarkCompleteRequestList {
+        public List<string> IDs { get; set; } = new();
+        public string TrangThai { get; set; } = ""; // thêm thuộc tính này
+    }
+
 }

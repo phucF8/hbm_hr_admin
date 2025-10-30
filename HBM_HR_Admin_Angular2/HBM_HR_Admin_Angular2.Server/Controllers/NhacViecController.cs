@@ -153,24 +153,98 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             }
         }
 
-        // 5. Đánh dấu hoàn thành
+        // 4. Xóa nhắc việc (mềm)
+        [HttpPost("DeleteList")]
+        public async Task<ApiResponse<string>> DeleteList([FromBody] NhacViecDeleteListRequest input) {
+            try {
+                if (input.IDs == null || !input.IDs.Any())
+                    return ApiResponse<string>.Error("Danh sách ID trống.");
+                var guidList = input.IDs
+                    .Select(id => Guid.TryParse(id, out var g) ? g : Guid.Empty)
+                    .Where(g => g != Guid.Empty)
+                    .ToList();
+                if (!guidList.Any())
+                    return ApiResponse<string>.Error("Danh sách ID không hợp lệ.");
+                var existingList = await _db.NV_NhacViec
+                    .Where(n => guidList.Contains(n.ID))
+                    .ToListAsync();
+                if (!existingList.Any())
+                    return ApiResponse<string>.Error("Không tìm thấy công việc nào phù hợp.");
+                foreach (var item in existingList) {
+                    item.DaXoa = true;
+                    item.NgayCapNhat = DateTime.Now;
+                }
+                await _db.SaveChangesAsync();
+                return ApiResponse<string>.Success($"Đã xóa {existingList.Count} công việc thành công.");
+            } catch (Exception ex) {
+                return ApiResponse<string>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
         [HttpPost("MarkComplete")]
         public async Task<ApiResponse<NV_NhacViec>> MarkComplete([FromBody] MarkCompleteRequest input) {
             try {
-                Guid id = Guid.Parse((string)input.ID);
-                var existing = await _db.NV_NhacViec.FirstOrDefaultAsync(n => n.ID == id);
-                if (existing == null)
-                    return ApiResponse<NV_NhacViec>.Error("Công việc không tồn tại");
+                // ✅ Kiểm tra đầu vào hợp lệ
+                if (string.IsNullOrEmpty(input.ID))
+                    return ApiResponse<NV_NhacViec>.Error("Thiếu ID công việc.");
 
-                existing.TrangThai = "HoanThanh";
+                Guid id = Guid.Parse(input.ID);
+                var existing = await _db.NV_NhacViec.FirstOrDefaultAsync(n => n.ID == id);
+
+                if (existing == null)
+                    return ApiResponse<NV_NhacViec>.Error("Công việc không tồn tại.");
+
+                // ✅ Cập nhật trạng thái theo request
+                if (!string.IsNullOrEmpty(input.TrangThai))
+                    existing.TrangThai = input.TrangThai;
+
                 existing.NgayCapNhat = DateTime.Now;
 
                 await _db.SaveChangesAsync();
+
                 return ApiResponse<NV_NhacViec>.Success(existing);
             } catch (Exception ex) {
                 return ApiResponse<NV_NhacViec>.Error(ex.InnerException?.Message ?? ex.Message);
             }
         }
+
+
+        [HttpPost("UpdateStatusList")]
+        public async Task<ApiResponse<string>> UpdateStatusList([FromBody] MarkCompleteRequestList input) {
+            try {
+                if (input.IDs == null || !input.IDs.Any())
+                    return ApiResponse<string>.Error("Không có công việc nào được chọn");
+
+                if (string.IsNullOrWhiteSpace(input.TrangThai))
+                    return ApiResponse<string>.Error("Thiếu trạng thái cần cập nhật");
+
+                // Chuyển List<string> sang List<Guid>
+                var guids = input.IDs.Select(Guid.Parse).ToList();
+
+                // Lấy danh sách Nhắc việc cần cập nhật
+                var nhacViecs = await _db.NV_NhacViec
+                    .Where(n => guids.Contains(n.ID))
+                    .ToListAsync();
+
+                if (!nhacViecs.Any())
+                    return ApiResponse<string>.Error("Không tìm thấy công việc cần cập nhật");
+
+                // Cập nhật trạng thái
+                foreach (var nv in nhacViecs) {
+                    nv.TrangThai = input.TrangThai;
+                    nv.NgayCapNhat = DateTime.Now;
+                }
+
+                await _db.SaveChangesAsync();
+
+                return ApiResponse<string>.Success(
+                    $"Đã cập nhật {nhacViecs.Count} công việc sang trạng thái '{input.TrangThai}'"
+                );
+            } catch (Exception ex) {
+                return ApiResponse<string>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
 
         // 6. Hoãn nhắc việc (Snooze)
         [HttpPost("Snooze")]
