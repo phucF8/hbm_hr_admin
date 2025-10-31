@@ -7,6 +7,7 @@
         public string TrangThai { get; set; }
         public string Filter { get; set; }
         public string KeySearch { get; set; }
+        public Guid? LoaiCongViecID { get; set; }
 
         // 👉 Thêm cho phân trang
         public int PageNumber { get; set; } = 1;
@@ -20,7 +21,7 @@
         public string ID { get; set; }
     }
 
-    public class NhacViecDeleteListRequest {
+    public class DeleteListRequest {
         public List<string> IDs { get; set; } = new List<string>();
     }
 
@@ -30,9 +31,29 @@
         public string TrangThai { get; set; } // ví dụ: "DangLam", "HoanThanh", "Huy"
     }
 
-    public class MarkCompleteRequestList {
+    public class UpdateTrangThaiRequestList {
         public List<string> IDs { get; set; } = new();
         public string TrangThai { get; set; } = ""; // thêm thuộc tính này
     }
+
+    public class UserRequest {
+        public string UserID { get; set; } = string.Empty;
+    }
+
+    public class UpdateViTriRequestList {
+        public List<UpdateViTriItem> Items { get; set; } = new();
+    }
+
+    public class UpdateViTriItem {
+        public Guid ID { get; set; }
+        public int ThuTuHienThi { get; set; }
+    }
+
+
+
+
+
+
+
 
 }

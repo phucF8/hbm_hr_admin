@@ -32,6 +32,10 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
                 var query = _db.NV_NhacViec
                     .Where(n => n.UserID == userId && !n.DaXoa);
+                // 🔹 Lọc theo loại công việc
+                if (filter.LoaiCongViecID != null) {
+                    query = query.Where(n => n.LoaiCongViecID == filter.LoaiCongViecID);
+                }
 
                 DateTime today = DateTime.Today;
 
@@ -101,7 +105,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 model.ID = Guid.NewGuid();
                 model.NgayTao = DateTime.Now;
                 model.NgayCapNhat = DateTime.Now;
-                model.GhiChu = model.GhiChu;
                 await _db.NV_NhacViec.AddAsync(model);
                 await _db.SaveChangesAsync();
                 return ApiResponse<NV_NhacViec>.Success(model);
@@ -126,6 +129,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 existing.Tag = model.Tag;
                 existing.TrangThai = model.TrangThai;
                 existing.NgayCapNhat = DateTime.Now;
+                existing.LoaiCongViecID = model.LoaiCongViecID;
 
                 await _db.SaveChangesAsync();
                 return ApiResponse<NV_NhacViec>.Success(existing);
@@ -155,7 +159,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
         // 4. Xóa nhắc việc (mềm)
         [HttpPost("DeleteList")]
-        public async Task<ApiResponse<string>> DeleteList([FromBody] NhacViecDeleteListRequest input) {
+        public async Task<ApiResponse<string>> DeleteList([FromBody] DeleteListRequest input) {
             try {
                 if (input.IDs == null || !input.IDs.Any())
                     return ApiResponse<string>.Error("Danh sách ID trống.");
@@ -210,7 +214,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
 
         [HttpPost("UpdateStatusList")]
-        public async Task<ApiResponse<string>> UpdateStatusList([FromBody] MarkCompleteRequestList input) {
+        public async Task<ApiResponse<string>> UpdateStatusList([FromBody] UpdateTrangThaiRequestList input) {
             try {
                 if (input.IDs == null || !input.IDs.Any())
                     return ApiResponse<string>.Error("Không có công việc nào được chọn");
@@ -272,18 +276,208 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
         // 7. Lấy chi tiết nhắc việc theo ID
         [HttpPost("detail")]
-        public async Task<ApiResponse<NV_NhacViec>> GetById([FromBody] NhacViecDeleteRequest input) {
+        public async Task<ApiResponse<NV_NhacViecDetailDto>> GetById([FromBody] NhacViecDeleteRequest input) {
             try {
                 Guid id = Guid.Parse((string)input.ID);
-                var existing = await _db.NV_NhacViec.FirstOrDefaultAsync(n => n.ID == id);
-                if (existing == null)
-                    return ApiResponse<NV_NhacViec>.Error("Công việc không tồn tại");
 
-                return ApiResponse<NV_NhacViec>.Success(existing);
+                var result = await (
+                    from n in _db.NV_NhacViec
+                    join l in _db.NV_LoaiCongViec on n.LoaiCongViecID equals l.ID into lj
+                    from lcv in lj.DefaultIfEmpty()
+                    where n.ID == id
+                    select new NV_NhacViecDetailDto {
+                        ID = n.ID,
+                        UserID = n.UserID,
+                        TieuDe = n.TieuDe,
+                        GhiChu = n.GhiChu,
+                        NgayGioNhac = n.NgayGioNhac,
+                        LapLai = n.LapLai,
+                        MucDoUuTien = n.MucDoUuTien,
+                        Tag = n.Tag,
+                        TrangThai = n.TrangThai,
+                        DaXoa = n.DaXoa,
+                        NgayTao = n.NgayTao,
+                        NgayCapNhat = n.NgayCapNhat,
+                        IsSent = n.IsSent,
+                        LoaiCongViecID = n.LoaiCongViecID,
+                        TenLoaiCongViec = lcv != null ? lcv.TenLoai : null
+                    }
+                ).FirstOrDefaultAsync();
+
+                if (result == null)
+                    return ApiResponse<NV_NhacViecDetailDto>.Error("Công việc không tồn tại");
+
+                return ApiResponse<NV_NhacViecDetailDto>.Success(result);
             } catch (Exception ex) {
-                return ApiResponse<NV_NhacViec>.Error(ex.InnerException?.Message ?? ex.Message);
+                return ApiResponse<NV_NhacViecDetailDto>.Error(ex.InnerException?.Message ?? ex.Message);
             }
         }
+
+
+        [HttpPost("LoaiCongViecList")]
+        public async Task<ApiResponse<List<NV_LoaiCongViec>>> LoaiCongViecList([FromBody] UserRequest input) {
+            try {
+                string userId = input.UserID;
+
+                var query = _db.NV_LoaiCongViec
+                    .Where(lcv => !lcv.DaXoa && (lcv.UserID == null || lcv.UserID == userId))
+                    .OrderBy(lcv => lcv.ThuTuHienThi)
+                    .ThenBy(lcv => lcv.TenLoai);
+
+                var list = await query.ToListAsync();
+
+                return ApiResponse<List<NV_LoaiCongViec>>.Success(list);
+            } catch (Exception ex) {
+                return ApiResponse<List<NV_LoaiCongViec>>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+        //Tạo loại công việc
+        [HttpPost("LoaiCongViecCreate")]
+        public async Task<ApiResponse<NV_LoaiCongViec>> LoaiCongViecCreate([FromBody] NV_LoaiCongViec model) {
+            try {
+                model.ID = Guid.NewGuid();
+                model.NgayTao = DateTime.Now;
+                model.NgayCapNhat = DateTime.Now;
+                await _db.NV_LoaiCongViec.AddAsync(model);
+                await _db.SaveChangesAsync();
+                return ApiResponse<NV_LoaiCongViec>.Success(model);
+            } catch (Exception ex) {
+                return ApiResponse<NV_LoaiCongViec>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+        //Tạo hoặc cập nhật loại công việc
+        [HttpPost("LoaiCongViecUpdate")]
+        public async Task<ApiResponse<NV_LoaiCongViec>> LoaiCongViecCreateOrUpdate([FromBody] NV_LoaiCongViec model) {
+            try {
+                if (model.ID == Guid.Empty || model.ID == default) {
+                    // === Thêm mới ===
+                    model.ID = Guid.NewGuid();
+                    model.NgayTao = DateTime.Now;
+                    model.NgayCapNhat = DateTime.Now;
+                    await _db.NV_LoaiCongViec.AddAsync(model);
+                } else {
+                    // === Cập nhật ===
+                    var existing = await _db.NV_LoaiCongViec.FirstOrDefaultAsync(x => x.ID == model.ID);
+                    if (existing == null)
+                        return ApiResponse<NV_LoaiCongViec>.Error("Không tìm thấy loại công việc cần cập nhật.");
+
+                    existing.TenLoai = model.TenLoai;
+                    existing.MoTa = model.MoTa;
+                    existing.ThuTuHienThi = model.ThuTuHienThi;
+                    existing.NgayCapNhat = DateTime.Now;
+                    existing.DaXoa = model.DaXoa;
+                    existing.UserID = model.UserID;
+                }
+
+                await _db.SaveChangesAsync();
+                return ApiResponse<NV_LoaiCongViec>.Success(model);
+            } catch (Exception ex) {
+                return ApiResponse<NV_LoaiCongViec>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+        // Xóa nhiều loại công việc (mềm)
+        [HttpPost("LoaiCongViecDeleteList")]
+        public async Task<ApiResponse<string>> LoaiCongViecDeleteList([FromBody] DeleteListRequest input) {
+            try {
+                if (input.IDs == null || !input.IDs.Any())
+                    return ApiResponse<string>.Error("Danh sách ID trống.");
+
+                // Chuyển sang Guid
+                var guidList = input.IDs
+                    .Select(id => Guid.TryParse(id, out var g) ? g : Guid.Empty)
+                    .Where(g => g != Guid.Empty)
+                    .ToList();
+
+                if (!guidList.Any())
+                    return ApiResponse<string>.Error("Danh sách ID không hợp lệ.");
+
+                // Lấy danh sách loại công việc
+                var existingList = await _db.NV_LoaiCongViec
+                    .Where(lcv => guidList.Contains(lcv.ID))
+                    .ToListAsync();
+
+                if (!existingList.Any())
+                    return ApiResponse<string>.Error("Không tìm thấy loại công việc nào phù hợp.");
+
+                // Kiểm tra ràng buộc với NV_NhacViec
+                var relatedTasks = await _db.NV_NhacViec
+                    .Where(nv => nv.LoaiCongViecID != null && guidList.Contains(nv.LoaiCongViecID.Value) && !nv.DaXoa)
+                    .GroupBy(nv => nv.LoaiCongViecID)
+                    .Select(g => new { LoaiCongViecID = g.Key, Count = g.Count() })
+                    .ToListAsync();
+
+                if (relatedTasks.Any()) {
+                    var messages = new List<string>();
+                    foreach (var r in relatedTasks) {
+                        var loai = existingList.FirstOrDefault(x => x.ID == r.LoaiCongViecID);
+                        if (loai != null) {
+                            messages.Add($"- '{loai.TenLoai}' có {r.Count} nhắc việc liên quan.");
+                        }
+                    }
+
+                    var msg = "Không thể xoá vì:\n" +
+                              string.Join("\n", messages) +
+                              "\n\nHãy xoá hoặc chuyển nhắc việc sang loại khác trước khi xoá.";
+                    return ApiResponse<string>.Error(msg);
+                }
+
+                // Xóa mềm các loại công việc hợp lệ
+                foreach (var item in existingList) {
+                    item.DaXoa = true;
+                    item.NgayCapNhat = DateTime.Now;
+                }
+
+                await _db.SaveChangesAsync();
+
+                return ApiResponse<string>.Success($"Đã xoá {existingList.Count} loại công việc thành công.");
+            } catch (Exception ex) {
+                return ApiResponse<string>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+
+
+
+
+        [HttpPost("LoaiCongViecUpdateViTriList")]
+        public async Task<ApiResponse<string>> LoaiCongViecUpdateViTriList([FromBody] UpdateViTriRequestList input) {
+            try {
+                if (input.Items == null || !input.Items.Any())
+                    return ApiResponse<string>.Error("Danh sách vị trí cập nhật trống.");
+
+                // Lấy toàn bộ ID
+                var guids = input.Items.Select(i => i.ID).ToList();
+
+                // Lấy danh sách loại công việc cần cập nhật
+                var loaiCongViecs = await _db.NV_LoaiCongViec
+                    .Where(l => guids.Contains(l.ID))
+                    .ToListAsync();
+
+                if (!loaiCongViecs.Any())
+                    return ApiResponse<string>.Error("Không tìm thấy loại công việc phù hợp.");
+
+                // Cập nhật vị trí mới cho từng loại công việc
+                foreach (var item in input.Items) {
+                    var entity = loaiCongViecs.FirstOrDefault(l => l.ID == item.ID);
+                    if (entity != null) {
+                        entity.ThuTuHienThi = item.ThuTuHienThi;
+                        entity.NgayCapNhat = DateTime.Now;
+                    }
+                }
+
+                await _db.SaveChangesAsync();
+
+                return ApiResponse<string>.Success($"Đã cập nhật vị trí cho {loaiCongViecs.Count} loại công việc.");
+            } catch (Exception ex) {
+                return ApiResponse<string>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+
+
 
     }
 

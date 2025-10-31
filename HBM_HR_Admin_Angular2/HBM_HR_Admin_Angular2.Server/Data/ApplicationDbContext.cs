@@ -55,7 +55,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<NV_NhacViec> NV_NhacViec { get; set; }
 
         public DbSet<NS_NhanVien_DeviceTokens> NS_NhanVien_DeviceTokens { get; set; }
-
+        public DbSet<NV_LoaiCongViec> NV_LoaiCongViec { get; set; }
+        
 
     }
 

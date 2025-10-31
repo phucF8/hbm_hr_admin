@@ -20,5 +20,44 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
         
         // ✅ Thêm cột IsSent
         public bool IsSent { get; set; }
+
+        // ✅ Thêm cột LoaiCongViecID (nullable)
+        public Guid? LoaiCongViecID { get; set; }
     }
+
+
+
+
+
+
+
+
+
+        [Table("NV_LoaiCongViec")]
+        public class NV_LoaiCongViec {
+            [Key]
+            public Guid ID { get; set; }
+
+            [StringLength(36)]
+            public string? UserID { get; set; } // null = loại công việc chung, khác null = loại riêng của user
+
+            [Required]
+            [StringLength(100)]
+            public string TenLoai { get; set; } = string.Empty;
+
+            [StringLength(500)]
+            public string? MoTa { get; set; }
+
+            public int? ThuTuHienThi { get; set; }
+
+            public DateTime NgayTao { get; set; } = DateTime.Now;
+
+            public DateTime NgayCapNhat { get; set; } = DateTime.Now;
+
+            public bool DaXoa { get; set; } = false;
+        }
+
+
+
+
 }
