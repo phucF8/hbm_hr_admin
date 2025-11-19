@@ -377,39 +377,50 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         public async Task<IActionResult> TestNotification([FromBody] TestNotificationRequest request)
         {
             var userStats = new Dictionary<string, (int success, int total)>(); // Lưu thống kê theo user
+            
+            String IDNhanVien = request.IDNhanVien;
+            if (string.IsNullOrWhiteSpace(IDNhanVien))
             {
-                String IDNhanVien = request.IDNhanVien;
-                if (string.IsNullOrWhiteSpace(IDNhanVien))
-                {
-                    return BadRequest("ID nhân viên không hợp lệ");
-                }
-                // Lấy token từ database
-                var deviceTokens = await _repository.GetDeviceTokenByEmployeeId(IDNhanVien);
-                if (deviceTokens == null || !deviceTokens.Any())
-                {
-                    _logger.LogWarning($"Không tìm thấy token cho nhân viên {IDNhanVien}");
-
-                }
-                foreach (var deviceToken in deviceTokens)
-                {
-                    var result = await _firebaseService.TestNotificationAsync(
-                        deviceToken.DeviceToken,
-                        request.Title,
-                        request.Body,
-                        request.Badge
-                        );
-                    if (result)
-                    {
-                    }
-                }
+                return BadRequest("ID nhân viên không hợp lệ");
             }
-            // Tính tổng kết thành công và thất bại cho các user
-            var summary = userStats.Select(userStat => new
+            // Lấy token từ database
+            var deviceTokens = await _repository.GetDeviceTokenByEmployeeId(IDNhanVien);
+            if (deviceTokens == null || !deviceTokens.Any())
             {
-                UserId = userStat.Key,
-                Success = userStat.Value.success,
-                TotalTokens = userStat.Value.total,
-                Status = userStat.Value.success > 0 ? "Success" : "Fail"
+                return BadRequest($"Không tìm thấy token cho nhân viên {IDNhanVien}");
+
+            }
+            foreach (var deviceToken in deviceTokens) {
+                if (!userStats.ContainsKey(IDNhanVien))
+                    userStats[IDNhanVien] = (0, 0);
+
+                var current = userStats[IDNhanVien];
+                current.total++;
+
+                var result = await _firebaseService.TestNotificationAsync(
+                    deviceToken.DeviceToken,
+                    request.Title,
+                    request.Body,
+                    request.Badge,
+                    request.Data
+                );
+
+                if (result)
+                    current.success++;
+
+                userStats[IDNhanVien] = current;
+            }
+
+            
+            // Tính tổng kết thành công và thất bại cho các user
+            var summary = userStats.Select(u => new
+            {
+                UserId = u.Key,
+                Success = u.Value.success,
+                Fail = u.Value.total - u.Value.success,
+                TotalTokens = u.Value.total,
+                Status = u.Value.success == u.Value.total ? "AllSuccess" :
+             u.Value.success == 0 ? "AllFail" : "PartialSuccess"
             });
             return Ok(new
             {

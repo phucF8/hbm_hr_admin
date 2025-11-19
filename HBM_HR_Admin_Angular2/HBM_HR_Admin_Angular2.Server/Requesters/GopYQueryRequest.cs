@@ -7,6 +7,7 @@
         public int PageSize { get; set; } = 10;    // Số bản ghi mỗi trang
         public string? Search { get; set; }        // Từ khóa tìm kiếm (nếu có)
         public string? TrangThai { get; set; }
+        public String? FilterType { get; set; }
     }
 
     public class GopYUnreadCountRequest {
@@ -37,6 +38,8 @@
         public string? TenNguoiNhan { get; set; }
         public string? AnhNguoiNhan { get; set; }
         public string? TenChucDanhNguoiNhan { get; set; }
+        public Guid? GroupID { get; set; }
+        public string GroupName { get; set; }
     }
 
     // Kết quả phân trang chung

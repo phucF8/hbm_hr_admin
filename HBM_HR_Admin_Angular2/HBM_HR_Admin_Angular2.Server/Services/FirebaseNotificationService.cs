@@ -96,7 +96,7 @@ public class FirebaseNotificationService
         }
     }
 
-    public async Task<bool> TestNotificationAsync(string deviceToken, string title, string body, int badge)
+    public async Task<bool> TestNotificationAsync(string deviceToken, string title, string body, int badge,Dictionary<string,string> data)
     {
         try
         {
@@ -117,9 +117,7 @@ public class FirebaseNotificationService
                         Sound = "default"
                     }
                 },
-                Data = new Dictionary<string, string> {
-                    { "custom_key", "value" }
-                }
+                Data = data
             };
             string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
             _logger.LogInformation($"Successfully sent message: {response}");

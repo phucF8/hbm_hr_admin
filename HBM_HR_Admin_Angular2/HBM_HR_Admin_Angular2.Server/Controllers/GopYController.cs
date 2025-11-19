@@ -5,6 +5,8 @@ using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Requesters;
 using HBM_HR_Admin_Angular2.Server.Services;
 using HBM_HR_Admin_Angular2.Server.Utility;
+using LinqToDB.Tools;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -36,9 +38,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             _firebaseService = firebaseService;
             _repository = repository;
         }
-
-
-
 
         /// <summary>
         /// copy file từ thư mục wwwroot/tmp sang thư mục wwwroot/uploads, ko xoá file trong tmp ngay vì tránh lỗi lock file
@@ -95,6 +94,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         }
 
         [HttpPost("create")]
+        [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateGopYRequest request) {
             try {
                 var gopyID = (request.Id != null && request.Id != Guid.Empty)? request.Id : Guid.NewGuid();
@@ -102,8 +102,29 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 if (nguoiNhanID == null) {
                     return BadRequest(ApiResponse<String>.Error("Người nhận góp ý không xác định"));
                 }
+                // ✅ Kiểm tra người gửi
+                if (string.IsNullOrEmpty(request.NhanVienID)) {
+                    return BadRequest(ApiResponse<string>.Error("Người gửi góp ý không xác định"));
+                }
+                // ✅ Kiểm tra người gửi và người nhận không được trùng nhau
+                if (request.NhanVienID == nguoiNhanID) {
+                    return BadRequest(ApiResponse<string>.Error("Người gửi và người nhận không được trùng nhau"));
+                }
+                // ✅ Giới hạn gửi góp ý ẩn danh
+                if (request.AnDanh) {
+                    var today = DateTime.Today;
+                    var countAnDanh = await _context.GY_GopYs
+                        .CountAsync(g => g.NhanVienID == request.NhanVienID
+                                         && g.AnDanh
+                                         && g.NgayGui >= today
+                                         && g.NgayGui < today.AddDays(1));
+                    if (countAnDanh >= 3) {
+                        return BadRequest(ApiResponse<string>.Error("Bạn đã gửi quá 3 góp ý ẩn danh trong ngày"));
+                    }
+                }
                 var maTraCuu = $"GY-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6]}";
-                string enrNoiDung = EncryptUtil.Encrypt(request.NoiDung);
+                //string enrNoiDung = EncryptUtil.Encrypt(request.NoiDung);
+                string enrNoiDung = request.NoiDung;
                 var gopY = new GY_GopY {
                     ID = gopyID,
                     TieuDe = request.TieuDe,
@@ -146,10 +167,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 data["ID"] = gopY?.ID.ToString() ?? "";
                 data["messageId"] = "";
                 var result = _firebaseService.SendNotificationToEmployeesAsync(nguoiNhanID, request.TieuDe, request.NoiDung, data, _firebaseService, _repository);
-                //var result = await _firebaseService.SendNotificationAsync(
-                //            "eoH2qtsyQweYoK_KsCV1Q7:APA91bEp8Un_Sb77MDQ_prldsqTQNBi_q28g12AQVD1Jzmrj6Q4cIoQNnP6pB_H43XZIvnHrNnlLGzMheJ1mn90pzWW5CmrHWiMPp2DCMcohWn57kaX0txM",
-                //            "TEST",
-                //            "NỘI DUNG");
                 return Ok(ApiResponse<string>.Success("Tạo góp ý thành công"));
             } catch (Exception ex) {
                 var innerMessage = ex.InnerException?.Message ?? ex.Message;
@@ -180,6 +197,23 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             if (!string.IsNullOrWhiteSpace(request.TrangThai)) {
                 query = query.Where(g => g.TrangThai == request.TrangThai);
             }
+            // 🟢 Lọc theo nhóm (Quan tâm, Ko Quan Tâm, Chưa Phân Loại, Tất cả)
+            var importantGroupId = new Guid("73A6A287-EDBD-4201-A77C-A9495FFC2C6A");
+            switch (request.FilterType) {
+                case "QT": // Quan trọng
+                    query = query.Where(x => x.GroupID == importantGroupId);
+                    break;
+                case "KQT": // Không quan trọng
+                    query = query.Where(x => x.GroupID != importantGroupId && x.GroupID != null);
+                    break;
+                case "CPL": // Chưa phân loại
+                    query = query.Where(x => x.GroupID == null);
+                    break;
+                case "": // Tất cả
+                default:
+                    // Không lọc gì thêm
+                    break;
+            }
             // 🔍 Lọc theo từ khóa tìm kiếm
             if (!string.IsNullOrWhiteSpace(request.Search)) {
                 query = query.Where(g => g.NoiDung.Contains(request.Search)
@@ -194,6 +228,11 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 from nvGui in nvGuiJoin.DefaultIfEmpty()
                 join nvNhan in _context.DbNhanVien on g.NguoiNhanID equals nvNhan.ID into nvNhanJoin
                 from nvNhan in nvNhanJoin.DefaultIfEmpty()
+
+                // 🔵 JOIN thêm bảng Group
+                join gr in _context.GY_Group on g.GroupID equals gr.ID into grJoin
+                from gr in grJoin.DefaultIfEmpty()
+
                 orderby g.NgayGui descending
                 select new GopYResponse {
                     ID = g.ID,
@@ -211,7 +250,10 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     // Người nhận
                     TenNguoiNhan = nvNhan != null ? nvNhan.TenNhanVien : null,
                     AnhNguoiNhan = nvNhan != null ? nvNhan.Anh : null,
-                    TenChucDanhNguoiNhan = nvNhan != null ? nvNhan.TenChucDanh : null
+                    TenChucDanhNguoiNhan = nvNhan != null ? nvNhan.TenChucDanh : null,
+                    // 🔵 Trả về Group
+                    GroupID = g.GroupID,
+                    GroupName = gr != null ? gr.Name : null
                 }
             )
             .Skip((request.PageNumber - 1) * request.PageSize)
@@ -270,7 +312,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(ApiResponse<object>.Success(gopy, "Thành công"));
         }
 
-
         [HttpPost("GetChiTiet")]
         public async Task<IActionResult> GetChiTiet([FromBody] GopYChiTietRequest request) {
             if (request == null || request.Id == Guid.Empty)
@@ -285,7 +326,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 select new GopYChiTietDto {
                     Id = x.ID,
                     TieuDe = x.TieuDe,
-                    NoiDung = EncryptUtil.Decrypt(x.NoiDung),
+                    //NoiDung = EncryptUtil.Decrypt(x.NoiDung),
+                    NoiDung = x.NoiDung,
                     NhanVienId = x.NhanVienID,
                     AnDanh = x.AnDanh,
                     CreatedDate = x.NgayGui,
@@ -319,48 +361,10 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(ApiResponse<GopYChiTietDto>.Success(gopy));
         }
 
-
         [HttpPost("GetGopYsByNhanVien")]
-        public async Task<ActionResult<PagedResultGopY>> GetGopYsByNhanVien([FromBody] GopYByNhanVienRequest request) {
-            if (request.PageNumber <= 0) request.PageNumber = 1;
-            if (request.PageSize <= 0) request.PageSize = 10;
-
-            var query = _context.GY_GopYs.AsQueryable();
-
-            // lọc theo NhanVienID
-            query = query.Where(g => g.NhanVienID == request.NhanVienID);
-
-            // tìm kiếm theo nội dung (nếu có)
-            if (!string.IsNullOrWhiteSpace(request.Search)) {
-                query = query.Where(g => g.NoiDung.Contains(request.Search));
-            }
-
-            var totalItems = await query.LongCountAsync();
-
-            var items = await query
-                .OrderByDescending(g => g.NgayGui)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .Select(g => new GopYResponse {
-                    ID = g.ID,
-                    NhanVienID = g.NhanVienID,
-                    NoiDung = g.NoiDung,
-                    NgayGui = g.NgayGui,
-                    TrangThai = g.TrangThai
-                })
-                .ToListAsync();
-
-            var result = new PagedResultGopY {
-                TotalItems = totalItems,
-                PageNumber = request.PageNumber,
-                PageSize = request.PageSize,
-                Items = items
-            };
-
-            return Ok(result);
-        }
 
         [HttpPost("Delete")]
+        [AllowAnonymous]
         public async Task<IActionResult> Delete([FromBody] DeleteGopYRequest request) {
             var gopY = await _context.GY_GopYs.FindAsync(request.ID);
 
@@ -470,7 +474,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             }
         }
 
-
         [HttpPost("phanhoi/create")]
         public async Task<IActionResult> CreatePhanHoi([FromBody] PhanHoiCreateRequest request) {
             if (request == null || string.IsNullOrWhiteSpace(request.NoiDung))
@@ -516,6 +519,53 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 await transaction.RollbackAsync();
                 return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
             }
+        }
+
+        [HttpPost("set-group")]
+        public async Task<IActionResult> SetGroupForGopY([FromBody] SetGroupRequest request) {
+            if (request == null || request.GopYID == Guid.Empty || request.GroupID == Guid.Empty)
+                return BadRequest(ApiResponse<string>.Error("GopYID và GroupID không được để trống."));
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try {
+                // Lấy phản hồi cần cập nhật
+                var gopY = await _context.GY_GopYs.FirstOrDefaultAsync(x => x.ID == request.GopYID);
+
+                if (gopY == null)
+                    return NotFound(ApiResponse<string>.Error("Góp ý không tồn tại."));
+                // Kiểm tra group có tồn tại không (tùy nhu cầu)
+                var group = await _context.GY_Group
+                    .FirstOrDefaultAsync(x => x.ID == request.GroupID);
+                if (group == null)
+                    return NotFound(ApiResponse<string>.Error("Nhóm phân loại không tồn tại."));
+
+                // Cập nhật GroupID
+                gopY.GroupID = request.GroupID;
+
+                _context.GY_GopYs.Update(gopY);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return Ok(ApiResponse<string>.Success("Gán nhóm thành công."));
+            } catch (Exception ex) {
+                await transaction.RollbackAsync();
+                return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
+            }
+        }
+
+        //chi dùng khi nội dung CSDL bị mã hoá cần giải mã tất cả
+        [HttpPost("DecryptNoiDung")]
+        public async Task<IActionResult> DecryptNoiDung() {
+            var gopYs = await _context.GY_GopYs.ToListAsync();
+            foreach (var item in gopYs) {
+                if (!string.IsNullOrEmpty(item.NoiDung)) {
+                    // Giải mã
+                    item.NoiDung = EncryptUtil.Decrypt(item.NoiDung);
+                }
+            }
+            await _context.SaveChangesAsync();
+            return Ok(new { status = "success", count = gopYs.Count });
         }
 
     }
