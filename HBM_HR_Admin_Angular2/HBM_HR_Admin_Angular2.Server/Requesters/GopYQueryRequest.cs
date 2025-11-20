@@ -38,8 +38,7 @@
         public string? TenNguoiNhan { get; set; }
         public string? AnhNguoiNhan { get; set; }
         public string? TenChucDanhNguoiNhan { get; set; }
-        public Guid? GroupID { get; set; }
-        public string GroupName { get; set; }
+        public string? GroupID { get; set; }
     }
 
     // Kết quả phân trang chung

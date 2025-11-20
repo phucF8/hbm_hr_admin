@@ -8,7 +8,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
     public class GY_GopY {
         [Key]
         public Guid ID { get; set; }
-        public Guid? GroupID { get; set; }
+        public string? GroupID { get; set; }
         public string TieuDe { get; set; }
         public string NoiDung { get; set; }
         public string? NhanVienID { get; set; }
@@ -23,7 +23,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models {
 
     public class GY_Group {
         [Key]
-        public Guid ID { get; set; } = Guid.NewGuid();
+        public string ID { get; set; }
         public string? Name { get; set; }
         public DateTime UpdateAt { get; set; } = DateTime.Now;
     }

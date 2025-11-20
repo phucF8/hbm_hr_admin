@@ -10,7 +10,7 @@ namespace HBM_HR_Admin_Angular2.Server.Requesters {
 
     public class SetGroupRequest {
         public Guid GopYID { get; set; }      // ID của phản hồi cần gán nhóm
-        public Guid GroupID { get; set; }     // ID nhóm cần gán
+        public string GroupID { get; set; }     // ID nhóm cần gán
     }
 
 

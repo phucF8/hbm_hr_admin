@@ -198,20 +198,14 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 query = query.Where(g => g.TrangThai == request.TrangThai);
             }
             // 🟢 Lọc theo nhóm (Quan tâm, Ko Quan Tâm, Chưa Phân Loại, Tất cả)
-            var importantGroupId = new Guid("73A6A287-EDBD-4201-A77C-A9495FFC2C6A");
             switch (request.FilterType) {
-                case "QT": // Quan trọng
-                    query = query.Where(x => x.GroupID == importantGroupId);
-                    break;
-                case "KQT": // Không quan trọng
-                    query = query.Where(x => x.GroupID != importantGroupId && x.GroupID != null);
-                    break;
                 case "CPL": // Chưa phân loại
                     query = query.Where(x => x.GroupID == null);
                     break;
                 case "": // Tất cả
+                    break;
                 default:
-                    // Không lọc gì thêm
+                    query = query.Where(x => x.GroupID == request.FilterType);
                     break;
             }
             // 🔍 Lọc theo từ khóa tìm kiếm
@@ -253,7 +247,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     TenChucDanhNguoiNhan = nvNhan != null ? nvNhan.TenChucDanh : null,
                     // 🔵 Trả về Group
                     GroupID = g.GroupID,
-                    GroupName = gr != null ? gr.Name : null
                 }
             )
             .Skip((request.PageNumber - 1) * request.PageSize)
@@ -523,7 +516,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
         [HttpPost("set-group")]
         public async Task<IActionResult> SetGroupForGopY([FromBody] SetGroupRequest request) {
-            if (request == null || request.GopYID == Guid.Empty || request.GroupID == Guid.Empty)
+            if (request == null || request.GopYID == Guid.Empty || request.GroupID == "")
                 return BadRequest(ApiResponse<string>.Error("GopYID và GroupID không được để trống."));
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -550,6 +543,22 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 return Ok(ApiResponse<string>.Success("Gán nhóm thành công."));
             } catch (Exception ex) {
                 await transaction.RollbackAsync();
+                return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
+            }
+        }
+
+        [HttpPost("get-groups")]
+        public async Task<IActionResult> GetGroups() {
+            try {
+                var groups = await _context.GY_Group
+                    .Select(g => new GroupDto {
+                        ID = g.ID,
+                        Name = g.Name,
+                        UpdateAt = g.UpdateAt,
+                    })
+                    .ToListAsync();
+                return Ok(ApiResponse<List<GroupDto>>.Success(groups));
+            } catch (Exception ex) {
                 return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
             }
         }
