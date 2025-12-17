@@ -18,6 +18,9 @@
         public DateTime CreatedDate { get; set; }
         public List<FileDto> Files { get; set; }
 
+        // 👇 Group
+        public string? GroupID { get; set; }
+
         // 👇 Thông tin người gửi
         public string? TenNguoiGui { get; set; }
         public string? AnhNguoiGui { get; set; }

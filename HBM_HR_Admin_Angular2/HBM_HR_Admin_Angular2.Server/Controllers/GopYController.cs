@@ -324,6 +324,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                     NhanVienId = x.NhanVienID,
                     AnDanh = x.AnDanh,
                     CreatedDate = x.NgayGui,
+                    GroupID = x.GroupID,
                     // 👇 Người gửi
                     TenNguoiGui = nvGui != null ? nvGui.TenNhanVien : (x.NhanVienID == null ? "Nặc danh" : null),
                     AnhNguoiGui = nvGui != null ? nvGui.Anh : null,
@@ -360,7 +361,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         [AllowAnonymous]
         public async Task<IActionResult> Delete([FromBody] DeleteGopYRequest request) {
             var gopY = await _context.GY_GopYs.FindAsync(request.ID);
-
             if (gopY == null) {
                 return NotFound(ApiResponse<String>.Error("Góp ý không tồn tại trên hệ thống"));
             }
@@ -380,12 +380,9 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 _context.GY_FileDinhKems.RemoveRange(filesPh);
             }
             _context.GY_PhanHois.RemoveRange(phanHois);
-
             // Xoá góp ý
             _context.GY_GopYs.Remove(gopY);
-
             await _context.SaveChangesAsync();
-
             return Ok(ApiResponse<String>.Success("Xoá góp ý thành công."));
         }
 

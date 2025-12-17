@@ -96,8 +96,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             }
         }
 
-
-
         // 2. Tạo nhắc việc
         [HttpPost("Create")]
         public async Task<ApiResponse<NV_NhacViec>> Create([FromBody] NV_NhacViec model) {
@@ -139,8 +137,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         }
 
         // 4. Xóa nhắc việc (mềm)
-        [HttpPost("Delete")]
-        public async Task<ApiResponse<string>> Delete([FromBody] NhacViecDeleteRequest input) {
+        [HttpPost("DeleteSoft")]
+        public async Task<ApiResponse<string>> DeleteSoft([FromBody] NhacViecDeleteRequest input) {
             try {
                 Guid id = Guid.Parse((string)input.ID);
                 var existing = await _db.NV_NhacViec.FirstOrDefaultAsync(n => n.ID == id);
@@ -150,6 +148,23 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 existing.DaXoa = true;
                 existing.NgayCapNhat = DateTime.Now;
 
+                await _db.SaveChangesAsync();
+                return ApiResponse<string>.Success("Xóa thành công");
+            } catch (Exception ex) {
+                return ApiResponse<string>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+        // 4. Xóa nhắc việc (cứng)
+        [HttpPost("Delete")]
+        public async Task<ApiResponse<string>> Delete([FromBody] NhacViecDeleteRequest input) {
+            try {
+                Guid id = Guid.Parse((string)input.ID);
+                var existing = await _db.NV_NhacViec
+                    .FirstOrDefaultAsync(n => n.ID == id);
+                if (existing == null)
+                    return ApiResponse<string>.Error("Công việc không tồn tại");
+                _db.NV_NhacViec.Remove(existing);
                 await _db.SaveChangesAsync();
                 return ApiResponse<string>.Success("Xóa thành công");
             } catch (Exception ex) {
@@ -185,6 +200,35 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             }
         }
 
+        // 4. Xóa nhắc việc (cứng)
+        [HttpPost("DeleteListHard")]
+        public async Task<ApiResponse<string>> DeleteListHard([FromBody] DeleteListRequest input) {
+            try {
+                if (input.IDs == null || !input.IDs.Any())
+                    return ApiResponse<string>.Error("Danh sách ID trống.");
+                var guidList = input.IDs
+                    .Select(id => Guid.TryParse(id, out var g) ? g : Guid.Empty)
+                    .Where(g => g != Guid.Empty)
+                    .ToList();
+                if (!guidList.Any())
+                    return ApiResponse<string>.Error("Danh sách ID không hợp lệ.");
+                var existingList = await _db.NV_NhacViec
+                    .Where(n => guidList.Contains(n.ID))
+                    .ToListAsync();
+                if (!existingList.Any())
+                    return ApiResponse<string>.Error("Không tìm thấy công việc nào phù hợp.");
+                // 🔥 XÓA CỨNG
+                _db.NV_NhacViec.RemoveRange(existingList);
+                await _db.SaveChangesAsync();
+                return ApiResponse<string>.Success(
+                    $"Đã xóa vĩnh viễn {existingList.Count} công việc."
+                );
+            } catch (Exception ex) {
+                return ApiResponse<string>.Error(ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+
         [HttpPost("MarkComplete")]
         public async Task<ApiResponse<NV_NhacViec>> MarkComplete([FromBody] MarkCompleteRequest input) {
             try {
@@ -211,7 +255,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 return ApiResponse<NV_NhacViec>.Error(ex.InnerException?.Message ?? ex.Message);
             }
         }
-
 
         [HttpPost("UpdateStatusList")]
         public async Task<ApiResponse<string>> UpdateStatusList([FromBody] UpdateTrangThaiRequestList input) {
@@ -248,7 +291,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 return ApiResponse<string>.Error(ex.InnerException?.Message ?? ex.Message);
             }
         }
-
 
         // 6. Hoãn nhắc việc (Snooze)
         [HttpPost("Snooze")]
@@ -312,7 +354,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 return ApiResponse<NV_NhacViecDetailDto>.Error(ex.InnerException?.Message ?? ex.Message);
             }
         }
-
 
         [HttpPost("LoaiCongViecList")]
         public async Task<ApiResponse<List<NV_LoaiCongViec>>> LoaiCongViecList([FromBody] UserRequest input) {
@@ -438,10 +479,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             }
         }
 
-
-
-
-
         [HttpPost("LoaiCongViecUpdateViTriList")]
         public async Task<ApiResponse<string>> LoaiCongViecUpdateViTriList([FromBody] UpdateViTriRequestList input) {
             try {
@@ -475,9 +512,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 return ApiResponse<string>.Error(ex.InnerException?.Message ?? ex.Message);
             }
         }
-
-
-
 
     }
 

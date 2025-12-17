@@ -28,17 +28,13 @@
        
         <div class="question-content">
           <input type="text" 
-          class="question-title" [formControlName]="'content'" placeholder="Nhập tiêu đề câu hỏi..." 
+          class="question-title" [formControlName]="'content'" placeholder="Nhập nội dung câu hỏi ..." 
           [ngClass]="{ 'is-invalid': question.get('content')?.invalid && (question.get('content')?.touched || question.get('content')?.dirty) }" 
           >
           <div class="invalid-feedback" *ngIf="question.get('content')?.invalid && (question.get('content')?.touched || question.get('content')?.dirty)">
             <span *ngIf="question.get('content')?.errors?.['required']">Vui lòng nhập nội dung câu hỏi.</span>
             <!-- Thêm lỗi khác nếu có -->
           </div>
-
-          <!-- <input type="text" class="question-title" [value]="question.get('content')"
-            placeholder="Nhập tiêu đề câu hỏi..."> -->
-
 
         </div>
 
