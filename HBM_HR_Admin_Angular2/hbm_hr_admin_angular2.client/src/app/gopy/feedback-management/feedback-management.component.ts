@@ -1,15 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { GopYItem, GopYRequest } from '@app/models/gopy.model';
 import { QuestionManagerComponent } from '@app/question-manager/question-manager.component';
+import { GopYService } from '@app/services/gop-y.service';
+import { LoadingService } from '@app/services/loading.service';
 
-interface Feedback {
-  id: number;
-  title: string;
-  type: string;
-  dateSubmitted: Date;
-  status: 'pending' | 'processing' | 'resolved' | 'rejected';
-}
 
 @Component({
   selector: 'app-feedback-management',
@@ -22,6 +18,10 @@ interface Feedback {
   ],
 })
 export class FeedbackManagementComponent implements OnInit {
+openedMenuId: any;
+toggleMenu(_t92: GopYItem) {
+throw new Error('Method not implemented.');
+}
   // Filter properties
   searchText: string = '';
   selectedType: string = '';
@@ -29,101 +29,70 @@ export class FeedbackManagementComponent implements OnInit {
   startDate: string = '';
   endDate: string = '';
 
-  // Data properties
-  feedbacks: Feedback[] = [
-    {
-      id: 1,
-      title: 'Góp ý cải thiện giao diện website',
-      type: 'Góp ý',
-      dateSubmitted: new Date('2024-12-15'),
-      status: 'pending'
-    },
-    {
-      id: 2,
-      title: 'Phản ánh lỗi đăng nhập',
-      type: 'Báo lỗi',
-      dateSubmitted: new Date('2024-12-14'),
-      status: 'processing'
-    },
-    {
-      id: 3,
-      title: 'Đề xuất tính năng mới',
-      type: 'Đề xuất tính năng',
-      dateSubmitted: new Date('2024-12-13'),
-      status: 'resolved'
-    },
-    {
-      id: 4,
-      title: 'Khiếu nại về dịch vụ',
-      type: 'Khiếu nại',
-      dateSubmitted: new Date('2024-12-12'),
-      status: 'rejected'
-    },
-    {
-      id: 5,
-      title: 'Báo cáo vấn đề bảo mật',
-      type: 'Báo mật',
-      dateSubmitted: new Date('2024-12-11'),
-      status: 'processing'
-    }
-  ];
+  filteredFeedbacks: GopYItem[] = [];
+  totalItems: number = 0;
 
-  filteredFeedbacks: Feedback[] = [];
+  constructor(
+      private gopYService: GopYService,
+      private loadingService: LoadingService // Giả định bạn có loading service
+  ) {}
+
+  // Khởi tạo params mặc định
+  queryParams: GopYRequest = {
+    pageNumber: 1,
+    pageSize: 20,
+    search: "",
+    trangThai: "",
+    filterType: ""
+  };
 
   ngOnInit(): void {
-    this.filteredFeedbacks = [...this.feedbacks];
+    this.loadData();
   }
 
   applyFilters(): void {
-    this.filteredFeedbacks = this.feedbacks.filter(feedback => {
-      const matchesSearch = !this.searchText ||
-        feedback.title.toLowerCase().includes(this.searchText.toLowerCase());
-
-      const matchesType = !this.selectedType || feedback.type === this.selectedType;
-
-      const matchesStatus = !this.selectedStatus || feedback.status === this.selectedStatus;
-
-      const matchesStartDate = !this.startDate ||
-        feedback.dateSubmitted >= new Date(this.startDate);
-
-      const matchesEndDate = !this.endDate ||
-        feedback.dateSubmitted <= new Date(this.endDate);
-
-      return matchesSearch && matchesType && matchesStatus && matchesStartDate && matchesEndDate;
-    });
+    
   }
 
   clearFilters(): void {
-    this.selectedType = '';
-    this.selectedStatus = '';
-    this.searchText = '';
-    this.startDate = '';
-    this.endDate = '';
-    this.filteredFeedbacks = [...this.feedbacks];
+    
   }
 
   getStatusLabel(status: string): string {
     const statusMap: { [key: string]: string } = {
-      'pending': 'Chờ xử lý',
-      'processing': 'Đang xử lý',
-      'resolved': 'Đã giải quyết',
-      'rejected': 'Đã từ chối'
+      'GY_CD': 'chưa đọc',
+      'GY_DD': 'đã đọc',
     };
     return statusMap[status] || status;
   }
 
-  viewFeedback(id: number): void {
+  viewFeedback(id: string): void {
     console.log('View feedback:', id);
   }
 
-  editFeedback(id: number): void {
+  editFeedback(id: string): void {
     console.log('Edit feedback:', id);
   }
 
-  deleteFeedback(id: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa ý kiến này?')) {
-      this.feedbacks = this.feedbacks.filter(f => f.id !== id);
-      this.applyFilters();
-    }
+  deleteFeedback(id: string): void {
+    
+  }
+
+  loadData() {
+    this.loadingService.show();
+    
+    this.gopYService.getAllGopYs(this.queryParams).subscribe({
+      next: (res) => {
+        if (res.status === 'SUCCESS') {
+          this.filteredFeedbacks = res.data.items;
+          this.totalItems = res.data.totalItems;
+        }
+        this.loadingService.hide();
+      },
+      error: (err) => {
+        console.error('Lỗi khi tải danh sách góp ý:', err);
+        this.loadingService.hide();
+      }
+    });
   }
 }

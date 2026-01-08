@@ -574,6 +574,88 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             return Ok(new { status = "success", count = gopYs.Count });
         }
 
+
+
+        [HttpPost("GetAllGopYs")]
+        public async Task<ActionResult<PagedResultGopY>> GetAllGopYs([FromBody] AllGopYQueryRequest request) {
+            // 1. Khởi tạo phân trang mặc định
+            if (request.PageNumber <= 0) request.PageNumber = 1;
+            if (request.PageSize <= 0) request.PageSize = 20;
+
+            var query = _context.GY_GopYs.AsQueryable();
+
+            // 2. Lọc theo trạng thái (Nếu có)
+            if (!string.IsNullOrWhiteSpace(request.TrangThai)) {
+                query = query.Where(g => g.TrangThai == request.TrangThai);
+            }
+
+            // 3. Lọc theo Nhóm (GroupID)
+            if (!string.IsNullOrWhiteSpace(request.FilterType)) {
+                if (request.FilterType == "CPL") {
+                    query = query.Where(x => x.GroupID == null);
+                } else {
+                    query = query.Where(x => x.GroupID == request.FilterType);
+                }
+            }
+
+            // 4. Tìm kiếm từ khóa (Tiêu đề, Nội dung, Mã tra cứu)
+            if (!string.IsNullOrWhiteSpace(request.Search)) {
+                query = query.Where(g => g.NoiDung.Contains(request.Search)
+                                      || g.TieuDe.Contains(request.Search)
+                                      || g.MaTraCuu.Contains(request.Search));
+            }
+
+            // 5. Đếm tổng số bản ghi sau khi lọc
+            var totalItems = await query.LongCountAsync();
+
+            // 6. Join các bảng liên quan và lấy dữ liệu
+            var items = await (
+                from g in query
+                join nvGui in _context.DbNhanVien on g.NhanVienID equals nvGui.ID into nvGuiJoin
+                from nvGui in nvGuiJoin.DefaultIfEmpty()
+                join nvNhan in _context.DbNhanVien on g.NguoiNhanID equals nvNhan.ID into nvNhanJoin
+                from nvNhan in nvNhanJoin.DefaultIfEmpty()
+                join gr in _context.GY_Group on g.GroupID equals gr.ID into grJoin
+                from gr in grJoin.DefaultIfEmpty()
+
+                orderby g.NgayGui descending
+                select new GopYResponse {
+                    ID = g.ID,
+                    TieuDe = g.TieuDe,
+                    NhanVienID = g.NhanVienID,
+                    NoiDung = g.NoiDung,
+                    NgayGui = g.NgayGui,
+                    TrangThai = g.TrangThai,
+                    MaTraCuu = g.MaTraCuu,
+                    AnDanh = g.AnDanh,
+
+                    // Xử lý logic hiển thị tên người gửi
+                    TenNguoiGui = nvGui != null ? nvGui.TenNhanVien : (g.AnDanh == true ? "Nặc danh" : "Không xác định"),
+                    AnhNguoiGui = nvGui != null ? nvGui.Anh : null,
+                    TenChucDanhNguoiGui = nvGui != null ? nvGui.TenChucDanh : null,
+
+                    TenNguoiNhan = nvNhan != null ? nvNhan.TenNhanVien : null,
+                    AnhNguoiNhan = nvNhan != null ? nvNhan.Anh : null,
+                    TenChucDanhNguoiNhan = nvNhan != null ? nvNhan.TenChucDanh : null,
+
+                    GroupID = g.GroupID,
+                    //TenGroup = gr != null ? gr.TieuDe : "Chưa phân loại"
+                }
+            )
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync();
+
+            // 7. Trả về kết quả
+            var result = new PagedResultGopY {
+                TotalItems = totalItems,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                Items = items
+            };
+
+            return Ok(ApiResponse<PagedResultGopY>.Success(result));
+        }
     }
 
 }

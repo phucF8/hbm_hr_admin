@@ -1,126 +1,123 @@
-<div class="feedback-container">
-  <div class="header">
-    <h1>Quản lý Ý kiến Đã Gửi</h1>
-    <p class="subtitle">Theo dõi và xử lý các ý kiến, góp ý từ người dùng</p>
+<div style="padding-left: 48px; padding-right: 48px;">
+  <div class="tabs">
+    <div class="tab active">Quản lý Ý kiến Đã Gửi</div>
   </div>
 
-  <!-- Filter Section -->
-  <div class="filter-section">
-    <div class="filter-header">
-      <span class="filter-icon">⚙</span>
-      <span class="filter-title">Bộ lọc</span>
-    </div>
+  <div class="search-container">
+    <div class="search-title">TIÊU CHÍ TÌM KIẾM</div>
 
-    <div class="filter-content">
-      <!-- Search -->
-      <div class="filter-group">
-        <input 
-          type="text" 
-          class="filter-input" 
-          placeholder="Tìm kiếm theo tiêu đề..."
-          [(ngModel)]="searchText"
-          (input)="applyFilters()">
+    <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+          <div class="form-group">
+            <label>Tiêu đề hoặc nội dung</label>
+            <input type="text" class="form-control" placeholder="Tìm kiếm..." [(ngModel)]="searchText" (input)="applyFilters()">
+          </div>
+
+          <div class="form-group">
+            <label>Loại ý kiến</label>
+            <select class="dropdown" [(ngModel)]="selectedType" (change)="applyFilters()">
+              <option value="">Tất cả loại</option>
+              <option value="Góp ý">Góp ý</option>
+              <option value="Báo lỗi">Báo lỗi</option>
+              <option value="Đề xuất tính năng">Đề xuất tính năng</option>
+              <option value="Khiếu nại">Khiếu nại</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <select class="dropdown" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+              <option value="">Tất cả trạng thái</option>
+              <option value="pending">Chờ xử lý</option>
+              <option value="processing">Đang xử lý</option>
+              <option value="resolved">Đã giải quyết</option>
+              <option value="rejected">Đã từ chối</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Từ ngày</label>
+            <input type="date" class="form-control" [(ngModel)]="startDate" (change)="applyFilters()">
+          </div>
+          <div class="form-group">
+            <label>Đến ngày</label>
+            <input type="date" class="form-control" [(ngModel)]="endDate" (change)="applyFilters()">
+          </div>
+        </div>
       </div>
 
-      <!-- Type Filter -->
-      <div class="filter-group">
-        <select 
-          class="filter-select" 
-          [(ngModel)]="selectedType"
-          (change)="applyFilters()">
-          <option value="">Tất cả loại</option>
-          <option value="Góp ý">Góp ý</option>
-          <option value="Báo lỗi">Báo lỗi</option>
-          <option value="Đề xuất tính năng">Đề xuất tính năng</option>
-          <option value="Khiếu nại">Khiếu nại</option>
-          <option value="Báo mật">Báo mật</option>
-        </select>
-      </div>
-
-      <!-- Status Filter -->
-      <div class="filter-group">
-        <select 
-          class="filter-select" 
-          [(ngModel)]="selectedStatus"
-          (change)="applyFilters()">
-          <option value="">Tất cả trạng thái</option>
-          <option value="pending">Chờ xử lý</option>
-          <option value="processing">Đang xử lý</option>
-          <option value="resolved">Đã giải quyết</option>
-          <option value="rejected">Đã từ chối</option>
-        </select>
-      </div>
-
-      <!-- Date Range -->
-      <div class="filter-group">
-        <input 
-          type="date" 
-          class="filter-date"
-          [(ngModel)]="startDate"
-          (change)="applyFilters()">
-      </div>
-
-      <div class="filter-group">
-        <input 
-          type="date" 
-          class="filter-date"
-          [(ngModel)]="endDate"
-          (change)="applyFilters()">
-      </div>
-
-      <!-- Clear Filter Button -->
-      <div class="filter-actions">
-        <button class="btn-clear" (click)="clearFilters()">
-          Xóa tất cả bộ lọc
+      <div class="buttons-container">
+        <button class="btn btn-search" (click)="applyFilters()">
+          <i class="bi bi-search"></i> Tìm kiếm
         </button>
-        <span class="result-count">Hiển thị {{ filteredFeedbacks.length }} / {{ feedbacks.length }} ý kiến</span>
+        <div class="right-buttons">
+          <button class="btn btn-clear" (click)="clearFilters()" style="background-color: #f15a59;">
+            <i class="bi bi-x-circle"></i> Xóa bộ lọc
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Table Section -->
-  <div class="table-container">
-    <table class="feedback-table">
+  <div class="panel" style="margin-top: 20px; background: white; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <div class="panel-header" style="padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+      <div><strong>DANH SÁCH BẢN GHI</strong></div>
+      <span class="result-count">Hiển thị {{ filteredFeedbacks.length }} ý kiến</span>
+    </div>
+
+    <table class="my-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>TIÊU ĐỀ</th>
-          <th>LOẠI</th>
-          <th>NGÀY GỬI</th>
-          <th>TRẠNG THÁI</th>
-          <th>HÀNH ĐỘNG</th>
+          <th style="width: 5%;">#ID</th>
+          <th style="width: 20%;">Tiêu đề</th>
+          <th style="width: 30%;">Nội dung</th>
+          <th style="width: 15%;">Người gửi</th>
+          <th style="width: 15%;">Người nhận</th>
+          <!-- <th style="width: 15%;">Loại</th> -->
+          <th style="width: 10%;">Ngày gửi</th>
+          <th style="width: 20%;">Trạng thái</th>
+          <th style="width: 10%;">Hành động</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let feedback of filteredFeedbacks">
-          <td>#{{ feedback.id }}</td>
-          <td>{{ feedback.title }}</td>
-          <td>{{ feedback.type }}</td>
-          <td>{{ feedback.dateSubmitted | date: 'dd/MM/yyyy' }}</td>
+        <tr *ngFor="let feedback of filteredFeedbacks; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td style="text-align: left;">{{ feedback.tieuDe }}</td>
+          <td style="text-align: left;">{{ feedback.noiDung }}</td>
+          <td>{{ feedback.tenNguoiGui }}</td>
+          <td>{{ feedback.tenNguoiNhan }}</td>
+          <!-- <td>{{ feedback.anDanh }}</td> -->
+          <td>{{ feedback.ngayGui | date: 'dd/MM/yyyy' }}</td>
           <td>
-            <span class="status-badge status-{{ feedback.status }}">
-              {{ getStatusLabel(feedback.status) }}
+            <span class="status-badge status-{{ feedback.trangThai }}">
+              {{ getStatusLabel(feedback.trangThai) }}
             </span>
           </td>
           <td>
-            <div class="action-buttons">
-              <button class="btn-icon btn-view" (click)="viewFeedback(feedback.id)" title="Xem">
-                👁
-              </button>
-              <button class="btn-icon btn-edit" (click)="editFeedback(feedback.id)" title="Chỉnh sửa">
-                ✏
-              </button>
-              <button class="btn-icon btn-delete" (click)="deleteFeedback(feedback.id)" title="Xóa">
-                🗑
-              </button>
+            <div class="dropdown-wrapper" (click)="toggleMenu(feedback); $event.stopPropagation()">
+              <div class="dropdown-button" style="background-color: #6c63ff;">
+                <div class="arrow-down"></div>
+              </div>
+              <div class="popup-menu" *ngIf="openedMenuId === feedback.id" style="right: 0;">
+                <div class="menu-item view" (click)="viewFeedback(feedback.id)">
+                  <i class="bi bi-eye"></i> <div class="menu-text">Xem</div>
+                </div>
+                <div class="menu-item edit" (click)="editFeedback(feedback.id)">
+                  <i class="bi bi-pencil"></i> <div class="menu-text">Sửa</div>
+                </div>
+                <div class="menu-item delete" (click)="deleteFeedback(feedback.id)">
+                  <i class="bi bi-trash"></i> <div class="menu-text">Xóa</div>
+                </div>
+              </div>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <div *ngIf="filteredFeedbacks.length === 0" class="no-results">
-      <p>Không tìm thấy ý kiến nào phù hợp với bộ lọc.</p>
+    <div *ngIf="filteredFeedbacks.length === 0" class="no-results" style="padding: 40px; text-align: center;">
+      <p>Không tìm thấy ý kiến nào phù hợp.</p>
     </div>
   </div>
 </div>
