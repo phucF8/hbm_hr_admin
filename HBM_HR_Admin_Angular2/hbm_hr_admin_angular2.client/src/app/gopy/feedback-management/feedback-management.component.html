@@ -1,6 +1,6 @@
 <div style="padding-left: 48px; padding-right: 48px;">
   <div class="tabs">
-    <div class="tab active">Quản lý Ý kiến Đã Gửi</div>
+    <div class="tab active">Quản lý Ý kiến Góp ý</div>
   </div>
 
   <div class="search-container">
@@ -83,7 +83,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let feedback of filteredFeedbacks; let i = index">
-          <td>{{ i + 1 }}</td>
+          <td>{{ utils.calculateTableIndex(i,queryParams.pageNumber,queryParams.pageSize) }}</td>
           <td style="text-align: left;">{{ feedback.tieuDe }}</td>
           <td style="text-align: left;">{{ feedback.noiDung }}</td>
           <td>{{ feedback.tenNguoiGui }}</td>
@@ -124,4 +124,9 @@
       <p>Không tìm thấy ý kiến nào phù hợp.</p>
     </div>
   </div>
+
+  <!-- Pagination section -->
+      <app-pagination [totalPages]="totalPage" [currentPage]="this.queryParams.pageNumber" (pageChange)="onPageChange($event)">
+      </app-pagination>
+
 </div>

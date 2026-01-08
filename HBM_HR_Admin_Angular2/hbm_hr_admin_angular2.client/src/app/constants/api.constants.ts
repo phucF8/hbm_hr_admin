@@ -6,3 +6,7 @@ export const API_CONSTANTS = {
 
 	AUTH_URL: `${environment.apiUrl}/auth`,
 };
+
+export const PAGINATION_CONFIG = {
+  DEFAULT_PAGE_SIZE: 20,
+};

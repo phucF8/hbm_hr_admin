@@ -6,6 +6,9 @@ import { QuestionManagerComponent } from '@app/question-manager/question-manager
 import { GopYService } from '@app/services/gop-y.service';
 import { LoadingService } from '@app/services/loading.service';
 import { InputFormComponent } from "@app/uicomponents/input-form/input-form.component";
+import { PaginationComponent } from "@app/components/pagination/pagination.component";
+import { UtilsService } from '@app/utils/utils.service';
+import { PAGINATION_CONFIG } from '@app/constants/api.constants';
 
 
 @Component({
@@ -16,9 +19,11 @@ import { InputFormComponent } from "@app/uicomponents/input-form/input-form.comp
     FormsModule,
     CommonModule,
     ReactiveFormsModule,
+    PaginationComponent
   ],
 })
 export class FeedbackManagementComponent implements OnInit {
+
   openedMenuId: any;
   toggleMenu(_t92: GopYItem) {
     throw new Error('Method not implemented.');
@@ -31,17 +36,18 @@ export class FeedbackManagementComponent implements OnInit {
   endDate: string = '';
 
   filteredFeedbacks: GopYItem[] = [];
-  totalItems: number = 0;
+  totalPage: number = 0;
 
   constructor(
     private gopYService: GopYService,
-    private loadingService: LoadingService // Giả định bạn có loading service
+    private loadingService: LoadingService, // Giả định bạn có loading service
+    public utils: UtilsService
   ) { }
 
   // Khởi tạo params mặc định
   queryParams: GopYRequest = {
     pageNumber: 1,
-    pageSize: 20,
+    pageSize: PAGINATION_CONFIG.DEFAULT_PAGE_SIZE,
     search: "",
     trangThai: "",
     filterType: ""
@@ -53,6 +59,13 @@ export class FeedbackManagementComponent implements OnInit {
 
   applyFilters(): void {
     this.queryParams.pageNumber = 1;
+    this.queryParams.search = this.searchText;
+    this.queryParams.trangThai = this.selectedStatus;
+    this.loadData();
+  }
+
+  onPageChange($event: number) {
+    this.queryParams.pageNumber = $event;
     this.queryParams.search = this.searchText;
     this.queryParams.trangThai = this.selectedStatus;
     this.loadData();
@@ -88,7 +101,7 @@ export class FeedbackManagementComponent implements OnInit {
       next: (res) => {
         if (res.status === 'SUCCESS') {
           this.filteredFeedbacks = res.data.items;
-          this.totalItems = res.data.totalItems;
+          this.totalPage = Math.ceil(res.data.totalItems / this.queryParams.pageSize);
         }
         this.loadingService.hide();
       },
@@ -98,4 +111,5 @@ export class FeedbackManagementComponent implements OnInit {
       }
     });
   }
+
 }
