@@ -7,17 +7,18 @@
 
 /* Search Container Styles (Copy from thong-bao) */
 .search-container {
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     border-radius: 5px;
     padding: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    flex-direction: column;
 }
 
 .search-title {
     color: #e74c3c;
     font-size: 16px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     text-transform: uppercase;
 }
 
@@ -29,8 +30,29 @@
     font-size: 14px;
 }
 
-.form-control, .dropdown {
+.form-control {
     height: 38px;
+    width: 300px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fafafa;
+}
+
+.form-control-date {
+    height: 38px;
+    width: 150px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fafafa;
+}
+
+.dropdown {
+    height: 38px;
+    width: 150px;
     padding: 6px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;

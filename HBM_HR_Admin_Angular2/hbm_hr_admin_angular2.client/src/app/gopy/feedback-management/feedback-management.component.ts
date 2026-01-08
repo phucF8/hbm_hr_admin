@@ -5,6 +5,7 @@ import { GopYItem, GopYRequest } from '@app/models/gopy.model';
 import { QuestionManagerComponent } from '@app/question-manager/question-manager.component';
 import { GopYService } from '@app/services/gop-y.service';
 import { LoadingService } from '@app/services/loading.service';
+import { InputFormComponent } from "@app/uicomponents/input-form/input-form.component";
 
 
 @Component({
@@ -14,14 +15,14 @@ import { LoadingService } from '@app/services/loading.service';
   imports: [
     FormsModule,
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
 })
 export class FeedbackManagementComponent implements OnInit {
-openedMenuId: any;
-toggleMenu(_t92: GopYItem) {
-throw new Error('Method not implemented.');
-}
+  openedMenuId: any;
+  toggleMenu(_t92: GopYItem) {
+    throw new Error('Method not implemented.');
+  }
   // Filter properties
   searchText: string = '';
   selectedType: string = '';
@@ -33,9 +34,9 @@ throw new Error('Method not implemented.');
   totalItems: number = 0;
 
   constructor(
-      private gopYService: GopYService,
-      private loadingService: LoadingService // Giả định bạn có loading service
-  ) {}
+    private gopYService: GopYService,
+    private loadingService: LoadingService // Giả định bạn có loading service
+  ) { }
 
   // Khởi tạo params mặc định
   queryParams: GopYRequest = {
@@ -51,11 +52,14 @@ throw new Error('Method not implemented.');
   }
 
   applyFilters(): void {
-    
+    this.queryParams.pageNumber = 1;
+    this.queryParams.search = this.searchText;
+    this.queryParams.trangThai = this.selectedStatus;
+    this.loadData();
   }
 
   clearFilters(): void {
-    
+
   }
 
   getStatusLabel(status: string): string {
@@ -75,12 +79,11 @@ throw new Error('Method not implemented.');
   }
 
   deleteFeedback(id: string): void {
-    
+
   }
 
   loadData() {
     this.loadingService.show();
-    
     this.gopYService.getAllGopYs(this.queryParams).subscribe({
       next: (res) => {
         if (res.status === 'SUCCESS') {

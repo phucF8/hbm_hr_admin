@@ -9,12 +9,14 @@
     <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
       <div>
         <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+          
           <div class="form-group">
             <label>Tiêu đề hoặc nội dung</label>
-            <input type="text" class="form-control" placeholder="Tìm kiếm..." [(ngModel)]="searchText" (input)="applyFilters()">
+            <input type="text" class="form-control" placeholder="Tìm kiếm..." [(ngModel)]="searchText"
+              (input)="applyFilters()">
           </div>
 
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label>Loại ý kiến</label>
             <select class="dropdown" [(ngModel)]="selectedType" (change)="applyFilters()">
               <option value="">Tất cả loại</option>
@@ -23,27 +25,25 @@
               <option value="Đề xuất tính năng">Đề xuất tính năng</option>
               <option value="Khiếu nại">Khiếu nại</option>
             </select>
-          </div>
+          </div> -->
 
           <div class="form-group">
             <label>Trạng thái</label>
             <select class="dropdown" [(ngModel)]="selectedStatus" (change)="applyFilters()">
-              <option value="">Tất cả trạng thái</option>
-              <option value="pending">Chờ xử lý</option>
-              <option value="processing">Đang xử lý</option>
-              <option value="resolved">Đã giải quyết</option>
-              <option value="rejected">Đã từ chối</option>
+              <option value="">Tất cả</option>
+              <option value="GY_CD">Chưa đọc</option>
+              <option value="GY_DD">Đã đọc</option>
             </select>
           </div>
 
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label>Từ ngày</label>
-            <input type="date" class="form-control" [(ngModel)]="startDate" (change)="applyFilters()">
+            <input type="date" class="form-control-date" [(ngModel)]="startDate" (change)="applyFilters()">
           </div>
           <div class="form-group">
             <label>Đến ngày</label>
-            <input type="date" class="form-control" [(ngModel)]="endDate" (change)="applyFilters()">
-          </div>
+            <input type="date" class="form-control-date" [(ngModel)]="endDate" (change)="applyFilters()">
+          </div> -->
         </div>
       </div>
 
@@ -51,17 +51,19 @@
         <button class="btn btn-search" (click)="applyFilters()">
           <i class="bi bi-search"></i> Tìm kiếm
         </button>
-        <div class="right-buttons">
+        <!-- <div class="right-buttons">
           <button class="btn btn-clear" (click)="clearFilters()" style="background-color: #f15a59;">
             <i class="bi bi-x-circle"></i> Xóa bộ lọc
           </button>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
 
-  <div class="panel" style="margin-top: 20px; background: white; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <div class="panel-header" style="padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+  <div class="panel"
+    style="margin-top: 20px; background: white; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <div class="panel-header"
+      style="padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
       <div><strong>DANH SÁCH BẢN GHI</strong></div>
       <span class="result-count">Hiển thị {{ filteredFeedbacks.length }} ý kiến</span>
     </div>
@@ -69,15 +71,14 @@
     <table class="my-table">
       <thead>
         <tr>
-          <th style="width: 5%;">#ID</th>
-          <th style="width: 20%;">Tiêu đề</th>
-          <th style="width: 30%;">Nội dung</th>
-          <th style="width: 15%;">Người gửi</th>
-          <th style="width: 15%;">Người nhận</th>
-          <!-- <th style="width: 15%;">Loại</th> -->
-          <th style="width: 10%;">Ngày gửi</th>
-          <th style="width: 20%;">Trạng thái</th>
-          <th style="width: 10%;">Hành động</th>
+          <th style="width: 4%; text-align: center;">#</th>
+          <th style="width: 18%;">Tiêu đề</th>
+          <th style="width: 35%;">Nội dung</th>
+          <th style="width: 12%;">Người gửi</th>
+          <th style="width: 12%;">Người nhận</th>
+          <th style="width: 9%; text-align: center;">Ngày gửi</th>
+          <th style="width: 10%; text-align: center;">Trạng thái</th>
+          <th style="text-align: center; white-space: nowrap;">Hành động</th>
         </tr>
       </thead>
       <tbody>
@@ -101,13 +102,16 @@
               </div>
               <div class="popup-menu" *ngIf="openedMenuId === feedback.id" style="right: 0;">
                 <div class="menu-item view" (click)="viewFeedback(feedback.id)">
-                  <i class="bi bi-eye"></i> <div class="menu-text">Xem</div>
+                  <i class="bi bi-eye"></i>
+                  <div class="menu-text">Xem</div>
                 </div>
                 <div class="menu-item edit" (click)="editFeedback(feedback.id)">
-                  <i class="bi bi-pencil"></i> <div class="menu-text">Sửa</div>
+                  <i class="bi bi-pencil"></i>
+                  <div class="menu-text">Sửa</div>
                 </div>
                 <div class="menu-item delete" (click)="deleteFeedback(feedback.id)">
-                  <i class="bi bi-trash"></i> <div class="menu-text">Xóa</div>
+                  <i class="bi bi-trash"></i>
+                  <div class="menu-text">Xóa</div>
                 </div>
               </div>
             </div>
