@@ -1,0 +1,114 @@
+<!-- HTML Template -->
+<div class="container-fluid py-4" *ngIf="data; else loadingTemplate">
+  <div class="card shadow-lg border-0">
+    <!-- Header với gradient -->
+    <div class="card-header-custom">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <h5 class="mb-0 ms-3 text-white fw-bold">Chi tiết góp ý</h5>
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="card-body p-4">
+      <!-- Tiêu đề và nội dung -->
+      <div class="detail-section mb-4">
+        <div class="title-wrapper">
+          
+          <h4 class="section-title"> {{ data.tieuDe }}</h4>
+        </div>
+        <div class="content-box">
+          <div class="content-text"> {{ data.noiDung }}</div>
+        </div>
+      </div>
+
+      <div class="divider-line"></div>
+
+      <!-- Thông tin người gửi và nhận -->
+      <div class="row g-4 my-3">
+        <div class="col-md-6">
+          <div class="info-card">
+            <div class="info-label">
+              <i class="fas fa-paper-plane me-2"></i> Người gửi
+            </div>
+            <div class="user-info">
+              <img [src]="getAnh(this.data.anhNguoiGui??'')||'assets/images/default-avatar.png'" 
+                   class="avatar-img" alt="Avatar">
+              <div class="user-details">
+                <div class="user-name">{{ data.tenNguoiGui }}</div>
+                <div class="user-position">{{ data.tenChucDanhNguoiGui || '' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="info-card receiver-card">
+            <div class="info-label">
+              <i class="fas fa-user-tie me-2"></i> Người nhận xử lý
+            </div>
+            <div class="user-info">
+              <img [src]="getAnh(data.anhNguoiNhan??'') || 'assets/images/default-avatar.png'" 
+                   class="avatar-img" alt="Avatar">
+              <div class="user-details">
+                <div class="user-name text-success">{{ data.tenNguoiNhan }}</div>
+                <div class="user-position">{{ data.tenChucDanhNguoiNhan }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-line"></div>
+
+      <!-- Thông tin bổ sung -->
+      <div class="row g-3 mt-3">
+        <div class="col-md-6">
+          <div class="meta-info">
+            <i class="far fa-calendar-alt icon-meta"></i>
+            <div>
+              <div class="meta-label">Thời gian gửi</div>
+              <div class="meta-value">{{ data.createdDate | date: 'HH:mm, dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div *ngIf="data.files && data.files.length > 0" class="attachments-section">
+            <div class="meta-info mb-2">
+              <i class="fas fa-paperclip icon-meta"></i>
+              <div class="meta-label">Tài liệu đính kèm ({{ data.files.length }})</div>
+            </div>
+            <div class="attachment-list">
+              <a *ngFor="let file of data.files" 
+                 [href]="file.url" 
+                 class="attachment-link" 
+                 target="_blank">
+                <i class="fas fa-file-alt me-2"></i>
+                <span>Xem tài liệu</span>
+                <i class="fas fa-external-link-alt ms-2 small"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer-custom">
+      <button class="btn-close-custom" (click)="onClose()">
+        <i class="fas fa-times me-2"></i> Đóng
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="spinner-custom">
+      <div class="spinner-border" role="status"></div>
+    </div>
+    <p class="loading-text">Đang tải thông tin chi tiết...</p>
+  </div>
+</ng-template>

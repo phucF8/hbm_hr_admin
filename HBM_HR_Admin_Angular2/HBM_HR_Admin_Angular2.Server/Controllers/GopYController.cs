@@ -656,6 +656,63 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
             return Ok(ApiResponse<PagedResultGopY>.Success(result));
         }
+
+
+        [HttpPost("admin/chitiet")]
+        public async Task<IActionResult> AdminGetChiTietGopy([FromBody] AdminGopYChiTietRequest request) {
+            if (request == null || request.Id == Guid.Empty)
+                return BadRequest(ApiResponse<GopYChiTietDto>.Error("Id không hợp lệ."));
+
+            // 1. Lấy dữ liệu gốc từ DB (Sử dụng SingleOrDefault để lấy toàn bộ object)
+            var gopyEntity = await _context.GY_GopYs
+                .FirstOrDefaultAsync(x => x.ID == request.Id);
+
+            if (gopyEntity == null)
+                return NotFound(ApiResponse<GopYChiTietDto>.Error("Không tìm thấy thông tin góp ý."));
+
+            // 3. Truy vấn thông tin chi tiết để trả về (Join thông tin nhân viên)
+            var data = await (
+                from x in _context.GY_GopYs
+                where x.ID == request.Id
+                join nvGui in _context.DbNhanVien on x.NhanVienID equals nvGui.ID into nvGuiJoin
+                from nvGui in nvGuiJoin.DefaultIfEmpty()
+                join nvNhan in _context.DbNhanVien on x.NguoiNhanID equals nvNhan.ID into nvNhanJoin
+                from nvNhan in nvNhanJoin.DefaultIfEmpty()
+                select new GopYChiTietDto {
+                    Id = x.ID,
+                    TieuDe = x.TieuDe,
+                    NoiDung = x.NoiDung,
+                    NhanVienId = x.NhanVienID,
+                    AnDanh = x.AnDanh,
+                    CreatedDate = x.NgayGui,
+                    GroupID = x.GroupID,
+                    //TrangThai = x.TrangThai,
+
+                    // Xử lý nặc danh: Nếu AnDanh = true thì không trả về thông tin người gửi
+                    TenNguoiGui = x.AnDanh == true ? "Nặc danh" : (nvGui != null ? nvGui.TenNhanVien : null),
+                    AnhNguoiGui = x.AnDanh == true ? null : (nvGui != null ? nvGui.Anh : null),
+                    TenChucDanhNguoiGui = x.AnDanh == true ? null : (nvGui != null ? nvGui.TenChucDanh : null),
+
+                    TenNguoiNhan = nvNhan != null ? nvNhan.TenNhanVien : null,
+                    AnhNguoiNhan = nvNhan != null ? nvNhan.Anh : null,
+                    TenChucDanhNguoiNhan = nvNhan != null ? nvNhan.TenChucDanh : null,
+                }
+            ).FirstOrDefaultAsync();
+
+            // 4. Lấy danh sách file đính kèm riêng biệt để tránh lỗi mapping phức tạp
+            if (data != null) {
+                data.Files = await _context.GY_FileDinhKems
+                    .Where(f => f.GopYID == data.Id)
+                    .Select(f => new FileDto {
+                        FileName = f.TenFile,
+                        FileUrl = f.DuongDan
+                    }).ToListAsync();
+            }
+
+            return Ok(ApiResponse<GopYChiTietDto>.Success(data));
+        }
+
+
     }
 
 }

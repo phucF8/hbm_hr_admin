@@ -9,6 +9,10 @@ import { InputFormComponent } from "@app/uicomponents/input-form/input-form.comp
 import { PaginationComponent } from "@app/components/pagination/pagination.component";
 import { UtilsService } from '@app/utils/utils.service';
 import { PAGINATION_CONFIG } from '@app/constants/api.constants';
+import Swal from 'sweetalert2';
+import { MatDialog } from '@angular/material/dialog';
+import { OpinionDetailComponent } from '../feedback-detail/feedback-detail.component';
+import { GopYDetailComponent } from '../chitiet/chitiet_gopy';
 
 
 @Component({
@@ -39,7 +43,8 @@ export class FeedbackManagementComponent implements OnInit {
   constructor(
     private gopYService: GopYService,
     private loadingService: LoadingService, // Giả định bạn có loading service
-    public utils: UtilsService
+    public utils: UtilsService,
+    private dialog: MatDialog,
   ) { }
 
   // Khởi tạo params mặc định
@@ -82,7 +87,34 @@ export class FeedbackManagementComponent implements OnInit {
   }
 
   viewFeedback(id: string): void {
-    console.log('View feedback:', id);
+    console.log(`getChiTietGopY id = `,id);
+    this.gopYService.getChiTietGopY(id).subscribe({
+          next: (result) => {
+            this.dialog.open(GopYDetailComponent, {
+              data: result.data,
+              disableClose: false,
+              panelClass: 'err-report-detail-dialog', // Thêm class để tùy chỉnh CSS
+              width: '50vw',
+              height: '80vh',
+              maxWidth: '100vw'
+            }).afterClosed().subscribe(result => {
+                if (result) {
+                  
+                }
+              });
+          },
+          error: (error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Đã xảy ra lỗi khi tải chi tiết báo cáo',
+              html: error.status === 0
+                ? 'Không nhận được phản hồi từ server. Có thể server chưa chạy hoặc bị chặn kết nối.'
+                : error.message,
+              confirmButtonText: 'Đóng'
+            });
+    
+          }
+        });
   }
 
   editFeedback(id: string): void {

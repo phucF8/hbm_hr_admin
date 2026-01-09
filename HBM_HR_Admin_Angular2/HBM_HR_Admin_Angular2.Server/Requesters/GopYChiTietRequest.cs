@@ -1,4 +1,9 @@
 ﻿namespace HBM_HR_Admin_Angular2.Server.Requesters {
+
+    public class AdminGopYChiTietRequest {
+        public Guid Id { get; set; }   // Id góp ý cần lấy
+    }
+
     public class GopYChiTietRequest {
         public Guid Id { get; set; }   // Id góp ý cần lấy
         public String UserID { get; set; }   // Id nguoi xem chi tiet góp ý
