@@ -8,6 +8,7 @@ import { GopYService } from '@app/services/gop-y.service';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { getFullImageUrl } from '@app/utils/url.utils';
+import { environment } from 'environments/environment';
 
 @Component({
     selector: 'app-gop-y-detail',
@@ -24,7 +25,7 @@ export class GopYDetailComponent implements OnInit, OnChanges {
         private gopYService: GopYService,
         private loadingService: LoadingService, // Inject LoadingService
         private errorService: ErrorService, // Inject ErrorService
-         private dialogRef: MatDialogRef<GopYDetailComponent>,
+        private dialogRef: MatDialogRef<GopYDetailComponent>,
         @Inject(MAT_DIALOG_DATA) public data: ChiTietGopY
     ) { }
 
@@ -36,7 +37,7 @@ export class GopYDetailComponent implements OnInit, OnChanges {
 
     // Sử dụng OnChanges để tải lại dữ liệu nếu gopYId thay đổi từ component cha
     ngOnChanges(changes: SimpleChanges): void {
-        
+
     }
 
 
@@ -44,9 +45,16 @@ export class GopYDetailComponent implements OnInit, OnChanges {
         this.dialogRef.close();
     }
 
-    getAnh(anh:string){
+    getAnh(anh: string) {
         return getFullImageUrl(anh);
     }
-    
+
+    getLinkFile(url: string): string {
+        if (!url) return '#';
+        // Nếu url là đường dẫn tương đối, hãy nối với Base URL của Server
+        // Ví dụ: return `https://api.yourdomain.com/${url}`;
+        // return `${environment.apiUrl}/${url}`;
+        return url;
+    }
 
 }

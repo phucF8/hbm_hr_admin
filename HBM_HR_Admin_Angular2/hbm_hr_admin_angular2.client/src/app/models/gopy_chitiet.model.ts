@@ -1,3 +1,8 @@
+export interface FileGopY {
+  fileName: string;
+  fileUrl: string;
+}
+
 export interface ChiTietGopY {
   id: string;
   tieuDe: string;
@@ -5,7 +10,7 @@ export interface ChiTietGopY {
   nhanVienId: string;
   anDanh: boolean;
   createdDate: string;
-  files: any[]; // Thay any bằng interface file nếu có
+  files: FileGopY[]; // Đã cập nhật từ any[] sang FileGopY[]
   groupID: string | null;
   tenNguoiGui: string;
   anhNguoiGui: string | null;
