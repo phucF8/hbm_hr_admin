@@ -10,6 +10,8 @@ import { Observable } from 'rxjs';
 import { AuthService } from '@app/services/auth.service';
 import { getFullImageUrl } from '@app/utils/url.utils';
 import { ROUTE_PATHS } from '@app/app.routes';
+import { getLocal } from '@app/utils/json-utils';
+import { UserPermission } from '@app/models/user.model';
 
 
 @Component({
@@ -31,6 +33,7 @@ export class MainLayoutComponent {
   showSignoutPopup = false;
 
   isLoading: Observable<boolean>;
+  permissions: UserPermission[] = [];
 
 
   @ViewChild('popup') popupRef!: ElementRef;
@@ -52,6 +55,9 @@ export class MainLayoutComponent {
     private loadingService: LoadingService,
     private router: Router) {
 
+      console.log('HELLO');
+      console.log(this.router.routerState.snapshot.root);
+
     var token = localStorage.getItem('access_token');
     this.isLoggedIn = token != null && token.trim() != '';
     this.tenNhanVien = localStorage.getItem('tenNhanVien') || '';
@@ -70,6 +76,10 @@ export class MainLayoutComponent {
     //   return status;
     // });
     this.isLoading = this.loadingService.isLoading$;
+
+    // Lấy toàn bộ cấu trúc các route đang hoạt động
+    
+
   }
 
 
@@ -81,6 +91,7 @@ export class MainLayoutComponent {
     //   this.anhNhanVien = getFullImageUrl(this.anhNhanVien);
     //   this.maNhanVien = this.authService.getCurrentUser()?.MaNhanVien || '';
     // }
+    this.permissions = getLocal<UserPermission[]>('permissions', []);
   }
 
   logout(): void {
@@ -99,6 +110,11 @@ export class MainLayoutComponent {
 
   goToHome() {
     this.router.navigate([ROUTE_PATHS.home]);
+  }
+
+  // Tạo hàm check quyền
+  hasPermission(code: string): boolean {
+    return this.permissions.some(p => p.code === code);
   }
 
   title = 'hbm_hr_admin_angular2.client';

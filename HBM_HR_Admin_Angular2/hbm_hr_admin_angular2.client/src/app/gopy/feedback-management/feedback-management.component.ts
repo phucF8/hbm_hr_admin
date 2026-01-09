@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GopYItem, GopYRequest } from '@app/models/gopy.model';
 import { QuestionManagerComponent } from '@app/question-manager/question-manager.component';
@@ -25,9 +25,7 @@ import { PAGINATION_CONFIG } from '@app/constants/api.constants';
 export class FeedbackManagementComponent implements OnInit {
 
   openedMenuId: any;
-  toggleMenu(_t92: GopYItem) {
-    throw new Error('Method not implemented.');
-  }
+
   // Filter properties
   searchText: string = '';
   selectedType: string = '';
@@ -111,5 +109,24 @@ export class FeedbackManagementComponent implements OnInit {
       }
     });
   }
+
+  toggleMenu(item: GopYItem) {
+    if (this.openedMenuId === item.id) {
+      // Nếu menu này đang mở -> đóng lại
+      this.openedMenuId = null;
+    } else {
+      // Đóng tất cả và mở menu mới
+      this.openedMenuId = item.id;
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const clickedInside = (event.target as HTMLElement).closest('.dropdown-wrapper');
+    if (!clickedInside) {
+      this.openedMenuId = null;
+    }
+  }
+
 
 }

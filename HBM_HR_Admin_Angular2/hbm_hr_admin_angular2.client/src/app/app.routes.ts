@@ -19,6 +19,7 @@ import { CompAComponent } from './demo/comp-a/comp-a.component';
 import { AdminGuard } from './guards/admin.guard';
 import { FeedbackManagementComponent } from './gopy/feedback-management/feedback-management.component';
 import { OpinionDetailComponent } from './gopy/feedback-detail/feedback-detail.component';
+import { AdminRedirectComponent } from './components/admin-redirect/admin-redirect.component';
 
 export const ROUTE_PATHS = {
   login: 'login',
@@ -37,10 +38,11 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     canActivate: [AdminGuard], // chỉ admin mới vào
     children: [
-      { path: '', redirectTo: 'thongbao', pathMatch: 'full' },
-      {
-        path: 'thongbao', component: ThongBaoComponent,
-        // canActivate: [AuthGuard]
+      { path: '', component: AdminRedirectComponent, pathMatch: 'full' },
+      { 
+        path: 'thongbao', 
+        component: ThongBaoComponent,
+        data: { permission: 'ADMIN_NOTICE' }
       },
       {
         path: 'survey-detail-report/:topicId', component: SurveyDetailReportComponent,
@@ -50,17 +52,26 @@ export const routes: Routes = [
         path: 'survey-release/:topicId', component: TopicReleaseComponent,
         canActivate: [AuthGuard]
       },
-      { path: 'admin', component: AdminComponent },
+      { 
+        path: 'admin', 
+        component: AdminComponent,
+        data: { permission: 'ADMIN_PERMISSION' }
+      },
       { path: 'tree-view-checklist', component: TreeViewChecklistComponent },
       {
         path: 'voting',
-        loadChildren: () => import('./voting/voting-module').then(m => m.VotingModule)
+        loadChildren: () => import('./voting/voting-module').then(m => m.VotingModule),
+        data: { permission: 'ADMIN_VOTE' }
       },
       {
         path: 'error-report',
-        loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule)
+        loadChildren: () => import('./error-report/error-report.module').then(m => m.ErrorReportModule),
+        data: { permission: 'ADMIN_ERROR_LOG' }
       },
-      { path: 'gopy', component: FeedbackManagementComponent },
+      { path: 'gopy', 
+        component: FeedbackManagementComponent,
+        data: { permission: 'ADMIN_GOPY' }
+      },
     ]
   },
 

@@ -1,18 +1,7 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, UrlTree } from '@angular/router';
-import { ROUTE_PATHS } from '@app/app.routes';
-import { LoginComponent } from '@app/components/login/login.component';
+import { CanActivate, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
-import { showJsonDebug } from '@app/utils/error-handler';
-import { safeStringify } from '@app/utils/json-utils';
 import { jwtDecode } from 'jwt-decode';
-
-
-interface JwtPayload {
-  role: string[] | string;
-  name: string;
-  exp: number;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -24,29 +13,39 @@ export class AdminGuard implements CanActivate {
     private authService: AuthService,
   ) { }
 
-  canActivate(): boolean {
-    if (this.authService.isTokenExpired()) {
-      // Token hết hạn, logout
-      localStorage.clear();
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    let targetRoute = route;// 1. Tìm data 'permission' từ route hiện tại hoặc các route con
+    // Duyệt sâu xuống route con cuối cùng để lấy data
+    while (targetRoute.firstChild) {
+      targetRoute = targetRoute.firstChild;
+    }
+    const requiredPermission = targetRoute.data['permission'];
+    console.log("Quyền yêu cầu của trang này là:", requiredPermission);
+    // 2. Logic kiểm tra Token (giữ nguyên code cũ của bạn)
+    const token = localStorage.getItem('access_token');
+    if (!token || this.authService.isTokenExpired()) {
       this.router.navigate(['/login']);
       return false;
-    } else {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        this.router.navigate(['/login']);
+    }
+    // 3. Giải mã và kiểm tra quyền
+    const decoded: any = jwtDecode(token);
+    const roleClaim = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+    const roles = Array.isArray(roleClaim) ? roleClaim : [roleClaim];
+    // 4. Kiểm tra quyền cụ thể
+    if (requiredPermission) {
+      if (roles.includes(requiredPermission)) {
+        return true;
+      } else {
+        console.warn(`User không có quyền: ${requiredPermission}`);
+        this.router.navigate(['/forbidden']);
         return false;
       }
-      const decoded: any = jwtDecode(token);
-      const roleClaim = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];  // lấy role từ claim chuẩn của ASP.NET
-      const roles = Array.isArray(roleClaim) ? roleClaim : [roleClaim];
-      console.log("Roles:", safeStringify(decoded));
-      if (roles.includes('ADMIN_VOTE')) {
-        return true;
-      }
-      this.router.navigate(['/forbidden']); // trang báo lỗi
-      return false;
     }
-
+    // Nếu không có yêu cầu permission cụ thể, chỉ cần có quyền admin chung (ví dụ ADMIN_VOTE)
+    // if (roles.includes('ADMIN_VOTE')) {
+      return true;
+    // }
+    // this.router.navigate(['/forbidden']);
+    // return false;
   }
-
 }

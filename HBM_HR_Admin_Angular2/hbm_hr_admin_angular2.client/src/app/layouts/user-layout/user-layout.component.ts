@@ -11,6 +11,7 @@ import { AuthService } from '@app/services/auth.service';
 import { getFullImageUrl } from '@app/utils/url.utils';
 import { ROUTE_PATHS } from '@app/app.routes';
 import { getLocal } from '@app/utils/json-utils';
+import { UserPermission } from '@app/models/user.model';
 
 
 @Component({
@@ -31,7 +32,7 @@ export class UserLayoutComponent {
   showSignoutPopup = false;
 
   isLoading: Observable<boolean>;
-  permissions: number[] = [];
+  permissions: UserPermission[] = [];
 
 
   @ViewChild('popup') popupRef!: ElementRef;
@@ -73,7 +74,7 @@ export class UserLayoutComponent {
   }
 
   ngOnInit() {
-    this.permissions = getLocal<number[]>('permissions', []);
+    this.permissions = getLocal<UserPermission[]>('permissions', []);
   }
 
   logout(): void {

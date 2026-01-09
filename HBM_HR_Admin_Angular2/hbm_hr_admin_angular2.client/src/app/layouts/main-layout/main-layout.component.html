@@ -37,7 +37,7 @@
                     </li> -->
 
                     <!-- ✅ Menu mới: Lỗi phản hồi -->
-                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }">
+                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }" *ngIf="hasPermission('ADMIN_NOTICE')">
                         <a class="nav-link" routerLink="thongbao">
                             <i class="bi bi-bell-fill"></i>
                             <span class="menu-title">Thông báo</span>
@@ -47,7 +47,7 @@
 
 
 
-                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }">
+                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }" *ngIf="hasPermission('ADMIN_VOTE')">
                         <a class="nav-link" routerLink="voting">
                             <i class="bi bi-check2-square"></i>
                             <span class="menu-title">Bình chọn</span>
@@ -57,21 +57,21 @@
 
 
 
-                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }">
+                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }" *ngIf="hasPermission('ADMIN_ERROR_LOG')">
                         <a class="nav-link" routerLink="error-report">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <span class="menu-title">Lỗi phản hồi</span>
                         </a>
                     </li>
 
-                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }">
+                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }" *ngIf="hasPermission('ADMIN_GOPY')">
                         <a class="nav-link" routerLink="gopy">
                             <i class="bi bi-envelope-fill"></i>
                             <span class="menu-title">Góp ý</span>
                         </a>
                     </li>
 
-                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }">
+                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }" *ngIf="hasPermission('ADMIN_PERMISSION')">
                         <a class="nav-link" routerLink="admin">
                             <i class="bi bi-gear-fill"></i>
                             <span class="menu-title">Admin</span>

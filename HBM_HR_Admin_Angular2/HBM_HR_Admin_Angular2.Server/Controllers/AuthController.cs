@@ -67,10 +67,14 @@
                 user = existingUser;
             }
 
-            // Lấy danh sách PermissionId của user
+          // Lấy danh sách đối tượng Permission (Id, Code) thay vì chỉ lấy ID
             var permissions = await _context.UserPermissions
                 .Where(up => up.UserId == user.Id)
-                .Select(up => up.PermissionId)
+                .Select(up => new {
+                    Id = up.Permission.Id,     // Giả sử bạn có Navigation Property là Permission
+                    Code = up.Permission.Code,
+                    Name = up.Permission.Name
+                })
                 .ToListAsync();
 
             var token = await GenerateJwtToken(request.Username, nhanVien); // Nếu login HR thành công -> tạo JWT riêng
