@@ -81,9 +81,9 @@
                             <div class="meta-label">Tài liệu đính kèm ({{ data.files.length }})</div>
                         </div>
                         <div class="attachment-list">
-                            <a *ngFor="let file of data.files" [href]="getLinkFile(file.fileUrl)"
-                                class="attachment-link" target="_blank" [title]="file.fileName">
-                                <i class="fas fa-file-alt me-2"></i>
+                            <a *ngFor="let file of data.files" class="attachment-link" style="cursor: pointer;"
+                                [title]="file.fileName" (click)="downloadFile(file.fileUrl)"> <i
+                                    class="fas fa-file-alt me-2"></i>
                                 <span class="text-truncate">{{ file.fileName }}</span>
                             </a>
                         </div>

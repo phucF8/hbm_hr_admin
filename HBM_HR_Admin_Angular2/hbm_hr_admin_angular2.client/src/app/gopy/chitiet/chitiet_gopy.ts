@@ -3,12 +3,13 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges, Inject } from '@ang
 // Giả định có các service này hoặc tự tạo
 import { LoadingService } from '../../services/loading.service';
 import { ErrorService } from '../../services/error.service';
-import { ChiTietGopY } from '@app/models/gopy_chitiet.model';
+import { ChiTietGopY, FileGopY } from '@app/models/gopy_chitiet.model';
 import { GopYService } from '@app/services/gop-y.service';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { getFullImageUrl } from '@app/utils/url.utils';
 import { environment } from 'environments/environment';
+import { FileService } from '@app/services/file.service';
 
 @Component({
     selector: 'app-gop-y-detail',
@@ -22,6 +23,7 @@ export class GopYDetailComponent implements OnInit, OnChanges {
     errorMessage: string | null = null;
 
     constructor(
+        private fileService: FileService,
         private gopYService: GopYService,
         private loadingService: LoadingService, // Inject LoadingService
         private errorService: ErrorService, // Inject ErrorService
@@ -57,4 +59,14 @@ export class GopYDetailComponent implements OnInit, OnChanges {
         return url;
     }
 
+    downloadFile(path: string) {
+        // đang lấy từ server thật http://admin.hbm.vn:8088/
+        // Nếu path chứa 'uploads/', lấy phần sau cùng. Nếu không, lấy toàn bộ path.
+        const fileName = path.includes('uploads/')
+            ? path.split('uploads/').pop() || ''
+            : path;
+
+        // 2. Gọi service để xử lý tải và mở file
+        this.fileService.downloadAndOpenFile(fileName);
+    }
 }
