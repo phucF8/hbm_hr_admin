@@ -1,8 +1,9 @@
-using Hangfire;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Hangfire;
 using HBM_HR_Admin_Angular2.Server.constance;
 using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.Filters;
 using HBM_HR_Admin_Angular2.Server.Middleware;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Repositories;
@@ -55,6 +56,8 @@ builder.Services.AddSingleton<FirebaseNotificationService>();
 
 builder.Services.AddControllers();
 
+
+builder.Services.AddScoped<DwhAppTokenFilter>();    //ĐĂNG KÝ FILTER DWH
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

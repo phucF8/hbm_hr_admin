@@ -377,7 +377,6 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         [HttpPost("LoaiCongViecCreate")]
         public async Task<ApiResponse<NV_LoaiCongViec>> LoaiCongViecCreate([FromBody] NV_LoaiCongViec model) {
             try {
-                model.ID = Guid.NewGuid();
                 model.NgayTao = DateTime.Now;
                 model.NgayCapNhat = DateTime.Now;
                 await _db.NV_LoaiCongViec.AddAsync(model);

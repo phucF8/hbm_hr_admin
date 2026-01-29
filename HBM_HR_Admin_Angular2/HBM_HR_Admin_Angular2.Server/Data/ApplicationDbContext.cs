@@ -1,4 +1,5 @@
-﻿using HBM_HR_Admin_Angular2.Server.Models;
+﻿using HBM_HR_Admin_Angular2.Server.entities;
+using HBM_HR_Admin_Angular2.Server.Models;
 using HBM_HR_Admin_Angular2.Server.Voting.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,7 +58,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public DbSet<NS_NhanVien_DeviceTokens> NS_NhanVien_DeviceTokens { get; set; }
         public DbSet<NV_LoaiCongViec> NV_LoaiCongViec { get; set; }
-        
+
+
+        // Data Warehouse
+        public DbSet<DwhEtlJobLog> DwhEtlJobLog { get; set; }
 
     }
 
