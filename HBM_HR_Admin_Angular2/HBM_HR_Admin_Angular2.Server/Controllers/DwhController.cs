@@ -4,6 +4,8 @@ using HBM_HR_Admin_Angular2.Server.DTOs.Dwh;
 using HBM_HR_Admin_Angular2.Server.entities;
 using HBM_HR_Admin_Angular2.Server.Filters;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
+using HBM_HR_Admin_Angular2.Server.Repositories;
+using HBM_HR_Admin_Angular2.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
@@ -15,9 +17,30 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
     public class DwhController : ControllerBase {
         
         private readonly ApplicationDbContext _db;
+        private readonly IConfiguration _config;
+        private readonly string _connectionString;
 
-        public DwhController(ApplicationDbContext db) {
+
+        private readonly FirebaseNotificationService _firebaseService;
+        private readonly NotificationRepository _repository;
+        private readonly NotificationService _notificationService;
+
+        private readonly IDebugRepository _debugRepository;
+
+
+        public DwhController(ApplicationDbContext db,
+            FirebaseNotificationService firebaseService,
+            NotificationRepository repository,
+            NotificationService notificationService,
+            IDebugRepository debugRepository,
+            IConfiguration config){
             _db = db;
+            _debugRepository = debugRepository;
+            _config = config;
+            _connectionString = _config.GetConnectionString("DefaultConnection");
+            _notificationService = notificationService;
+            _firebaseService = firebaseService;
+            _repository = repository;
         }
 
         [HttpPost("etl/job-log")]
@@ -41,6 +64,48 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
                 await _db.DwhEtlJobLog.AddAsync(entity);
                 await _db.SaveChangesAsync();
+
+                // ===============================
+                // ✅ PUSH NOTIFICATION
+                // ===============================
+
+                var title = "ETL Job hoàn thành";
+                var body = $"Job {model.JobName} đã ghi log lúc {model.LogDate:dd/MM/yyyy HH:mm}";
+
+                var data = new Dictionary<string, string> {
+                    ["Role"] = "ETL",
+                    ["Type"] = "etl-job-log",
+                    ["JobId"] = model.ID_JOB.ToString(),
+                    ["JobName"] = model.JobName,
+                    ["LogDate"] = model.LogDate.ToString("O")
+                };
+
+
+                String username = "phucnh@hbm.vn";
+                var nhanVien = await _debugRepository.GetNhanVienByUsernameAsync(username);
+
+
+                // Ví dụ: gửi cho admin / IT / DWH team
+                var receivers = new List<string> {
+                    nhanVien.ID,
+                };
+
+                await _notificationService.CreateThongBaoAsync(
+                    Guid.NewGuid(),       // ID thông báo
+                    false,                // không ẩn danh
+                    title,
+                    "SYSTEM",             // người gửi
+                    receivers
+                );
+
+                await _firebaseService.SendNotificationToEmployeesAsync(
+                    string.Join(",", receivers),
+                    title,
+                    body,
+                    data,
+                    _firebaseService,
+                    _repository
+                );
 
                 return ApiResponse<bool>.Success(true);
             } catch (Exception ex) {
