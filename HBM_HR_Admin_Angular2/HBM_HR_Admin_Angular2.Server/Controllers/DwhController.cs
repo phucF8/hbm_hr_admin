@@ -69,8 +69,10 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 // ✅ PUSH NOTIFICATION
                 // ===============================
 
-                var title = "ETL Job hoàn thành";
-                var body = $"Job {model.JobName} đã ghi log lúc {model.LogDate:dd/MM/yyyy HH:mm}";
+                var title = "Hệ thống Data Warehouse gặp lỗi xử lý dữ liệu";
+                var body = $"Quá trình xử lý dữ liệu Data Warehouse: " +
+                    $"{model.JobName}," + 
+                    $"ngày {model.LogDate:dd/MM/yyyy HH:mm:ss} đã xảy ra lỗi.";
 
                 var data = new Dictionary<string, string> {
                     ["Role"] = "ETL",
@@ -90,9 +92,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     nhanVien.ID,
                 };
 
-                await _notificationService.CreateThongBaoAsync(
+                await _notificationService.CreateThongBaoDwhLogAsync(
                     Guid.NewGuid(),       // ID thông báo
-                    false,                // không ẩn danh
                     title,
                     "SYSTEM",             // người gửi
                     receivers
