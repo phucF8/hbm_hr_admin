@@ -6,6 +6,7 @@ using HBM_HR_Admin_Angular2.Server.Filters;
 using HBM_HR_Admin_Angular2.Server.Models.Common;
 using HBM_HR_Admin_Angular2.Server.Repositories;
 using HBM_HR_Admin_Angular2.Server.Services;
+using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
@@ -76,8 +77,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
                 var data = new Dictionary<string, string> {
                     ["Role"] = "ETL",
-                    ["Type"] = "etl-job-log",
-                    ["JobId"] = model.ID_JOB.ToString(),
+                    ["Type"] = "DWH_LOG",
+                    ["ID"] = entity.ID.ToString(),
                     ["JobName"] = model.JobName,
                     ["LogDate"] = model.LogDate.ToString("O")
                 };
@@ -93,7 +94,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 };
 
                 await _notificationService.CreateThongBaoDwhLogAsync(
-                    Guid.NewGuid(),       // ID thông báo
+                    entity.ID,       // ID thông báo
                     title,
                     "SYSTEM",             // người gửi
                     receivers
@@ -116,6 +117,47 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             }
         }
 
+        Guid LongToGuid(long value) {
+            var bytes = new byte[16];
+            BitConverter.GetBytes(value).CopyTo(bytes, 0);
+            return new Guid(bytes);
+        }
+
+
+        [HttpPost("etl/job-log/detail")]
+        public async Task<IActionResult> GetEtlJobLogDetail(
+        [FromBody] DwhLogChiTietRequest request) {
+            if (request == null) {
+                return BadRequest(
+                    ApiResponse<DwhEtlJobLogChiTietDto>.Error("Id không hợp lệ.")
+                );
+            }
+
+            var log = await _db.DwhEtlJobLog
+                .Where(x => x.ID == request.Id)
+                .Select(x => new DwhEtlJobLogChiTietDto {
+                    Id = x.ID,
+                    IdJob = x.ID_JOB,
+                    JobName = x.JOBNAME,
+                    LogDate = x.LOGDATE,
+                    Errors = x.ERRORS,
+                    LogField = x.LOG_FIELD,
+                    CreatedAt = x.CREATED_AT
+                })
+                .FirstOrDefaultAsync();
+
+            if (log == null) {
+                return NotFound(
+                    ApiResponse<DwhEtlJobLogChiTietDto>.Error(
+                        "Không tìm thấy thông tin chi tiết xử lý dữ liệu."
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<DwhEtlJobLogChiTietDto>.Success(log)
+            );
+        }
 
 
     }
