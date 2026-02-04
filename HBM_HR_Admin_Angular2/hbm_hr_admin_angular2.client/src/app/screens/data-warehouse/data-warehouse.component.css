@@ -99,3 +99,12 @@
     color: #666; /* Màu chữ xanh đậm */
     
   }
+
+.log-field-cell {
+  width: 100%;          /* ăn hết chiều rộng của cột */
+  max-width: 100%;      /* KHÔNG khóa 300px */
+  text-align: left;
+  white-space: nowrap;  /* 1 dòng */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
