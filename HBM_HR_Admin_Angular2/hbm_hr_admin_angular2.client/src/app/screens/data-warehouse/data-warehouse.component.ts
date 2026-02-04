@@ -7,12 +7,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { DataWarehouseService } from './services/data-warehouse.service';
 import { DataWarehouseItem } from './models/data-warehouse.model';
 import { DataWarehouseDetailComponent } from './data-warehouse-detail/data-warehouse-detail.component';
+import { PaginationComponent } from '@app/components/pagination/pagination.component';
+import { PAGINATION_CONFIG } from '@app/constants/api.constants';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-data-warehouse',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconButton, MatTooltipModule],
+  imports: [CommonModule, FormsModule, MatIconButton, MatTooltipModule, PaginationComponent],
   templateUrl: './data-warehouse.component.html',
   styleUrls: ['./data-warehouse.component.css']
 })
@@ -23,8 +25,9 @@ export class DataWarehouseComponent implements OnInit {
   showPopup: boolean = false;
   selectAll: boolean = false;
   currentPage: number = 1;
-  pageSize: number = 20;
+  pageSize: number = PAGINATION_CONFIG.DEFAULT_PAGE_SIZE;
   totalItems: number = 0;
+  totalPages: number = 0;
 
   constructor(
     private dataWarehouseService: DataWarehouseService,
@@ -48,6 +51,7 @@ export class DataWarehouseComponent implements OnInit {
       next: (data) => {
         this.listItem = data.items;
         this.totalItems = data.totalCount;
+        this.totalPages = Math.ceil(data.totalCount / this.pageSize);
         console.log('Loaded data warehouse items:', this.listItem.length);
       },
       error: (error) => {
@@ -61,6 +65,11 @@ export class DataWarehouseComponent implements OnInit {
         });
       }
     });
+  }
+
+  onPageChange($event: number) {
+    this.currentPage = $event;
+    this.loadList();
   }
 
   toggleSelectAll() {
