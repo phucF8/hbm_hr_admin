@@ -1,15 +1,9 @@
 <div class="container_popup">
 
-  <div class="header">CHI TIẾT ETL JOB LOG</div>
+  <div class="header">CHI TIẾT LOG</div>
 
-  <div class="section">
-    <div class="section-title">THÔNG TIN CÔNG VIỆC</div>
-
-    <div class="info-row">
-      <div class="info-label">› ID</div>
-      <div class="info-value">{{ data.id }}</div>
-    </div>
-
+  <div>
+    <div class="section-title">THÔNG TIN CHUNG</div>
     <div class="info-row">
       <div class="info-label">› Job ID</div>
       <div class="info-value">{{ data.idJob }}</div>
@@ -21,33 +15,32 @@
     </div>
 
     <div class="info-row">
-      <div class="info-label">› Ngày Log</div>
+      <div class="info-label">› Ngày phát sinh</div>
       <div class="info-value">{{ data.logDate | date: 'dd/MM/yyyy HH:mm:ss' }}</div>
     </div>
 
     <div class="info-row">
-      <div class="info-label">› Số lỗi</div>
-      <div class="info-value" [ngClass]="{ 'error-count': data.errors > 0 }">
-        {{ data.errors }}
+        <div class="info-label">› Ngày ghi nhận</div>
+      <div class="info-value">{{ data.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">› Phân loại</div>
+      <div class="info-value" [ngClass]="{ 'status-error': data.errors !== 0, 'status-success': data.errors === 0 }">
+        {{ data.errors === 0 ? 'Thành công' : 'Lỗi' }}
       </div>
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-title">THÔNG TIN LOG</div>
+  <div class="log-section">
+    <div class="section-title">LOG CHI TIẾT</div>
 
-    <div class="info-row">
-      <div class="info-label">› Log Field</div>
-      <div class="info-value">
+    <div class="log-row">
+      <div class="log-value">
         <div class="log-field-container">
           {{ data.logField }}
         </div>
       </div>
-    </div>
-
-    <div class="info-row">
-      <div class="info-label">› Ngày tạo</div>
-      <div class="info-value">{{ data.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</div>
     </div>
   </div>
 
