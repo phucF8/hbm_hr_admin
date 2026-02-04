@@ -27,11 +27,20 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Nếu token còn hạn thì gắn Authorization Header
     const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-    let headers: any = { 'X-App-Token': environment.appToken };
+
+    // Build minimal setHeaders so we don't overwrite headers already set by services
+    const setHeaders: any = {};
     if (token) {
-      headers.Authorization = `Bearer ${token}`;
+      setHeaders.Authorization = `Bearer ${token}`;
     }
-    request = request.clone({ setHeaders: headers });
+    // If caller hasn't provided X-App-Token, set the default app token.
+    // This preserves custom X-App-Token values set by specific services (e.g. DWH service).
+    const hasXAppToken = request.headers.has('X-App-Token');
+    if (!hasXAppToken) {
+      setHeaders['X-App-Token'] = environment.appToken;
+    }
+
+    request = request.clone({ setHeaders });
 
     return next.handle(request).pipe(
       tap(() => {
@@ -39,9 +48,13 @@ export class AuthInterceptor implements HttpInterceptor {
       }),
       // Kiểm tra lỗi 401 hoặc message từ backend
       catchError((error: HttpErrorResponse) => {
+        // Skip redirect cho DWH API endpoints - để user có thể xử lý lỗi riêng
+        const isDwhApi = request.url.includes('/dwh/');
+
         if (
-          error.status === 401 ||
-          error.error?.message?.includes('Không thể xác định danh tính')
+          !isDwhApi &&
+          (error.status === 401 ||
+            error.error?.message?.includes('Không thể xác định danh tính'))
         ) {
           localStorage.removeItem('access_token');// Xóa token cũ
           sessionStorage.removeItem('access_token');

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using HBM_HR_Admin_Angular2.Server.Data;
+using HBM_HR_Admin_Angular2.Server.DTOs;
 using HBM_HR_Admin_Angular2.Server.DTOs.Dwh;
 using HBM_HR_Admin_Angular2.Server.entities;
 using HBM_HR_Admin_Angular2.Server.Filters;
@@ -157,6 +158,49 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(
                 ApiResponse<DwhEtlJobLogChiTietDto>.Success(log)
             );
+        }
+
+        [HttpPost("etl/job-log/list")]
+        public async Task<IActionResult> GetEtlJobLogList([FromBody] DwhLogListRequest request) {
+            if (request == null) return BadRequest(ApiResponse<string>.Error("Request không hợp lệ"));
+            if (request.PageNumber <= 0) request.PageNumber = 1;
+            if (request.PageSize <= 0) request.PageSize = 20;
+    
+            var query = _db.DwhEtlJobLog.AsQueryable();
+    
+            if (request.IdJob.HasValue) query = query.Where(x => x.ID_JOB == request.IdJob.Value);
+            if (request.FromDate.HasValue) query = query.Where(x => x.LOGDATE >= request.FromDate.Value);
+            if (request.ToDate.HasValue) query = query.Where(x => x.LOGDATE <= request.ToDate.Value);
+            if (!string.IsNullOrWhiteSpace(request.Search)) {
+                var s = request.Search.Trim();
+                query = query.Where(x => x.JOBNAME.Contains(s) || x.LOG_FIELD.Contains(s));
+            }
+    
+            var total = await query.LongCountAsync();
+    
+            var items = await query
+                .OrderByDescending(x => x.LOGDATE)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(x => new DwhEtlJobLogDto {
+                    Id = x.ID,
+                    IdJob = x.ID_JOB,
+                    JobName = x.JOBNAME,
+                    LogDate = x.LOGDATE,
+                    Errors = x.ERRORS,
+                    LogField = x.LOG_FIELD,
+                    CreatedAt = x.CREATED_AT
+                })
+                .ToListAsync();
+    
+            var result = new PagedResult<DwhEtlJobLogDto> {
+                TotalCount = (int)total,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                items = items
+            };
+    
+            return Ok(ApiResponse<object>.Success(result));
         }
 
 

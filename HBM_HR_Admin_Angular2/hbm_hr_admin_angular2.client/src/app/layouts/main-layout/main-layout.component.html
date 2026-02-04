@@ -71,6 +71,13 @@
                         </a>
                     </li>
 
+                    <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }" *ngIf="hasPermission('ADMIN_DATA_WAREHOUSE')">
+                        <a class="nav-link" routerLink="data-warehouse">
+                            <i class="bi bi-hdd-fill"></i>
+                            <span class="menu-title">Data Warehouse</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item" routerLinkActive="active-menu" [routerLinkActiveOptions]="{ exact: true }" *ngIf="hasPermission('ADMIN_PERMISSION')">
                         <a class="nav-link" routerLink="admin">
                             <i class="bi bi-gear-fill"></i>

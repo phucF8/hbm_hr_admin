@@ -15,11 +15,11 @@ import { SurveyReviewComponent } from './survey/survey-review/survey-review.comp
 import { SurveyDetailReportComponent } from './survey/survey-detail-report/survey-detail-report.component';
 import { TopicReleaseComponent } from './survey/topic-release/topic-release.component';
 import { TreeViewChecklistComponent } from './uicomponents/tree-view-checklist/tree-view-checklist.component';
-import { CompAComponent } from './demo/comp-a/comp-a.component';
 import { AdminGuard } from './guards/admin.guard';
 import { FeedbackManagementComponent } from './gopy/feedback-management/feedback-management.component';
 import { OpinionDetailComponent } from './gopy/feedback-detail/feedback-detail.component';
 import { AdminRedirectComponent } from './components/admin-redirect/admin-redirect.component';
+import { DataWarehouseComponent } from './screens/data-warehouse/data-warehouse.component';
 
 export const ROUTE_PATHS = {
   login: 'login',
@@ -30,7 +30,6 @@ export const ROUTE_PATHS = {
 
 export const routes: Routes = [
   { path: ROUTE_PATHS.login, component: LoginComponent },
-  { path: 'test', component: CompAComponent },
   { path: 'gopy', component: FeedbackManagementComponent },
   { path: 'gopydetail', component: OpinionDetailComponent },
   {
@@ -71,6 +70,10 @@ export const routes: Routes = [
       { path: 'gopy', 
         component: FeedbackManagementComponent,
         data: { permission: 'ADMIN_GOPY' }
+      },
+      { path: 'data-warehouse', 
+        component: DataWarehouseComponent,
+        data: { permission: 'ADMIN_DATA_WAREHOUSE' }
       },
     ]
   },

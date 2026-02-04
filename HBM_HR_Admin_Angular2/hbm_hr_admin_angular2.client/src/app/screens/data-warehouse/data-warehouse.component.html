@@ -1,0 +1,128 @@
+<div style="padding-left: 48px; padding-right: 48px;">
+  <div class="tabs">
+    <div class="tab active">DỮ LIỆU DATA WAREHOUSE - ETL JOB LOG</div>
+  </div>
+
+  <div class="action-buttons">
+
+  </div>
+
+
+
+
+  <div class="search-container">
+
+    <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
+
+      <div>
+        <div style="display: flex;gap: 10px; margin-bottom: 16px;">
+        </div>
+        <div style="display: flex; gap: 8px; width: 100%;">
+        </div>
+      </div>
+
+      <div class="buttons-container">
+        <div class="right-buttons">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <div><strong>BẢN GHI</strong></div>
+        <div class="search-container">
+
+
+
+
+        </div>
+      </div>
+
+
+
+      <!-- hộp thoại tạo thông báo mới hoặc xem chi tiết thông báo -->
+      <div class="overlay" *ngIf="showPopup">
+        <div class="overlay-content" style="background-color: transparent; padding: 0;width: 60%">
+          <!-- <chitiet-thong-bao [notificationId]="notificationId" (closePopupEvent)="handleClosePopup($event)"
+            (createEvent)="handleCreate($event)">
+          </chitiet-thong-bao> -->
+        </div>
+      </div>
+
+
+
+
+      <table class="my-table">
+        <thead>
+          <tr>
+            <th style="width: 2%;white-space: nowrap;text-align: center;">#</th>
+            <th style="width: 5%;white-space: nowrap;text-align: center;">Job ID</th>
+            <th style="width: 15%;white-space: nowrap;text-align: left;">Job Name</th>
+            <th style="width: 12%;white-space: nowrap;text-align: center;">Log Date</th>
+            <th style="width: 8%;white-space: nowrap;text-align: center;">Errors</th>
+            <th style="width: 20%;white-space: nowrap;text-align: left;">Log Field</th>
+            <th style="width: 12%;white-space: nowrap;text-align: center;">Created At</th>
+            <th style="width: 5%;"></th>
+          </tr>
+
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of listItem; let i = index" (click)="view(item.id)">
+            <td style="white-space: nowrap;text-align: center;">
+              {{ (currentPage - 1) * pageSize + i + 1 }}
+            </td>
+            <td style="white-space: nowrap;text-align: center;">{{ item.idJob }}</td>
+            <td style="text-align: left;white-space: nowrap;">{{ item.jobName }}</td>
+            <td style="text-align: center;white-space: nowrap;">{{ item.logDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td style="text-align: center;">
+              <span *ngIf="item.errors > 0" style="color: #dc3545; font-weight: bold;">{{ item.errors }}</span>
+              <span *ngIf="item.errors === 0" style="color: #28a745;">0</span>
+            </td>
+            <td style="text-align: left;">{{ item.logField }}</td>
+            <td style="text-align: center;white-space: nowrap;">{{ item.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+
+              <div class="dropdown-wrapper" (click)="toggleMenu(item); $event.stopPropagation()" >
+                <div class="dropdown-button">
+                  <div class="arrow-down"></div>
+                </div>
+                <div class="popup-menu" *ngIf="openedMenuId === item.id">
+
+                  <div class="menu-item view" (click)="view(item.id)">
+                    <i class="bi bi-eye"></i>
+                    <div class="menu-text">Xem</div>
+                  </div>
+                </div>
+
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination section -->
+      <!-- <app-pagination [totalPages]="totalPages" [currentPage]="currentPage" (pageChange)="onPageChange($event)">
+      </app-pagination> -->
+
+    </div>
+  </div>
+
+  <!-- Back to top button -->
+  <div class="back-to-top">↑</div>
+
+
+</div>
