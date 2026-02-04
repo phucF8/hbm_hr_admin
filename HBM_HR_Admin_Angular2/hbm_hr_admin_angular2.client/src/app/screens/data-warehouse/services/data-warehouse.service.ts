@@ -16,8 +16,8 @@ import { environment } from 'environments/environment';
 export class DataWarehouseService {
 
   private apiUrl = `${environment.apiUrl}/dwh/etl/job-log`; // API endpoint
-  // Token cho DWH API - có thể thay đổi dễ dàng ở đây
-  private dwhToken = 'dwh_9F3KpA2XrM8QwL7HcZVtU6YBEnJ5sD4G';
+  // Token cho DWH API lấy từ môi trường để dễ cấu hình
+  private dwhToken = environment.dwhToken;
 
   constructor(private http: HttpClient) { }
 
@@ -58,9 +58,11 @@ export class DataWarehouseService {
     );
   }
 
-  getDetail(id: number): Observable<DataWarehouseItem> {
-    return this.http.get<ApiResponse<DataWarehouseItem>>(
-      `${this.apiUrl}/${id}`,
+  getDetail(id: string | number): Observable<DataWarehouseItem> {
+    const body = { id };
+    return this.http.post<ApiResponse<DataWarehouseItem>>(
+      `${this.apiUrl}/detail`,
+      body,
       { headers: this.getHeaders() }
     ).pipe(
       map(response => response.data),

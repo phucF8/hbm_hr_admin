@@ -1,5 +1,5 @@
 export interface DwhEtlJobLogDto {
-  id: number;
+  id: string;
   idJob: number;
   jobName: string;
   logDate: string;

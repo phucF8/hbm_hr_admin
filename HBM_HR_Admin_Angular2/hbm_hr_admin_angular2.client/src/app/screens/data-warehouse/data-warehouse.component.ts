@@ -18,7 +18,7 @@ import Swal from 'sweetalert2';
 export class DataWarehouseComponent implements OnInit {
   
   listItem: DataWarehouseItem[] = [];
-  openedMenuId: number | null = null;
+  openedMenuId: string | null = null;
   showPopup: boolean = false;
   selectAll: boolean = false;
   currentPage: number = 1;
@@ -80,7 +80,7 @@ export class DataWarehouseComponent implements OnInit {
     this.openedMenuId = null;
   }
 
-  view(id: number) {
+  view(id: string | number) {
     this.dataWarehouseService.getDetail(id).subscribe({
       next: (data) => {
         console.log('Loaded detail:', data);
@@ -97,7 +97,7 @@ export class DataWarehouseComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading data warehouse detail:', error);
-        const errorMessage = this.getErrorMessage(error, `GET /dwh/etl/job-log/${id}`);
+        const errorMessage = this.getErrorMessage(error, `POST /dwh/etl/job-log/detail`);
         Swal.fire({
           icon: 'error',
           title: 'Lỗi tải chi tiết',
