@@ -6,6 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { DataWarehouseService } from './services/data-warehouse.service';
 import { DataWarehouseItem } from './models/data-warehouse.model';
+import { DataWarehouseDetailComponent } from './data-warehouse-detail/data-warehouse-detail.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -84,16 +85,16 @@ export class DataWarehouseComponent implements OnInit {
     this.dataWarehouseService.getDetail(id).subscribe({
       next: (data) => {
         console.log('Loaded detail:', data);
-        // TODO: Mở dialog hiển thị chi tiết
-        // this.dialog.open(DataWarehouseDetailComponent, {
-        //   data: data,
-        //   disableClose: true,
-        //   width: '60vw',
-        //   height: '90vh',
-        //   maxWidth: '100vw'
-        // }).afterClosed().subscribe(() => {
-        //   this.loadList();
-        // });
+        this.dialog.open(DataWarehouseDetailComponent, {
+          data: data,
+          disableClose: false,
+          panelClass: 'data-warehouse-detail-dialog',
+          width: '60vw',
+          height: '90vh',
+          maxWidth: '100vw'
+        }).afterClosed().subscribe(result => {
+          console.log('Dialog closed');
+        });
       },
       error: (error) => {
         console.error('Error loading data warehouse detail:', error);

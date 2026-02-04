@@ -1,0 +1,60 @@
+<div class="container_popup">
+
+  <div class="header">CHI TIẾT ETL JOB LOG</div>
+
+  <div class="section">
+    <div class="section-title">THÔNG TIN CÔNG VIỆC</div>
+
+    <div class="info-row">
+      <div class="info-label">› ID</div>
+      <div class="info-value">{{ data.id }}</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">› Job ID</div>
+      <div class="info-value">{{ data.idJob }}</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">› Tên công việc</div>
+      <div class="info-value">{{ data.jobName }}</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">› Ngày Log</div>
+      <div class="info-value">{{ data.logDate | date: 'dd/MM/yyyy HH:mm:ss' }}</div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">› Số lỗi</div>
+      <div class="info-value" [ngClass]="{ 'error-count': data.errors > 0 }">
+        {{ data.errors }}
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">THÔNG TIN LOG</div>
+
+    <div class="info-row">
+      <div class="info-label">› Log Field</div>
+      <div class="info-value">
+        <div class="log-field-container">
+          {{ data.logField }}
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <div class="info-label">› Ngày tạo</div>
+      <div class="info-value">{{ data.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</div>
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button type="button" class="btn btn-cancel" mat-dialog-close (click)="closePopup()">
+      Đóng
+    </button>
+  </div>
+
+</div>
