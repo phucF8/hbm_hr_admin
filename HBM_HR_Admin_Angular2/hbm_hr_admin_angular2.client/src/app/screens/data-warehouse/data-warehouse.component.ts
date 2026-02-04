@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DataWarehouseService } from './services/data-warehouse.service';
 import { DataWarehouseItem } from './models/data-warehouse.model';
 import { DataWarehouseDetailComponent } from './data-warehouse-detail/data-warehouse-detail.component';
+import { DataWarehouseNotificationSettingsComponent } from './data-warehouse-notification-settings/data-warehouse-notification-settings.component';
 import { PaginationComponent } from '@app/components/pagination/pagination.component';
 import { PAGINATION_CONFIG } from '@app/constants/api.constants';
 import Swal from 'sweetalert2';
@@ -70,6 +71,20 @@ export class DataWarehouseComponent implements OnInit {
   onPageChange($event: number) {
     this.currentPage = $event;
     this.loadList();
+  }
+
+  openNotificationSettings(): void {
+    this.dialog.open(DataWarehouseNotificationSettingsComponent, {
+      disableClose: false,
+      panelClass: 'data-warehouse-settings-dialog',
+      width: '60vw',
+      height: '70vh',
+      maxWidth: '100vw'
+    }).afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Notification settings saved:', result);
+      }
+    });
   }
 
   toggleSelectAll() {
