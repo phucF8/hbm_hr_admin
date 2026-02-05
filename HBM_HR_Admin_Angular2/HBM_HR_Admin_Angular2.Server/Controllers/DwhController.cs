@@ -85,38 +85,46 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 };
 
 
-                String username = "phucnh@hbm.vn";
-                var nhanVien = await _debugRepository.GetNhanVienByUsernameAsync(username);
+                // Lấy danh sách recipients từ bảng DWH_ETL_JOB_LOG_Recipients
+                var recipientUserGuids = await _db.DwhEtlJobLogRecipients
+                    .Where(r => r.ID == entity.ID)
+                    .Select(r => r.UserId)
+                    .ToListAsync();
 
+                // Map sang danh sách nhân viên (NS_NhanViens.UserID) để lấy ID nội bộ dùng trong Notification
+                var receivers = new List<string>();
+                if (recipientUserGuids.Any()) {
+                    var userIdsAsString = recipientUserGuids.Select(g => g.ToString()).ToList();
+                    var nvList = await _db.DbNhanVien
+                        .Where(nv => userIdsAsString.Contains(nv.UserID))
+                        .Select(nv => nv.ID)
+                        .ToListAsync();
+                    receivers.AddRange(nvList);
+                }
 
-                // Ví dụ: gửi cho admin / IT / DWH team
-                var receivers = new List<string> {
-                    nhanVien.ID,
-                };
+                 await _notificationService.CreateThongBaoDwhLogAsync(
+                     entity.ID,       // ID thông báo
+                     title,
+                     "SYSTEM",             // người gửi
+                     receivers
+                 );
 
-                await _notificationService.CreateThongBaoDwhLogAsync(
-                    entity.ID,       // ID thông báo
-                    title,
-                    "SYSTEM",             // người gửi
-                    receivers
-                );
+                 await _firebaseService.SendNotificationToEmployeesAsync(
+                     string.Join(",", receivers),
+                     title,
+                     body,
+                     data,
+                     _firebaseService,
+                     _repository
+                 );
 
-                await _firebaseService.SendNotificationToEmployeesAsync(
-                    string.Join(",", receivers),
-                    title,
-                    body,
-                    data,
-                    _firebaseService,
-                    _repository
-                );
-
-                return ApiResponse<bool>.Success(true);
-            } catch (Exception ex) {
-                return ApiResponse<bool>.Error(
-                    ex.InnerException?.Message ?? ex.Message
-                );
-            }
-        }
+                 return ApiResponse<bool>.Success(true);
+             } catch (Exception ex) {
+                 return ApiResponse<bool>.Error(
+                     ex.InnerException?.Message ?? ex.Message
+                 );
+             }
+         }
 
         Guid LongToGuid(long value) {
             var bytes = new byte[16];
@@ -203,6 +211,60 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             return Ok(ApiResponse<object>.Success(result));
         }
 
+        [HttpPost("notification/recipients")]
+        public async Task<ApiResponse<bool>> AssignNotificationRecipients(
+        [FromBody] List<String> userIds)
+        {
+            try
+            {
+                // Xoá hết recipients cũ (nếu cần, tuỳ logic)
+                var oldRecipients = await _db.DwhNotificationRecipients.ToListAsync();
+                if (oldRecipients.Any())
+                    _db.DwhNotificationRecipients.RemoveRange(oldRecipients);
+
+                // Thêm recipients mới
+                var entities = userIds.Distinct().Select(userId => new DwhNotificationRecipient
+                {
+                    IDuser = userId,
+                    AssignedAt = DateTime.Now
+                });
+
+                await _db.DwhNotificationRecipients.AddRangeAsync(entities);
+                await _db.SaveChangesAsync();
+
+                return ApiResponse<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Error(
+                    ex.InnerException?.Message ?? ex.Message
+                );
+            }
+        }
+
+        [HttpPost("notification/recipients/list")]
+        public async Task<ApiResponse<List<object>>> GetNotificationRecipientsList()
+        {
+            // Lấy danh sách userId từ bảng DWH_NOTIFICATION_RECIPIENTS
+            var userIds = await _db.DwhNotificationRecipients
+                .Select(x => x.IDuser.ToString())
+                .ToListAsync();
+
+            // Lấy thông tin nhân viên tương ứng
+            var nhanViens = await _db.DbNhanVien
+                .Where(nv => userIds.Contains(nv.ID))
+                .Select(nv => new {
+                    id = nv.ID,
+                    maNhanVien = nv.MaNhanVien,
+                    tenNhanVien = nv.TenNhanVien,
+                    tenChucDanh = nv.TenChucDanh,
+                    tenPhongBan = nv.TenPhongBan,
+                    anh = nv.Anh
+                })
+                .ToListAsync();
+
+            return ApiResponse<List<object>>.Success(nhanViens.Cast<object>().ToList());
+        }
 
     }
 

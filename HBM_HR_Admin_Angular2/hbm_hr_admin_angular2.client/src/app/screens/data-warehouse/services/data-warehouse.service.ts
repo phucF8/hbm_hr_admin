@@ -15,7 +15,7 @@ import { environment } from 'environments/environment';
 })
 export class DataWarehouseService {
 
-  private apiUrl = `${environment.apiUrl}/dwh/etl/job-log`; // API endpoint
+  private apiUrl = `${environment.apiUrl}/dwh`; // API endpoint
   // Token cho DWH API lấy từ môi trường để dễ cấu hình
   private dwhToken = environment.dwhToken;
 
@@ -46,7 +46,7 @@ export class DataWarehouseService {
     };
 
     return this.http.post<ApiResponse<DataWarehouseListResponse>>(
-      `${this.apiUrl}/list`,
+      `${this.apiUrl}/etl/job-log/list`,
       request,
       { headers: this.getHeaders() }
     ).pipe(
@@ -61,13 +61,41 @@ export class DataWarehouseService {
   getDetail(id: string | number): Observable<DataWarehouseItem> {
     const body = { id };
     return this.http.post<ApiResponse<DataWarehouseItem>>(
-      `${this.apiUrl}/detail`,
+      `${this.apiUrl}/etl/job-log/detail`,
       body,
       { headers: this.getHeaders() }
     ).pipe(
       map(response => response.data),
       catchError(error => {
         console.error('Error fetching data warehouse detail:', error);
+        throw error;
+      })
+    );
+  }
+
+  assignNotificationRecipients(userIds: string[]): Observable<boolean> {
+    return this.http.post<ApiResponse<boolean>>(
+      `${this.apiUrl}/notification/recipients`,
+      userIds,
+      { headers: this.getHeaders() }
+    ).pipe(
+      map(response => response.data),
+      catchError(error => {
+        console.error('Error assigning notification recipients:', error);
+        throw error;
+      })
+    );
+  }
+
+  getNotificationRecipientsList(): Observable<any[]> {
+    return this.http.post<ApiResponse<any[]>>(
+      `${this.apiUrl}/notification/recipients/list`,
+      {},
+      { headers: this.getHeaders() }
+    ).pipe(
+      map(response => response.data),
+      catchError(error => {
+        console.error('Error fetching notification recipients list:', error);
         throw error;
       })
     );

@@ -18,6 +18,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         public DbSet<Topic> Topics { get; set; }
 
+        // Voting entities
         public DbSet<Question> Questions { get; set; }
         public DbSet<Option> Options { get; set; }
 
@@ -48,6 +49,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 .HasForeignKey(f => f.PhanHoiID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // DWH_ETL_JOB_LOG_Recipients composite key
+            modelBuilder.Entity<DwhEtlJobLogRecipient>()
+                .HasKey(x => new { x.ID, x.UserId });
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -62,6 +67,8 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
         // Data Warehouse
         public DbSet<DwhEtlJobLog> DwhEtlJobLog { get; set; }
+        public DbSet<DwhEtlJobLogRecipient> DwhEtlJobLogRecipients { get; set; }
+        public DbSet<DwhNotificationRecipient> DwhNotificationRecipients { get; set; }
 
     }
 
