@@ -3,8 +3,8 @@ const path = require('path');
 const fse = require('fs-extra');
 
 // Đường dẫn tuyệt đối
-const sourceDir = 'C:/adminthongbao_deploy/wwwroot/browser';
-const targetDir = 'C:/adminthongbao_deploy/wwwroot';
+const sourceDir = 'D:/admin_deploy/wwwroot/browser';
+const targetDir = 'D:/admin_deploy/wwwroot';
 
 if (!fse.existsSync(sourceDir)) {
   console.error(`❌ Không tìm thấy thư mục: ${sourceDir}`);

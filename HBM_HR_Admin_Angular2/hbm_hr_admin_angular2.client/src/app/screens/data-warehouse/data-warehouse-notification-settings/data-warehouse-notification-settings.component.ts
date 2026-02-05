@@ -105,7 +105,7 @@ export class DataWarehouseNotificationSettingsComponent implements OnInit {
           Swal.fire({
             icon: 'success',
             title: 'Thành công',
-            text: 'Đã lưu cấu hình thông báo',
+            text: 'Đã lưu thiết lập thông báo',
             timer: 2000,
             showConfirmButton: false
           });
@@ -116,7 +116,7 @@ export class DataWarehouseNotificationSettingsComponent implements OnInit {
           const errorMessage = this.getErrorMessage(error, 'POST /dwh/etl/job-log/recipients', userIds);
           Swal.fire({
             icon: 'error',
-            title: 'Lỗi lưu cấu hình',
+            title: 'Lỗi lưu thiết lập',
             html: errorMessage,
             confirmButtonText: 'Đóng'
           });

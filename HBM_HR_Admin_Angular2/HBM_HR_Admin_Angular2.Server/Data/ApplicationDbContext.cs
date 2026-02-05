@@ -49,9 +49,10 @@ namespace HBM_HR_Admin_Angular2.Server.Data
                 .HasForeignKey(f => f.PhanHoiID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // DWH_ETL_JOB_LOG_Recipients composite key
-            modelBuilder.Entity<DwhEtlJobLogRecipient>()
-                .HasKey(x => new { x.ID, x.UserId });
+            // DWH_NOTIFICATION_RECIPIENTS primary key
+            modelBuilder.Entity<DwhNotificationRecipient>()
+                .HasKey(x => x.IDuser)
+                .HasName("PK_DWH_NOTIFICATION_RECIPIENTS");
 
             base.OnModelCreating(modelBuilder);
         }
@@ -66,8 +67,7 @@ namespace HBM_HR_Admin_Angular2.Server.Data
 
 
         // Data Warehouse
-        public DbSet<DwhEtlJobLog> DwhEtlJobLog { get; set; }
-        public DbSet<DwhEtlJobLogRecipient> DwhEtlJobLogRecipients { get; set; }
+        public DbSet<DwhEtlJobLog> DwhEtlJobLogs { get; set; }
         public DbSet<DwhNotificationRecipient> DwhNotificationRecipients { get; set; }
 
     }

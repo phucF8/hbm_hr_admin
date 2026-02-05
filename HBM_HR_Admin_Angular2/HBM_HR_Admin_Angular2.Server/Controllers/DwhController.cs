@@ -59,12 +59,12 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     ID_JOB = model.ID_JOB,
                     JOBNAME = model.JobName,
                     LOGDATE = model.LogDate,
-                    ERRORS = model.Errors,
+                    ERRORS = model.JobStatus,
                     LOG_FIELD = model.LogField,
                     CREATED_AT = DateTime.Now
                 };
 
-                await _db.DwhEtlJobLog.AddAsync(entity);
+                await _db.DwhEtlJobLogs.AddAsync(entity);
                 await _db.SaveChangesAsync();
 
                 // ===============================
@@ -84,19 +84,16 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     ["LogDate"] = model.LogDate.ToString("O")
                 };
 
-
-                // Lấy danh sách recipients từ bảng DWH_ETL_JOB_LOG_Recipients
-                var recipientUserGuids = await _db.DwhEtlJobLogRecipients
-                    .Where(r => r.ID == entity.ID)
-                    .Select(r => r.UserId)
+                // Lấy danh sách recipients từ bảng DWH_NOTIFICATION_RECIPIENTS
+                var recipientUserIds = await _db.DwhNotificationRecipients
+                    .Select(r => r.IDuser)
                     .ToListAsync();
 
-                // Map sang danh sách nhân viên (NS_NhanViens.UserID) để lấy ID nội bộ dùng trong Notification
+                // Map sang danh sách nhân viên (NS_NhanViens.ID) để lấy ID nội bộ dùng trong Notification
                 var receivers = new List<string>();
-                if (recipientUserGuids.Any()) {
-                    var userIdsAsString = recipientUserGuids.Select(g => g.ToString()).ToList();
+                if (recipientUserIds.Any()) {
                     var nvList = await _db.DbNhanVien
-                        .Where(nv => userIdsAsString.Contains(nv.UserID))
+                        .Where(nv => recipientUserIds.Contains(nv.ID))
                         .Select(nv => nv.ID)
                         .ToListAsync();
                     receivers.AddRange(nvList);
@@ -142,7 +139,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 );
             }
 
-            var log = await _db.DwhEtlJobLog
+            var log = await _db.DwhEtlJobLogs
                 .Where(x => x.ID == request.Id)
                 .Select(x => new DwhEtlJobLogChiTietDto {
                     Id = x.ID,
@@ -174,7 +171,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             if (request.PageNumber <= 0) request.PageNumber = 1;
             if (request.PageSize <= 0) request.PageSize = 20;
     
-            var query = _db.DwhEtlJobLog.AsQueryable();
+            var query = _db.DwhEtlJobLogs.AsQueryable();
     
             if (request.IdJob.HasValue) query = query.Where(x => x.ID_JOB == request.IdJob.Value);
             if (request.FromDate.HasValue) query = query.Where(x => x.LOGDATE >= request.FromDate.Value);
@@ -187,7 +184,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             var total = await query.LongCountAsync();
     
             var items = await query
-                .OrderByDescending(x => x.LOGDATE)
+                .OrderByDescending(x => x.CREATED_AT)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .Select(x => new DwhEtlJobLogDto {
@@ -213,11 +210,14 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
         [HttpPost("notification/recipients")]
         public async Task<ApiResponse<bool>> AssignNotificationRecipients(
-        [FromBody] List<String> userIds)
+        [FromBody] List<string> userIds)
         {
+            if (userIds == null || !userIds.Any())
+                return ApiResponse<bool>.Error("Danh sách UserIds rỗng");
+
             try
             {
-                // Xoá hết recipients cũ (nếu cần, tuỳ logic)
+                // Xoá hết recipients cũ
                 var oldRecipients = await _db.DwhNotificationRecipients.ToListAsync();
                 if (oldRecipients.Any())
                     _db.DwhNotificationRecipients.RemoveRange(oldRecipients);
@@ -227,7 +227,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 {
                     IDuser = userId,
                     AssignedAt = DateTime.Now
-                });
+                }).ToList(); // Thêm .ToList() để materialize
 
                 await _db.DwhNotificationRecipients.AddRangeAsync(entities);
                 await _db.SaveChangesAsync();
@@ -243,27 +243,59 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         }
 
         [HttpPost("notification/recipients/list")]
-        public async Task<ApiResponse<List<object>>> GetNotificationRecipientsList()
+        public async Task<ApiResponse<List<object>>> GetNotificationRecipients()
         {
-            // Lấy danh sách userId từ bảng DWH_NOTIFICATION_RECIPIENTS
-            var userIds = await _db.DwhNotificationRecipients
-                .Select(x => x.IDuser.ToString())
-                .ToListAsync();
+            try
+            {
+                var userIds = await _db.DwhNotificationRecipients
+                    .Select(x => x.IDuser)
+                    .ToListAsync();
 
-            // Lấy thông tin nhân viên tương ứng
-            var nhanViens = await _db.DbNhanVien
-                .Where(nv => userIds.Contains(nv.ID))
-                .Select(nv => new {
-                    id = nv.ID,
-                    maNhanVien = nv.MaNhanVien,
-                    tenNhanVien = nv.TenNhanVien,
-                    tenChucDanh = nv.TenChucDanh,
-                    tenPhongBan = nv.TenPhongBan,
-                    anh = nv.Anh
-                })
-                .ToListAsync();
+                if (!userIds.Any())
+                    return ApiResponse<List<object>>.Success(new List<object>());
 
-            return ApiResponse<List<object>>.Success(nhanViens.Cast<object>().ToList());
+                var nhanViens = await _db.DbNhanVien
+                    .Where(nv => userIds.Contains(nv.ID))
+                    .Select(nv => new {
+                        idUser = nv.ID,
+                        id = nv.ID,
+                        maNhanVien = nv.MaNhanVien,
+                        tenNhanVien = nv.TenNhanVien,
+                        tenChucDanh = nv.TenChucDanh,
+                        tenPhongBan = nv.TenPhongBan,
+                        anh = nv.Anh
+                    })
+                    .ToListAsync();
+
+                return ApiResponse<List<object>>.Success(nhanViens.Cast<object>().ToList());
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<List<object>>.Error(
+                    ex.InnerException?.Message ?? ex.Message
+                );
+            }
+        }
+
+        [HttpGet("notification/recipients/debug")]
+        public async Task<IActionResult> DebugNotificationRecipients()
+        {
+            try
+            {
+                var recipients = await _db.DwhNotificationRecipients.ToListAsync();
+                var nhanViens = await _db.DbNhanVien.Select(nv => new { nv.ID, nv.UserID }).ToListAsync();
+
+                return Ok(new {
+                    recipientsCount = recipients.Count,
+                    recipients = recipients.Select(r => r.IDuser),
+                    nhanViensCount = nhanViens.Count,
+                    nhanVienUserIds = nhanViens.Select(nv => nv.UserID)
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }
