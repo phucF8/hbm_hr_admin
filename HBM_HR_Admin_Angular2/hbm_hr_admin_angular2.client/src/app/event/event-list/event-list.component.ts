@@ -14,7 +14,8 @@ import { EventDetailComponent } from '../event-detail/event-detail.component';
 /**
  * Component quản lý danh sách Event HTML
  * Event là nội dung HTML được hiển thị trên mobile app
- * Hỗ trợ tìm kiếm, phân trang, CRUD và quản lý trạng thái
+ * Hỗ trợ CRUD (Create, Read, Update, Delete) và quản lý trạng thái IsActive
+ * APIs: getActiveEvent, getAllEvents, getEventById, createEvent, updateEvent, deleteEvent, toggleEventStatus
  */
 @Component({
   selector: 'app-event-list',
@@ -69,17 +70,19 @@ export class EventListComponent implements OnInit {
   }
 
   /**
-   * Load danh sách events từ API
-   * Thêm property 'selected' cho mỗi item để hỗ trợ select multiple
+   * Load danh sách events từ API getAllEvents
+   * Thêm property 'selected' cho mỗi item để hỗ trợ select multiple checkbox
    */
   loadData(): void {
     this.loadingService.show();
+    
     this.eventService.getAllEvents(this.queryParams).subscribe({
       next: (response) => {
         if (response.status === 'SUCCESS') {
           // Thêm property selected cho checkbox
-          this.events = response.data.items.map(item => ({ ...item, selected: false }));
-          this.totalPage = response.data.totalPages;
+          const eventList = Array.isArray(response.data) ? response.data : [response.data];
+          this.events = eventList.map(item => ({ ...item, selected: false }));
+          this.totalPage = 1; // Backend không trả về totalPages trong response này
         } else {
           Swal.fire('Lỗi', response.message, 'error');
         }
@@ -142,7 +145,10 @@ export class EventListComponent implements OnInit {
     this.openedMenuId = null;
   }
 
-  // CRUD Actions
+  /**
+   * Mở dialog tạo event mới
+   * Dialog sẽ được khởi tạo với data = null để component xác định đây là Create mode
+   */
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(EventDetailComponent, {
       width: '800px',
@@ -156,6 +162,10 @@ export class EventListComponent implements OnInit {
     });
   }
 
+  /**
+   * Mở dialog chỉnh sửa event
+   * Truyền event data để component xác định đây là Edit mode
+   */
   openEditDialog(event: EventItem): void {
     this.closeMenu();
     const dialogRef = this.dialog.open(EventDetailComponent, {
@@ -180,11 +190,20 @@ export class EventListComponent implements OnInit {
       title: event.title,
       html: `
         <div style="text-align: left;">
-          <p><strong>Nội dung:</strong></p>
-          <div>${event.content}</div>
-          ${event.imageUrl ? `<img src="${event.imageUrl}" style="max-width: 100%; margin-top: 10px;">` : ''}
-          <p style="margin-top: 15px;"><strong>Thời gian:</strong> ${this.formatDate(event.startDate)} - ${this.formatDate(event.endDate)}</p>
-          <p><strong>Trạng thái:</strong> ${event.isActive ? 'Hiển thị' : 'Ẩn'}</p>
+          <p><strong>Nội dung HTML:</strong></p>
+          <div>${event.htmlContent || 'Không có nội dung'}</div>
+          <p style="margin-top: 15px;">
+            <strong>Thời gian:</strong><br>
+            Bắt đầu: ${this.formatDateTime(event.startTime)}<br>
+            Kết thúc: ${event.endTime ? this.formatDateTime(event.endTime) : 'N/A'}
+          </p>
+          <p>
+            <strong>Trạng thái:</strong> ${event.isActive ? '<span style="color:green">Hiển thị</span>' : '<span style="color:red">Ẩn</span>'}
+          </p>
+          <p>
+            <strong>Phiên bản:</strong> ${event.version || 1}<br>
+            <strong>Độ ưu tiên:</strong> ${event.priority || 0}
+          </p>
         </div>
       `,
       width: '600px',
@@ -192,6 +211,10 @@ export class EventListComponent implements OnInit {
     });
   }
 
+  /**
+   * Xóa 1 event sau khi xác nhận
+   * Gọi API deleteEvent
+   */
   deleteEvent(event: EventItem): void {
     this.closeMenu();
     Swal.fire({
@@ -205,8 +228,10 @@ export class EventListComponent implements OnInit {
       cancelButtonText: 'Hủy'
     }).then((result) => {
       if (result.isConfirmed) {
+        this.loadingService.show();
         this.eventService.deleteEvent(event.id).subscribe({
           next: (response) => {
+            this.loadingService.hide();
             if (response.status === 'SUCCESS') {
               Swal.fire('Thành công', 'Đã xóa event', 'success');
               this.loadData();
@@ -215,6 +240,7 @@ export class EventListComponent implements OnInit {
             }
           },
           error: (error) => {
+            this.loadingService.hide();
             Swal.fire('Lỗi', 'Không thể xóa event', 'error');
           }
         });
@@ -224,7 +250,8 @@ export class EventListComponent implements OnInit {
 
   /**
    * Xóa nhiều events đã được chọn
-   * Lọc ra các event có selected = true và gọi API xóa hàng loạt
+   * Lọc ra các event có selected = true và gọi xóa từng cái
+   * (Backend không hỗ trợ deleteMultiple nên sẽ xóa từng cái)
    */
   deleteSelected(): void {
     const selectedIds = this.events.filter(e => e.selected).map(e => e.id);
@@ -244,28 +271,40 @@ export class EventListComponent implements OnInit {
       cancelButtonText: 'Hủy'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eventService.deleteMultipleEvents(selectedIds).subscribe({
-          next: (response) => {
-            if (response.status === 'SUCCESS') {
-              Swal.fire('Thành công', `Đã xóa ${selectedIds.length} event`, 'success');
-              this.selectAll = false;
-              this.loadData();
-            } else {
-              Swal.fire('Lỗi', response.message, 'error');
+        this.loadingService.show();
+        // Since backend doesn't support deleteMultiple, delete one by one
+        let deletedCount = 0;
+        selectedIds.forEach(id => {
+          this.eventService.deleteEvent(id).subscribe({
+            next: (response) => {
+              if (response.status === 'SUCCESS') {
+                deletedCount++;
+              }
+              if (deletedCount === selectedIds.length) {
+                this.loadingService.hide();
+                Swal.fire('Thành công', `Đã xóa ${deletedCount} event`, 'success');
+                this.selectAll = false;
+                this.loadData();
+              }
+            },
+            error: (error) => {
+              console.error('Error deleting event:', error);
             }
-          },
-          error: (error) => {
-            Swal.fire('Lỗi', 'Không thể xóa events', 'error');
-          }
+          });
         });
       }
     });
   }
 
+  /**
+   * Toggle trạng thái IsActive của event
+   * Gọi API toggleEventStatus
+   */
   toggleStatus(event: EventItem): void {
     this.closeMenu();
     const newStatus = !event.isActive;
-    this.eventService.toggleEventStatus(event.id, newStatus).subscribe({
+    
+    this.eventService.toggleEventStatus(event.id).subscribe({
       next: (response) => {
         if (response.status === 'SUCCESS') {
           event.isActive = newStatus;
@@ -280,10 +319,14 @@ export class EventListComponent implements OnInit {
     });
   }
 
-  formatDate(dateStr?: string): string {
+  formatDateTime(dateStr?: string | Date | null): string {
     if (!dateStr) return 'N/A';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('vi-VN');
+    try {
+      const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+      return date.toLocaleString('vi-VN');
+    } catch {
+      return 'N/A';
+    }
   }
 
   getStatusLabel(isActive: boolean): string {
@@ -298,3 +341,4 @@ export class EventListComponent implements OnInit {
     return this.events.some(e => e.selected);
   }
 }
+

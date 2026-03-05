@@ -1,6 +1,7 @@
 /**
  * DTOs cho Event Management
  * Event là nội dung HTML hiển thị trên mobile app
+ * Khớp với backend API: POST /api/event/...
  */
 
 // Request để lấy danh sách events (có phân trang và filter)
@@ -13,56 +14,46 @@ export interface EventRequest {
   toDate?: string;      // Filter theo ngày kết thúc
 }
 
-// Request tạo event mới
+// Request tạo event mới - khớp với CreateEventPageRequest backend
 export interface CreateEventRequest {
-  title: string;        // Tiêu đề event
-  content: string;      // Nội dung HTML
-  imageUrl?: string;    // URL ảnh thumbnail
-  startDate?: string;
-  endDate?: string;
-  isActive: boolean;    // Có hiển thị trên mobile không
-  orderNumber?: number; // Thứ tự ưu tiên (càng nhỏ càng trước)
+  title: string;              // Tiêu đề event (max 255)
+  htmlContent: string;        // Nội dung HTML
+  isActive: boolean;          // Có hiển thị hay không
+  version?: number;           // Phiên bản (mặc định 1)
+  startTime: string | Date;   // Thời gian bắt đầu (ISO format)
+  endTime?: string | Date;    // Thời gian kết thúc (ISO format)
+  priority?: number;          // Độ ưu tiên (mặc định 0)
 }
 
-// Request cập nhật event
+// Request cập nhật event - khớp với UpdateEventPageRequest backend
 export interface UpdateEventRequest {
-  id: string;
-  title: string;
-  content: string;
-  imageUrl?: string;
-  startDate?: string;
-  endDate?: string;
+  id: string;                 // Event ID (GUID)
+  title: string;              // Tiêu đề event
+  htmlContent: string;        // Nội dung HTML
   isActive: boolean;
-  orderNumber?: number;
+  version?: number;
+  startTime: string | Date;   // Thời gian bắt đầu
+  endTime?: string | Date;
+  priority?: number;
 }
 
-// Event item trong danh sách
+// Event item trong danh sách - khớp với EventPage backend model
 export interface EventItem {
-  id: string;
+  id: string;                 // GUID
   title: string;
-  content: string;           // HTML content để render trên mobile
-  imageUrl?: string;
-  startDate?: string;
-  endDate?: string;
+  htmlContent: string;        // HTML content để render
   isActive: boolean;
-  orderNumber?: number;
-  createdBy?: string;
-  createdDate?: string;
-  modifiedBy?: string;
-  modifiedDate?: string;
-  selected?: boolean;        // Dùng cho checkbox select multiple (UI only)
+  version?: number;
+  startTime: string | Date | null;
+  endTime?: string | Date | null;
+  priority?: number;
+  selected?: boolean;         // UI only - dùng cho checkbox select multiple
 }
 
 export interface EventResponse {
   status: string;
   message: string;
-  data: {
-    totalItems: number;
-    pageNumber: number;
-    pageSize: number;
-    totalPages: number;
-    items: EventItem[];
-  };
+  data: EventItem;
 }
 
 export interface EventDetailResponse {
@@ -71,8 +62,10 @@ export interface EventDetailResponse {
   data: EventItem;
 }
 
+// Generic API response wrapper
 export interface ApiResponse<T> {
   status: string;
   message: string;
   data: T;
 }
+

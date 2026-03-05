@@ -15,7 +15,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-data-warehouse',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconButton, MatTooltipModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, MatTooltipModule, PaginationComponent],
   templateUrl: './data-warehouse.component.html',
   styleUrls: ['./data-warehouse.component.css']
 })
