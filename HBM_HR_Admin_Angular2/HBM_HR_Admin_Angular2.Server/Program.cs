@@ -47,7 +47,8 @@ builder.Services.AddScoped<JwtTokenGenerator>();
 //builder.Services.AddScoped<HrAuthService>();
 builder.Services.AddHttpClient<HrAuthService>();
 
-
+// Đăng ký EventService
+builder.Services.AddScoped<EventService>();
 
 
 
