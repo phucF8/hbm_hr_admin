@@ -5,7 +5,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { EventItem, EventRequest } from '@app/models/event.model';
 import { EventService } from '@app/services/event.service';
 import { LoadingService } from '@app/services/loading.service';
-import { PaginationComponent } from '@app/components/pagination/pagination.component';
 import { UtilsService } from '@app/utils/utils.service';
 import { PAGINATION_CONFIG } from '@app/constants/api.constants';
 import Swal from 'sweetalert2';
@@ -22,8 +21,7 @@ import { EventDetailComponent } from '../event-detail/event-detail.component';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    PaginationComponent
+    FormsModule
   ],
   templateUrl: './event-list.component.html',
   styleUrls: ['./event-list.component.css']
