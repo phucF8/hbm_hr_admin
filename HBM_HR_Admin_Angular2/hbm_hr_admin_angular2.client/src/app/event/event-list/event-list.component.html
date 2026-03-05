@@ -17,9 +17,7 @@
           *ngIf="hasSelectedEvents()">
           <i class="bi bi-trash"></i> Xóa đã chọn
         </button>
-        <span class="result-count" style="margin-left: 15px;">
-          Hiển thị {{ events.length }} event
-        </span>
+        
       </div>
     </div>
 
@@ -90,12 +88,6 @@
       </tbody>
     </table>
 
-    <div style="padding: 15px; display: flex; justify-content: center;">
-      <app-pagination 
-        [currentPage]="queryParams.pageNumber" 
-        [totalPages]="totalPage"
-        (pageChange)="onPageChange($event)">
-      </app-pagination>
-    </div>
+    
   </div>
 </div>

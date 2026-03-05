@@ -19,11 +19,7 @@ import { MergedData } from '@app/models/thong-bao.model';
 import { DanhSachNguoiNhan, ThongBaoItem } from '@app/responses/thongbao_rp';
 import Swal from 'sweetalert2';
 import { ErrorService } from '@app/services/error.service';
-import { InputFormComponent } from '@app/uicomponents/input-form/input-form.component';
-import { FromToDateFormComponent } from '@app/uicomponents/from-to-date-form/from-to-date-form.component';
-import { OneSelectFormComponent } from '@app/uicomponents/one-select-form/one-select-form.component';
 import { CommonModule } from '@angular/common';
-import { SearchUserFormComponent } from '@app/uicomponents/search-user-form/search-user-form.component';
 import { AdvancedSearchComponent } from '../advanced-search/advanced-search.component';
 import { TbchitietComponent } from './tbchitiet/tbchitiet.component';
 import { PaginationComponent } from '../pagination/pagination.component';
@@ -36,10 +32,6 @@ import { PaginationComponent } from '../pagination/pagination.component';
   imports: [
     CommonModule, 
     FormsModule,
-    InputFormComponent,
-    FromToDateFormComponent,
-    OneSelectFormComponent,
-    SearchUserFormComponent,
     AdvancedSearchComponent,
     TbchitietComponent,
     PaginationComponent,
