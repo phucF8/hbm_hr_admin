@@ -1,0 +1,146 @@
+<div style="padding-left: 48px; padding-right: 48px;">
+  <div class="tabs">
+    <div class="tab active">Quản lý Event HTML</div>
+  </div>
+
+  <div class="search-container">
+    <div class="search-title">TIÊU CHÍ TÌM KIẾM</div>
+
+    <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+          
+          <div class="form-group">
+            <label>Tiêu đề</label>
+            <input type="text" class="form-control" placeholder="Tìm kiếm..." [(ngModel)]="searchText"
+              (input)="applyFilters()">
+          </div>
+
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <select class="dropdown" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+              <option value="">Tất cả</option>
+              <option value="true">Hiển thị</option>
+              <option value="false">Ẩn</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Từ ngày</label>
+            <input type="date" class="form-control-date" [(ngModel)]="startDate" (change)="applyFilters()">
+          </div>
+          
+          <div class="form-group">
+            <label>Đến ngày</label>
+            <input type="date" class="form-control-date" [(ngModel)]="endDate" (change)="applyFilters()">
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons-container">
+        <button class="btn btn-search" (click)="applyFilters()">
+          <i class="bi bi-search"></i> Tìm kiếm
+        </button>
+        <button class="btn btn-clear" (click)="clearFilters()" style="background-color: #f15a59;">
+          <i class="bi bi-x-circle"></i> Xóa bộ lọc
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel"
+    style="margin-top: 20px; background: white; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <div class="panel-header"
+      style="padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+      <div><strong>DANH SÁCH EVENT</strong></div>
+      <div>
+        <button class="btn btn-primary" (click)="openCreateDialog()" 
+          style="margin-right: 10px; background-color: #28a745;">
+          <i class="bi bi-plus-circle"></i> Tạo mới
+        </button>
+        <button class="btn btn-danger" (click)="deleteSelected()" 
+          *ngIf="hasSelectedEvents()">
+          <i class="bi bi-trash"></i> Xóa đã chọn
+        </button>
+        <span class="result-count" style="margin-left: 15px;">
+          Hiển thị {{ events.length }} event
+        </span>
+      </div>
+    </div>
+
+    <table class="my-table">
+      <thead>
+        <tr>
+          <th style="width: 3%; text-align: center;">
+            <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()">
+          </th>
+          <th style="width: 4%; text-align: center;">#</th>
+          <th style="width: 25%;">Tiêu đề</th>
+          <th style="width: 35%;">Nội dung</th>
+          <th style="width: 10%; text-align: center;">Từ ngày</th>
+          <th style="width: 10%; text-align: center;">Đến ngày</th>
+          <th style="width: 8%; text-align: center;">Trạng thái</th>
+          <th style="text-align: center; white-space: nowrap;">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let event of events; let i = index">
+          <td style="text-align: center;">
+            <input type="checkbox" [(ngModel)]="event.selected">
+          </td>
+          <td style="text-align: center;">
+            {{ utils.calculateTableIndex(i, queryParams.pageNumber, queryParams.pageSize) }}
+          </td>
+          <td style="text-align: left;">{{ event.title }}</td>
+          <td style="text-align: left;">
+            <!-- Preview HTML content (giới hạn chiều cao để không vỡ layout) -->
+            <div [innerHTML]="event.content" 
+              style="max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
+            </div>
+          </td>
+          <td style="text-align: center;">{{ event.startDate | date: 'dd/MM/yyyy' }}</td>
+          <td style="text-align: center;">{{ event.endDate | date: 'dd/MM/yyyy' }}</td>
+          <td style="text-align: center;">
+            <span class="status-badge" [class.status-active]="event.isActive" [class.status-inactive]="!event.isActive">
+              {{ getStatusLabel(event.isActive) }}
+            </span>
+          </td>
+          <td style="text-align: center;">
+            <div class="dropdown-wrapper" (click)="toggleMenu(event); $event.stopPropagation()">
+              <div class="dropdown-button" style="background-color: #6c63ff;">
+                <i class="bi bi-three-dots-vertical"></i>
+              </div>
+              <div class="dropdown-menu" *ngIf="openedMenuId === event.id">
+                <div class="dropdown-item" (click)="viewDetail(event)">
+                  <i class="bi bi-eye"></i> Xem chi tiết
+                </div>
+                <div class="dropdown-item" (click)="openEditDialog(event)">
+                  <i class="bi bi-pencil"></i> Chỉnh sửa
+                </div>
+                <div class="dropdown-item" (click)="toggleStatus(event)">
+                  <i class="bi bi-toggle-on"></i> {{ event.isActive ? 'Ẩn' : 'Hiển thị' }}
+                </div>
+                <div class="dropdown-item delete" (click)="deleteEvent(event)">
+                  <i class="bi bi-trash"></i> Xóa
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="events.length === 0">
+          <td colspan="8" style="text-align: center; padding: 20px;">
+            Không có dữ liệu
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="padding: 15px; display: flex; justify-content: center;">
+      <app-pagination 
+        [currentPage]="queryParams.pageNumber" 
+        [totalPages]="totalPage"
+        (pageChange)="onPageChange($event)">
+      </app-pagination>
+    </div>
+  </div>
+</div>

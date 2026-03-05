@@ -20,6 +20,7 @@ import { FeedbackManagementComponent } from './gopy/feedback-management/feedback
 import { OpinionDetailComponent } from './gopy/feedback-detail/feedback-detail.component';
 import { AdminRedirectComponent } from './components/admin-redirect/admin-redirect.component';
 import { DataWarehouseComponent } from './screens/data-warehouse/data-warehouse.component';
+import { EventListComponent } from './event/event-list/event-list.component';
 
 export const ROUTE_PATHS = {
   login: 'login',
@@ -74,6 +75,11 @@ export const routes: Routes = [
       { path: 'data-warehouse', 
         component: DataWarehouseComponent,
         data: { permission: 'ADMIN_DATA_WAREHOUSE' }
+      },
+      { 
+        path: 'event', 
+        component: EventListComponent,
+        data: { permission: 'ADMIN_EVENT' }
       },
     ]
   },

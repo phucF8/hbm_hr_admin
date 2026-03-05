@@ -1,0 +1,118 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>{{ isEditMode ? 'Chỉnh sửa Event' : 'Tạo Event mới' }}</h2>
+    <button class="close-button" (click)="onCancel()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Tiêu đề -->
+      <div class="form-group">
+        <label class="required">Tiêu đề</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="title"
+          placeholder="Nhập tiêu đề event"
+          [class.is-invalid]="title?.invalid && title?.touched">
+        <div class="error-message" *ngIf="title?.invalid && title?.touched">
+          <span *ngIf="title?.errors?.['required']">Tiêu đề là bắt buộc</span>
+          <span *ngIf="title?.errors?.['minlength']">Tiêu đề phải có ít nhất 3 ký tự</span>
+        </div>
+      </div>
+
+      <!-- Nội dung HTML -->
+      <div class="form-group">
+        <label class="required">Nội dung HTML</label>
+        <textarea 
+          class="form-control textarea-large" 
+          formControlName="content"
+          placeholder="Nhập nội dung HTML của event"
+          rows="10"
+          [class.is-invalid]="content?.invalid && content?.touched">
+        </textarea>
+        <div class="error-message" *ngIf="content?.invalid && content?.touched">
+          <span *ngIf="content?.errors?.['required']">Nội dung là bắt buộc</span>
+          <span *ngIf="content?.errors?.['minlength']">Nội dung phải có ít nhất 10 ký tự</span>
+        </div>
+        <small class="form-hint">
+          Hỗ trợ HTML tags để hiển thị trên mobile app. Ví dụ: &lt;h1&gt;, &lt;p&gt;, &lt;img&gt;, &lt;a&gt;...
+        </small>
+      </div>
+
+      <!-- URL hình ảnh -->
+      <div class="form-group">
+        <label>URL hình ảnh</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          formControlName="imageUrl"
+          placeholder="https://example.com/image.jpg">
+        <small class="form-hint">Link ảnh thumbnail cho event (không bắt buộc)</small>
+      </div>
+
+      <!-- Preview ảnh (tự động ẩn nếu URL sai) -->
+      <div class="image-preview" *ngIf="imageUrl?.value">
+        <img [src]="imageUrl?.value" alt="Preview" (error)="imageUrl?.setValue('')">
+      </div>
+
+      <!-- Ngày bắt đầu và kết thúc -->
+      <div class="form-row">
+        <div class="form-group" style="flex: 1;">
+          <label>Ngày bắt đầu</label>
+          <input 
+            type="date" 
+            class="form-control" 
+            formControlName="startDate">
+        </div>
+
+        <div class="form-group" style="flex: 1;">
+          <label>Ngày kết thúc</label>
+          <input 
+            type="date" 
+            class="form-control" 
+            formControlName="endDate">
+        </div>
+      </div>
+
+      <!-- Thứ tự hiển thị -->
+      <div class="form-group">
+        <label>Thứ tự hiển thị</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          formControlName="orderNumber"
+          placeholder="0"
+          min="0">
+        <small class="form-hint">Số càng nhỏ càng ưu tiên hiển thị trước</small>
+      </div>
+
+      <!-- Trạng thái hiển thị -->
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            formControlName="isActive">
+          <span>Hiển thị event trên mobile app</span>
+        </label>
+      </div>
+
+      <!-- Buttons -->
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
+          Hủy
+        </button>
+        <button type="submit" class="btn btn-submit" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">{{ isEditMode ? 'Cập nhật' : 'Tạo mới' }}</span>
+          <span *ngIf="isSubmitting">
+            <i class="bi bi-hourglass-split"></i> Đang xử lý...
+          </span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
