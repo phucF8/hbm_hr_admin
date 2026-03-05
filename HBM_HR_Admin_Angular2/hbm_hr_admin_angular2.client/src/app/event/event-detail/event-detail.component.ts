@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { EventItem, CreateEventRequest, UpdateEventRequest } from '@app/models/event.model';
 import { EventService } from '@app/services/event.service';
+import { FileService } from '@app/services/file.service';
 import Swal from 'sweetalert2';
 
 /**
@@ -35,6 +36,7 @@ export class EventDetailComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private eventService: EventService,
+    private fileService: FileService,
     private dialogRef: MatDialogRef<EventDetailComponent>,
     private sanitizer: DomSanitizer,
     @Inject(MAT_DIALOG_DATA) public data: EventItem | null
@@ -71,9 +73,13 @@ export class EventDetailComponent implements OnInit {
   }
 
   loadEventData(event: EventItem): void {
+    // Extract text content từ HTML document nếu có
+    const htmlContent = event.content || event.htmlContent || '';
+    const textContent = this.extractContentFromHtml(htmlContent);
+    
     this.eventForm.patchValue({
       title: event.title || '',
-      content: event.content || event.htmlContent || '',
+      content: textContent,
       startDate: this.formatDateForInput((event.startDate || event.startTime) ?? null),
       endDate: this.formatDateForInput((event.endDate || event.endTime) ?? null),
       orderNumber: event.priority || 0,
@@ -220,6 +226,30 @@ export class EventDetailComponent implements OnInit {
   }
 
   /**
+   * Extract text content từ HTML document
+   * Parse HTML và lấy text từ .preview-content element
+   */
+  private extractContentFromHtml(html: string): string {
+    if (!html || html.trim().length === 0) return '';
+    
+    // Tạo DOM parser để parse HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Tìm element có class preview-content
+    const contentElement = doc.querySelector('.preview-content');
+    if (contentElement) {
+      // Decode HTML entities và return text content
+      const textarea = document.createElement('textarea');
+      textarea.innerHTML = contentElement.innerHTML;
+      return textarea.value;
+    }
+    
+    // Fallback: nếu không tìm thấy .preview-content, return raw text
+    return html;
+  }
+
+  /**
    * Submit form - tự động phân biệt Create/Update dựa vào isEditMode
    * Validate form và các tham số trước khi gọi API
    */
@@ -240,22 +270,113 @@ export class EventDetailComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    if (this.isEditMode && this.data) {
-      this.updateEvent(formValue);
-    } else {
-      this.createEvent(formValue);
+    // Upload ảnh trước (nếu có), sau đó mới create/update event
+    this.uploadImageIfNeeded().then(imageUrl => {
+      if (this.isEditMode && this.data) {
+        this.updateEvent(formValue, imageUrl);
+      } else {
+        this.createEvent(formValue, imageUrl);
+      }
+    }).catch(error => {
+      this.isSubmitting = false;
+      Swal.fire('Lỗi', error.message || 'Không thể upload hình ảnh', 'error');
+    });
+  }
+
+  /**
+   * Upload ảnh lên server nếu user đã chọn file mới
+   * @returns Promise với imageUrl từ server, hoặc null nếu không có file
+   */
+  private async uploadImageIfNeeded(): Promise<string | null> {
+    if (!this.selectedImageFile) {
+      // Không có file mới, giữ nguyên URL cũ (nếu có)
+      return this.previewUrl;
+    }
+
+    try {
+      const response = await this.fileService.uploadFile(this.selectedImageFile).toPromise();
+      if (response && response.status === 'SUCCESS' && response.data) {
+        // Giả sử backend trả về { status: 'SUCCESS', data: { fileUrl: '...' } }
+        return response.data.fileUrl || response.data.url || response.data;
+      }
+      throw new Error('Upload thất bại');
+    } catch (error: any) {
+      throw new Error(error.message || 'Không thể upload hình ảnh');
     }
   }
 
-  createEvent(formValue: any): void {
+  /**
+   * Tạo HTML content hoàn chỉnh để lưu vào database
+   * Bao gồm cả background image và styled content
+   */
+  private generateHtmlContent(imageUrl: string | null): string {
+    const contentText = this.content?.value || '';
+    const bgImage = imageUrl ? `url('${imageUrl}')` : 'none';
+    
+    return `
+      <!DOCTYPE html>
+      <html lang="vi">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          html, body {
+            width: 100%;
+            height: 100%;
+          }
+          body {
+            background-image: ${bgImage};
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          }
+          .preview-overlay {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .preview-content {
+            word-break: break-word;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.5;
+            max-width: 90%;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="preview-overlay">
+          <div class="preview-content">${this.escapeHtml(contentText)}</div>
+        </div>
+      </body>
+      </html>
+    `.trim();
+  }
+
+  createEvent(formValue: any, imageUrl: string | null): void {
     const request: CreateEventRequest = {
       title: formValue.title,
-      htmlContent: formValue.content, // Map content -> htmlContent for API
+      htmlContent: this.generateHtmlContent(imageUrl), // HTML hoàn chỉnh bao gồm ảnh nền
       startTime: new Date(formValue.startDate).toISOString(),
       endTime: formValue.endDate ? new Date(formValue.endDate).toISOString() : undefined,
       isActive: formValue.isActive,
       version: formValue.version || 1,
-      priority: formValue.priority || 0
+      priority: formValue.priority || 0,
+      imageUrl: imageUrl || undefined
     };
 
     this.eventService.createEvent(request).subscribe({
@@ -275,16 +396,17 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
-  updateEvent(formValue: any): void {
+  updateEvent(formValue: any, imageUrl: string | null): void {
     const request: UpdateEventRequest = {
       id: this.data!.id,
       title: formValue.title,
-      htmlContent: formValue.content, // Map content -> htmlContent for API
+      htmlContent: this.generateHtmlContent(imageUrl), // HTML hoàn chỉnh bao gồm ảnh nền
       startTime: new Date(formValue.startDate).toISOString(),
       endTime: formValue.endDate ? new Date(formValue.endDate).toISOString() : undefined,
       isActive: formValue.isActive,
       version: formValue.version || 1,
-      priority: formValue.priority || 0
+      priority: formValue.priority || 0,
+      imageUrl: imageUrl || undefined
     };
 
     this.eventService.updateEvent(request).subscribe({

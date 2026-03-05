@@ -1,12 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment.prod';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Injectable({ providedIn: 'root' })
 export class FileService {
   constructor(private http: HttpClient) { }
+
+  /**
+   * Upload file lên server
+   * @param file File cần upload
+   * @returns Observable với response chứa URL file đã upload
+   */
+  uploadFile(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const url = `${environment.apiUrl}/FileUpload/Upload`;
+    return this.http.post(url, formData);
+  }
 
   async downloadAndOpenFile(fileName: string): Promise<void> {
     // đang lấy từ server thật http://admin.hbm.vn:8088/

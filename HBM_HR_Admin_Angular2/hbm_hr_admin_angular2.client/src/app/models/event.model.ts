@@ -23,6 +23,7 @@ export interface CreateEventRequest {
   startTime: string | Date;   // Thời gian bắt đầu (ISO format)
   endTime?: string | Date;    // Thời gian kết thúc (ISO format)
   priority?: number;          // Độ ưu tiên (mặc định 0)
+  imageUrl?: string;          // URL hình ảnh từ server
 }
 
 // Request cập nhật event - khớp với UpdateEventPageRequest backend
@@ -35,6 +36,7 @@ export interface UpdateEventRequest {
   startTime: string | Date;   // Thời gian bắt đầu
   endTime?: string | Date;
   priority?: number;
+  imageUrl?: string;          // URL hình ảnh từ server
 }
 
 // Event item trong danh sách - khớp với EventPage backend model
