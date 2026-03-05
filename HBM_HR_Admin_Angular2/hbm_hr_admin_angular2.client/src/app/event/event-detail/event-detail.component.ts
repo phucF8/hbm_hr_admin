@@ -26,6 +26,9 @@ export class EventDetailComponent implements OnInit {
   eventForm!: FormGroup;
   isEditMode: boolean = false;
   isSubmitting: boolean = false;
+  selectedImageName: string = '';
+  previewUrl: string | null = null;
+  selectedImageFile: File | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -48,7 +51,6 @@ export class EventDetailComponent implements OnInit {
     this.eventForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       content: ['', [Validators.required, Validators.minLength(10)]],
-      imageUrl: [''],
       startDate: [null, Validators.required],
       endDate: [null],
       orderNumber: [0],
@@ -62,7 +64,6 @@ export class EventDetailComponent implements OnInit {
     this.eventForm.patchValue({
       title: event.title || '',
       content: event.content || event.htmlContent || '',
-      imageUrl: event.imageUrl || '',
       startDate: this.formatDateForInput((event.startDate || event.startTime) ?? null),
       endDate: this.formatDateForInput((event.endDate || event.endTime) ?? null),
       orderNumber: event.priority || 0,
@@ -70,6 +71,11 @@ export class EventDetailComponent implements OnInit {
       version: event.version ?? 1,
       priority: event.priority ?? 0
     });
+    
+    // Set preview URL nếu event có imageUrl
+    if (event.imageUrl) {
+      this.previewUrl = event.imageUrl;
+    }
   }
 
   /**
@@ -85,6 +91,42 @@ export class EventDetailComponent implements OnInit {
     const day = String(d.getDate()).padStart(2, '0');
     
     return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Xử lý khi người dùng chọn file hình ảnh
+   */
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+
+    if (files && files.length > 0) {
+      const file = files[0];
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        Swal.fire('Lỗi', 'Vui lòng chọn file ảnh', 'error');
+        input.value = '';
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire('Lỗi', 'Kích thước ảnh không được vượt quá 5MB', 'error');
+        input.value = '';
+        return;
+      }
+
+      this.selectedImageFile = file;
+      this.selectedImageName = file.name;
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.previewUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   /**
@@ -187,7 +229,6 @@ export class EventDetailComponent implements OnInit {
   // Getters để truy cập form controls trong template
   get title() { return this.eventForm.get('title'); }
   get content() { return this.eventForm.get('content'); }
-  get imageUrl() { return this.eventForm.get('imageUrl'); }
   get startDate() { return this.eventForm.get('startDate'); }
   get endDate() { return this.eventForm.get('endDate'); }
   get orderNumber() { return this.eventForm.get('orderNumber'); }
