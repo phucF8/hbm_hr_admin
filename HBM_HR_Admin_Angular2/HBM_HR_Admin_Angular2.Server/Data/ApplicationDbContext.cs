@@ -70,6 +70,9 @@ namespace HBM_HR_Admin_Angular2.Server.Data
         public DbSet<DwhEtlJobLog> DwhEtlJobLogs { get; set; }
         public DbSet<DwhNotificationRecipient> DwhNotificationRecipients { get; set; }
 
+        // Event Pages
+        public DbSet<EventPage> EventPages { get; set; }
+
     }
 
 

@@ -1,77 +1,18 @@
+using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBM_HR_Admin_Angular2.Server.Services
 {
     public class EventService
     {
+        private readonly ApplicationDbContext _context;
         private readonly ILogger<EventService> _logger;
 
-        // Mock data để test logic
-        private readonly List<EventPage> _mockEvents;
-
-        public EventService(ILogger<EventService> logger)
+        public EventService(ApplicationDbContext context, ILogger<EventService> logger)
         {
+            _context = context;
             _logger = logger;
-
-            // Khởi tạo mock data
-            _mockEvents = new List<EventPage>
-            {
-                new EventPage
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Tết Nguyên Đán 2026",
-                    HtmlContent = "<h1>Chúc mừng năm mới!</h1>",
-                    IsActive = true,
-                    Version = 1,
-                    StartTime = new DateTime(2026, 1, 25),
-                    EndTime = new DateTime(2026, 2, 5),
-                    Priority = 10
-                },
-                new EventPage
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Khuyến mãi Tháng 3",
-                    HtmlContent = "<h1>Giảm giá 20%</h1>",
-                    IsActive = true,
-                    Version = 1,
-                    StartTime = new DateTime(2026, 3, 1),
-                    EndTime = new DateTime(2026, 3, 31),
-                    Priority = 5
-                },
-                new EventPage
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Event Ưu tiên cao - Test",
-                    HtmlContent = "<h1>Event có priority cao nhất</h1>",
-                    IsActive = true,
-                    Version = 1,
-                    StartTime = new DateTime(2026, 3, 1),
-                    EndTime = new DateTime(2026, 3, 15),
-                    Priority = 20
-                },
-                new EventPage
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Event đã hết hạn",
-                    HtmlContent = "<h1>Event cũ</h1>",
-                    IsActive = true,
-                    Version = 1,
-                    StartTime = new DateTime(2025, 12, 1),
-                    EndTime = new DateTime(2025, 12, 31),
-                    Priority = 15
-                },
-                new EventPage
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Event tương lai",
-                    HtmlContent = "<h1>Event chưa đến</h1>",
-                    IsActive = true,
-                    Version = 1,
-                    StartTime = new DateTime(2026, 4, 1),
-                    EndTime = new DateTime(2026, 4, 30),
-                    Priority = 8
-                }
-            };
         }
 
         /// <summary>
@@ -88,27 +29,120 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             // Lọc các event hợp lệ:
             // - IsActive = true
             // - StartTime <= now <= EndTime (hoặc EndTime = null)
-            var activeEvents = _mockEvents
+            var selectedEvent = await _context.EventPages
                 .Where(e => e.IsActive)
                 .Where(e => e.StartTime <= now)
                 .Where(e => e.EndTime == null || e.EndTime >= now)
-                .ToList();
+                .OrderByDescending(e => e.Priority)
+                .ThenByDescending(e => e.EndTime ?? DateTime.MaxValue)
+                .ThenBy(e => e.StartTime)
+                .FirstOrDefaultAsync();
 
-            if (!activeEvents.Any())
+            if (selectedEvent == null)
             {
                 _logger.LogInformation("Không có event nào đang active");
                 return null;
             }
 
-            // Chọn event có Priority cao nhất
-            var selectedEvent = activeEvents
+            _logger.LogInformation($"Event được chọn: {selectedEvent.Title} (Priority: {selectedEvent.Priority})");
+
+            return selectedEvent;
+        }
+
+        /// <summary>
+        /// Lấy tất cả events
+        /// </summary>
+        public async Task<List<EventPage>> GetAllEventsAsync()
+        {
+            return await _context.EventPages
                 .OrderByDescending(e => e.Priority)
-                .FirstOrDefault();
+                .ThenByDescending(e => e.StartTime)
+                .ToListAsync();
+        }
 
-            _logger.LogInformation($"Event được chọn: {selectedEvent?.Title} (Priority: {selectedEvent?.Priority})");
+        /// <summary>
+        /// Lấy event theo ID
+        /// </summary>
+        public async Task<EventPage?> GetEventByIdAsync(Guid id)
+        {
+            return await _context.EventPages.FindAsync(id);
+        }
 
-            // Simulate async operation
-            return await Task.FromResult(selectedEvent);
+        /// <summary>
+        /// Tạo event mới
+        /// </summary>
+        public async Task<EventPage> CreateEventAsync(EventPage eventPage)
+        {
+            eventPage.Id = Guid.NewGuid();
+            _context.EventPages.Add(eventPage);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Tạo event mới: {eventPage.Title} (ID: {eventPage.Id})");
+            return eventPage;
+        }
+
+        /// <summary>
+        /// Cập nhật event
+        /// </summary>
+        public async Task<EventPage?> UpdateEventAsync(Guid id, EventPage updatedEvent)
+        {
+            var existingEvent = await _context.EventPages.FindAsync(id);
+            if (existingEvent == null)
+            {
+                _logger.LogWarning($"Không tìm thấy event với ID: {id}");
+                return null;
+            }
+
+            existingEvent.Title = updatedEvent.Title;
+            existingEvent.HtmlContent = updatedEvent.HtmlContent;
+            existingEvent.IsActive = updatedEvent.IsActive;
+            existingEvent.Version = updatedEvent.Version;
+            existingEvent.StartTime = updatedEvent.StartTime;
+            existingEvent.EndTime = updatedEvent.EndTime;
+            existingEvent.Priority = updatedEvent.Priority;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Cập nhật event: {existingEvent.Title} (ID: {id})");
+            return existingEvent;
+        }
+
+        /// <summary>
+        /// Xóa event
+        /// </summary>
+        public async Task<bool> DeleteEventAsync(Guid id)
+        {
+            var eventPage = await _context.EventPages.FindAsync(id);
+            if (eventPage == null)
+            {
+                _logger.LogWarning($"Không tìm thấy event với ID: {id}");
+                return false;
+            }
+
+            _context.EventPages.Remove(eventPage);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Xóa event: {eventPage.Title} (ID: {id})");
+            return true;
+        }
+
+        /// <summary>
+        /// Toggle trạng thái IsActive
+        /// </summary>
+        public async Task<EventPage?> ToggleActiveStatusAsync(Guid id)
+        {
+            var eventPage = await _context.EventPages.FindAsync(id);
+            if (eventPage == null)
+            {
+                _logger.LogWarning($"Không tìm thấy event với ID: {id}");
+                return null;
+            }
+
+            eventPage.IsActive = !eventPage.IsActive;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Toggle IsActive của event {eventPage.Title}: {eventPage.IsActive}");
+            return eventPage;
         }
     }
 }
