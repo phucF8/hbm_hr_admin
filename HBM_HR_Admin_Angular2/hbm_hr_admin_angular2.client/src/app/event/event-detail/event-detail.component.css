@@ -36,8 +36,8 @@
 
 .dialog-body {
   padding: 24px;
-  max-height: 600px;
-  overflow-y: auto;
+  height: calc(92vh - 84px);
+  overflow-y: visible;
 }
 
 /* Form Styles */
@@ -104,6 +104,23 @@
   gap: 15px;
 }
 
+.editor-preview-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.editor-left {
+  flex: 0 0 58%;
+  min-width: 0;
+}
+
+.editor-right {
+  flex: 0 0 42%;
+  min-width: 280px;
+}
+
 /* Checkbox */
 .checkbox-label {
   display: flex;
@@ -138,6 +155,69 @@
   max-width: 100%;
   max-height: 200px;
   border-radius: 4px;
+}
+
+.preview-section {
+  margin-bottom: 0;
+}
+
+.preview-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.mobile-preview {
+  width: min(100%, 320px);
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+  border-radius: 20px;
+  border: 8px solid #111827;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  background-color: #1f2937;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.mobile-preview-overlay {
+  height: 100%;
+  padding: 20px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-preview-content {
+  width: 100%;
+  max-width: 520px;
+  color: #fff;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.mobile-preview-content :first-child {
+  margin-top: 0;
+}
+
+.mobile-preview-content :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .editor-preview-row {
+    flex-direction: column;
+  }
+
+  .editor-right {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 /* Dialog Actions */

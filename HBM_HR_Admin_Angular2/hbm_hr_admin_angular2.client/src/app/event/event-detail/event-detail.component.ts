@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { CommonModule, formatDate } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { EventItem, CreateEventRequest, UpdateEventRequest } from '@app/models/event.model';
@@ -229,6 +229,13 @@ export class EventDetailComponent implements OnInit {
   // Getters để truy cập form controls trong template
   get title() { return this.eventForm.get('title'); }
   get content() { return this.eventForm.get('content'); }
+  get previewHtmlContent(): string {
+    const value = this.content?.value;
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value;
+    }
+    return '<p>Nội dung hiển thị sẽ xuất hiện tại đây</p>';
+  }
   get startDate() { return this.eventForm.get('startDate'); }
   get endDate() { return this.eventForm.get('endDate'); }
   get orderNumber() { return this.eventForm.get('orderNumber'); }

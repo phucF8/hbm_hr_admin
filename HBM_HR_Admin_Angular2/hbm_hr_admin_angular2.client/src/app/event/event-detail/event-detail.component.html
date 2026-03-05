@@ -24,48 +24,63 @@
         </div>
       </div>
 
-      <!-- Nội dung hiển thị -->
-      <div class="form-group">
-        <label class="required">Nội dung hiển thị</label>
-        <textarea 
-          class="form-control textarea-large" 
-          formControlName="content"
-          placeholder="Nhập nội dung văn bản muốn hiển thị"
-          [class.is-invalid]="content?.invalid && content?.touched">
-        </textarea>
-        <div class="error-message" *ngIf="content?.invalid && content?.touched">
-          <span *ngIf="content?.errors?.['required']">Nội dung là bắt buộc</span>
-          <span *ngIf="content?.errors?.['minlength']">Nội dung phải có ít nhất 10 ký tự</span>
-        </div>
-        
-      </div>
+      <div class="editor-preview-row">
+        <div class="editor-left">
+          <!-- Nội dung hiển thị -->
+          <div class="form-group">
+            <label class="required">Nội dung hiển thị</label>
+            <textarea 
+              class="form-control textarea-large" 
+              formControlName="content"
+              placeholder="Nhập nội dung văn bản muốn hiển thị"
+              [class.is-invalid]="content?.invalid && content?.touched">
+            </textarea>
+            <div class="error-message" *ngIf="content?.invalid && content?.touched">
+              <span *ngIf="content?.errors?.['required']">Nội dung là bắt buộc</span>
+              <span *ngIf="content?.errors?.['minlength']">Nội dung phải có ít nhất 10 ký tự</span>
+            </div>
+          </div>
 
-      <!-- Hình nền -->
-      <div class="form-group">
-        <label>Hình nền</label>
-        <div class="file-upload-container">
-          <input 
-            type="file" 
-            #fileInput
-            (change)="onImageSelected($event)"
-            accept="image/*"
-            style="display: none;">
-          <button 
-            type="button"
-            class="btn btn-file-upload"
-            (click)="fileInput.click()">
-            <i class="bi bi-cloud-upload"></i> Chọn hình nền
-          </button>
-          <span class="file-name" *ngIf="selectedImageName">
-            {{ selectedImageName }}
-          </span>
-        </div>
-        <small class="form-hint">Chọn file ảnh để làm hình nền event (không bắt buộc)</small>
-      </div>
+          <!-- Hình nền -->
+          <div class="form-group">
+            <label>Hình nền</label>
+            <div class="file-upload-container">
+              <input 
+                type="file" 
+                #fileInput
+                (change)="onImageSelected($event)"
+                accept="image/*"
+                style="display: none;">
+              <button 
+                type="button"
+                class="btn btn-file-upload"
+                (click)="fileInput.click()">
+                <i class="bi bi-cloud-upload"></i> Chọn hình nền
+              </button>
+              <span class="file-name" *ngIf="selectedImageName">
+                {{ selectedImageName }}
+              </span>
+            </div>
+            <small class="form-hint">Chọn file ảnh để làm hình nền event (không bắt buộc)</small>
+          </div>
 
-      <!-- Preview ảnh -->
-      <div class="image-preview" *ngIf="previewUrl">
-        <img [src]="previewUrl" alt="Preview" (error)="previewUrl = null">
+          <!-- Preview ảnh -->
+          <div class="image-preview" *ngIf="previewUrl">
+            <img [src]="previewUrl" alt="Preview" (error)="previewUrl = null">
+          </div>
+        </div>
+
+        <div class="editor-right">
+          <!-- Màn hình preview -->
+          <div class="preview-section">
+            <div class="preview-title">Màn hình Preview</div>
+            <div class="mobile-preview" [style.background-image]="previewUrl ? 'url(' + previewUrl + ')' : 'none'">
+              <div class="mobile-preview-overlay">
+                <div class="mobile-preview-content" [innerHTML]="previewHtmlContent"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Ngày bắt đầu, kết thúc và mức độ ưu tiên -->
