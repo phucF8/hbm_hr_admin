@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { EventItem, CreateEventRequest, UpdateEventRequest } from '@app/models/event.model';
 import { EventService } from '@app/services/event.service';
 import Swal from 'sweetalert2';
@@ -29,11 +30,13 @@ export class EventDetailComponent implements OnInit {
   selectedImageName: string = '';
   previewUrl: string | null = null;
   selectedImageFile: File | null = null;
+  iframeHtmlContent: SafeResourceUrl = '';
 
   constructor(
     private fb: FormBuilder,
     private eventService: EventService,
     private dialogRef: MatDialogRef<EventDetailComponent>,
+    private sanitizer: DomSanitizer,
     @Inject(MAT_DIALOG_DATA) public data: EventItem | null
   ) {
     // Nếu có data truyền vào = Edit mode, không có = Create mode
@@ -44,7 +47,14 @@ export class EventDetailComponent implements OnInit {
   ngOnInit(): void {
     if (this.data) {
       this.loadEventData(this.data);
+    } else {
+      // Cập nhật iframe content lần đầu cho create mode
+      this.updateIframeContent();
     }
+    // Update iframe content mỗi khi content hoặc image thay đổi
+    this.eventForm.get('content')?.valueChanges.subscribe(() => {
+      this.updateIframeContent();
+    });
   }
 
   initForm(): void {
@@ -76,6 +86,9 @@ export class EventDetailComponent implements OnInit {
     if (event.imageUrl) {
       this.previewUrl = event.imageUrl;
     }
+    
+    // Update iframe content sau khi load data
+    this.updateIframeContent();
   }
 
   /**
@@ -124,9 +137,86 @@ export class EventDetailComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
         this.previewUrl = e.target?.result as string;
+        this.updateIframeContent();
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  /**
+   * Cập nhật nội dung iframe khi content hoặc image thay đổi
+   * Tạo HTML document isolated khỏi CSS của page
+   */
+  private updateIframeContent(): void {
+    const contentText = this.content?.value || '<p>Nội dung hiển thị sẽ xuất hiện tại đây</p>';
+    const bgImage = this.previewUrl ? `url('${this.previewUrl}')` : 'none';
+    
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="vi">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          html, body {
+            width: 100%;
+            height: 100%;
+          }
+          body {
+            background-image: ${bgImage};
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          }
+          .preview-overlay {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .preview-content {
+            word-break: break-word;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.5;
+            max-width: 90%;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="preview-overlay">
+          <div class="preview-content">${this.escapeHtml(contentText)}</div>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    // Sử dụng blob URL để load HTML content vào iframe
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    this.iframeHtmlContent = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+  }
+
+  /**
+   * Escape HTML special characters để tránh XSS
+   */
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   /**
@@ -229,13 +319,6 @@ export class EventDetailComponent implements OnInit {
   // Getters để truy cập form controls trong template
   get title() { return this.eventForm.get('title'); }
   get content() { return this.eventForm.get('content'); }
-  get previewHtmlContent(): string {
-    const value = this.content?.value;
-    if (typeof value === 'string' && value.trim().length > 0) {
-      return value;
-    }
-    return '<p>Nội dung hiển thị sẽ xuất hiện tại đây</p>';
-  }
   get startDate() { return this.eventForm.get('startDate'); }
   get endDate() { return this.eventForm.get('endDate'); }
   get orderNumber() { return this.eventForm.get('orderNumber'); }

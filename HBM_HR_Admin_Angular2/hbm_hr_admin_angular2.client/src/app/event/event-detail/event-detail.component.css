@@ -201,15 +201,12 @@
 .mobile-preview {
   width: 100%;
   max-width: 360px;
-  aspect-ratio: 9 / 16;
+  height: 576px;
   border-radius: 20px;
   border: 8px solid #111827;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  background-color: #1f2937;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   overflow: hidden;
+  display: block;
 }
 
 .mobile-preview-overlay {
@@ -229,14 +226,6 @@
   font-size: 16px;
   line-height: 1.5;
   word-break: break-word;
-}
-
-.mobile-preview-content :first-child {
-  margin-top: 0;
-}
-
-.mobile-preview-content :last-child {
-  margin-bottom: 0;
 }
 
 @media (max-width: 768px) {

@@ -112,11 +112,13 @@
           <!-- Màn hình preview -->
           <div class="preview-section">
             <div class="preview-title">Màn hình Preview</div>
-            <div class="mobile-preview" [style.background-image]="previewUrl ? 'url(' + previewUrl + ')' : 'none'">
-              <div class="mobile-preview-overlay">
-                <div class="mobile-preview-content" [innerHTML]="previewHtmlContent"></div>
-              </div>
-            </div>
+            <iframe 
+              class="mobile-preview"
+              [src]="iframeHtmlContent"
+              frameborder="0"
+              scrolling="no"
+              sandbox="allow-same-origin">
+            </iframe>
           </div>
         </div>
       </div>
