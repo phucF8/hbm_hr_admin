@@ -7,25 +7,24 @@
   </div>
 
   <div class="dialog-body">
-    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
-      
-      <!-- Tiêu đề -->
-      <div class="form-group">
-        <label class="required">Tiêu đề</label>
-        <input 
-          type="text" 
-          class="form-control" 
-          formControlName="title"
-          placeholder="Nhập tiêu đề event"
-          [class.is-invalid]="title?.invalid && title?.touched">
-        <div class="error-message" *ngIf="title?.invalid && title?.touched">
-          <span *ngIf="title?.errors?.['required']">Tiêu đề là bắt buộc</span>
-          <span *ngIf="title?.errors?.['minlength']">Tiêu đề phải có ít nhất 3 ký tự</span>
-        </div>
-      </div>
-
+    <form class="event-form" [formGroup]="eventForm" (ngSubmit)="onSubmit()">
       <div class="editor-preview-row">
         <div class="editor-left">
+          <!-- Tiêu đề -->
+          <div class="form-group">
+            <label class="required">Tiêu đề</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="title"
+              placeholder="Nhập tiêu đề event"
+              [class.is-invalid]="title?.invalid && title?.touched">
+            <div class="error-message" *ngIf="title?.invalid && title?.touched">
+              <span *ngIf="title?.errors?.['required']">Tiêu đề là bắt buộc</span>
+              <span *ngIf="title?.errors?.['minlength']">Tiêu đề phải có ít nhất 3 ký tự</span>
+            </div>
+          </div>
+
           <!-- Nội dung hiển thị -->
           <div class="form-group">
             <label class="required">Nội dung hiển thị</label>
@@ -64,9 +63,48 @@
             <small class="form-hint">Chọn file ảnh để làm hình nền event (không bắt buộc)</small>
           </div>
 
-          <!-- Preview ảnh -->
-          <div class="image-preview" *ngIf="previewUrl">
-            <img [src]="previewUrl" alt="Preview" (error)="previewUrl = null">
+          <!-- Ngày bắt đầu, kết thúc và mức độ ưu tiên -->
+          <div class="form-row">
+            <div class="form-group form-col">
+              <label class="required">Ngày bắt đầu</label>
+              <input 
+                type="date" 
+                class="form-control" 
+                formControlName="startDate"
+                [class.is-invalid]="startDate?.invalid && startDate?.touched">
+              <div class="error-message" *ngIf="startDate?.invalid && startDate?.touched">
+                <span *ngIf="startDate?.errors?.['required']">Ngày bắt đầu là bắt buộc</span>
+              </div>
+            </div>
+
+            <div class="form-group form-col">
+              <label>Ngày kết thúc</label>
+              <input 
+                type="date" 
+                class="form-control" 
+                formControlName="endDate">
+            </div>
+
+            <div class="form-group form-col">
+              <label>Mức độ ưu tiên</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                formControlName="priority"
+                placeholder="0"
+                min="0">
+              <small class="form-hint">Số càng nhỏ càng ưu tiên</small>
+            </div>
+          </div>
+
+          <!-- Trạng thái hiển thị -->
+          <div class="status-box">
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                formControlName="isActive">
+              <span>Hiển thị event trên mobile app</span>
+            </label>
           </div>
         </div>
 
@@ -81,51 +119,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Ngày bắt đầu, kết thúc và mức độ ưu tiên -->
-      <div class="form-row">
-        <div class="form-group" style="flex: 1;">
-          <label class="required">Ngày bắt đầu</label>
-          <input 
-            type="date" 
-            class="form-control" 
-            formControlName="startDate"
-            [class.is-invalid]="startDate?.invalid && startDate?.touched">
-          <div class="error-message" *ngIf="startDate?.invalid && startDate?.touched">
-            <span *ngIf="startDate?.errors?.['required']">Ngày bắt đầu là bắt buộc</span>
-          </div>
-        </div>
-
-        <div class="form-group" style="flex: 1;">
-          <label>Ngày kết thúc</label>
-          <input 
-            type="date" 
-            class="form-control" 
-            formControlName="endDate">
-        </div>
-
-        <div class="form-group" style="flex: 1;">
-          <label>Mức độ ưu tiên</label>
-          <input 
-            type="number" 
-            class="form-control" 
-            formControlName="priority"
-            placeholder="0"
-            min="0">
-          <small class="form-hint">Số càng nhỏ càng ưu tiên</small>
-        </div>
-      </div>
-
-      <!-- Trạng thái hiển thị -->
-      <div class="form-group" style="padding: 12px; background-color: #f8f9fa; border-radius: 4px; border-left: 3px solid #6c63ff;">
-        <label class="checkbox-label" style="margin: 0; display: flex; align-items: center; gap: 8px;">
-          <input 
-            type="checkbox" 
-            formControlName="isActive"
-            style="width: 18px; height: 18px; cursor: pointer;">
-          <span style="font-weight: 500;">Hiển thị event trên mobile app</span>
-        </label>
       </div>
 
       <!-- Buttons -->

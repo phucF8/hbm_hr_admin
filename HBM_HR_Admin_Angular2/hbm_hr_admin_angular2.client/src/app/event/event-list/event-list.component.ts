@@ -149,7 +149,7 @@ export class EventListComponent implements OnInit {
    */
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(EventDetailComponent, {
-      width: '1280px',
+      width: '880px',
       maxWidth: '96vw',
       height: '92vh',
       data: null // null = create mode
@@ -169,7 +169,7 @@ export class EventListComponent implements OnInit {
   openEditDialog(event: EventItem): void {
     this.closeMenu();
     const dialogRef = this.dialog.open(EventDetailComponent, {
-      width: '1280px',
+      width: '880px',
       maxWidth: '96vw',
       height: '92vh',
       data: event
