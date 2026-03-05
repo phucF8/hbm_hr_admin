@@ -47,9 +47,11 @@ export class EventDetailComponent implements OnInit {
   initForm(): void {
     this.eventForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
-      htmlContent: ['', [Validators.required, Validators.minLength(10)]],
-      startTime: [null, Validators.required],
-      endTime: [null],
+      content: ['', [Validators.required, Validators.minLength(10)]],
+      imageUrl: [''],
+      startDate: [null, Validators.required],
+      endDate: [null],
+      orderNumber: [0],
       isActive: [true],
       version: [1],
       priority: [0]
@@ -59,9 +61,11 @@ export class EventDetailComponent implements OnInit {
   loadEventData(event: EventItem): void {
     this.eventForm.patchValue({
       title: event.title || '',
-      htmlContent: event.htmlContent || '',
-      startTime: event.startTime ? this.formatDateTimeForInput(event.startTime) : null,
-      endTime: event.endTime ? this.formatDateTimeForInput(event.endTime) : null,
+      content: event.content || event.htmlContent || '',
+      imageUrl: event.imageUrl || '',
+      startDate: this.formatDateForInput((event.startDate || event.startTime) ?? null),
+      endDate: this.formatDateForInput((event.endDate || event.endTime) ?? null),
+      orderNumber: event.priority || 0,
       isActive: event.isActive ?? true,
       version: event.version ?? 1,
       priority: event.priority ?? 0
@@ -69,9 +73,9 @@ export class EventDetailComponent implements OnInit {
   }
 
   /**
-   * Format Date/string to ISO string format cho datetime-local input
+   * Format Date/string to YYYY-MM-DD format cho input type="date"
    */
-  private formatDateTimeForInput(date: string | Date | null): string | null {
+  private formatDateForInput(date: string | Date | null): string | null {
     if (!date) return null;
     const d = typeof date === 'string' ? new Date(date) : date;
     if (isNaN(d.getTime())) return null;
@@ -79,10 +83,8 @@ export class EventDetailComponent implements OnInit {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    const hours = String(d.getHours()).padStart(2, '0');
-    const minutes = String(d.getMinutes()).padStart(2, '0');
     
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${year}-${month}-${day}`;
   }
 
   /**
@@ -98,9 +100,9 @@ export class EventDetailComponent implements OnInit {
 
     const formValue = this.eventForm.value;
     
-    // Validate EndTime > StartTime
-    if (formValue.endTime && new Date(formValue.endTime) <= new Date(formValue.startTime)) {
-      Swal.fire('Lỗi', 'EndTime phải lớn hơn StartTime', 'error');
+    // Validate endDate > startDate
+    if (formValue.endDate && new Date(formValue.endDate) <= new Date(formValue.startDate)) {
+      Swal.fire('Lỗi', 'Ngày kết thúc phải lớn hơn ngày bắt đầu', 'error');
       return;
     }
 
@@ -116,9 +118,9 @@ export class EventDetailComponent implements OnInit {
   createEvent(formValue: any): void {
     const request: CreateEventRequest = {
       title: formValue.title,
-      htmlContent: formValue.htmlContent,
-      startTime: new Date(formValue.startTime).toISOString(),
-      endTime: formValue.endTime ? new Date(formValue.endTime).toISOString() : undefined,
+      htmlContent: formValue.content, // Map content -> htmlContent for API
+      startTime: new Date(formValue.startDate).toISOString(),
+      endTime: formValue.endDate ? new Date(formValue.endDate).toISOString() : undefined,
       isActive: formValue.isActive,
       version: formValue.version || 1,
       priority: formValue.priority || 0
@@ -145,9 +147,9 @@ export class EventDetailComponent implements OnInit {
     const request: UpdateEventRequest = {
       id: this.data!.id,
       title: formValue.title,
-      htmlContent: formValue.htmlContent,
-      startTime: new Date(formValue.startTime).toISOString(),
-      endTime: formValue.endTime ? new Date(formValue.endTime).toISOString() : undefined,
+      htmlContent: formValue.content, // Map content -> htmlContent for API
+      startTime: new Date(formValue.startDate).toISOString(),
+      endTime: formValue.endDate ? new Date(formValue.endDate).toISOString() : undefined,
       isActive: formValue.isActive,
       version: formValue.version || 1,
       priority: formValue.priority || 0
@@ -184,9 +186,11 @@ export class EventDetailComponent implements OnInit {
 
   // Getters để truy cập form controls trong template
   get title() { return this.eventForm.get('title'); }
-  get htmlContent() { return this.eventForm.get('htmlContent'); }
-  get startTime() { return this.eventForm.get('startTime'); }
-  get endTime() { return this.eventForm.get('endTime'); }
+  get content() { return this.eventForm.get('content'); }
+  get imageUrl() { return this.eventForm.get('imageUrl'); }
+  get startDate() { return this.eventForm.get('startDate'); }
+  get endDate() { return this.eventForm.get('endDate'); }
+  get orderNumber() { return this.eventForm.get('orderNumber'); }
   get isActive() { return this.eventForm.get('isActive'); }
   get version() { return this.eventForm.get('version'); }
   get priority() { return this.eventForm.get('priority'); }

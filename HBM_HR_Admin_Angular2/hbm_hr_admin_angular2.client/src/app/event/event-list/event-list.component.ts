@@ -79,10 +79,10 @@ export class EventListComponent implements OnInit {
     this.eventService.getAllEvents(this.queryParams).subscribe({
       next: (response) => {
         if (response.status === 'SUCCESS') {
-          // Thêm property selected cho checkbox
-          const eventList = Array.isArray(response.data) ? response.data : [response.data];
-          this.events = eventList.map(item => ({ ...item, selected: false }));
-          this.totalPage = 1; // Backend không trả về totalPages trong response này
+          // Backend trả về data là array trực tiếp
+          const eventList = Array.isArray(response.data) ? response.data : [];
+          this.events = eventList.map((item: EventItem) => ({ ...item, selected: false }));
+          this.totalPage = 1; // Backend chưa hỗ trợ phân trang
         } else {
           Swal.fire('Lỗi', response.message, 'error');
         }
@@ -191,11 +191,12 @@ export class EventListComponent implements OnInit {
       html: `
         <div style="text-align: left;">
           <p><strong>Nội dung HTML:</strong></p>
-          <div>${event.htmlContent || 'Không có nội dung'}</div>
+          <div>${event.content || event.htmlContent || 'Không có nội dung'}</div>
+          ${event.imageUrl ? `<img src="${event.imageUrl}" style="max-width: 100%; margin-top: 10px;">` : ''}
           <p style="margin-top: 15px;">
             <strong>Thời gian:</strong><br>
-            Bắt đầu: ${this.formatDateTime(event.startTime)}<br>
-            Kết thúc: ${event.endTime ? this.formatDateTime(event.endTime) : 'N/A'}
+            Bắt đầu: ${this.formatDateTime(event.startDate || event.startTime)}<br>
+            Kết thúc: ${(event.endDate || event.endTime) ? this.formatDateTime(event.endDate || event.endTime) : 'N/A'}
           </p>
           <p>
             <strong>Trạng thái:</strong> ${event.isActive ? '<span style="color:green">Hiển thị</span>' : '<span style="color:red">Ẩn</span>'}

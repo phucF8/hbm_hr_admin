@@ -41,19 +41,30 @@ export interface UpdateEventRequest {
 export interface EventItem {
   id: string;                 // GUID
   title: string;
-  htmlContent: string;        // HTML content để render
+  content: string;            // HTML content để render (alias cho htmlContent)
+  htmlContent?: string;       // Backward compatibility
   isActive: boolean;
   version?: number;
-  startTime: string | Date | null;
-  endTime?: string | Date | null;
+  startDate: string | Date | null;    // Thời gian bắt đầu (alias cho startTime)
+  endDate?: string | Date | null;     // Thời gian kết thúc (alias cho endTime)
+  startTime?: string | Date | null;   // Backward compatibility
+  endTime?: string | Date | null;     // Backward compatibility
   priority?: number;
+  orderNumber?: number;       // Thứ tự hiển thị
   selected?: boolean;         // UI only - dùng cho checkbox select multiple
+  imageUrl?: string;          // Optional image URL
 }
 
+// Response cho danh sách events với phân trang
 export interface EventResponse {
   status: string;
   message: string;
-  data: EventItem;
+  data: {
+    items: EventItem[];
+    totalPages: number;
+    totalCount?: number;
+    currentPage?: number;
+  };
 }
 
 export interface EventDetailResponse {
