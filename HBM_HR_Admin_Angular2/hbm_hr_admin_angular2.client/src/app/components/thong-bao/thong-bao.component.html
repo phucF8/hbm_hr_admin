@@ -8,56 +8,6 @@
   </div>
 
 
-  <div class="search-container">
-    <div class="search-title">TIÊU CHÍ TÌM KIẾM</div>
-
-    <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
-
-      <div>
-        <div style="display: flex;gap: 10px; margin-bottom: 16px;">
-          <app-input-form label="Tiêu đề hoặc nội dung" placeholder="Nhập từ cần tìm kiếm" [(value)]="searchText"
-            (onEnter)="onSearchTextChange()" />
-          <app-from-to-date-form [(fromDate)]="ngayTaoTu" [(toDate)]="ngayTaoDen" label="Thời gian tạo"
-            fromDateId="from-date" toDateId="to-date" />
-          <app-one-select-form [(ngModel)]="loaiThongBao" [options]="nhomThongBaoOptions" label="Nhóm thông báo" />
-          <app-one-select-form [(ngModel)]="notificationType" [options]="notificationTypeOptions"
-            label="Loại thông báo" />
-          <app-one-select-form [(ngModel)]="isSentToAll" [options]="sentToAllOptions" label="Hoàn thành" />
-          <app-one-select-form [(ngModel)]="isPlatform" [options]="platformOptions" label="Nền tảng phát sinh" />
-        </div>
-        <div style="display: flex; gap: 8px; width: 100%;">
-          <app-search-user-form [label]="'Người tạo'" (selectedUsersChange)="ngTaoSelected($event)">
-          </app-search-user-form>
-
-          <app-search-user-form [label]="'Người nhận'" (selectedUsersChange)="ngNhanSelected($event)">
-          </app-search-user-form>
-        </div>
-
-
-      </div>
-
-      <div class="buttons-container">
-        <button class="btn" (click)="timKiem()">
-          <i class="bi bi-search"></i> Tìm kiếm
-        </button>
-
-        <div class="right-buttons">
-          <button class="btn btn-primary" (click)="openTaoThongBaoPopup()">
-            <i class="bi bi-plus-circle"></i> Tạo mới
-          </button>
-          <button class="btn" (click)="openXuatFile()">
-            <i class="bi bi-file-earmark-excel"></i> Xuất File
-          </button>
-          <button *ngIf="hasSelectedThongBao()" class="btn" (click)="deleteMultiSelected()">
-            <i class="bi bi-trash"></i> Xóa những thông báo đã chọn
-          </button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-
 
 
 

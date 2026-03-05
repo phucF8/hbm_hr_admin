@@ -3,51 +3,6 @@
     <div class="tab active">Quản lý Event</div>
   </div>
 
-  <div class="search-container">
-    <div class="search-title">TIÊU CHÍ TÌM KIẾM</div>
-
-    <div class="search-form" style="display: flex; align-items: center; justify-content: space-between;">
-      <div>
-        <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
-          
-          <div class="form-group">
-            <label>Tiêu đề</label>
-            <input type="text" class="form-control" placeholder="Tìm kiếm..." [(ngModel)]="searchText"
-              (input)="applyFilters()">
-          </div>
-
-          <div class="form-group">
-            <label>Trạng thái</label>
-            <select class="dropdown" [(ngModel)]="selectedStatus" (change)="applyFilters()">
-              <option value="">Tất cả</option>
-              <option value="true">Hiển thị</option>
-              <option value="false">Ẩn</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Từ ngày</label>
-            <input type="date" class="form-control-date" [(ngModel)]="startDate" (change)="applyFilters()">
-          </div>
-          
-          <div class="form-group">
-            <label>Đến ngày</label>
-            <input type="date" class="form-control-date" [(ngModel)]="endDate" (change)="applyFilters()">
-          </div>
-        </div>
-      </div>
-
-      <div class="buttons-container">
-        <button class="btn btn-search" (click)="applyFilters()">
-          <i class="bi bi-search"></i> Tìm kiếm
-        </button>
-        <button class="btn btn-clear" (click)="clearFilters()" style="background-color: #f15a59;">
-          <i class="bi bi-x-circle"></i> Xóa bộ lọc
-        </button>
-      </div>
-    </div>
-  </div>
-
   <div class="panel"
     style="margin-top: 20px; background: white; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
     <div class="panel-header"
