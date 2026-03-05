@@ -1,6 +1,6 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2>{{ isEditMode ? 'Chỉnh sửa Event' : 'Tạo Event mới' }}</h2>
+    <h2>{{ isEditMode ? 'Chỉnh sửa' : 'Tạo mới' }}</h2>
     <button class="close-button" (click)="onCancel()">
       <i class="bi bi-x-lg"></i>
     </button>
@@ -59,14 +59,18 @@
         <img [src]="imageUrl?.value" alt="Preview" (error)="imageUrl?.setValue('')">
       </div>
 
-      <!-- Ngày bắt đầu và kết thúc -->
+      <!-- Ngày bắt đầu, kết thúc và mức độ ưu tiên -->
       <div class="form-row">
         <div class="form-group" style="flex: 1;">
-          <label>Ngày bắt đầu</label>
+          <label class="required">Ngày bắt đầu</label>
           <input 
             type="date" 
             class="form-control" 
-            formControlName="startDate">
+            formControlName="startDate"
+            [class.is-invalid]="startDate?.invalid && startDate?.touched">
+          <div class="error-message" *ngIf="startDate?.invalid && startDate?.touched">
+            <span *ngIf="startDate?.errors?.['required']">Ngày bắt đầu là bắt buộc</span>
+          </div>
         </div>
 
         <div class="form-group" style="flex: 1;">
@@ -76,18 +80,17 @@
             class="form-control" 
             formControlName="endDate">
         </div>
-      </div>
 
-      <!-- Thứ tự hiển thị -->
-      <div class="form-group">
-        <label>Thứ tự hiển thị</label>
-        <input 
-          type="number" 
-          class="form-control" 
-          formControlName="orderNumber"
-          placeholder="0"
-          min="0">
-        <small class="form-hint">Số càng nhỏ càng ưu tiên hiển thị trước</small>
+        <div class="form-group" style="flex: 1;">
+          <label>Mức độ ưu tiên</label>
+          <input 
+            type="number" 
+            class="form-control" 
+            formControlName="priority"
+            placeholder="0"
+            min="0">
+          <small class="form-hint">Số càng nhỏ càng ưu tiên</small>
+        </div>
       </div>
 
       <!-- Trạng thái hiển thị -->
