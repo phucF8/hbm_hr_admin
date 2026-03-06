@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'environments/environment.prod';
+import { environment } from 'environments/environment';
 import { firstValueFrom, Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -19,6 +19,24 @@ export class FileService {
     
     const url = `${environment.apiUrl}/FileUpload/Upload`;
     return this.http.post(url, formData);
+  }
+
+  uploadPublicFile(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const url = `${environment.apiUrl}/FileUpload/upload-public`;
+    return this.http.post(url, formData);
+  }
+
+  /**
+   * Lấy file đã giải mã dạng blob thông qua ViewFile API
+   * @param encryptedFileName Tên file đã mã hóa (e.g., "filename.jpg.enc")
+   * @returns Observable với blob của file đã giải mã
+   */
+  getFileAsBlob(encryptedFileName: string): Observable<Blob> {
+    const url = `${environment.apiUrl}/FileUpload/ViewFile?fileName=${encodeURIComponent(encryptedFileName)}`;
+    return this.http.get(url, { responseType: 'blob' });
   }
 
   async downloadAndOpenFile(fileName: string): Promise<void> {

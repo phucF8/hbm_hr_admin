@@ -33,6 +33,11 @@ export class EventDetailComponent implements OnInit {
   selectedImageFile: File | null = null;
   iframeHtmlContent: SafeResourceUrl = '';
   backgroundImageUrl: string | null = null; // Full URL để user test
+  
+  // Upload trực tiếp file sau khi chọn
+  isUploadingImage: boolean = false;
+  hasImageUploaded: boolean = false;
+  imageUploadMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -142,6 +147,7 @@ export class EventDetailComponent implements OnInit {
 
       this.selectedImageFile = file;
       this.selectedImageName = file.name;
+      this.hasImageUploaded = false; // Reset upload status khi chọn file mới
 
       // Create preview
       const reader = new FileReader();
@@ -150,6 +156,59 @@ export class EventDetailComponent implements OnInit {
         this.updateIframeContent();
       };
       reader.readAsDataURL(file);
+    }
+  }
+
+  /**
+   * Upload file hình ảnh đã chọn lên server
+   * Gọi API /Upload để lưu vào folder tmp
+   * Sau đó gọi ViewFile để lấy blob đã giải mã
+   */
+  async uploadSelectedImage(): Promise<void> {
+    if (!this.selectedImageFile) {
+      Swal.fire('Lỗi', 'Vui lòng chọn hình ảnh trước', 'error');
+      return;
+    }
+
+    this.isUploadingImage = true;
+    this.imageUploadMessage = 'Đang upload...';
+
+    try {
+      // Upload file lên server (tmp folder)
+      const response = await this.fileService.uploadFile(this.selectedImageFile).toPromise();
+      console.log('[EventDetail] Upload response:', response);
+
+      if (response && response.status === 'SUCCESS' && response.data) {
+        let encryptedFileName = response.data.encryptedFileName;
+
+        // Extract encryptedFileName từ response
+        if (!encryptedFileName && response.data.url) {
+          encryptedFileName = response.data.url.split('/').pop();
+        }
+        if (!encryptedFileName && response.data.filePath) {
+          encryptedFileName = response.data.filePath.split('\\').pop() || response.data.filePath.split('/').pop();
+        }
+
+        if (!encryptedFileName) {
+          throw new Error('Không thể extract tên file mã hóa từ response');
+        }
+
+        this.isUploadingImage = false;
+        this.hasImageUploaded = true;
+        this.imageUploadMessage = 'Upload thành công!';
+
+        Swal.fire('Thành công', 'Đã upload hình ảnh', 'success');
+        console.log('[EventDetail] Image uploaded successfully');
+      } else {
+        throw new Error(response?.message || 'Upload thất bại');
+      }
+    } catch (error: any) {
+      console.error('[EventDetail] Upload error:', error);
+      this.isUploadingImage = false;
+      this.hasImageUploaded = false;
+      this.imageUploadMessage = 'Upload thất bại';
+
+      Swal.fire('Lỗi', error.message || 'Không thể upload hình ảnh', 'error');
     }
   }
 
@@ -319,26 +378,78 @@ export class EventDetailComponent implements OnInit {
 
   /**
    * Upload ảnh lên server nếu user đã chọn file mới
-   * @returns Promise với imageUrl từ server, hoặc null nếu không có file
+   * Nếu đã upload qua uploadSelectedImage() thì skip
+   * @returns Promise với blob URL của ảnh đã giải mã, hoặc null nếu không có file
    */
   private async uploadImageIfNeeded(): Promise<string | null> {
-    if (!this.selectedImageFile) {
-      // Không có file mới, giữ nguyên URL cũ (nếu có)
+    // Nếu file đã được upload qua nút upload - không cần upload lại
+    if (this.hasImageUploaded) {
+      console.log('[EventDetail] Image already uploaded, using existing preview URL');
       return this.previewUrl;
     }
 
+    // Nếu không có file mới, giữ nguyên URL cũ (nếu có)
+    if (!this.selectedImageFile) {
+      console.log('[EventDetail] No image file selected, using existing preview URL');
+      return this.previewUrl;
+    }
+
+    // Upload file nếu user chọn nhưng chưa ấn nút upload (fallback scenario)
     try {
-      const response = await this.fileService.uploadFile(this.selectedImageFile).toPromise();
-      console.log('Upload response:', response); // DEBUG: In response từ server
+      console.log('[EventDetail] Uploading selected image (fallback - user forgot to click upload button)');
+      const response = await this.fileService.uploadPublicFile(this.selectedImageFile).toPromise();
+      console.log('[EventDetail] Upload response:', response);
+      
       if (response && response.status === 'SUCCESS' && response.data) {
-        // Giả sử backend trả về { status: 'SUCCESS', data: { fileUrl: '...' } }
-        const fileUrl = response.data.fileUrl || response.data.url || response.data;
-        console.log('Extracted fileUrl:', fileUrl); // DEBUG: In URL được extract
-        return fileUrl;
+        let encryptedFileName = response.data.encryptedFileName;
+        
+        // Nếu không có encryptedFileName, thử extract từ url hoặc filePath
+        if (!encryptedFileName && response.data.url) {
+          encryptedFileName = response.data.url.split('/').pop();
+        }
+        if (!encryptedFileName && response.data.filePath) {
+          encryptedFileName = response.data.filePath.split('\\').pop() || response.data.filePath.split('/').pop();
+        }
+
+        if (!encryptedFileName) {
+          throw new Error('Không thể extract tên file mã hóa từ response');
+        }
+
+        return response.data.url || null;
       }
       throw new Error('Upload thất bại');
     } catch (error: any) {
-      console.error('Upload error:', error); // DEBUG: In error chi tiết
+      const statusCode = error?.status || error?.error?.status;
+      if (statusCode === 405) {
+        try {
+          console.warn('[EventDetail] upload-public chưa hỗ trợ trên server, fallback sang /Upload');
+          const fallbackResponse = await this.fileService.uploadFile(this.selectedImageFile).toPromise();
+          console.log('[EventDetail] Fallback upload response:', fallbackResponse);
+          if (fallbackResponse && fallbackResponse.status === 'SUCCESS' && fallbackResponse.data) {
+            let encryptedFileName = fallbackResponse.data.encryptedFileName;
+            
+            // Nếu không có encryptedFileName, thử extract từ url hoặc filePath
+            if (!encryptedFileName && fallbackResponse.data.url) {
+              encryptedFileName = fallbackResponse.data.url.split('/').pop();
+            }
+            if (!encryptedFileName && fallbackResponse.data.filePath) {
+              encryptedFileName = fallbackResponse.data.filePath.split('\\').pop() || fallbackResponse.data.filePath.split('/').pop();
+            }
+
+            if (!encryptedFileName) {
+              throw new Error('Không thể extract tên file mã hóa từ fallback response');
+            }
+
+            return fallbackResponse.data.url || null;
+          }
+          throw new Error('Fallback upload thất bại');
+        } catch (fallbackError: any) {
+          console.error('[EventDetail] Fallback upload error:', fallbackError);
+          throw new Error(fallbackError.message || 'Không thể upload hình ảnh');
+        }
+      }
+
+      console.error('[EventDetail] Upload error:', error);
       throw new Error(error.message || 'Không thể upload hình ảnh');
     }
   }

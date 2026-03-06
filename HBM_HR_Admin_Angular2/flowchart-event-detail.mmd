@@ -1,0 +1,109 @@
+flowchart TD
+    Start([Component Init]) --> CheckMode{Có data truyền vào?}
+    CheckMode -->|Có| LoadData["loadEventData:<br/>- Extract content từ HTML<br/>- Extract background image URL<br/>- Patch form values<br/>- Update iframe preview"]
+    CheckMode -->|Không| UpdateIframe["updateIframeContent:<br/>- Create HTML document<br/>- Convert to blob URL<br/>- Render preview"]
+    
+    LoadData --> Subscribe["Subscribe valueChanges<br/>của form.content"]
+    UpdateIframe --> Subscribe
+    
+    Subscribe --> WaitAction["Chờ user action"]
+    
+    WaitAction --> OnImageSelected{"User chọn ảnh?"}
+    OnImageSelected -->|Không| WaitAction
+    OnImageSelected -->|Có| ValidateType{"File là ảnh?"}
+    
+    ValidateType -->|Không| ErrorType["Show error:<br/>Vui lòng chọn file ảnh"]
+    ErrorType --> WaitAction
+    
+    ValidateType -->|Có| ValidateSize{"Size ≤ 5MB?"}
+    ValidateSize -->|Không| ErrorSize["Show error:<br/>Kích thước > 5MB"]
+    ErrorSize --> WaitAction
+    
+    ValidateSize -->|Có| SaveFile["- Set selectedImageFile<br/>- Create FileReader<br/>- Set previewUrl<br/>- updateIframeContent"]
+    SaveFile --> WaitAction
+    
+    WaitAction --> OnSubmit{"User click Submit?"}
+    OnSubmit -->|Không| WaitAction
+    OnSubmit -->|Có| ValidateForm{"Form valid?"}
+    
+    ValidateForm -->|Không| ErrorForm["markFormGroupTouched()<br/>Show error message"]
+    ErrorForm --> WaitAction
+    
+    ValidateForm -->|Có| CheckDate{"endDate > startDate?"}
+    CheckDate -->|Không| ErrorDate["Show error:<br/>endDate must > startDate"]
+    ErrorDate --> WaitAction
+    
+    CheckDate -->|Có| SetSubmitting["isSubmitting = true"]
+    SetSubmitting --> UploadImage["uploadImageIfNeeded()"]
+    
+    UploadImage --> CheckFile{"selectedImageFile<br/>exists?"}
+    CheckFile -->|Không| ReturnPreview["Return previewUrl"]
+    CheckFile -->|Có| CallUploadPublic["fileService.uploadPublicFile()"]
+    
+    CallUploadPublic --> CheckResponse{"Response status<br/>= SUCCESS?"}
+    CheckResponse -->|Không| Catch405{"statusCode<br/>= 405?"}
+    
+    Catch405 -->|Không| ThrowError["Throw error:<br/>Upload thất bại"]
+    Catch405 -->|Có| Fallback["Fallback sang<br/>uploadFile()"]
+    
+    Fallback --> CheckFallbackResp{"Fallback Response<br/>= SUCCESS?"}
+    CheckFallbackResp -->|Không| ThrowFallbackError["Throw error:<br/>Fallback upload thất bại"]
+    
+    CheckResponse -->|Có| ExtractEncrypted1["Extract encryptedFileName:<br/>1. response.data.encryptedFileName<br/>2. Parse from url<br/>3. Parse from filePath"]
+    CheckFallbackResp -->|Có| ExtractEncrypted2["Extract encryptedFileName:<br/>1. response.data.encryptedFileName<br/>2. Parse from url<br/>3. Parse from filePath"]
+    
+    ExtractEncrypted1 --> CheckExtracted1{"encryptedFileName<br/>found?"}
+    ExtractEncrypted2 --> CheckExtracted2{"encryptedFileName<br/>found?"}
+    
+    CheckExtracted1 -->|Không| ThrowExtractError["Throw error:<br/>Không thể extract"]
+    CheckExtracted2 -->|Không| ThrowExtractError2["Throw error:<br/>Không thể extract"]
+    
+    CheckExtracted1 -->|Có| CallViewFile1["fileService.getFileAsBlob<br/>encryptedFileName"]
+    CheckExtracted2 -->|Có| CallViewFile2["fileService.getFileAsBlob<br/>encryptedFileName"]
+    
+    CallViewFile1 --> CheckBlob1{"Blob exists?"}
+    CallViewFile2 --> CheckBlob2{"Blob exists?"}
+    
+    CheckBlob1 -->|Không| ThrowBlobError1["Throw error:<br/>Không lấy blob"]
+    CheckBlob2 -->|Không| ThrowBlobError2["Throw error:<br/>Không lấy blob fallback"]
+    
+    CheckBlob1 -->|Có| CreateBlobUrl1["URL.createObjectURL(blob)<br/>Return blobUrl"]
+    CheckBlob2 -->|Có| CreateBlobUrl2["URL.createObjectURL(blob)<br/>Return blobUrl"]
+    
+    ReturnPreview --> CheckMode2{"isEditMode?"}
+    CreateBlobUrl1 --> CheckMode2
+    CreateBlobUrl2 --> CheckMode2
+    
+    ThrowError --> CatchError["catch error:<br/>isSubmitting = false<br/>Show Swal error"]
+    ThrowFallbackError --> CatchError
+    ThrowExtractError --> CatchError
+    ThrowExtractError2 --> CatchError
+    ThrowBlobError1 --> CatchError
+    ThrowBlobError2 --> CatchError
+    
+    CatchError --> WaitAction
+    
+    CheckMode2 -->|No, Create mode| CreateEvent["createEvent:<br/>- generateHtmlContent<br/>- Build CreateEventRequest<br/>- Call eventService.createEvent()"]
+    
+    CheckMode2 -->|Yes, Edit mode| UpdateEventAPI["updateEvent:<br/>- generateHtmlContent<br/>- Build UpdateEventRequest<br/>- Call eventService.updateEvent()"]
+    
+    CreateEvent --> CheckSuccess{"Response status<br/>= SUCCESS?"}
+    UpdateEventAPI --> CheckSuccess
+    
+    CheckSuccess -->|Không| ShowErrorSwal["Show Swal error"]
+    CheckSuccess -->|Có| ShowSuccessSwal["Show Swal success"]
+    
+    ShowErrorSwal --> SetFalse["isSubmitting = false"]
+    ShowSuccessSwal --> SetFalse
+    SetFalse --> CloseDialog["dialogRef.close(true)"]
+    CloseDialog --> End([End])
+    
+    style Start fill:#90EE90
+    style End fill:#FFB6C6
+    style UploadImage fill:#87CEEB
+    style CallUploadPublic fill:#87CEEB
+    style Fallback fill:#FFD700
+    style CallViewFile1 fill:#87CEEB
+    style CallViewFile2 fill:#87CEEB
+    style CreateEvent fill:#DDA0DD
+    style UpdateEventAPI fill:#DDA0DD

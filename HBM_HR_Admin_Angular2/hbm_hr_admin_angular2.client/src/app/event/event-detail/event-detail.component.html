@@ -62,6 +62,31 @@
             </div>
             <small class="form-hint">Chọn file ảnh để làm hình nền event (không bắt buộc)</small>
             
+            <!-- Nút upload file sau khi chọn -->
+            <div *ngIf="selectedImageFile && !hasImageUploaded" class="upload-action-container">
+              <button 
+                type="button"
+                class="btn btn-upload-file"
+                (click)="uploadSelectedImage()"
+                [disabled]="isUploadingImage">
+                <span *ngIf="!isUploadingImage">
+                  <i class="bi bi-upload"></i> Upload file lên tmp
+                </span>
+                <span *ngIf="isUploadingImage">
+                  <i class="bi bi-hourglass-split"></i> Đang upload...
+                </span>
+              </button>
+              <small class="form-hint">Nhấn để upload file lên thư mục tmp</small>
+            </div>
+
+            <!-- Hiển thị status upload -->
+            <div *ngIf="isUploadingImage || hasImageUploaded" class="upload-status-container">
+              <div [class]="'upload-status ' + (hasImageUploaded ? 'success' : 'uploading')">
+                <i [class]="hasImageUploaded ? 'bi bi-check-circle-fill' : 'bi bi-hourglass-split'"></i>
+                <span>{{ hasImageUploaded ? 'File đã upload thành công' : 'Đang upload...' }}</span>
+              </div>
+            </div>
+            
             <!-- Hiển thị full URL ảnh nền để test -->
             <div *ngIf="backgroundImageUrl" class="image-url-display">
               <div class="label-small">URL ảnh nền hiện tại:</div>

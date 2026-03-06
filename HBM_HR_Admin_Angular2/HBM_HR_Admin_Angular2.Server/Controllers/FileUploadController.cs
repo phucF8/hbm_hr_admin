@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -114,6 +113,79 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
                 return StatusCode(500, ApiResponse<object>.Error($"File write error: {ex.Message}"));
             } catch (Exception ex) {
                 _logger.LogError(ex, $"❌ Upload failed: Unexpected error for file {file?.FileName}");
+                return StatusCode(500, ApiResponse<object>.Error($"Upload failed: {ex.Message}"));
+            }
+        }
+
+        [HttpPost("upload-public")]
+        [RequestSizeLimit(long.MaxValue)]
+        public async Task<IActionResult> UploadSingleToUploads(IFormFile file) {
+            try {
+                if (file == null) {
+                    _logger.LogWarning("❌ Upload (uploads) failed: No file provided");
+                    return BadRequest(ApiResponse<object>.Error("No file provided."));
+                }
+
+                _logger.LogInformation($"📤 Upload (uploads) started: {file.FileName} (Size: {file.Length} bytes)");
+
+                if (file.Length == 0) {
+                    _logger.LogWarning($"❌ Upload (uploads) failed: File is empty - {file.FileName}");
+                    return BadRequest(ApiResponse<object>.Error("Empty file."));
+                }
+
+                if (file.Length > _maxFileSizeBytes) {
+                    var maxMb = _maxFileSizeBytes / (1024 * 1024);
+                    _logger.LogWarning($"❌ Upload (uploads) failed: File too large - {file.FileName} ({file.Length} bytes > {_maxFileSizeBytes} bytes)");
+                    return BadRequest(ApiResponse<object>.Error(
+                        $"File too large. Max allowed: {maxMb} MB."));
+                }
+
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!_allowedExtensions.Contains(ext)) {
+                    _logger.LogWarning($"❌ Upload (uploads) failed: Extension not allowed - {file.FileName} (ext: {ext})");
+                    return BadRequest(ApiResponse<object>.Error($"Extension '{ext}' not allowed."));
+                }
+
+                var savedFileName = $"{Guid.NewGuid()}{ext}".Replace("\"", string.Empty);
+
+                string originalFilePath = Path.Combine(_uploadPublic, savedFileName);
+                string encryptedFileName = $"{savedFileName}.enc";
+                string encryptedFilePath = Path.Combine(_uploadPublic, encryptedFileName);
+
+                _logger.LogInformation($"📝 Step 1 (uploads): Saving original file to {originalFilePath}");
+
+                using (var stream = new FileStream(originalFilePath, FileMode.Create)) {
+                    await file.CopyToAsync(stream);
+                }
+                _logger.LogInformation("✅ Original file (uploads) saved successfully");
+
+                _logger.LogInformation($"🔐 Step 2 (uploads): Encrypting file to {encryptedFilePath}");
+                await EncryptUtil.EncryptFileAsync(originalFilePath, encryptedFilePath);
+                _logger.LogInformation("✅ File (uploads) encrypted successfully");
+
+                _logger.LogInformation("🗑️ Step 3 (uploads): Cleaning up original file");
+                System.IO.File.Delete(originalFilePath);
+                _logger.LogInformation("✅ Original file (uploads) deleted");
+
+                var fileUrl = $"/{UploadPublicFolderName}/{encryptedFileName}";
+                var filePath = encryptedFilePath;
+
+                var fileInfo = new {
+                    tenFile = file.FileName,
+                    url = fileUrl,
+                    filePath = filePath,
+                    encryptedFileName = encryptedFileName,
+                    originalSize = file.Length
+                };
+
+                _logger.LogInformation($"✅ Upload (uploads) completed successfully - File: {file.FileName}, URL: {fileUrl}, Saved At: {filePath}");
+
+                return Ok(ApiResponse<object>.Success(fileInfo, "Tải lên thành công"));
+            } catch (IOException ex) {
+                _logger.LogError(ex, $"❌ Upload (uploads) failed: IO Error for file {file?.FileName}");
+                return StatusCode(500, ApiResponse<object>.Error($"File write error: {ex.Message}"));
+            } catch (Exception ex) {
+                _logger.LogError(ex, $"❌ Upload (uploads) failed: Unexpected error for file {file?.FileName}");
                 return StatusCode(500, ApiResponse<object>.Error($"Upload failed: {ex.Message}"));
             }
         }
@@ -237,6 +309,42 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             } catch (Exception ex) {
                 _logger.LogError(ex, "❌ Multi-upload failed with unexpected error");
                 return StatusCode(500, new { error = $"Upload failed: {ex.Message}" });
+            }
+        }
+
+        /// <summary>
+        /// Debug endpoint: Trả về thông tin đường dẫn và danh sách file upload
+        /// Chỉ dùng cho development/debugging
+        /// </summary>
+        [AllowAnonymous]
+        [HttpGet("debug-paths")]
+        public IActionResult DebugPaths() {
+            try {
+                var tmpFiles = Directory.Exists(_uploadRoot) 
+                    ? Directory.GetFiles(_uploadRoot).Select(f => Path.GetFileName(f)).ToList()
+                    : new List<string>();
+                
+                var publicFiles = Directory.Exists(_uploadPublic)
+                    ? Directory.GetFiles(_uploadPublic).Select(f => Path.GetFileName(f)).ToList()
+                    : new List<string>();
+
+                var debugInfo = new {
+                    info = "🔍 Debug Info - File Upload Paths",
+                    tmpFolderPath = _uploadRoot,
+                    publicFolderPath = _uploadPublic,
+                    tmpFolderExists = Directory.Exists(_uploadRoot),
+                    publicFolderExists = Directory.Exists(_uploadPublic),
+                    tmpFilesCount = tmpFiles.Count,
+                    tmpFiles = tmpFiles,
+                    publicFilesCount = publicFiles.Count,
+                    publicFiles = publicFiles,
+                    note = "upload-public lưu vào: " + _uploadPublic + " folder"
+                };
+
+                return Ok(ApiResponse<object>.Success(debugInfo));
+            } catch (Exception ex) {
+                _logger.LogError(ex, "❌ Debug error");
+                return StatusCode(500, new { error = ex.Message });
             }
         }
     }
