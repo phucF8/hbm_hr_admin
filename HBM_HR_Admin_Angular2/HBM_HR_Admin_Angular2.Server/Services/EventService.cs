@@ -278,5 +278,101 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                 throw;
             }
         }
+
+        /// <summary>
+        /// Generate HTML document từ HtmlContent JSON
+        /// </summary>
+        /// <param name="htmlContentJson">JSON string chứa uploadedImageUrl và content</param>
+        /// <returns>HTML document hoàn chỉnh</returns>
+        public string GenerateHtmlFromContent(string htmlContentJson)
+        {
+            string imageUrl = "none";
+            string textContent = "Nội dung hiển thị sẽ xuất hiện tại đây";
+
+            if (!string.IsNullOrWhiteSpace(htmlContentJson))
+            {
+                try
+                {
+                    var jsonDoc = JsonDocument.Parse(htmlContentJson);
+                    var root = jsonDoc.RootElement;
+
+                    // Extract uploadedImageUrl
+                    if (root.TryGetProperty("uploadedImageUrl", out var uploadedImageUrlElement))
+                    {
+                        var fileName = uploadedImageUrlElement.GetString();
+                        if (!string.IsNullOrWhiteSpace(fileName))
+                        {
+                            imageUrl = $"url('/uploads/{fileName}')";
+                        }
+                    }
+
+                    // Extract content
+                    if (root.TryGetProperty("content", out var contentElement))
+                    {
+                        var content = contentElement.GetString();
+                        if (!string.IsNullOrWhiteSpace(content))
+                        {
+                            textContent = System.Net.WebUtility.HtmlEncode(content);
+                        }
+                    }
+                }
+                catch (JsonException ex)
+                {
+                    _logger.LogWarning($"Không thể parse HtmlContent JSON: {ex.Message}");
+                }
+            }
+
+            return $@"
+<!DOCTYPE html>
+<html lang=""vi"">
+<head>
+  <meta charset=""UTF-8"">
+  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+  <style>
+    * {{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }}
+    html, body {{
+      width: 100%;
+      height: 100%;
+    }}
+    body {{
+      background-image: {imageUrl};
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }}
+    .preview-overlay {{
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }}
+    .preview-content {{
+      word-break: break-word;
+      color: white;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 90%;
+    }}
+  </style>
+</head>
+<body>
+  <div class=""preview-overlay"">
+    <div class=""preview-content"">{textContent}</div>
+  </div>
+</body>
+</html>".Trim();
+        }
     }
 }

@@ -34,7 +34,24 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     return Ok(ApiResponse<EventPage?>.Success(null, "Không có event nào đang hoạt động"));
                 }
 
-                return Ok(ApiResponse<EventPage>.Success(activeEvent, "Lấy event thành công"));
+                // Tạo HTML từ HtmlContent JSON
+                var generatedHtml = _eventService.GenerateHtmlFromContent(activeEvent.HtmlContent);
+
+                // Trả về object với thêm trường GeneratedHtml
+                var response = new
+                {
+                    activeEvent.Id,
+                    activeEvent.Title,
+                    activeEvent.HtmlContent,
+                    activeEvent.IsActive,
+                    activeEvent.Version,
+                    activeEvent.StartTime,
+                    activeEvent.EndTime,
+                    activeEvent.Priority,
+                    GeneratedHtml = generatedHtml
+                };
+
+                return Ok(ApiResponse<object>.Success(response, "Lấy event thành công"));
             }
             catch (Exception ex)
             {
@@ -52,7 +69,22 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             try
             {
                 var events = await _eventService.GetAllEventsAsync();
-                return Ok(ApiResponse<List<EventPage>>.Success(events, "Lấy danh sách event thành công"));
+                
+                // Tạo HTML cho mỗi event
+                var eventsWithHtml = events.Select(e => new
+                {
+                    e.Id,
+                    e.Title,
+                    e.HtmlContent,
+                    e.IsActive,
+                    e.Version,
+                    e.StartTime,
+                    e.EndTime,
+                    e.Priority,
+                    GeneratedHtml = _eventService.GenerateHtmlFromContent(e.HtmlContent)
+                }).ToList();
+
+                return Ok(ApiResponse<object>.Success(eventsWithHtml, "Lấy danh sách event thành công"));
             }
             catch (Exception ex)
             {
@@ -76,7 +108,24 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     return NotFound(ApiResponse<string>.Error($"Không tìm thấy event với ID: {request.Id}"));
                 }
 
-                return Ok(ApiResponse<EventPage>.Success(eventPage, "Lấy event thành công"));
+                // Tạo HTML từ HtmlContent JSON
+                var generatedHtml = _eventService.GenerateHtmlFromContent(eventPage.HtmlContent);
+
+                // Trả về object với thêm trường GeneratedHtml
+                var response = new
+                {
+                    eventPage.Id,
+                    eventPage.Title,
+                    eventPage.HtmlContent,
+                    eventPage.IsActive,
+                    eventPage.Version,
+                    eventPage.StartTime,
+                    eventPage.EndTime,
+                    eventPage.Priority,
+                    GeneratedHtml = generatedHtml
+                };
+
+                return Ok(ApiResponse<object>.Success(response, "Lấy event thành công"));
             }
             catch (Exception ex)
             {
@@ -112,7 +161,24 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
 
                 var createdEvent = await _eventService.CreateEventAsync(eventPage);
 
-                return Ok(ApiResponse<EventPage>.Success(createdEvent, "Tạo event thành công"));
+                // Tạo HTML từ HtmlContent JSON
+                var generatedHtml = _eventService.GenerateHtmlFromContent(createdEvent.HtmlContent);
+
+                // Trả về object với thêm trường GeneratedHtml
+                var response = new
+                {
+                    createdEvent.Id,
+                    createdEvent.Title,
+                    createdEvent.HtmlContent,
+                    createdEvent.IsActive,
+                    createdEvent.Version,
+                    createdEvent.StartTime,
+                    createdEvent.EndTime,
+                    createdEvent.Priority,
+                    GeneratedHtml = generatedHtml
+                };
+
+                return Ok(ApiResponse<object>.Success(response, "Tạo event thành công"));
             }
             catch (Exception ex)
             {
@@ -153,7 +219,24 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     return NotFound(ApiResponse<string>.Error($"Không tìm thấy event với ID: {request.Id}"));
                 }
 
-                return Ok(ApiResponse<EventPage>.Success(updatedEvent, "Cập nhật event thành công"));
+                // Tạo HTML từ HtmlContent JSON
+                var generatedHtml = _eventService.GenerateHtmlFromContent(updatedEvent.HtmlContent);
+
+                // Trả về object với thêm trường GeneratedHtml
+                var response = new
+                {
+                    updatedEvent.Id,
+                    updatedEvent.Title,
+                    updatedEvent.HtmlContent,
+                    updatedEvent.IsActive,
+                    updatedEvent.Version,
+                    updatedEvent.StartTime,
+                    updatedEvent.EndTime,
+                    updatedEvent.Priority,
+                    GeneratedHtml = generatedHtml
+                };
+
+                return Ok(ApiResponse<object>.Success(response, "Cập nhật event thành công"));
             }
             catch (Exception ex)
             {
@@ -201,7 +284,24 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     return NotFound(ApiResponse<string>.Error($"Không tìm thấy event với ID: {request.Id}"));
                 }
 
-                return Ok(ApiResponse<EventPage>.Success(updatedEvent, 
+                // Tạo HTML từ HtmlContent JSON
+                var generatedHtml = _eventService.GenerateHtmlFromContent(updatedEvent.HtmlContent);
+
+                // Trả về object với thêm trường GeneratedHtml
+                var response = new
+                {
+                    updatedEvent.Id,
+                    updatedEvent.Title,
+                    updatedEvent.HtmlContent,
+                    updatedEvent.IsActive,
+                    updatedEvent.Version,
+                    updatedEvent.StartTime,
+                    updatedEvent.EndTime,
+                    updatedEvent.Priority,
+                    GeneratedHtml = generatedHtml
+                };
+
+                return Ok(ApiResponse<object>.Success(response, 
                     $"Toggle IsActive thành công. Trạng thái hiện tại: {updatedEvent.IsActive}"));
             }
             catch (Exception ex)
