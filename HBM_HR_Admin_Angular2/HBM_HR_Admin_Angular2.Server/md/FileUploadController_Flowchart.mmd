@@ -1,0 +1,260 @@
+# FileUploadController - Flowchart Luồng Xử Lý
+
+```mermaid
+flowchart TD
+    Start([Request tới FileUploadController]) --> CheckEndpoint{Endpoint nào?}
+    
+    CheckEndpoint -->|POST /upload| Upload["<b>Upload Single File</b><br/>Encrypt & Save"]
+    CheckEndpoint -->|GET /ViewFile| ViewFile["<b>View File</b><br/>Decrypt & Return"]
+    CheckEndpoint -->|POST /upload-multi| UploadMulti["<b>Upload Multiple Files</b><br/>Batch Processing"]
+    
+    %% ========== UPLOAD SINGLE FILE ==========
+    Upload --> U1{File có null?}
+    U1 -->|Yes| UErr1["❌ No file provided"]
+    U1 -->|No| U2["📝 Log: Upload started<br/>FileName + Size"]
+    U2 --> U3{File.Length = 0?}
+    U3 -->|Yes| UErr2["❌ Empty file"]
+    U3 -->|No| U4{File.Length > MaxSize?}
+    U4 -->|Yes| UErr3["❌ File too large<br/>Max: MaxFileSizeMb MB"]
+    U4 -->|No| U5["Lấy Extension"]
+    U5 --> U6{Extension trong<br/>AllowedExtensions?}
+    U6 -->|No| UErr4["❌ Extension not allowed"]
+    U6 -->|Yes| U7["Tạo tên file:<br/>GUID + extension"]
+    U7 --> U8["Tạo đường dẫn:<br/>originalFilePath<br/>encryptedFilePath"]
+    U8 --> U9["📝 Step 1: Lưu file gốc<br/>wwwroot/tmp/GUID.ext"]
+    U9 --> U10["using FileStream<br/>CopyToAsync"]
+    U10 --> U11["✅ Log: Original saved"]
+    U11 --> U12["🔐 Step 2: Encrypt file<br/>EncryptUtil.EncryptFileAsync"]
+    U12 --> U13["Đọc file gốc<br/>→ Mã hóa AES<br/>→ Lưu .enc"]
+    U13 --> U14["✅ Log: Encrypted"]
+    U14 --> U15["🗑️ Step 3: Delete original<br/>File.Delete(originalFilePath)"]
+    U15 --> U16["✅ Log: Original deleted"]
+    U16 --> U17["Tạo response object:<br/>- tenFile<br/>- url<br/>- filePath<br/>- encryptedFileName<br/>- originalSize"]
+    U17 --> U18["✅ Return OK<br/>ApiResponse.Success"]
+    
+    %% Upload Errors
+    UErr1 --> UBadReq["❌ BadRequest 400"]
+    UErr2 --> UBadReq
+    UErr3 --> UBadReq
+    UErr4 --> UBadReq
+    
+    %% Exception Handling
+    U10 -.->|IOException| UEx1["❌ File write error<br/>StatusCode 500"]
+    U12 -.->|Exception| UEx2["❌ Upload failed<br/>StatusCode 500"]
+    UEx1 --> UEnd
+    UEx2 --> UEnd
+    
+    %% ========== VIEW FILE ==========
+    ViewFile --> V1["📥 Log: Download started<br/>fileName"]
+    V1 --> V2["Tạo đường dẫn:<br/>wwwroot/uploads/fileName"]
+    V2 --> V3{File tồn tại?}
+    V3 -->|No| VErr1["❌ Log: File not found<br/>NotFound 404"]
+    V3 -->|Yes| V4["🔐 Log: Decrypting file"]
+    V4 --> V5["Tạo temp file:<br/>Path.GetTempFileName()"]
+    V5 --> V6["DecryptFileAsync<br/>encrypted → temp"]
+    V6 --> V7["Đọc file temp<br/>→ MemoryStream"]
+    V7 --> V8["Xác định ContentType<br/>theo extension"]
+    V8 --> V8a["Extension mapping:<br/>.jpg/.jpeg → image/jpeg<br/>.png → image/png<br/>.pdf → application/pdf<br/>other → octet-stream"]
+    V8a --> V9["✅ Log: Download completed<br/>Size + ContentType"]
+    V9 --> V10["Return File()<br/>MemoryStream.ToArray()<br/>+ ContentType"]
+    V10 --> V11["🗑️ Finally: Delete temp file"]
+    V11 --> VEnd["✅ File 200"]
+    
+    VErr1 --> VEnd
+    V6 -.->|Exception| VEx1["❌ Log Error<br/>StatusCode 500"]
+    VEx1 --> V11
+    
+    %% ========== UPLOAD MULTI ==========
+    UploadMulti --> M1{Files null hoặc rỗng?}
+    M1 -->|Yes| MErr1["❌ No files provided"]
+    M1 -->|No| M2["📤 Log: Multi-upload started<br/>Count files"]
+    M2 --> M3["Tạo List results<br/>List failedFiles"]
+    M3 --> M4["ForEach file in files"]
+    M4 --> M5{File null hoặc<br/>Length = 0?}
+    M5 -->|Yes| M6["⏭️ Skip: Empty file<br/>Add to failedFiles"]
+    M5 -->|No| M7{Length > MaxSize?}
+    M7 -->|Yes| M8["⏭️ Skip: Too large<br/>Add to failedFiles"]
+    M7 -->|No| M9{Extension allowed?}
+    M9 -->|No| M10["⏭️ Skip: Extension<br/>Add to failedFiles"]
+    M9 -->|Yes| M11["Tạo tên file: GUID+ext"]
+    M11 --> M12["📝 Log: Saving file"]
+    M12 --> M13["using FileStream.Create<br/>CopyToAsync"]
+    M13 --> M14["Add to results:<br/>originalName<br/>storedName<br/>size, url<br/>status: ✅"]
+    M14 --> M15["✅ Log: File uploaded"]
+    M15 --> M16{Còn file?}
+    M16 -->|Yes| M4
+    M16 -->|No| M17["Tạo response:<br/>- successful<br/>- failed<br/>- summary"]
+    M17 --> M18["✅ Log: Multi-upload completed<br/>X/Y successful"]
+    M18 --> M19["Return OK<br/>response object"]
+    
+    M6 --> M16
+    M8 --> M16
+    M10 --> M16
+    M13 -.->|Exception| M20["❌ Log Error<br/>Add to failedFiles"]
+    M20 --> M16
+    
+    MErr1 --> MBadReq["❌ BadRequest 400"]
+    M4 -.->|Unexpected Exception| MEx["❌ StatusCode 500<br/>Upload failed"]
+    
+    %% End Points
+    U18 --> UEnd["End"]
+    UBadReq --> UEnd
+    M19 --> MEnd["End"]
+    MBadReq --> MEnd
+    MEx --> MEnd
+    
+    %% Styling
+    style Start fill:#e1f5ff
+    style UEnd fill:#e1f5ff
+    style VEnd fill:#e1f5ff
+    style MEnd fill:#e1f5ff
+    
+    style Upload fill:#fff9c4
+    style ViewFile fill:#c8e6c9
+    style UploadMulti fill:#f3e5f5
+    
+    style U18 fill:#c8e6c9
+    style V10 fill:#c8e6c9
+    style M19 fill:#c8e6c9
+    
+    style UErr1 fill:#ffccbc
+    style UErr2 fill:#ffccbc
+    style UErr3 fill:#ffccbc
+    style UErr4 fill:#ffccbc
+    style UEx1 fill:#ffccbc
+    style UEx2 fill:#ffccbc
+    
+    style VErr1 fill:#ffccbc
+    style VEx1 fill:#ffccbc
+    
+    style MErr1 fill:#ffccbc
+    style MEx fill:#ffccbc
+    
+    style U12 fill:#ffe0b2
+    style U13 fill:#ffe0b2
+    style V6 fill:#ffe0b2
+```
+
+## Chi Tiết Luồng Xử Lý
+
+### 1. **Upload Single File** (`POST /api/fileupload/upload`)
+
+#### Validation Pipeline:
+1. ✅ **File existence** - Kiểm tra file có null không
+2. ✅ **File size** - Kiểm tra không rỗng, không quá MaxFileSizeMb
+3. ✅ **Extension** - Kiểm tra extension trong AllowedExtensions (`.jpg`, `.png`, `.pdf`, `.docx`)
+
+#### Processing Flow:
+```
+1. Tạo tên file mới: GUID + extension
+2. Lưu file gốc: wwwroot/tmp/{GUID}.ext
+3. Mã hóa file: EncryptUtil.EncryptFileAsync()
+   → Đọc file gốc
+   → Mã hóa AES
+   → Lưu thành {GUID}.ext.enc
+4. Xóa file gốc (bảo mật)
+5. Trả về thông tin:
+   - tenFile: Tên file gốc
+   - url: /tmp/{fileName}.enc
+   - filePath: Đường dẫn vật lý
+   - encryptedFileName: Tên file đã mã hóa
+   - originalSize: Kích thước gốc
+```
+
+#### Error Handling:
+- `IOException` → File write error (500)
+- `Exception` → Upload failed (500)
+- Validation fails → BadRequest (400)
+
+---
+
+### 2. **View File** (`GET /api/fileupload/ViewFile?fileName=...`)
+
+#### Processing Flow:
+```
+1. Tìm file mã hóa: wwwroot/uploads/{fileName}
+2. Kiểm tra file tồn tại
+   → No: NotFound 404
+   → Yes: Continue
+3. Tạo temp file: Path.GetTempFileName()
+4. Giải mã: DecryptFileAsync(encrypted → temp)
+5. Đọc vào MemoryStream
+6. Xác định ContentType:
+   - .jpg/.jpeg → image/jpeg
+   - .png → image/png
+   - .pdf → application/pdf
+   - other → application/octet-stream
+7. Return File(bytes, contentType)
+8. Finally: Xóa temp file
+```
+
+#### Security Feature:
+- ⚠️ **Hiện tại đang có bug**: ViewFile đọc từ `_uploadPublic` (uploads)
+  nhưng Upload lưu vào `_uploadRoot` (tmp)
+- Cần sửa line 138: `_uploadPublic` → `_uploadRoot`
+
+---
+
+### 3. **Upload Multiple Files** (`POST /api/fileupload/upload-multi`)
+
+#### Batch Processing:
+```
+1. Kiểm tra danh sách files
+2. Khởi tạo:
+   - results: List thành công
+   - failedFiles: List thất bại
+3. ForEach file:
+   a. Validate (size, extension)
+   b. Nếu PASS:
+      - Lưu file (không mã hóa)
+      - Add vào results
+   c. Nếu FAIL:
+      - Skip file
+      - Add lỗi vào failedFiles
+4. Trả về tổng hợp:
+   - successful: [{originalName, storedName, size, url}]
+   - failed: ["fileName: error reason"]
+   - summary: "✅ X/Y files uploaded successfully"
+```
+
+#### Difference vs Single Upload:
+- ❌ **Không mã hóa file** (lưu trực tiếp)
+- ✅ **Partial success** - Một số file lỗi không ảnh hưởng file khác
+- ✅ **Detailed report** - Trả về chi tiết thành công/thất bại
+
+---
+
+## Cấu Hình (appsettings.json)
+
+```json
+{
+  "FileUpload": {
+    "MaxFileSizeMb": 50,
+    "AllowedExtensions": [".jpg", ".png", ".pdf", ".docx"]
+  }
+}
+```
+
+## Thư Mục Lưu Trữ
+
+- **tmp** (`_uploadRoot`) - File mã hóa từ single upload
+- **uploads** (`_uploadPublic`) - File public cho ViewFile endpoint
+
+## Bảo Mật
+
+✅ File encryption (AES) cho single upload  
+✅ Extension whitelist  
+✅ File size limit  
+✅ Xóa file gốc sau khi mã hóa  
+✅ Temp file cleanup trong ViewFile  
+⚠️ Multi-upload không mã hóa
+
+## Logging
+
+Mọi bước quan trọng đều được log với emoji:
+- 📤 Upload started
+- 📝 Saving file
+- 🔐 Encrypting/Decrypting
+- ✅ Success
+- ❌ Error
+- 🗑️ Cleanup
