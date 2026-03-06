@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
@@ -19,12 +20,14 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         private readonly long _maxFileSizeBytes;
         private readonly string[] _allowedExtensions;
         private readonly string _uploadRoot,_uploadPublic;
+        private readonly ILogger<FileUploadController> _logger;
         private const string UploadFolderName = "tmp";
 
         private const string UploadPublicFolderName = "uploads";
 
 
-        public FileUploadController(IConfiguration config, IWebHostEnvironment env) {
+        public FileUploadController(IConfiguration config, IWebHostEnvironment env, ILogger<FileUploadController> logger) {
+            _logger = logger;
             // config example in appsettings.json -> "FileUpload": { "MaxFileSizeMb": 50, "AllowedExtensions": [".jpg",".png",".pdf"] }
             var section = config.GetSection("FileUpload");
             var maxMb = section.GetValue<long>("MaxFileSizeMb", 50);
@@ -39,85 +42,125 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
         [HttpPost("upload")]
         [RequestSizeLimit(long.MaxValue)]
         public async Task<IActionResult> UploadSingle(IFormFile file) {
-            if (file == null)
-                return BadRequest(ApiResponse<object>.Error("No file provided."));
-            if (file.Length == 0)
-                return BadRequest(ApiResponse<object>.Error("Empty file."));
-            if (file.Length > _maxFileSizeBytes)
-                return BadRequest(ApiResponse<object>.Error(
-                    $"File too large. Max allowed: {_maxFileSizeBytes / (1024 * 1024)} MB."));
+            try {
+                if (file == null) {
+                    _logger.LogWarning("❌ Upload failed: No file provided");
+                    return BadRequest(ApiResponse<object>.Error("No file provided."));
+                }
 
-            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!_allowedExtensions.Contains(ext))
-                return BadRequest(ApiResponse<object>.Error($"Extension '{ext}' not allowed."));
+                _logger.LogInformation($"📤 Upload started: {file.FileName} (Size: {file.Length} bytes)");
 
-            var savedFileName = $"{Guid.NewGuid()}.{ext}".Replace("\"", string.Empty);
-            var savePath = Path.Combine(_uploadRoot, savedFileName);
+                if (file.Length == 0) {
+                    _logger.LogWarning($"❌ Upload failed: File is empty - {file.FileName}");
+                    return BadRequest(ApiResponse<object>.Error("Empty file."));
+                }
 
-            string originalFilePath = Path.Combine(_uploadRoot, savedFileName);
-            //string encryptedFileName = $"{Path.GetFileNameWithoutExtension(savedFileName)}.enc";
-            string encryptedFileName = $"{savedFileName}.enc";
-            string encryptedFilePath = Path.Combine(_uploadRoot, encryptedFileName);
+                if (file.Length > _maxFileSizeBytes) {
+                    var maxMb = _maxFileSizeBytes / (1024 * 1024);
+                    _logger.LogWarning($"❌ Upload failed: File too large - {file.FileName} ({file.Length} bytes > {_maxFileSizeBytes} bytes)");
+                    return BadRequest(ApiResponse<object>.Error(
+                        $"File too large. Max allowed: {maxMb} MB."));
+                }
 
-            // 1️.Lưu file gốc tạm
-            using (var stream = new FileStream(originalFilePath, FileMode.Create)) {
-                await file.CopyToAsync(stream);
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!_allowedExtensions.Contains(ext)) {
+                    _logger.LogWarning($"❌ Upload failed: Extension not allowed - {file.FileName} (ext: {ext})");
+                    return BadRequest(ApiResponse<object>.Error($"Extension '{ext}' not allowed."));
+                }
+
+                var savedFileName = $"{Guid.NewGuid()}.{ext}".Replace("\"", string.Empty);
+                var savePath = Path.Combine(_uploadRoot, savedFileName);
+
+                string originalFilePath = Path.Combine(_uploadRoot, savedFileName);
+                string encryptedFileName = $"{savedFileName}.enc";
+                string encryptedFilePath = Path.Combine(_uploadRoot, encryptedFileName);
+
+                _logger.LogInformation($"📝 Step 1: Saving original file to {originalFilePath}");
+
+                // 1️⃣ Lưu file gốc tạm
+                using (var stream = new FileStream(originalFilePath, FileMode.Create)) {
+                    await file.CopyToAsync(stream);
+                }
+                _logger.LogInformation($"✅ Original file saved successfully");
+
+                // 2️⃣ Mã hoá file
+                _logger.LogInformation($"🔐 Step 2: Encrypting file to {encryptedFilePath}");
+                await EncryptUtil.EncryptFileAsync(originalFilePath, encryptedFilePath);
+                _logger.LogInformation($"✅ File encrypted successfully");
+
+                // 3️⃣ Xoá file gốc sau khi mã hoá
+                _logger.LogInformation($"🗑️ Step 3: Cleaning up original file");
+                System.IO.File.Delete(originalFilePath);
+                _logger.LogInformation($"✅ Original file deleted");
+
+                var fileUrl = $"/{UploadFolderName}/{encryptedFileName}";
+                var filePath = encryptedFilePath;
+
+                // ✅ Tạo object dữ liệu trả về đúng yêu cầu
+                var fileInfo = new {
+                    tenFile = file.FileName,
+                    url = fileUrl,
+                    filePath = filePath,
+                    encryptedFileName = encryptedFileName,
+                    originalSize = file.Length
+                };
+
+                _logger.LogInformation($"✅ Upload completed successfully - File: {file.FileName}, URL: {fileUrl}, Saved At: {filePath}");
+
+                // ✅ Trả về theo ApiResponse<T>
+                return Ok(ApiResponse<object>.Success(fileInfo, "Tải lên thành công"));
+            } catch (IOException ex) {
+                _logger.LogError(ex, $"❌ Upload failed: IO Error for file {file?.FileName}");
+                return StatusCode(500, ApiResponse<object>.Error($"File write error: {ex.Message}"));
+            } catch (Exception ex) {
+                _logger.LogError(ex, $"❌ Upload failed: Unexpected error for file {file?.FileName}");
+                return StatusCode(500, ApiResponse<object>.Error($"Upload failed: {ex.Message}"));
             }
-
-            // 2️.Mã hoá file
-            await EncryptUtil.EncryptFileAsync(originalFilePath, encryptedFilePath);
-
-            // 3️.Xoá file gốc sau khi mã hoá
-            System.IO.File.Delete(originalFilePath);
-
-            //// ✅ Ghi file ra đĩa
-            //await using (var stream = System.IO.File.Create(savePath)) {
-            //    await file.CopyToAsync(stream);
-            //}
-
-            //var fileUrl = $"/{UploadFolderName}/{savedFileName}";
-            var fileUrl = $"/{UploadFolderName}/{encryptedFileName}";
-
-            // ✅ Tạo object dữ liệu trả về đúng yêu cầu
-            var fileInfo = new {
-                tenFile = file.FileName,
-                url = fileUrl
-            };
-
-            // ✅ Trả về theo ApiResponse<T>
-            return Ok(ApiResponse<object>.Success(fileInfo, "Tải lên thành công"));
         }
 
         [AllowAnonymous]
         [HttpGet("ViewFile")]
         public async Task<IActionResult> ViewFile(string fileName) {
-            string encryptedPath = Path.Combine(_uploadPublic, fileName);
-
-            if (!System.IO.File.Exists(encryptedPath))
-                return NotFound();
-
-            // Tạo file tạm để chứa file đã giải mã
-            string tempFile = Path.GetTempFileName();
-
             try {
-                await EncryptUtil.DecryptFileAsync(encryptedPath, tempFile);
+                _logger.LogInformation($"📥 Download started: {fileName}");
 
-                await using var memoryStream = new MemoryStream(await System.IO.File.ReadAllBytesAsync(tempFile));
-                memoryStream.Position = 0;
+                string encryptedPath = Path.Combine(_uploadPublic, fileName);
 
-                string originalExt = Path.GetExtension(fileName.Replace(".enc", "")).ToLower();
-                string contentType = originalExt switch {
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".pdf" => "application/pdf",
-                    _ => "application/octet-stream"
-                };
+                if (!System.IO.File.Exists(encryptedPath)) {
+                    _logger.LogWarning($"❌ Download failed: File not found - {fileName} at {encryptedPath}");
+                    return NotFound();
+                }
 
-                return File(memoryStream.ToArray(), contentType);
-            } finally {
-                // Xóa file tạm
-                if (System.IO.File.Exists(tempFile))
-                    System.IO.File.Delete(tempFile);
+                _logger.LogInformation($"🔐 Decrypting file: {fileName}");
+
+                // Tạo file tạm để chứa file đã giải mã
+                string tempFile = Path.GetTempFileName();
+
+                try {
+                    await EncryptUtil.DecryptFileAsync(encryptedPath, tempFile);
+
+                    await using var memoryStream = new MemoryStream(await System.IO.File.ReadAllBytesAsync(tempFile));
+                    memoryStream.Position = 0;
+
+                    string originalExt = Path.GetExtension(fileName.Replace(".enc", "")).ToLower();
+                    string contentType = originalExt switch {
+                        ".jpg" or ".jpeg" => "image/jpeg",
+                        ".png" => "image/png",
+                        ".pdf" => "application/pdf",
+                        _ => "application/octet-stream"
+                    };
+
+                    _logger.LogInformation($"✅ Download completed successfully - File: {fileName}, Size: {memoryStream.Length} bytes, ContentType: {contentType}");
+
+                    return File(memoryStream.ToArray(), contentType);
+                } finally {
+                    // Xóa file tạm
+                    if (System.IO.File.Exists(tempFile))
+                        System.IO.File.Delete(tempFile);
+                }
+            } catch (Exception ex) {
+                _logger.LogError(ex, $"❌ Download failed: Error reading {fileName}");
+                return StatusCode(500);
             }
         }
 
@@ -125,21 +168,76 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
 
         [HttpPost("upload-multi")]
         public async Task<IActionResult> UploadMultiple(List<IFormFile> files) {
-            if (files == null || files.Count == 0) return BadRequest(new { error = "No files provided." });
-            var results = new List<object>();
-            foreach (var file in files) {
-                if (file == null || file.Length == 0) continue;
-                if (file.Length > _maxFileSizeBytes) continue;
-                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-                if (!_allowedExtensions.Contains(ext)) continue;
-                var savedFileName = $"{Guid.NewGuid()}{ext}".Replace("\"", string.Empty);
-                var savePath = Path.Combine(_uploadRoot, savedFileName);
-                await using (var stream = System.IO.File.Create(savePath)) {
-                    await file.CopyToAsync(stream);
+            try {
+                if (files == null || files.Count == 0) {
+                    _logger.LogWarning("❌ Multi-upload failed: No files provided");
+                    return BadRequest(new { error = "No files provided." });
                 }
-                results.Add(new { originalName = file.FileName, storedName = savedFileName, size = file.Length, url = $"/{UploadFolderName}/{savedFileName}" });
+
+                _logger.LogInformation($"📤 Multi-upload started: {files.Count} file(s)");
+
+                var results = new List<object>();
+                var failedFiles = new List<string>();
+
+                foreach (var file in files) {
+                    try {
+                        if (file == null || file.Length == 0) {
+                            _logger.LogWarning($"⏭️ Skipped: Empty file");
+                            failedFiles.Add($"{file?.FileName}: Empty file");
+                            continue;
+                        }
+
+                        if (file.Length > _maxFileSizeBytes) {
+                            _logger.LogWarning($"⏭️ Skipped: {file.FileName} - File too large");
+                            failedFiles.Add($"{file.FileName}: File too large");
+                            continue;
+                        }
+
+                        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                        if (!_allowedExtensions.Contains(ext)) {
+                            _logger.LogWarning($"⏭️ Skipped: {file.FileName} - Extension not allowed");
+                            failedFiles.Add($"{file.FileName}: Extension '{ext}' not allowed");
+                            continue;
+                        }
+
+                        var savedFileName = $"{Guid.NewGuid()}{ext}".Replace("\"", string.Empty);
+                        var savePath = Path.Combine(_uploadRoot, savedFileName);
+
+                        _logger.LogInformation($"📝 Saving: {file.FileName} to {savePath}");
+
+                        await using (var stream = System.IO.File.Create(savePath)) {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        var result = new { 
+                            originalName = file.FileName, 
+                            storedName = savedFileName, 
+                            size = file.Length, 
+                            url = $"/{UploadFolderName}/{savedFileName}",
+                            status = "✅ Success"
+                        };
+                        results.Add(result);
+
+                        _logger.LogInformation($"✅ File uploaded successfully: {file.FileName} -> {savedFileName}");
+                    } catch (Exception ex) {
+                        _logger.LogError(ex, $"❌ Error uploading file: {file?.FileName}");
+                        failedFiles.Add($"{file?.FileName}: {ex.Message}");
+                    }
+                }
+
+                var response = new {
+                    successful = results,
+                    failed = failedFiles,
+                    summary = $"✅ {results.Count}/{files.Count} files uploaded successfully"
+                };
+
+                _logger.LogInformation($"✅ Multi-upload completed: {results.Count}/{files.Count} successful");
+
+                return Ok(response);
+            } catch (Exception ex) {
+                _logger.LogError(ex, "❌ Multi-upload failed with unexpected error");
+                return StatusCode(500, new { error = $"Upload failed: {ex.Message}" });
             }
-            return Ok(results);
         }
     }
 }

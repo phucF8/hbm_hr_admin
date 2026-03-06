@@ -1,0 +1,66 @@
+flowchart TD
+    A["Khoi tao EventDetailComponent"] --> B["constructor: set isEditMode, initForm"]
+    B --> C["ngOnInit"]
+    C --> D{"Co data truyen vao?"}
+
+    D -- "Co" --> E["loadEventData(event)"]
+    E --> E1["Patch form values"]
+    E1 --> E2{"event co imageUrl?"}
+    E2 -- "Co" --> E3["set previewUrl"]
+    E2 -- "Khong" --> E4["Bo qua"]
+    E3 --> E5["updateIframeContent"]
+    E4 --> E5
+
+    D -- "Khong" --> F["updateIframeContent lan dau"]
+    E5 --> G["Subscribe content.valueChanges"]
+    F --> G
+    G --> H["Nguoi dung nhap noi dung"]
+    H --> I["updateIframeContent realtime"]
+
+    I --> J["Nguoi dung chon anh nen"]
+    J --> K["onImageSelected"]
+    K --> L{"File hop le image/*?"}
+    L -- "Khong" --> L1["Swal loi va return"]
+    L -- "Co" --> M{"File <= 5MB?"}
+    M -- "Khong" --> M1["Swal loi va return"]
+    M -- "Co" --> N["Set selectedImageFile/name"]
+    N --> O["FileReader doc anh"]
+    O --> P["set previewUrl"]
+    P --> Q["updateIframeContent"]
+
+    Q --> R["Nguoi dung bam Tao/Câp nhat"]
+    R --> S["onSubmit"]
+    S --> T{"Form hop le?"}
+    T -- "Khong" --> T1["mark touched + Swal loi + stop"]
+    T -- "Co" --> U{"endDate > startDate?"}
+    U -- "Khong" --> U1["Swal loi + stop"]
+    U -- "Co" --> V["isSubmitting = true"]
+    V --> W["uploadImageIfNeeded"]
+
+    W --> X{"Co selectedImageFile moi?"}
+    X -- "Khong" --> X1["Tra previewUrl hien tai"]
+    X -- "Co" --> X2["fileService.uploadFile"]
+    X2 --> X3{"Upload SUCCESS?"}
+    X3 -- "Khong" --> X4["Catch loi -> isSubmitting=false + Swal"]
+    X3 -- "Co" --> X5["Lay imageUrl tu response"]
+
+    X1 --> Y{"isEditMode && data?"}
+    X5 --> Y
+
+    Y -- "Khong" --> Z["createEvent(formValue, imageUrl)"]
+    Y -- "Co" --> AA["updateEvent(formValue, imageUrl)"]
+
+    Z --> Z1["generateHtmlContent(imageUrl)"]
+    Z1 --> Z2["eventService.createEvent"]
+    Z2 --> Z3{"API SUCCESS?"}
+    Z3 -- "Co" --> Z4["isSubmitting=false + Swal success + close(true)"]
+    Z3 -- "Khong" --> Z5["isSubmitting=false + Swal error"]
+
+    AA --> AA1["generateHtmlContent(imageUrl)"]
+    AA1 --> AA2["eventService.updateEvent"]
+    AA2 --> AA3{"API SUCCESS?"}
+    AA3 -- "Co" --> AA4["isSubmitting=false + Swal success + close(true)"]
+    AA3 -- "Khong" --> AA5["isSubmitting=false + Swal error"]
+
+    R --> AB["Nguoi dung bam Huy"]
+    AB --> AC["onCancel -> close(false)"]

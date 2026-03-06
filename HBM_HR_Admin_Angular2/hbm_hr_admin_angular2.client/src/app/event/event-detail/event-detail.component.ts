@@ -32,6 +32,7 @@ export class EventDetailComponent implements OnInit {
   previewUrl: string | null = null;
   selectedImageFile: File | null = null;
   iframeHtmlContent: SafeResourceUrl = '';
+  backgroundImageUrl: string | null = null; // Full URL để user test
 
   constructor(
     private fb: FormBuilder,
@@ -76,7 +77,8 @@ export class EventDetailComponent implements OnInit {
     // Extract text content từ HTML document nếu có
     const htmlContent = event.content || event.htmlContent || '';
     const textContent = this.extractContentFromHtml(htmlContent);
-    
+    const extractedBackgroundUrl = this.extractBackgroundImageUrlFromHtml(htmlContent);
+
     this.eventForm.patchValue({
       title: event.title || '',
       content: textContent,
@@ -87,12 +89,14 @@ export class EventDetailComponent implements OnInit {
       version: event.version ?? 1,
       priority: event.priority ?? 0
     });
-    
-    // Set preview URL nếu event có imageUrl
-    if (event.imageUrl) {
-      this.previewUrl = event.imageUrl;
+
+    // Ưu tiên imageUrl từ API, nếu không có thì lấy từ htmlContent
+    this.previewUrl = event.imageUrl || extractedBackgroundUrl;
+    this.backgroundImageUrl = this.previewUrl; // Lưu full URL để hiển thị cho user test
+    if (this.previewUrl) {
+      this.selectedImageName = this.extractFileNameFromUrl(this.previewUrl);
     }
-    
+
     // Update iframe content sau khi load data
     this.updateIframeContent();
   }
@@ -231,11 +235,11 @@ export class EventDetailComponent implements OnInit {
    */
   private extractContentFromHtml(html: string): string {
     if (!html || html.trim().length === 0) return '';
-    
+
     // Tạo DOM parser để parse HTML
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    
+
     // Tìm element có class preview-content
     const contentElement = doc.querySelector('.preview-content');
     if (contentElement) {
@@ -244,9 +248,39 @@ export class EventDetailComponent implements OnInit {
       textarea.innerHTML = contentElement.innerHTML;
       return textarea.value;
     }
-    
+
     // Fallback: nếu không tìm thấy .preview-content, return raw text
     return html;
+  }
+
+  /**
+   * Extract background-image URL từ HTML document
+   * Tìm style background-image ở body hoặc inline style
+   */
+  private extractBackgroundImageUrlFromHtml(html: string): string | null {
+    if (!html || html.trim().length === 0) return null;
+
+    // Ưu tiên parse nhanh bằng regex để bắt cả CSS trong <style>
+    const backgroundRegex = /background-image\s*:\s*url\((['"]?)(.*?)\1\)/i;
+    const match = html.match(backgroundRegex);
+    if (match && match[2]) {
+      return match[2].trim();
+    }
+
+    return null;
+  }
+
+  /**
+   * Lấy tên file từ URL để hiển thị trên form
+   */
+  private extractFileNameFromUrl(url: string): string {
+    try {
+      const cleanUrl = url.split('?')[0].split('#')[0];
+      const fileName = cleanUrl.substring(cleanUrl.lastIndexOf('/') + 1);
+      return decodeURIComponent(fileName) || cleanUrl;
+    } catch {
+      return url;
+    }
   }
 
   /**
@@ -295,12 +329,16 @@ export class EventDetailComponent implements OnInit {
 
     try {
       const response = await this.fileService.uploadFile(this.selectedImageFile).toPromise();
+      console.log('Upload response:', response); // DEBUG: In response từ server
       if (response && response.status === 'SUCCESS' && response.data) {
         // Giả sử backend trả về { status: 'SUCCESS', data: { fileUrl: '...' } }
-        return response.data.fileUrl || response.data.url || response.data;
+        const fileUrl = response.data.fileUrl || response.data.url || response.data;
+        console.log('Extracted fileUrl:', fileUrl); // DEBUG: In URL được extract
+        return fileUrl;
       }
       throw new Error('Upload thất bại');
     } catch (error: any) {
+      console.error('Upload error:', error); // DEBUG: In error chi tiết
       throw new Error(error.message || 'Không thể upload hình ảnh');
     }
   }
@@ -424,6 +462,15 @@ export class EventDetailComponent implements OnInit {
         Swal.fire('Lỗi', error.message || 'Không thể cập nhật event', 'error');
       }
     });
+  }
+
+  /**
+   * Mở URL ảnh trong browser tab mới để user test sự tồn tại
+   */
+  openImageInBrowser(url: string): void {
+    if (url) {
+      window.open(url, '_blank');
+    }
   }
 
   onCancel(): void {

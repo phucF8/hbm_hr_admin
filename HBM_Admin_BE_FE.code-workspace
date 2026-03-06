@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "HBM_HR_Admin_Angular2/HBM_HR_Admin_Angular2.Server"
+		},
+		{
+			"path": "HBM_HR_Admin_Angular2/hbm_hr_admin_angular2.client"
+		}
+	],
+	"settings": {}
+}

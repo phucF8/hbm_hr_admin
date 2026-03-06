@@ -61,6 +61,21 @@
               </span>
             </div>
             <small class="form-hint">Chọn file ảnh để làm hình nền event (không bắt buộc)</small>
+            
+            <!-- Hiển thị full URL ảnh nền để test -->
+            <div *ngIf="backgroundImageUrl" class="image-url-display">
+              <div class="label-small">URL ảnh nền hiện tại:</div>
+              <div class="url-box">
+                <span class="url-text">{{ backgroundImageUrl }}</span>
+                <button 
+                  type="button"
+                  class="btn btn-small btn-test"
+                  (click)="openImageInBrowser(backgroundImageUrl)"
+                  title="Mở URL ảnh trong browser để kiểm tra">
+                  <i class="bi bi-box-arrow-up-right"></i> Test
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Ngày bắt đầu, kết thúc và mức độ ưu tiên -->
@@ -103,7 +118,7 @@
               <input 
                 type="checkbox" 
                 formControlName="isActive">
-              <span>Hiển thị event trên mobile app</span>
+              <span>Hiển thị trên mobile app</span>
             </label>
           </div>
         </div>
