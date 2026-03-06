@@ -14,6 +14,7 @@ import { EventItem } from '../../models/event.model';
 export class EventPreviewDialogComponent {
   iframeSrc: SafeResourceUrl;
   event: EventItem;
+  showMetadata: boolean = true;
 
   constructor(
     private dialogRef: MatDialogRef<EventPreviewDialogComponent>,
@@ -27,6 +28,10 @@ export class EventPreviewDialogComponent {
     const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
     const blobUrl = URL.createObjectURL(blob);
     this.iframeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+  }
+
+  toggleMetadata(): void {
+    this.showMetadata = !this.showMetadata;
   }
 
   close(): void {
