@@ -8,11 +8,13 @@ namespace HBM_HR_Admin_Angular2.Server.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<EventService> _logger;
+        private readonly IWebHostEnvironment _environment;
 
-        public EventService(ApplicationDbContext context, ILogger<EventService> logger)
+        public EventService(ApplicationDbContext context, ILogger<EventService> logger, IWebHostEnvironment environment)
         {
             _context = context;
             _logger = logger;
+            _environment = environment;
         }
 
         /// <summary>
@@ -74,6 +76,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         public async Task<EventPage> CreateEventAsync(EventPage eventPage)
         {
             eventPage.Id = Guid.NewGuid();
+
             _context.EventPages.Add(eventPage);
             await _context.SaveChangesAsync();
 
@@ -143,6 +146,49 @@ namespace HBM_HR_Admin_Angular2.Server.Services
 
             _logger.LogInformation($"Toggle IsActive của event {eventPage.Title}: {eventPage.IsActive}");
             return eventPage;
+        }
+
+        /// <summary>
+        /// Lưu HTML content ra file trong thư mục wwwroot/events
+        /// </summary>
+        /// <param name="eventId">ID của event</param>
+        /// <param name="htmlContent">Nội dung HTML</param>
+        /// <param name="fileName">Tên file (không bao gồm extension)</param>
+        /// <returns>Đường dẫn tương đối của file đã tạo</returns>
+        public async Task<string> SaveHtmlToFileAsync(Guid eventId, string htmlContent, string fileName)
+        {
+            try
+            {
+                // Tạo tên file an toàn (loại bỏ ký tự không hợp lệ)
+                var safeFileName = string.Join("_", fileName.Split(Path.GetInvalidFileNameChars()));
+                var fileNameWithId = $"{safeFileName}_{eventId}.html";
+
+                // Đường dẫn thư mục events trong wwwroot
+                var eventsFolder = Path.Combine(_environment.WebRootPath, "events");
+
+                // Tạo thư mục nếu chưa tồn tại
+                if (!Directory.Exists(eventsFolder))
+                {
+                    Directory.CreateDirectory(eventsFolder);
+                    _logger.LogInformation($"Đã tạo thư mục: {eventsFolder}");
+                }
+
+                // Đường dẫn file đầy đủ
+                var filePath = Path.Combine(eventsFolder, fileNameWithId);
+
+                // Ghi nội dung HTML ra file
+                await File.WriteAllTextAsync(filePath, htmlContent);
+
+                _logger.LogInformation($"Đã lưu file HTML: {filePath}");
+
+                // Trả về đường dẫn tương đối để có thể truy cập qua HTTP
+                return $"/events/{fileNameWithId}";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Lỗi khi lưu file HTML: {ex.Message}");
+                throw;
+            }
         }
     }
 }

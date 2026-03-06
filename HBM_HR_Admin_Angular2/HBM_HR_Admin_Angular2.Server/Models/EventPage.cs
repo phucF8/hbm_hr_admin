@@ -14,6 +14,7 @@ namespace HBM_HR_Admin_Angular2.Server.Models
         public string Title { get; set; }
 
         [Required]
+        [Column(TypeName = "nvarchar(max)")]
         public string HtmlContent { get; set; }
 
         public bool IsActive { get; set; } = true;

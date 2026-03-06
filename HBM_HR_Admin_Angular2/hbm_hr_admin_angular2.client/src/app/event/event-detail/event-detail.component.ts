@@ -31,13 +31,18 @@ export class EventDetailComponent implements OnInit {
   selectedImageName: string = '';
   previewUrl: string | null = null;
   selectedImageFile: File | null = null;
+  uploadedImageUrl: string | null = null; // Lưu URL của file đã upload
   iframeHtmlContent: SafeResourceUrl = '';
   backgroundImageUrl: string | null = null; // Full URL để user test
+  previewHtmlBlobUrl: string | null = null; // Blob URL của HTML preview để user mở trong browser
   
   // Upload trực tiếp file sau khi chọn
   isUploadingImage: boolean = false;
   hasImageUploaded: boolean = false;
   imageUploadMessage: string = '';
+  
+  // Tạo file HTML
+  isCreatingFile: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -74,7 +79,8 @@ export class EventDetailComponent implements OnInit {
       orderNumber: [0],
       isActive: [true],
       version: [1],
-      priority: [0]
+      priority: [0],
+      htmlContent: [''] // Ẩn field dùng để lưu HTML content hoàn chỉnh
     });
   }
 
@@ -97,6 +103,7 @@ export class EventDetailComponent implements OnInit {
 
     // Ưu tiên imageUrl từ API, nếu không có thì lấy từ htmlContent
     this.previewUrl = event.imageUrl || extractedBackgroundUrl;
+    this.uploadedImageUrl = null; // Reset upload URL khi load event cũ
     this.backgroundImageUrl = this.previewUrl; // Lưu full URL để hiển thị cho user test
     if (this.previewUrl) {
       this.selectedImageName = this.extractFileNameFromUrl(this.previewUrl);
@@ -148,6 +155,7 @@ export class EventDetailComponent implements OnInit {
       this.selectedImageFile = file;
       this.selectedImageName = file.name;
       this.hasImageUploaded = false; // Reset upload status khi chọn file mới
+      this.uploadedImageUrl = null; // Reset uploaded URL khi chọn file mới
 
       // Create preview
       const reader = new FileReader();
@@ -195,6 +203,7 @@ export class EventDetailComponent implements OnInit {
 
         this.isUploadingImage = false;
         this.hasImageUploaded = true;
+        this.uploadedImageUrl = response.data.url || null; // Lưu URL từ response
         this.imageUploadMessage = 'Upload thành công!';
 
         Swal.fire('Thành công', 'Đã upload hình ảnh', 'success');
@@ -206,6 +215,7 @@ export class EventDetailComponent implements OnInit {
       console.error('[EventDetail] Upload error:', error);
       this.isUploadingImage = false;
       this.hasImageUploaded = false;
+      this.uploadedImageUrl = null; // Reset uploaded URL khi upload thất bại
       this.imageUploadMessage = 'Upload thất bại';
 
       Swal.fire('Lỗi', error.message || 'Không thể upload hình ảnh', 'error');
@@ -365,6 +375,15 @@ export class EventDetailComponent implements OnInit {
 
     // Upload ảnh trước (nếu có), sau đó mới create/update event
     this.uploadImageIfNeeded().then(imageUrl => {
+      // Cập nhật htmlContent trước khi submit nếu chưa có
+      if (!formValue.htmlContent) {
+        const jsonContent = this.generateJsonContent();
+        this.eventForm.patchValue({
+          htmlContent: jsonContent
+        }, { emitEvent: false });
+        formValue.htmlContent = jsonContent;
+      }
+
       if (this.isEditMode && this.data) {
         this.updateEvent(formValue, imageUrl);
       } else {
@@ -382,10 +401,10 @@ export class EventDetailComponent implements OnInit {
    * @returns Promise với blob URL của ảnh đã giải mã, hoặc null nếu không có file
    */
   private async uploadImageIfNeeded(): Promise<string | null> {
-    // Nếu file đã được upload qua nút upload - không cần upload lại
-    if (this.hasImageUploaded) {
-      console.log('[EventDetail] Image already uploaded, using existing preview URL');
-      return this.previewUrl;
+    // Nếu file đã được upload qua nút upload - sử dụng uploadedImageUrl
+    if (this.hasImageUploaded && this.uploadedImageUrl) {
+      console.log('[EventDetail] Using uploaded image URL:', this.uploadedImageUrl);
+      return this.uploadedImageUrl;
     }
 
     // Nếu không có file mới, giữ nguyên URL cũ (nếu có)
@@ -455,71 +474,24 @@ export class EventDetailComponent implements OnInit {
   }
 
   /**
-   * Tạo HTML content hoàn chỉnh để lưu vào database
-   * Bao gồm cả background image và styled content
+   * Tạo JSON content chứa uploadedImageUrl và content
+   * Lưu vào database dưới dạng JSON string
    */
-  private generateHtmlContent(imageUrl: string | null): string {
-    const contentText = this.content?.value || '';
-    const bgImage = imageUrl ? `url('${imageUrl}')` : 'none';
+  private generateJsonContent(): string {
+    const formValue = this.eventForm.value;
     
-    return `
-      <!DOCTYPE html>
-      <html lang="vi">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          html, body {
-            width: 100%;
-            height: 100%;
-          }
-          body {
-            background-image: ${bgImage};
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-          }
-          .preview-overlay {
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .preview-content {
-            word-break: break-word;
-            color: white;
-            text-align: center;
-            font-size: 16px;
-            line-height: 1.5;
-            max-width: 90%;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="preview-overlay">
-          <div class="preview-content">${this.escapeHtml(contentText)}</div>
-        </div>
-      </body>
-      </html>
-    `.trim();
+    const contentData = {
+      uploadedImageUrl: this.uploadedImageUrl || null,
+      content: formValue.content || ''
+    };
+
+    return JSON.stringify(contentData, null, 2);
   }
 
   createEvent(formValue: any, imageUrl: string | null): void {
     const request: CreateEventRequest = {
       title: formValue.title,
-      htmlContent: this.generateHtmlContent(imageUrl), // HTML hoàn chỉnh bao gồm ảnh nền
+      htmlContent: formValue.htmlContent, // Sử dụng HTML content từ form
       startTime: new Date(formValue.startDate).toISOString(),
       endTime: formValue.endDate ? new Date(formValue.endDate).toISOString() : undefined,
       isActive: formValue.isActive,
@@ -549,7 +521,7 @@ export class EventDetailComponent implements OnInit {
     const request: UpdateEventRequest = {
       id: this.data!.id,
       title: formValue.title,
-      htmlContent: this.generateHtmlContent(imageUrl), // HTML hoàn chỉnh bao gồm ảnh nền
+      htmlContent: formValue.htmlContent, // Sử dụng HTML content từ form
       startTime: new Date(formValue.startDate).toISOString(),
       endTime: formValue.endDate ? new Date(formValue.endDate).toISOString() : undefined,
       isActive: formValue.isActive,
@@ -584,6 +556,36 @@ export class EventDetailComponent implements OnInit {
     }
   }
 
+  /**
+   * Preview event content
+   * Tạo JSON content từ form data
+   */
+  onPreview(): void {
+    if (this.eventForm.invalid) {
+      this.markFormGroupTouched(this.eventForm);
+      Swal.fire('Lỗi', 'Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
+      return;
+    }
+
+    const jsonContent = this.generateJsonContent();
+    
+    // Lưu JSON content vào form control
+    this.eventForm.patchValue({
+      htmlContent: jsonContent
+    });
+
+    Swal.fire('Thông báo', 'Đã cập nhật JSON content:\n\n' + jsonContent, 'info');
+  }
+
+  /**
+   * Mở file HTML preview trong tab browser mới
+   */
+  openPreviewInBrowser(): void {
+    if (this.previewHtmlBlobUrl) {
+      window.open(this.previewHtmlBlobUrl, '_blank');
+    }
+  }
+
   onCancel(): void {
     this.dialogRef.close(false);
   }
@@ -605,5 +607,6 @@ export class EventDetailComponent implements OnInit {
   get isActive() { return this.eventForm.get('isActive'); }
   get version() { return this.eventForm.get('version'); }
   get priority() { return this.eventForm.get('priority'); }
+  get htmlContent() { return this.eventForm.get('htmlContent'); }
 }
 

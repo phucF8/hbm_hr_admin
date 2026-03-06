@@ -86,21 +86,6 @@
                 <span>{{ hasImageUploaded ? 'File đã upload thành công' : 'Đang upload...' }}</span>
               </div>
             </div>
-            
-            <!-- Hiển thị full URL ảnh nền để test -->
-            <div *ngIf="backgroundImageUrl" class="image-url-display">
-              <div class="label-small">URL ảnh nền hiện tại:</div>
-              <div class="url-box">
-                <span class="url-text">{{ backgroundImageUrl }}</span>
-                <button 
-                  type="button"
-                  class="btn btn-small btn-test"
-                  (click)="openImageInBrowser(backgroundImageUrl)"
-                  title="Mở URL ảnh trong browser để kiểm tra">
-                  <i class="bi bi-box-arrow-up-right"></i> Test
-                </button>
-              </div>
-            </div>
           </div>
 
           <!-- Ngày bắt đầu, kết thúc và mức độ ưu tiên -->
@@ -165,6 +150,12 @@
 
       <!-- Buttons -->
       <div class="dialog-actions">
+        <button type="button" class="btn btn-preview" (click)="onPreview()" [disabled]="isSubmitting || eventForm.invalid">
+          <i class="bi bi-eye"></i> Preview
+        </button>
+        <button type="button" class="btn btn-open-preview" (click)="openPreviewInBrowser()" [disabled]="!previewHtmlBlobUrl" title="Mở preview trong tab browser mới">
+          <i class="bi bi-box-arrow-up-right"></i> Xem toàn màn hình
+        </button>
         <button type="button" class="btn btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
           Hủy
         </button>

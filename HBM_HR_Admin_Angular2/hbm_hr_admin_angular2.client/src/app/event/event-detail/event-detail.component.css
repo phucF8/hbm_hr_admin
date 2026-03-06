@@ -280,6 +280,24 @@
   background-color: #d0d0d0;
 }
 
+.btn-preview {
+  background-color: #00a680;
+  color: white;
+}
+
+.btn-preview:hover:not(:disabled) {
+  background-color: #008560;
+}
+
+.btn-open-preview {
+  background-color: #0066cc;
+  color: white;
+}
+
+.btn-open-preview:hover:not(:disabled) {
+  background-color: #0052a3;
+}
+
 .btn-submit {
   background-color: #6c63ff;
   color: white;
