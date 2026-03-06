@@ -21,13 +21,13 @@ export class FileService {
     return this.http.post(url, formData);
   }
 
-  uploadPublicFile(file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
+  // uploadPublicFile(file: File): Observable<any> {
+  //   const formData = new FormData();
+  //   formData.append('file', file);
 
-    const url = `${environment.apiUrl}/FileUpload/upload-public`;
-    return this.http.post(url, formData);
-  }
+  //   const url = `${environment.apiUrl}/FileUpload/upload-public`;
+  //   return this.http.post(url, formData);
+  // }
 
   /**
    * Lấy file đã giải mã dạng blob thông qua ViewFile API

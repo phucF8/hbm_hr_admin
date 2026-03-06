@@ -1,6 +1,7 @@
 using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace HBM_HR_Admin_Angular2.Server.Services
 {
@@ -72,10 +73,14 @@ namespace HBM_HR_Admin_Angular2.Server.Services
 
         /// <summary>
         /// Tạo event mới
+        /// Parse HtmlContent để extract uploadedImageUrl và copy file từ tmp sang uploads
         /// </summary>
         public async Task<EventPage> CreateEventAsync(EventPage eventPage)
         {
             eventPage.Id = Guid.NewGuid();
+
+            // Parse HtmlContent và copy file từ tmp sang uploads
+            await ProcessImageFromHtmlContentAsync(eventPage.HtmlContent);
 
             _context.EventPages.Add(eventPage);
             await _context.SaveChangesAsync();
@@ -86,6 +91,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
 
         /// <summary>
         /// Cập nhật event
+        /// Parse HtmlContent để extract uploadedImageUrl và copy file từ tmp sang uploads
         /// </summary>
         public async Task<EventPage?> UpdateEventAsync(Guid id, EventPage updatedEvent)
         {
@@ -95,6 +101,9 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                 _logger.LogWarning($"Không tìm thấy event với ID: {id}");
                 return null;
             }
+
+            // Parse HtmlContent và copy file từ tmp sang uploads
+            await ProcessImageFromHtmlContentAsync(updatedEvent.HtmlContent);
 
             existingEvent.Title = updatedEvent.Title;
             existingEvent.HtmlContent = updatedEvent.HtmlContent;
@@ -187,6 +196,85 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             catch (Exception ex)
             {
                 _logger.LogError($"Lỗi khi lưu file HTML: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Parse HtmlContent JSON để extract uploadedImageUrl và copy file từ tmp sang uploads
+        /// </summary>
+        /// <param name="htmlContent">JSON string chứa uploadedImageUrl và content</param>
+        private async Task ProcessImageFromHtmlContentAsync(string htmlContent)
+        {
+            if (string.IsNullOrWhiteSpace(htmlContent))
+            {
+                return;
+            }
+
+            try
+            {
+                // Parse JSON
+                var jsonDoc = JsonDocument.Parse(htmlContent);
+                var root = jsonDoc.RootElement;
+
+                // Extract uploadedImageUrl
+                if (root.TryGetProperty("uploadedImageUrl", out var uploadedImageUrlElement))
+                {
+                    var uploadedImageUrl = uploadedImageUrlElement.GetString();
+                    
+                    if (!string.IsNullOrWhiteSpace(uploadedImageUrl))
+                    {
+                        // Copy file từ tmp sang uploads
+                        await CopyFileFromTmpToUploadsAsync(uploadedImageUrl);
+                    }
+                }
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning($"Không thể parse HtmlContent JSON: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Lỗi khi xử lý image từ HtmlContent: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Copy file từ thư mục tmp sang uploads
+        /// </summary>
+        /// <param name="fileName">Tên file (vd: 5a65a55a-3876-437a-a008-f242519ed62f..jpg.enc)</param>
+        private async Task CopyFileFromTmpToUploadsAsync(string fileName)
+        {
+            try
+            {
+                var tmpFolder = Path.Combine(_environment.WebRootPath, "tmp");
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+
+                var sourcePath = Path.Combine(tmpFolder, fileName);
+                var destPath = Path.Combine(uploadsFolder, fileName);
+
+                // Kiểm tra file tồn tại trong tmp
+                if (!File.Exists(sourcePath))
+                {
+                    _logger.LogWarning($"File không tồn tại trong tmp: {sourcePath}");
+                    return;
+                }
+
+                // Tạo thư mục uploads nếu chưa tồn tại
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                    _logger.LogInformation($"Đã tạo thư mục: {uploadsFolder}");
+                }
+
+                // Copy file (overwrite nếu đã tồn tại)
+                await Task.Run(() => File.Copy(sourcePath, destPath, overwrite: true));
+
+                _logger.LogInformation($"Đã copy file từ tmp sang uploads: {fileName}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Lỗi khi copy file {fileName} từ tmp sang uploads: {ex.Message}");
                 throw;
             }
         }
