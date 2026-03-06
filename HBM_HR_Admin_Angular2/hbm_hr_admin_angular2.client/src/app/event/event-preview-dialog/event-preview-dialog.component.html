@@ -1,0 +1,37 @@
+<div class="phone-container">
+  <div class="phone-header">
+    <h3>{{ event.title }}</h3>
+    <button class="close-btn" (click)="close()">✕</button>
+  </div>
+  
+  <div class="phone-screen">
+    <iframe [src]="iframeSrc" frameborder="0"></iframe>
+  </div>
+
+  <!-- Metadata Section -->
+  <div class="metadata-section">
+    <div class="metadata-title">Thông tin sự kiện</div>
+    <div class="metadata-row">
+      <span class="metadata-label">Bắt đầu:</span>
+      <span class="metadata-value">{{ formatDate(event.startTime || event.startDate) }}</span>
+    </div>
+    <div class="metadata-row">
+      <span class="metadata-label">Kết thúc:</span>
+      <span class="metadata-value">{{ formatDate(event.endTime || event.endDate) }}</span>
+    </div>
+    <div class="metadata-row">
+      <span class="metadata-label">Trạng thái:</span>
+      <span class="metadata-value" [ngClass]="getStatusClass()">{{ getStatusText() }}</span>
+    </div>
+    <div class="metadata-row">
+      <span class="metadata-label">Ưu tiên:</span>
+      <span class="metadata-value">Mức {{ event.priority || 0 }}</span>
+    </div>
+  </div>
+
+  <!-- JSON Data Section -->
+  <div class="json-section">
+    <div class="json-title">Cấu trúc JSON Data</div>
+    <pre class="json-content">{{ formatJson() }}</pre>
+  </div>
+</div>

@@ -9,6 +9,7 @@ import { UtilsService } from '@app/utils/utils.service';
 import { PAGINATION_CONFIG } from '@app/constants/api.constants';
 import Swal from 'sweetalert2';
 import { EventDetailComponent } from '../event-detail/event-detail.component';
+import { EventPreviewDialogComponent } from '../event-preview-dialog/event-preview-dialog.component';
 
 /**
  * Component quản lý danh sách Event HTML
@@ -79,7 +80,11 @@ export class EventListComponent implements OnInit {
         if (response.status === 'SUCCESS') {
           // Backend trả về data là array trực tiếp
           const eventList = Array.isArray(response.data) ? response.data : [];
-          this.events = eventList.map((item: EventItem) => ({ ...item, selected: false }));
+          this.events = eventList.map((item: any) => ({ 
+            ...item, 
+            selected: false,
+            generatedHtml: item.generatedHtml || item.GeneratedHtml // Map từ API response
+          }));
           this.totalPage = 1; // Backend chưa hỗ trợ phân trang
         } else {
           Swal.fire('Lỗi', response.message, 'error');
@@ -184,33 +189,57 @@ export class EventListComponent implements OnInit {
 
   /**
    * Xem chi tiết và preview HTML content của event
-   * Hiển thị trong SweetAlert với HTML được render
+   * Mở HTML trong dialog hình điện thoại
    */
   viewDetail(event: EventItem): void {
     this.closeMenu();
-    Swal.fire({
-      title: event.title,
-      html: `
-        <div style="text-align: left;">
-          <p><strong>Nội dung HTML:</strong></p>
-          <div>${event.content || event.htmlContent || 'Không có nội dung'}</div>
-          ${event.imageUrl ? `<img src="${event.imageUrl}" style="max-width: 100%; margin-top: 10px;">` : ''}
-          <p style="margin-top: 15px;">
-            <strong>Thời gian:</strong><br>
-            Bắt đầu: ${this.formatDateTime(event.startDate || event.startTime)}<br>
-            Kết thúc: ${(event.endDate || event.endTime) ? this.formatDateTime(event.endDate || event.endTime) : 'N/A'}
-          </p>
-          <p>
-            <strong>Trạng thái:</strong> ${event.isActive ? '<span style="color:green">Hiển thị</span>' : '<span style="color:red">Ẩn</span>'}
-          </p>
-          <p>
-            <strong>Phiên bản:</strong> ${event.version || 1}<br>
-            <strong>Độ ưu tiên:</strong> ${event.priority || 0}
-          </p>
-        </div>
-      `,
-      width: '600px',
-      confirmButtonText: 'Đóng'
+    
+    // Nếu event chưa có generatedHtml, gọi API để lấy
+    if (!event.generatedHtml) {
+      this.loadingService.show();
+      this.eventService.getEventById(event.id).subscribe({
+        next: (response) => {
+          this.loadingService.hide();
+          if (response.status === 'SUCCESS' && response.data) {
+            const eventData = response.data as any;
+            // Update event với data đầy đủ từ server
+            const fullEvent = {
+              ...event,
+              ...eventData,
+              generatedHtml: eventData.generatedHtml || eventData.GeneratedHtml
+            };
+            this.openPreviewDialog(fullEvent);
+          } else {
+            Swal.fire('Lỗi', 'Không thể tải event', 'error');
+          }
+        },
+        error: (error) => {
+          this.loadingService.hide();
+          Swal.fire('Lỗi', 'Không thể tải event', 'error');
+        }
+      });
+    } else {
+      this.openPreviewDialog(event);
+    }
+  }
+
+  /**
+   * Mở dialog preview HTML với hình dạng điện thoại
+   */
+  private openPreviewDialog(event: EventItem): void {
+    if (!event.generatedHtml) {
+      Swal.fire('Thông báo', 'Không có nội dung HTML', 'info');
+      return;
+    }
+
+    this.dialog.open(EventPreviewDialogComponent, {
+      width: '420px',
+      height: '90vh',
+      maxHeight: '800px',
+      data: {
+        event: event
+      },
+      panelClass: 'phone-preview-dialog'
     });
   }
 

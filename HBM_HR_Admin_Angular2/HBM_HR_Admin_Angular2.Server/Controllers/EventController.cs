@@ -70,7 +70,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
             {
                 var events = await _eventService.GetAllEventsAsync();
                 
-                // Tạo HTML cho mỗi event
+                // Map mỗi event với GeneratedHtml
                 var eventsWithHtml = events.Select(e => new
                 {
                     e.Id,
@@ -83,7 +83,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     e.Priority,
                     GeneratedHtml = _eventService.GenerateHtmlFromContent(e.HtmlContent)
                 }).ToList();
-
+                
                 return Ok(ApiResponse<object>.Success(eventsWithHtml, "Lấy danh sách event thành công"));
             }
             catch (Exception ex)

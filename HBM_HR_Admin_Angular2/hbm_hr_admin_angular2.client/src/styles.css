@@ -501,3 +501,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .bg-warning   { background-color: #ffc107; color: #000; }
 .bg-info      { background-color: #0dcaf0; color: #000; }
 .bg-dark      { background-color: #212529; }
+
+/* Phone Preview Dialog Styles */
+.phone-preview-dialog .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.phone-preview-dialog .mat-mdc-dialog-surface {
+  border-radius: 20px !important;
+}

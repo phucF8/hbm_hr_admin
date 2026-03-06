@@ -55,6 +55,7 @@ export interface EventItem {
   orderNumber?: number;       // Thứ tự hiển thị
   selected?: boolean;         // UI only - dùng cho checkbox select multiple
   imageUrl?: string;          // Optional image URL
+  generatedHtml?: string;     // HTML document hoàn chỉnh từ server
 }
 
 // Response cho danh sách events với phân trang
