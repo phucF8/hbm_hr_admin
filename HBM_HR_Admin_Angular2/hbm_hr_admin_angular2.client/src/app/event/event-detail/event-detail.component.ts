@@ -292,41 +292,63 @@ export class EventDetailComponent implements OnInit {
   }
 
   /**
-   * Extract text content từ HTML document
-   * Parse HTML và lấy text từ .preview-content element
+   * Extract text content từ HtmlContent JSON
+   * Parse JSON và lấy thuộc tính "content"
    */
   private extractContentFromHtml(html: string): string {
     if (!html || html.trim().length === 0) return '';
 
-    // Tạo DOM parser để parse HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    // Tìm element có class preview-content
-    const contentElement = doc.querySelector('.preview-content');
-    if (contentElement) {
-      // Decode HTML entities và return text content
-      const textarea = document.createElement('textarea');
-      textarea.innerHTML = contentElement.innerHTML;
-      return textarea.value;
+    try {
+      // Parse JSON từ HtmlContent
+      const jsonData = JSON.parse(html);
+      
+      // Lấy thuộc tính content
+      if (jsonData.content && typeof jsonData.content === 'string') {
+        return jsonData.content;
+      }
+    } catch (error) {
+      console.warn('[EventDetail] Cannot parse HtmlContent as JSON, trying HTML fallback:', error);
+      
+      // Fallback: parse như HTML document (backward compatibility)
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const contentElement = doc.querySelector('.preview-content');
+        if (contentElement) {
+          const textarea = document.createElement('textarea');
+          textarea.innerHTML = contentElement.innerHTML;
+          return textarea.value;
+        }
+      } catch {}
     }
 
-    // Fallback: nếu không tìm thấy .preview-content, return raw text
-    return html;
+    return '';
   }
 
   /**
-   * Extract background-image URL từ HTML document
-   * Tìm style background-image ở body hoặc inline style
+   * Extract background-image URL từ HtmlContent JSON
+   * Parse JSON và lấy thuộc tính "uploadedImageUrl"
    */
   private extractBackgroundImageUrlFromHtml(html: string): string | null {
     if (!html || html.trim().length === 0) return null;
 
-    // Ưu tiên parse nhanh bằng regex để bắt cả CSS trong <style>
-    const backgroundRegex = /background-image\s*:\s*url\((['"]?)(.*?)\1\)/i;
-    const match = html.match(backgroundRegex);
-    if (match && match[2]) {
-      return match[2].trim();
+    try {
+      // Parse JSON từ HtmlContent
+      const jsonData = JSON.parse(html);
+      
+      // Lấy thuộc tính uploadedImageUrl
+      if (jsonData.uploadedImageUrl && typeof jsonData.uploadedImageUrl === 'string') {
+        return jsonData.uploadedImageUrl;
+      }
+    } catch (error) {
+      console.warn('[EventDetail] Cannot parse HtmlContent as JSON, trying HTML fallback:', error);
+      
+      // Fallback: parse bằng regex từ HTML (backward compatibility)
+      const backgroundRegex = /background-image\s*:\s*url\((['"]?)(.*?)\1\)/i;
+      const match = html.match(backgroundRegex);
+      if (match && match[2]) {
+        return match[2].trim();
+      }
     }
 
     return null;
