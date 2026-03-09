@@ -315,11 +315,18 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                         var fileName = uploadedImageUrlElement.GetString();
                         if (!string.IsNullOrWhiteSpace(fileName))
                         {
-                            if (Uri.TryCreate(fileName, UriKind.Absolute, out var absoluteUri)
+                            // Check if it's a data URL (base64 for preview)
+                            if (fileName.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+                            {
+                                imageUrl = $"url('{fileName}')";
+                            }
+                            // Check if it's an absolute HTTP/HTTPS URL
+                            else if (Uri.TryCreate(fileName, UriKind.Absolute, out var absoluteUri)
                                 && (absoluteUri.Scheme == Uri.UriSchemeHttp || absoluteUri.Scheme == Uri.UriSchemeHttps))
                             {
                                 imageUrl = $"url('{absoluteUri}')";
                             }
+                            // Otherwise, treat as relative filename
                             else
                             {
                                 var normalizedFileName = fileName.Replace("\\", "/").Split('/').Last();
@@ -376,8 +383,9 @@ namespace HBM_HR_Admin_Angular2.Server.Services
       padding: 20px;
       background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      padding-top: 60px;
     }}
     .preview-content {{
       word-break: break-word;

@@ -7,6 +7,7 @@ import { EventItem, CreateEventRequest, UpdateEventRequest } from '@app/models/e
 import { EventService } from '@app/services/event.service';
 import { FileService } from '@app/services/file.service';
 import Swal from 'sweetalert2';
+import { debounceTime, Subject } from 'rxjs';
 
 /**
  * Component dialog để tạo mới hoặc chỉnh sửa Event
@@ -33,8 +34,6 @@ export class EventDetailComponent implements OnInit {
   selectedImageFile: File | null = null;
   uploadedImageUrl: string | null = null; // Lưu URL của file đã upload
   iframeHtmlContent: SafeResourceUrl = '';
-  backgroundImageUrl: string | null = null; // Full URL để user test
-  previewHtmlBlobUrl: string | null = null; // Blob URL của HTML preview để user mở trong browser
   
   // Upload trực tiếp file sau khi chọn
   isUploadingImage: boolean = false;
@@ -43,6 +42,9 @@ export class EventDetailComponent implements OnInit {
   
   // Tạo file HTML
   isCreatingFile: boolean = false;
+  
+  // Subject cho debounce update preview
+  private previewUpdate$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -64,8 +66,16 @@ export class EventDetailComponent implements OnInit {
       // Cập nhật iframe content lần đầu cho create mode
       this.updateIframeContent();
     }
-    // Update iframe content mỗi khi content hoặc image thay đổi
+    
+    // Update iframe content mỗi khi content hoặc image thay đổi (debounce 300ms)
     this.eventForm.get('content')?.valueChanges.subscribe(() => {
+      this.previewUpdate$.next();
+    });
+    
+    // Subscribe vào debounced preview updates
+    this.previewUpdate$.pipe(
+      debounceTime(300)
+    ).subscribe(() => {
       this.updateIframeContent();
     });
   }
@@ -167,119 +177,44 @@ export class EventDetailComponent implements OnInit {
     }
   }
 
-  /**
-   * Upload file hình ảnh đã chọn lên server (không mã hóa)
-   * Gọi API /upload-unencrypted để lưu vào folder tmp
-   */
-  async uploadSelectedImage(): Promise<void> {
-    if (!this.selectedImageFile) {
-      Swal.fire('Lỗi', 'Vui lòng chọn hình ảnh trước', 'error');
-      return;
-    }
 
-    this.isUploadingImage = true;
-    this.imageUploadMessage = 'Đang upload...';
-
-    try {
-      // Upload file lên server (tmp folder, không mã hóa)
-      const response = await this.fileService.uploadFileUnencrypted(this.selectedImageFile).toPromise();
-      console.log('[EventDetail] Upload response:', response);
-
-      if (response && response.status === 'SUCCESS' && response.data) {
-        // API trả về fileName hoặc url, lấy tên file từ response
-        let fileName = response.data.fileName || response.data.url?.split('/').pop();
-
-        if (!fileName) {
-          throw new Error('Không thể extract tên file từ response');
-        }
-
-        this.isUploadingImage = false;
-        this.hasImageUploaded = true;
-        // Lưu chỉ tên file, không lưu path
-        this.uploadedImageUrl = fileName;
-        this.imageUploadMessage = 'Upload thành công!';
-
-        Swal.fire('Thành công', 'Đã upload hình ảnh', 'success');
-        console.log('[EventDetail] Image uploaded successfully:', fileName);
-      } else {
-        throw new Error(response?.message || 'Upload thất bại');
-      }
-    } catch (error: any) {
-      console.error('[EventDetail] Upload error:', error);
-      this.isUploadingImage = false;
-      this.hasImageUploaded = false;
-      this.uploadedImageUrl = null; // Reset uploaded URL khi upload thất bại
-      this.imageUploadMessage = 'Upload thất bại';
-
-      Swal.fire('Lỗi', error.message || 'Không thể upload hình ảnh', 'error');
-    }
-  }
 
   /**
    * Cập nhật nội dung iframe khi content hoặc image thay đổi
-   * Tạo HTML document isolated khỏi CSS của page
+   * Gọi backend API để generate HTML (single source of truth)
    */
   private updateIframeContent(): void {
-    const contentText = this.content?.value || '<p>Nội dung hiển thị sẽ xuất hiện tại đây</p>';
-    const bgImage = this.previewUrl ? `url('${this.previewUrl}')` : 'none';
+    // Tạo JSON content từ form values
+    const jsonContent = this.buildPreviewJsonContent();
     
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="vi">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          html, body {
-            width: 100%;
-            height: 100%;
-          }
-          body {
-            background-image: ${bgImage};
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-          }
-          .preview-overlay {
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .preview-content {
-            word-break: break-word;
-            color: white;
-            text-align: center;
-            font-size: 16px;
-            line-height: 1.5;
-            max-width: 90%;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="preview-overlay">
-          <div class="preview-content">${this.escapeHtml(contentText)}</div>
-        </div>
-      </body>
-      </html>
-    `;
-    
-    // Sử dụng blob URL để load HTML content vào iframe
-    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-    const blobUrl = URL.createObjectURL(blob);
-    this.iframeHtmlContent = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+    // Gọi backend API để generate HTML
+    this.eventService.generatePreviewHtml(jsonContent).subscribe({
+      next: (response) => {
+        if (response.status === 'SUCCESS' && response.data) {
+          const htmlContent = response.data.html;
+          
+          // Sử dụng blob URL để load HTML content vào iframe
+          const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+          const blobUrl = URL.createObjectURL(blob);
+          this.iframeHtmlContent = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+        }
+      },
+      error: (error) => {
+        console.error('[EventDetail] Failed to generate preview HTML:', error);
+      }
+    });
+  }
+
+  /**
+   * Tạo JSON content cho preview từ form values
+   * Dùng previewUrl (data URL) cho live preview, hoặc uploadedImageUrl nếu đã upload
+   */
+  private buildPreviewJsonContent(): string {
+    const contentData = {
+      uploadedImageUrl: this.previewUrl || null,
+      content: this.content?.value || ''
+    };
+    return JSON.stringify(contentData);
   }
 
   /**
@@ -412,42 +347,49 @@ export class EventDetailComponent implements OnInit {
 
   /**
    * Upload ảnh lên server nếu user đã chọn file mới
-   * Nếu đã upload qua uploadSelectedImage() thì skip
+   * Flow:
+   * 1. Nếu đã upload qua nút upload → dùng uploadedImageUrl
+   * 2. Nếu chọn file nhưng chưa upload → tự động upload khi submit: (main flow)
+   * 3. Nếu không chọn file → dùng preview URL cũ (hoặc null)
    * @returns Promise với fileName của ảnh, hoặc null nếu không có file
    */
   private async uploadImageIfNeeded(): Promise<string | null> {
-    // Nếu file đã được upload qua nút upload - sử dụng uploadedImageUrl
+    // Flow 1: File đã được upload qua nút "Upload file lên tmp"
     if (this.hasImageUploaded && this.uploadedImageUrl) {
-      console.log('[EventDetail] Using uploaded image URL:', this.uploadedImageUrl);
+      console.log('[EventDetail] Using already uploaded image URL:', this.uploadedImageUrl);
       return this.uploadedImageUrl;
     }
 
-    // Nếu không có file mới, giữ nguyên URL cũ (nếu có)
-    if (!this.selectedImageFile) {
-      console.log('[EventDetail] No image file selected, using existing preview URL');
-      return this.previewUrl;
-    }
-
-    // Upload file nếu user chọn nhưng chưa ấn nút upload (fallback scenario)
-    try {
-      console.log('[EventDetail] Uploading selected image (fallback - user forgot to click upload button)');
-      const response = await this.fileService.uploadFileUnencrypted(this.selectedImageFile).toPromise();
-      console.log('[EventDetail] Upload response:', response);
-      
-      if (response && response.status === 'SUCCESS' && response.data) {
-        let fileName = response.data.fileName || response.data.url?.split('/').pop();
+    // Flow 2: User chọn file nhưng chưa upload → tự động upload khi submit
+    if (this.selectedImageFile) {
+      try {
+        console.log('[EventDetail] Auto-uploading selected image during submit');
+        const response = await this.fileService.uploadFileUnencrypted(this.selectedImageFile).toPromise();
+        console.log('[EventDetail] Auto-upload response:', response);
         
-        if (!fileName) {
-          throw new Error('Không thể extract tên file từ response');
-        }
+        if (response && response.status === 'SUCCESS' && response.data) {
+          let fileName = response.data.fileName || response.data.url?.split('/').pop();
+          
+          if (!fileName) {
+            throw new Error('Không thể extract tên file từ response');
+          }
 
-        return fileName;
+          // Cập nhật state cho consistency
+          this.uploadedImageUrl = fileName;
+          this.hasImageUploaded = true;
+          
+          return fileName;
+        }
+        throw new Error('Upload thất bại');
+      } catch (error: any) {
+        console.error('[EventDetail] Auto-upload error:', error);
+        throw new Error(error.message || 'Không thể upload hình ảnh');
       }
-      throw new Error('Upload thất bại');
-    } catch (error: any) {
-      console.error('[EventDetail] Upload error:', error);
-      throw new Error(error.message || 'Không thể upload hình ảnh');
     }
+
+    // Flow 3: Không có file mới, giữ nguyên URL cũ (nếu có)
+    console.log('[EventDetail] No image file selected, using existing preview URL');
+    return this.previewUrl;
   }
 
   /**
@@ -530,36 +472,6 @@ export class EventDetailComponent implements OnInit {
   openImageInBrowser(url: string): void {
     if (url) {
       window.open(url, '_blank');
-    }
-  }
-
-  /**
-   * Preview event content
-   * Tạo JSON content từ form data
-   */
-  onPreview(): void {
-    if (this.eventForm.invalid) {
-      this.markFormGroupTouched(this.eventForm);
-      Swal.fire('Lỗi', 'Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
-      return;
-    }
-
-    const jsonContent = this.generateJsonContent();
-    
-    // Lưu JSON content vào form control
-    this.eventForm.patchValue({
-      htmlContent: jsonContent
-    });
-
-    Swal.fire('Thông báo', 'Đã cập nhật JSON content:\n\n' + jsonContent, 'info');
-  }
-
-  /**
-   * Mở file HTML preview trong tab browser mới
-   */
-  openPreviewInBrowser(): void {
-    if (this.previewHtmlBlobUrl) {
-      window.open(this.previewHtmlBlobUrl, '_blank');
     }
   }
 

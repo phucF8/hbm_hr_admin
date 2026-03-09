@@ -312,5 +312,29 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
             }
         }
+
+        /// <summary>
+        /// POST /api/event/preview - Generate HTML từ HtmlContent JSON (cho live preview)
+        /// </summary>
+        [HttpPost("preview")]
+        public IActionResult GeneratePreviewHtml([FromBody] PreviewHtmlRequest request)
+        {
+            try
+            {
+                var generatedHtml = _eventService.GenerateHtmlFromContent(request.HtmlContent, GetRequestBaseUrl());
+
+                var response = new
+                {
+                    Html = generatedHtml
+                };
+
+                return Ok(ApiResponse<object>.Success(response, "Generate HTML thành công"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Lỗi khi generate preview HTML: {ex.Message}");
+                return BadRequest(ApiResponse<string>.Error($"Lỗi: {ex.Message}"));
+            }
+        }
     }
 }

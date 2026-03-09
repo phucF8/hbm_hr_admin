@@ -64,4 +64,10 @@ namespace HBM_HR_Admin_Angular2.Server.DTOs
         [Required(ErrorMessage = "Id là bắt buộc")]
         public Guid Id { get; set; }
     }
+
+    public class PreviewHtmlRequest
+    {
+        [Required(ErrorMessage = "HtmlContent là bắt buộc")]
+        public string HtmlContent { get; set; } = string.Empty;
+    }
 }

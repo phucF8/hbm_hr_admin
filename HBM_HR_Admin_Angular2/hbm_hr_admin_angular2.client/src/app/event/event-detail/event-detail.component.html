@@ -60,24 +60,7 @@
                 {{ selectedImageName }}
               </span>
             </div>
-            <small class="form-hint">Chọn file ảnh để làm hình nền event (không bắt buộc)</small>
-            
-            <!-- Nút upload file sau khi chọn -->
-            <div *ngIf="selectedImageFile && !hasImageUploaded" class="upload-action-container">
-              <button 
-                type="button"
-                class="btn btn-upload-file"
-                (click)="uploadSelectedImage()"
-                [disabled]="isUploadingImage">
-                <span *ngIf="!isUploadingImage">
-                  <i class="bi bi-upload"></i> Upload file lên tmp
-                </span>
-                <span *ngIf="isUploadingImage">
-                  <i class="bi bi-hourglass-split"></i> Đang upload...
-                </span>
-              </button>
-              <small class="form-hint">Nhấn để upload file lên thư mục tmp</small>
-            </div>
+            <small class="form-hint">Chọn file ảnh để làm hình nền event (không bắt buộc). File sẽ tự động upload khi nhấn "Tạo mới" hoặc "Cập nhật"</small>
 
             <!-- Hiển thị status upload -->
             <div *ngIf="isUploadingImage || hasImageUploaded" class="upload-status-container">
@@ -150,12 +133,6 @@
 
       <!-- Buttons -->
       <div class="dialog-actions">
-        <button type="button" class="btn btn-preview" (click)="onPreview()" [disabled]="isSubmitting || eventForm.invalid">
-          <i class="bi bi-eye"></i> Preview
-        </button>
-        <button type="button" class="btn btn-open-preview" (click)="openPreviewInBrowser()" [disabled]="!previewHtmlBlobUrl" title="Mở preview trong tab browser mới">
-          <i class="bi bi-box-arrow-up-right"></i> Xem toàn màn hình
-        </button>
         <button type="button" class="btn btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
           Hủy
         </button>

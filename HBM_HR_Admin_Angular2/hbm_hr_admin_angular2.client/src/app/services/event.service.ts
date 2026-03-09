@@ -87,5 +87,13 @@ export class EventService {
   toggleEventStatus(id: string): Observable<ApiResponse<EventItem>> {
     return this.http.post<ApiResponse<EventItem>>(`${this.apiUrl}/toggle`, { id });
   }
+
+  /**
+   * Generate HTML từ HtmlContent JSON (cho live preview)
+   * POST /api/event/preview
+   */
+  generatePreviewHtml(htmlContent: string): Observable<ApiResponse<{ html: string }>> {
+    return this.http.post<ApiResponse<{ html: string }>>(`${this.apiUrl}/preview`, { htmlContent });
+  }
 }
 
