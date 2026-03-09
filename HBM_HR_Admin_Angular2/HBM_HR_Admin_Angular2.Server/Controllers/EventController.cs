@@ -13,6 +13,8 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
         private readonly EventService _eventService;
         private readonly ILogger<EventController> _logger;
 
+        private string GetRequestBaseUrl() => $"{Request.Scheme}://{Request.Host}";
+
         public EventController(EventService eventService, ILogger<EventController> logger)
         {
             _eventService = eventService;
@@ -35,7 +37,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 }
 
                 // Tạo HTML từ HtmlContent JSON
-                var generatedHtml = _eventService.GenerateHtmlFromContent(activeEvent.HtmlContent);
+                var generatedHtml = _eventService.GenerateHtmlFromContent(activeEvent.HtmlContent, GetRequestBaseUrl());
 
                 // Trả về object với thêm trường GeneratedHtml
                 var response = new
@@ -81,7 +83,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                     e.StartTime,
                     e.EndTime,
                     e.Priority,
-                    GeneratedHtml = _eventService.GenerateHtmlFromContent(e.HtmlContent)
+                    GeneratedHtml = _eventService.GenerateHtmlFromContent(e.HtmlContent, GetRequestBaseUrl())
                 }).ToList();
                 
                 return Ok(ApiResponse<object>.Success(eventsWithHtml, "Lấy danh sách event thành công"));
@@ -109,7 +111,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 }
 
                 // Tạo HTML từ HtmlContent JSON
-                var generatedHtml = _eventService.GenerateHtmlFromContent(eventPage.HtmlContent);
+                var generatedHtml = _eventService.GenerateHtmlFromContent(eventPage.HtmlContent, GetRequestBaseUrl());
 
                 // Trả về object với thêm trường GeneratedHtml
                 var response = new
@@ -162,7 +164,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 var createdEvent = await _eventService.CreateEventAsync(eventPage);
 
                 // Tạo HTML từ HtmlContent JSON
-                var generatedHtml = _eventService.GenerateHtmlFromContent(createdEvent.HtmlContent);
+                var generatedHtml = _eventService.GenerateHtmlFromContent(createdEvent.HtmlContent, GetRequestBaseUrl());
 
                 // Trả về object với thêm trường GeneratedHtml
                 var response = new
@@ -220,7 +222,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 }
 
                 // Tạo HTML từ HtmlContent JSON
-                var generatedHtml = _eventService.GenerateHtmlFromContent(updatedEvent.HtmlContent);
+                var generatedHtml = _eventService.GenerateHtmlFromContent(updatedEvent.HtmlContent, GetRequestBaseUrl());
 
                 // Trả về object với thêm trường GeneratedHtml
                 var response = new
@@ -285,7 +287,7 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers
                 }
 
                 // Tạo HTML từ HtmlContent JSON
-                var generatedHtml = _eventService.GenerateHtmlFromContent(updatedEvent.HtmlContent);
+                var generatedHtml = _eventService.GenerateHtmlFromContent(updatedEvent.HtmlContent, GetRequestBaseUrl());
 
                 // Trả về object với thêm trường GeneratedHtml
                 var response = new

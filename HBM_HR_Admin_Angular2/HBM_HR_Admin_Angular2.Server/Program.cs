@@ -11,6 +11,7 @@ using HBM_HR_Admin_Angular2.Server.Services;
 using HBM_HR_Admin_Angular2.Server.Voting.Repositories;
 using HBM_HR_Admin_Angular2.Server.Voting.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -87,6 +88,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<JwtTokenGenerator>();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor
+                             | ForwardedHeaders.XForwardedProto
+                             | ForwardedHeaders.XForwardedHost;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -120,6 +130,8 @@ var app = builder.Build();
 
 // Hangfire Dashboard
 app.UseHangfireDashboard("/hangfire");
+
+app.UseForwardedHeaders();
 
 // Áp dụng CORS
 app.UseCors("AllowAngular");

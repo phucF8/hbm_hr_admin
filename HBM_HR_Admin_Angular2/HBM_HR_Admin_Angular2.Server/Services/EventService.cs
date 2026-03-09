@@ -294,10 +294,13 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         /// </summary>
         /// <param name="htmlContentJson">JSON string chứa uploadedImageUrl và content</param>
         /// <returns>HTML document hoàn chỉnh</returns>
-        public string GenerateHtmlFromContent(string htmlContentJson)
+        public string GenerateHtmlFromContent(string htmlContentJson, string? requestBaseUrl = null)
         {
             string imageUrl = "none";
             string textContent = "Nội dung hiển thị sẽ xuất hiện tại đây";
+            var fileBaseUrl = string.IsNullOrWhiteSpace(requestBaseUrl)
+                ? _publicFileBaseUrl
+                : requestBaseUrl.TrimEnd('/');
 
             if (!string.IsNullOrWhiteSpace(htmlContentJson))
             {
@@ -312,8 +315,16 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                         var fileName = uploadedImageUrlElement.GetString();
                         if (!string.IsNullOrWhiteSpace(fileName))
                         {
-                            var normalizedFileName = fileName.Replace("\\", "/").Split('/').Last();
-                            imageUrl = $"url('{_publicFileBaseUrl}/uploads/{normalizedFileName}')";
+                            if (Uri.TryCreate(fileName, UriKind.Absolute, out var absoluteUri)
+                                && (absoluteUri.Scheme == Uri.UriSchemeHttp || absoluteUri.Scheme == Uri.UriSchemeHttps))
+                            {
+                                imageUrl = $"url('{absoluteUri}')";
+                            }
+                            else
+                            {
+                                var normalizedFileName = fileName.Replace("\\", "/").Split('/').Last();
+                                imageUrl = $"url('{fileBaseUrl}/uploads/{normalizedFileName}')";
+                            }
                         }
                     }
 
