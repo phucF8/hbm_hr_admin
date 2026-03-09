@@ -21,6 +21,19 @@ export class FileService {
     return this.http.post(url, formData);
   }
 
+  /**
+   * Upload file lên server (không mã hóa)
+   * @param file File cần upload
+   * @returns Observable với response chứa URL file đã upload
+   */
+  uploadFileUnencrypted(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const url = `${environment.apiUrl}/FileUpload/upload-unencrypted`;
+    return this.http.post(url, formData);
+  }
+
   // uploadPublicFile(file: File): Observable<any> {
   //   const formData = new FormData();
   //   formData.append('file', file);

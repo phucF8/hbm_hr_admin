@@ -1,6 +1,7 @@
 using HBM_HR_Admin_Angular2.Server.Data;
 using HBM_HR_Admin_Angular2.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
 namespace HBM_HR_Admin_Angular2.Server.Services
@@ -10,12 +11,21 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         private readonly ApplicationDbContext _context;
         private readonly ILogger<EventService> _logger;
         private readonly IWebHostEnvironment _environment;
+        private readonly string _publicFileBaseUrl;
 
-        public EventService(ApplicationDbContext context, ILogger<EventService> logger, IWebHostEnvironment environment)
+        public EventService(
+            ApplicationDbContext context,
+            ILogger<EventService> logger,
+            IWebHostEnvironment environment,
+            IConfiguration configuration)
         {
             _context = context;
             _logger = logger;
             _environment = environment;
+            var configuredBaseUrl = configuration["AppSettings:PublicFileBaseUrl"];
+            _publicFileBaseUrl = string.IsNullOrWhiteSpace(configuredBaseUrl)
+                ? "http://localhost:8088"
+                : configuredBaseUrl.TrimEnd('/');
         }
 
         /// <summary>
@@ -302,7 +312,8 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                         var fileName = uploadedImageUrlElement.GetString();
                         if (!string.IsNullOrWhiteSpace(fileName))
                         {
-                            imageUrl = $"url('/uploads/{fileName}')";
+                            var normalizedFileName = fileName.Replace("\\", "/").Split('/').Last();
+                            imageUrl = $"url('{_publicFileBaseUrl}/uploads/{normalizedFileName}')";
                         }
                     }
 

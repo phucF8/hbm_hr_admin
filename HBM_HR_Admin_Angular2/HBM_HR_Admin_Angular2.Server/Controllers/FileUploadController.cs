@@ -117,6 +117,75 @@ namespace HBM_HR_Admin_Angular2.Server.Controllers {
             }
         }
 
+        /// <summary>
+        /// POST /api/fileupload/upload-unencrypted - Upload file không mã hóa lên thư mục tmp
+        /// Giữ nguyên phần mở rộng file
+        /// </summary>
+        [HttpPost("upload-unencrypted")]
+        [RequestSizeLimit(long.MaxValue)]
+        public async Task<IActionResult> UploadUnencrypted(IFormFile file) {
+            try {
+                if (file == null) {
+                    _logger.LogWarning("❌ Upload (unencrypted) failed: No file provided");
+                    return BadRequest(ApiResponse<object>.Error("No file provided."));
+                }
+
+                _logger.LogInformation($"📤 Upload (unencrypted) started: {file.FileName} (Size: {file.Length} bytes)");
+
+                if (file.Length == 0) {
+                    _logger.LogWarning($"❌ Upload (unencrypted) failed: File is empty - {file.FileName}");
+                    return BadRequest(ApiResponse<object>.Error("Empty file."));
+                }
+
+                if (file.Length > _maxFileSizeBytes) {
+                    var maxMb = _maxFileSizeBytes / (1024 * 1024);
+                    _logger.LogWarning($"❌ Upload (unencrypted) failed: File too large - {file.FileName} ({file.Length} bytes > {_maxFileSizeBytes} bytes)");
+                    return BadRequest(ApiResponse<object>.Error(
+                        $"File too large. Max allowed: {maxMb} MB."));
+                }
+
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!_allowedExtensions.Contains(ext)) {
+                    _logger.LogWarning($"❌ Upload (unencrypted) failed: Extension not allowed - {file.FileName} (ext: {ext})");
+                    return BadRequest(ApiResponse<object>.Error($"Extension '{ext}' not allowed."));
+                }
+
+                // Tạo tên file: GUID + extension (không thêm .enc)
+                var savedFileName = $"{Guid.NewGuid()}{ext}".Replace("\"", string.Empty);
+                var filePath = Path.Combine(_uploadRoot, savedFileName);
+
+                _logger.LogInformation($"📝 Saving file to {filePath}");
+
+                // Lưu file trực tiếp không mã hóa
+                using (var stream = new FileStream(filePath, FileMode.Create)) {
+                    await file.CopyToAsync(stream);
+                }
+
+                _logger.LogInformation($"✅ File saved successfully (unencrypted)");
+
+                var fileUrl = $"/{UploadFolderName}/{savedFileName}";
+
+                // Tạo object dữ liệu trả về
+                var fileInfo = new {
+                    tenFile = file.FileName,
+                    url = fileUrl,
+                    filePath = filePath,
+                    fileName = savedFileName,
+                    originalSize = file.Length
+                };
+
+                _logger.LogInformation($"✅ Upload (unencrypted) completed successfully - File: {file.FileName}, URL: {fileUrl}, Saved At: {filePath}");
+
+                return Ok(ApiResponse<object>.Success(fileInfo, "Tải lên thành công"));
+            } catch (IOException ex) {
+                _logger.LogError(ex, $"❌ Upload (unencrypted) failed: IO Error for file {file?.FileName}");
+                return StatusCode(500, ApiResponse<object>.Error($"File write error: {ex.Message}"));
+            } catch (Exception ex) {
+                _logger.LogError(ex, $"❌ Upload (unencrypted) failed: Unexpected error for file {file?.FileName}");
+                return StatusCode(500, ApiResponse<object>.Error($"Upload failed: {ex.Message}"));
+            }
+        }
+
         [HttpPost("upload-public")]
         [RequestSizeLimit(long.MaxValue)]
         public async Task<IActionResult> UploadSingleToUploads(IFormFile file) {

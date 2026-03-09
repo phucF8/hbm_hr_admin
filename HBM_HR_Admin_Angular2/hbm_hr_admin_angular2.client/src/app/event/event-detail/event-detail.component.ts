@@ -168,9 +168,8 @@ export class EventDetailComponent implements OnInit {
   }
 
   /**
-   * Upload file hình ảnh đã chọn lên server
-   * Gọi API /Upload để lưu vào folder tmp
-   * Sau đó gọi ViewFile để lấy blob đã giải mã
+   * Upload file hình ảnh đã chọn lên server (không mã hóa)
+   * Gọi API /upload-unencrypted để lưu vào folder tmp
    */
   async uploadSelectedImage(): Promise<void> {
     if (!this.selectedImageFile) {
@@ -182,34 +181,26 @@ export class EventDetailComponent implements OnInit {
     this.imageUploadMessage = 'Đang upload...';
 
     try {
-      // Upload file lên server (tmp folder)
-      const response = await this.fileService.uploadFile(this.selectedImageFile).toPromise();
+      // Upload file lên server (tmp folder, không mã hóa)
+      const response = await this.fileService.uploadFileUnencrypted(this.selectedImageFile).toPromise();
       console.log('[EventDetail] Upload response:', response);
 
       if (response && response.status === 'SUCCESS' && response.data) {
-        let encryptedFileName = response.data.encryptedFileName;
+        // API trả về fileName hoặc url, lấy tên file từ response
+        let fileName = response.data.fileName || response.data.url?.split('/').pop();
 
-        // Extract encryptedFileName từ response
-        if (!encryptedFileName && response.data.url) {
-          encryptedFileName = response.data.url.split('/').pop();
-        }
-        if (!encryptedFileName && response.data.filePath) {
-          encryptedFileName = response.data.filePath.split('\\').pop() || response.data.filePath.split('/').pop();
-        }
-
-        if (!encryptedFileName) {
-          throw new Error('Không thể extract tên file mã hóa từ response');
+        if (!fileName) {
+          throw new Error('Không thể extract tên file từ response');
         }
 
         this.isUploadingImage = false;
         this.hasImageUploaded = true;
         // Lưu chỉ tên file, không lưu path
-        const fileName = response.data.url?.split('/').pop() || response.data.url;
-        this.uploadedImageUrl = fileName || null;
+        this.uploadedImageUrl = fileName;
         this.imageUploadMessage = 'Upload thành công!';
 
         Swal.fire('Thành công', 'Đã upload hình ảnh', 'success');
-        console.log('[EventDetail] Image uploaded successfully');
+        console.log('[EventDetail] Image uploaded successfully:', fileName);
       } else {
         throw new Error(response?.message || 'Upload thất bại');
       }
@@ -400,7 +391,7 @@ export class EventDetailComponent implements OnInit {
   /**
    * Upload ảnh lên server nếu user đã chọn file mới
    * Nếu đã upload qua uploadSelectedImage() thì skip
-   * @returns Promise với blob URL của ảnh đã giải mã, hoặc null nếu không có file
+   * @returns Promise với fileName của ảnh, hoặc null nếu không có file
    */
   private async uploadImageIfNeeded(): Promise<string | null> {
     // Nếu file đã được upload qua nút upload - sử dụng uploadedImageUrl
@@ -418,25 +409,17 @@ export class EventDetailComponent implements OnInit {
     // Upload file nếu user chọn nhưng chưa ấn nút upload (fallback scenario)
     try {
       console.log('[EventDetail] Uploading selected image (fallback - user forgot to click upload button)');
-      const response = await this.fileService.uploadFile(this.selectedImageFile).toPromise();
+      const response = await this.fileService.uploadFileUnencrypted(this.selectedImageFile).toPromise();
       console.log('[EventDetail] Upload response:', response);
       
       if (response && response.status === 'SUCCESS' && response.data) {
-        let encryptedFileName = response.data.encryptedFileName;
+        let fileName = response.data.fileName || response.data.url?.split('/').pop();
         
-        // Nếu không có encryptedFileName, thử extract từ url hoặc filePath
-        if (!encryptedFileName && response.data.url) {
-          encryptedFileName = response.data.url.split('/').pop();
-        }
-        if (!encryptedFileName && response.data.filePath) {
-          encryptedFileName = response.data.filePath.split('\\').pop() || response.data.filePath.split('/').pop();
+        if (!fileName) {
+          throw new Error('Không thể extract tên file từ response');
         }
 
-        if (!encryptedFileName) {
-          throw new Error('Không thể extract tên file mã hóa từ response');
-        }
-
-        return encryptedFileName;
+        return fileName;
       }
       throw new Error('Upload thất bại');
     } catch (error: any) {
