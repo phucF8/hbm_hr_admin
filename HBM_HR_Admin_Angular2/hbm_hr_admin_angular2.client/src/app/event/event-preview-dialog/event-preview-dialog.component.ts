@@ -14,7 +14,7 @@ import { EventItem } from '../../models/event.model';
 export class EventPreviewDialogComponent {
   iframeSrc: SafeResourceUrl;
   event: EventItem;
-  showMetadata: boolean = true;
+  showMetadata: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<EventPreviewDialogComponent>,

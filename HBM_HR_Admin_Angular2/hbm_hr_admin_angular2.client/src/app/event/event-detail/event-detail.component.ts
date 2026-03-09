@@ -114,7 +114,6 @@ export class EventDetailComponent implements OnInit {
     // Ưu tiên imageUrl từ API, nếu không có thì lấy từ htmlContent
     this.previewUrl = event.imageUrl || extractedBackgroundUrl;
     this.uploadedImageUrl = null; // Reset upload URL khi load event cũ
-    this.backgroundImageUrl = this.previewUrl; // Lưu full URL để hiển thị cho user test
     if (this.previewUrl) {
       this.selectedImageName = this.extractFileNameFromUrl(this.previewUrl);
     }
