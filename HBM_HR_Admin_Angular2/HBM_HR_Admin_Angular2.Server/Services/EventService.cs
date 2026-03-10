@@ -102,6 +102,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         /// <summary>
         /// Cập nhật event
         /// Parse HtmlContent để extract uploadedImageUrl và copy file từ tmp sang uploads
+        /// Xóa ảnh cũ nếu ảnh nền thay đổi
         /// </summary>
         public async Task<EventPage?> UpdateEventAsync(Guid id, EventPage updatedEvent)
         {
@@ -112,8 +113,19 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                 return null;
             }
 
+            // Lấy URL ảnh cũ và mới để so sánh
+            var oldImageUrl = ExtractImageUrlFromHtmlContent(existingEvent.HtmlContent);
+            var newImageUrl = ExtractImageUrlFromHtmlContent(updatedEvent.HtmlContent);
+
             // Parse HtmlContent và copy file từ tmp sang uploads
             await ProcessImageFromHtmlContentAsync(updatedEvent.HtmlContent);
+
+            // Xóa ảnh cũ nếu ảnh nền thay đổi (và ảnh cũ không phải data URL hoặc absolute URL)
+            if (!string.IsNullOrWhiteSpace(oldImageUrl) && 
+                !string.Equals(oldImageUrl, newImageUrl, StringComparison.OrdinalIgnoreCase))
+            {
+                DeleteImageFileByUrl(oldImageUrl);
+            }
 
             existingEvent.Title = updatedEvent.Title;
             existingEvent.HtmlContent = updatedEvent.HtmlContent;
@@ -152,36 +164,60 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         }
 
         /// <summary>
+        /// Extract image URL từ HtmlContent JSON
+        /// </summary>
+        private string? ExtractImageUrlFromHtmlContent(string htmlContent)
+        {
+            if (string.IsNullOrWhiteSpace(htmlContent))
+            {
+                return null;
+            }
+
+            try
+            {
+                var jsonData = JsonDocument.Parse(htmlContent);
+                return jsonData.RootElement.GetProperty("uploadedImageUrl").GetString();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Xóa file ảnh từ thư mục uploads/ dựa trên HtmlContent JSON
         /// </summary>
         private void DeleteEventImageFile(string htmlContent)
         {
-            if (string.IsNullOrWhiteSpace(htmlContent))
+            var imageUrl = ExtractImageUrlFromHtmlContent(htmlContent);
+            if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                DeleteImageFileByUrl(imageUrl);
+            }
+        }
+
+        /// <summary>
+        /// Xóa file ảnh từ thư mục uploads/ dựa trên image URL
+        /// </summary>
+        private void DeleteImageFileByUrl(string imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
             {
                 return;
             }
 
             try
             {
-                // Parse JSON từ HtmlContent
-                var jsonData = JsonDocument.Parse(htmlContent);
-                var uploadedImageUrl = jsonData.RootElement.GetProperty("uploadedImageUrl").GetString();
-
-                if (string.IsNullOrWhiteSpace(uploadedImageUrl))
-                {
-                    return;
-                }
-
                 // Bỏ qua data URLs và absolute URLs
-                if (uploadedImageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase) ||
-                    uploadedImageUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                    uploadedImageUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                if (imageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase) ||
+                    imageUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                    imageUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                 {
                     return;
                 }
 
                 // Lấy tên file (bỏ qua path nếu có)
-                var fileName = uploadedImageUrl.Replace("\\", "/").Split('/').Last();
+                var fileName = imageUrl.Replace("\\", "/").Split('/').Last();
 
                 // Xây dựng đường dẫn vật lý đến file
                 var filePath = Path.Combine(_environment.WebRootPath, "uploads", fileName);
@@ -190,7 +226,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
-                    _logger.LogInformation($"Đã xóa file ảnh: {filePath}");
+                    _logger.LogInformation($"Đã xóa file ảnh cũ: {filePath}");
                 }
                 else
                 {
@@ -199,7 +235,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             }
             catch (Exception ex)
             {
-                // Không throw exception để không ảnh hưởng đến việc xóa event
+                // Không throw exception để không ảnh hưởng đến việc update/delete event
                 _logger.LogWarning($"Không thể xóa file ảnh: {ex.Message}");
             }
         }
