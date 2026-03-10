@@ -130,7 +130,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         }
 
         /// <summary>
-        /// Xóa event
+        /// Xóa event và file ảnh tài nguyên tương ứng
         /// </summary>
         public async Task<bool> DeleteEventAsync(Guid id)
         {
@@ -141,11 +141,67 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                 return false;
             }
 
+            // Xóa file ảnh tài nguyên nếu có
+            DeleteEventImageFile(eventPage.HtmlContent);
+
             _context.EventPages.Remove(eventPage);
             await _context.SaveChangesAsync();
 
             _logger.LogInformation($"Xóa event: {eventPage.Title} (ID: {id})");
             return true;
+        }
+
+        /// <summary>
+        /// Xóa file ảnh từ thư mục uploads/ dựa trên HtmlContent JSON
+        /// </summary>
+        private void DeleteEventImageFile(string htmlContent)
+        {
+            if (string.IsNullOrWhiteSpace(htmlContent))
+            {
+                return;
+            }
+
+            try
+            {
+                // Parse JSON từ HtmlContent
+                var jsonData = JsonDocument.Parse(htmlContent);
+                var uploadedImageUrl = jsonData.RootElement.GetProperty("uploadedImageUrl").GetString();
+
+                if (string.IsNullOrWhiteSpace(uploadedImageUrl))
+                {
+                    return;
+                }
+
+                // Bỏ qua data URLs và absolute URLs
+                if (uploadedImageUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase) ||
+                    uploadedImageUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                    uploadedImageUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                // Lấy tên file (bỏ qua path nếu có)
+                var fileName = uploadedImageUrl.Replace("\\", "/").Split('/').Last();
+
+                // Xây dựng đường dẫn vật lý đến file
+                var filePath = Path.Combine(_environment.WebRootPath, "uploads", fileName);
+
+                // Xóa file nếu tồn tại
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                    _logger.LogInformation($"Đã xóa file ảnh: {filePath}");
+                }
+                else
+                {
+                    _logger.LogWarning($"File ảnh không tồn tại: {filePath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Không throw exception để không ảnh hưởng đến việc xóa event
+                _logger.LogWarning($"Không thể xóa file ảnh: {ex.Message}");
+            }
         }
 
         /// <summary>
