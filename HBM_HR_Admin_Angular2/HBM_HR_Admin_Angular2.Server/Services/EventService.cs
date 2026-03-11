@@ -39,27 +39,40 @@ namespace HBM_HR_Admin_Angular2.Server.Services
 
             _logger.LogInformation($"Tìm event active tại thời điểm: {now}");
 
-            // Lọc các event hợp lệ:
-            // - IsActive = true
-            // - StartTime <= now <= EndTime (hoặc EndTime = null)
-            var selectedEvent = await _context.EventPages
-                .Where(e => e.IsActive)
-                .Where(e => e.StartTime <= now)
-                .Where(e => e.EndTime == null || e.EndTime >= now)
-                .OrderByDescending(e => e.Priority)
-                .ThenByDescending(e => e.EndTime ?? DateTime.MaxValue)
-                .ThenBy(e => e.StartTime)
-                .FirstOrDefaultAsync();
-
-            if (selectedEvent == null)
+            try
             {
-                _logger.LogInformation("Không có event nào đang active");
-                return null;
+                // Lấy tất cả event active về memory trước để tránh lỗi SQL conversion
+                var activeEvents = await _context.EventPages
+                    .Where(e => e.IsActive)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                _logger.LogInformation($"Tìm thấy {activeEvents.Count} event đang IsActive = true");
+
+                // Lọc theo thời gian trong memory
+                var selectedEvent = activeEvents
+                    .Where(e => e.StartTime <= now && (e.EndTime == null || e.EndTime >= now))
+                    .OrderByDescending(e => e.Priority)
+                    .ThenByDescending(e => e.EndTime ?? DateTime.MaxValue)
+                    .ThenBy(e => e.StartTime)
+                    .FirstOrDefault();
+
+                if (selectedEvent == null)
+                {
+                    _logger.LogInformation("Không có event nào trong khoảng thời gian hiện tại");
+                    return null;
+                }
+
+                _logger.LogInformation($"Event được chọn: {selectedEvent.Title} (Priority: {selectedEvent.Priority}, StartTime: {selectedEvent.StartTime}, EndTime: {selectedEvent.EndTime})");
+
+                return selectedEvent;
             }
-
-            _logger.LogInformation($"Event được chọn: {selectedEvent.Title} (Priority: {selectedEvent.Priority})");
-
-            return selectedEvent;
+            catch (Exception ex)
+            {
+                _logger.LogError($"Lỗi khi query GetActiveEventAsync: {ex.Message}");
+                _logger.LogError($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         /// <summary>

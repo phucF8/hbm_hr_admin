@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "HBM_HR_Admin_Angular2/hbm_hr_admin_angular2.client"
+		},
+		{
+			"path": "../hbm_hr_app_flutter_3381"
 		}
 	],
 	"settings": {}
