@@ -8,10 +8,64 @@ namespace HBM_HR_Admin_Angular2.Server.Services
 {
     public class EventService
     {
+                private const string EventTemplateImagePlaceholder = "{{IMAGE_URL}}";
+                private const string EventTemplateTextPlaceholder = "{{TEXT_CONTENT}}";
+                private const string DefaultEventHtmlTemplate = @"
+<!DOCTYPE html>
+<html lang=""vi""><head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+        body {
+            background-image: {{IMAGE_URL}};
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .preview-overlay {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .preview-content {
+            word-break: break-word;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+    </style>
+</head>
+<body>
+    <div class=""preview-overlay"">
+        <div class=""preview-content"">{{TEXT_CONTENT}}</div>
+    </div>
+</body>
+</html>";
+
         private readonly ApplicationDbContext _context;
         private readonly ILogger<EventService> _logger;
         private readonly IWebHostEnvironment _environment;
         private readonly string _publicFileBaseUrl;
+                private readonly string _eventHtmlTemplatePath;
 
         public EventService(
             ApplicationDbContext context,
@@ -26,6 +80,11 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             _publicFileBaseUrl = string.IsNullOrWhiteSpace(configuredBaseUrl)
                 ? "http://localhost:8088"
                 : configuredBaseUrl.TrimEnd('/');
+            _eventHtmlTemplatePath = Path.Combine(
+                _environment.ContentRootPath,
+                "Resources",
+                "Templates",
+                "event-preview-template.html");
         }
 
         /// <summary>
@@ -188,8 +247,14 @@ namespace HBM_HR_Admin_Angular2.Server.Services
 
             try
             {
-                var jsonData = JsonDocument.Parse(htmlContent);
-                return jsonData.RootElement.GetProperty("uploadedImageUrl").GetString();
+                using var jsonData = JsonDocument.Parse(htmlContent);
+                if (jsonData.RootElement.TryGetProperty("uploadedImageUrl", out var imageUrlElement) &&
+                    imageUrlElement.ValueKind == JsonValueKind.String)
+                {
+                    return imageUrlElement.GetString();
+                }
+
+                return null;
             }
             catch
             {
@@ -362,11 +427,20 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(fileName) ||
+                    fileName.StartsWith("data:", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
                 var tmpFolder = Path.Combine(_environment.WebRootPath, "tmp");
                 var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+                var normalizedFileName = fileName.Replace("\\", "/").Split('/').Last();
 
-                var sourcePath = Path.Combine(tmpFolder, fileName);
-                var destPath = Path.Combine(uploadsFolder, fileName);
+                var sourcePath = Path.Combine(tmpFolder, normalizedFileName);
+                var destPath = Path.Combine(uploadsFolder, normalizedFileName);
 
                 // Kiểm tra file tồn tại trong tmp
                 if (!File.Exists(sourcePath))
@@ -385,7 +459,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                 // Copy file (overwrite nếu đã tồn tại)
                 await Task.Run(() => File.Copy(sourcePath, destPath, overwrite: true));
 
-                _logger.LogInformation($"Đã copy file từ tmp sang uploads: {fileName}");
+                _logger.LogInformation($"Đã copy file từ tmp sang uploads: {normalizedFileName}");
             }
             catch (Exception ex)
             {
@@ -403,6 +477,10 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         {
             string imageUrl = "none";
             string textContent = "Nội dung hiển thị sẽ xuất hiện tại đây";
+            var textSize = 16;
+            var textColor = "#ffffff";
+            var isBold = false;
+            var isItalic = false;
             var fileBaseUrl = string.IsNullOrWhiteSpace(requestBaseUrl)
                 ? _publicFileBaseUrl
                 : requestBaseUrl.TrimEnd('/');
@@ -411,7 +489,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             {
                 try
                 {
-                    var jsonDoc = JsonDocument.Parse(htmlContentJson);
+                    using var jsonDoc = JsonDocument.Parse(htmlContentJson);
                     var root = jsonDoc.RootElement;
 
                     // Extract uploadedImageUrl
@@ -441,73 +519,152 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                     }
 
                     // Extract content
-                    if (root.TryGetProperty("content", out var contentElement))
+                    if (root.TryGetProperty("content", out var contentElement) &&
+                        contentElement.ValueKind == JsonValueKind.String)
                     {
-                        var content = contentElement.GetString();
-                        if (!string.IsNullOrWhiteSpace(content))
-                        {
-                            textContent = System.Net.WebUtility.HtmlEncode(content);
-                        }
+                        textContent = FormatTextContent(contentElement.GetString());
                     }
+
+                    textSize = NormalizeTextSize(GetOptionalInt(root, "textSize"));
+                    textColor = NormalizeTextColor(GetOptionalString(root, "textColor"));
+                    isBold = GetOptionalBoolean(root, "isBold");
+                    isItalic = GetOptionalBoolean(root, "isItalic");
                 }
                 catch (JsonException ex)
                 {
-                    _logger.LogWarning($"Không thể parse HtmlContent JSON: {ex.Message}");
+                    _logger.LogWarning(ex, "Không thể parse HtmlContent JSON. Sử dụng fallback content gốc.");
+
+                    if (LooksLikeHtmlDocument(htmlContentJson))
+                    {
+                        return htmlContentJson.Trim();
+                    }
+
+                    textContent = FormatTextContent(htmlContentJson);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Lỗi khi generate HTML từ event content");
                 }
             }
 
-            return $@"
-<!DOCTYPE html>
-<html lang=""vi"">
-<head>
-  <meta charset=""UTF-8"">
-  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-  <style>
-    * {{
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }}
-    html, body {{
-      width: 100%;
-      height: 100%;
-    }}
-    body {{
-      background-image: {imageUrl};
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    }}
-    .preview-overlay {{
-      width: 100%;
-      height: 100%;
-      padding: 20px;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 60px;
-    }}
-    .preview-content {{
-      word-break: break-word;
-      color: white;
-      text-align: center;
-      font-size: 16px;
-      line-height: 1.5;
-      max-width: 90%;
-    }}
-  </style>
-</head>
-<body>
-  <div class=""preview-overlay"">
-    <div class=""preview-content"">{textContent}</div>
-  </div>
-</body>
-</html>".Trim();
+            var htmlTemplate = GetEventHtmlTemplate();
+            var styledTextContent = BuildStyledTextContent(textContent, textSize, textColor, isBold, isItalic);
+            return htmlTemplate
+                .Replace(EventTemplateImagePlaceholder, imageUrl, StringComparison.Ordinal)
+                .Replace(EventTemplateTextPlaceholder, styledTextContent, StringComparison.Ordinal)
+                .Trim();
+        }
+
+        private string GetEventHtmlTemplate()
+        {
+            try
+            {
+                if (File.Exists(_eventHtmlTemplatePath))
+                {
+                    return File.ReadAllText(_eventHtmlTemplatePath);
+                }
+
+                _logger.LogWarning("Không tìm thấy template HTML event tại: {TemplatePath}", _eventHtmlTemplatePath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi đọc template HTML event từ file: {TemplatePath}", _eventHtmlTemplatePath);
+            }
+
+            return DefaultEventHtmlTemplate;
+        }
+
+        private static string FormatTextContent(string? textContent)
+        {
+            if (string.IsNullOrWhiteSpace(textContent))
+            {
+                return "Nội dung hiển thị sẽ xuất hiện tại đây";
+            }
+
+            return System.Net.WebUtility.HtmlEncode(textContent)
+                .Replace("\r\n", "<br>", StringComparison.Ordinal)
+                .Replace("\n", "<br>", StringComparison.Ordinal);
+        }
+
+        private static string BuildStyledTextContent(string textContent, int textSize, string textColor, bool isBold, bool isItalic)
+        {
+            var fontWeight = isBold ? "700" : "400";
+            var fontStyle = isItalic ? "italic" : "normal";
+
+            return $"<span style=\"display: inline-block; width: 100%; font-size: {textSize}px !important; color: {textColor} !important; font-weight: {fontWeight} !important; font-style: {fontStyle} !important;\">{textContent}</span>";
+        }
+
+        private static string? GetOptionalString(JsonElement root, string propertyName)
+        {
+            if (root.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String)
+            {
+                return property.GetString();
+            }
+
+            return null;
+        }
+
+        private static int? GetOptionalInt(JsonElement root, string propertyName)
+        {
+            if (!root.TryGetProperty(propertyName, out var property))
+            {
+                return null;
+            }
+
+            if (property.ValueKind == JsonValueKind.Number && property.TryGetInt32(out var intValue))
+            {
+                return intValue;
+            }
+
+            if (property.ValueKind == JsonValueKind.String && int.TryParse(property.GetString(), out intValue))
+            {
+                return intValue;
+            }
+
+            return null;
+        }
+
+        private static bool GetOptionalBoolean(JsonElement root, string propertyName)
+        {
+            if (!root.TryGetProperty(propertyName, out var property))
+            {
+                return false;
+            }
+
+            return property.ValueKind switch
+            {
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.String when bool.TryParse(property.GetString(), out var boolValue) => boolValue,
+                _ => false
+            };
+        }
+
+        private static int NormalizeTextSize(int? textSize)
+        {
+            if (!textSize.HasValue)
+            {
+                return 16;
+            }
+
+            return Math.Clamp(textSize.Value, 10, 72);
+        }
+
+        private static string NormalizeTextColor(string? textColor)
+        {
+            if (!string.IsNullOrWhiteSpace(textColor) &&
+                System.Text.RegularExpressions.Regex.IsMatch(textColor.Trim(), "^#([0-9a-fA-F]{6})$"))
+            {
+                return textColor.Trim();
+            }
+
+            return "#ffffff";
+        }
+
+        private static bool LooksLikeHtmlDocument(string value)
+        {
+            return value.Contains("<html", StringComparison.OrdinalIgnoreCase) ||
+                   value.Contains("<!DOCTYPE", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

@@ -97,6 +97,76 @@
   color: #666;
 }
 
+.text-style-toolbar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.text-style-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.text-style-field label {
+  margin-bottom: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.size-input-wrapper,
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.size-unit,
+.color-value {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.color-picker {
+  width: 48px;
+  height: 40px;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.text-style-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-style-toggle {
+  min-width: 44px;
+  height: 40px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-style-toggle:hover {
+  border-color: #6c63ff;
+  color: #6c63ff;
+}
+
+.btn-style-toggle.active {
+  background: #6c63ff;
+  border-color: #6c63ff;
+  color: #fff;
+}
+
 .error-message {
   color: #dc3545;
   font-size: 12px;
@@ -235,6 +305,10 @@
 
   .editor-right {
     order: -1;
+  }
+
+  .text-style-toolbar {
+    grid-template-columns: 1fr;
   }
 
   .form-row {

@@ -26,6 +26,9 @@ import { debounceTime, Subject } from 'rxjs';
 })
 export class EventDetailComponent implements OnInit {
 
+  readonly defaultTextSize = 16;
+  readonly defaultTextColor = '#ffffff';
+
   eventForm!: FormGroup;
   isEditMode: boolean = false;
   isSubmitting: boolean = false;
@@ -67,10 +70,7 @@ export class EventDetailComponent implements OnInit {
       this.updateIframeContent();
     }
     
-    // Update iframe content mỗi khi content hoặc image thay đổi (debounce 300ms)
-    this.eventForm.get('content')?.valueChanges.subscribe(() => {
-      this.previewUpdate$.next();
-    });
+    this.registerPreviewSubscriptions();
     
     // Subscribe vào debounced preview updates
     this.previewUpdate$.pipe(
@@ -84,6 +84,10 @@ export class EventDetailComponent implements OnInit {
     this.eventForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       content: ['', [Validators.required, Validators.minLength(10)]],
+      textSize: [this.defaultTextSize, [Validators.required, Validators.min(10), Validators.max(72)]],
+      textColor: [this.defaultTextColor, [Validators.required]],
+      isBold: [false],
+      isItalic: [false],
       startDate: [null, Validators.required],
       endDate: [null],
       orderNumber: [0],
@@ -94,15 +98,28 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
+  private registerPreviewSubscriptions(): void {
+    ['content', 'textSize', 'textColor', 'isBold', 'isItalic'].forEach(controlName => {
+      this.eventForm.get(controlName)?.valueChanges.subscribe(() => {
+        this.previewUpdate$.next();
+      });
+    });
+  }
+
   loadEventData(event: EventItem): void {
     // Extract text content từ HTML document nếu có
     const htmlContent = event.content || event.htmlContent || '';
     const textContent = this.extractContentFromHtml(htmlContent);
     const extractedBackgroundUrl = this.extractBackgroundImageUrlFromHtml(htmlContent);
+    const textStyles = this.extractTextStyleSettingsFromHtml(htmlContent);
 
     this.eventForm.patchValue({
       title: event.title || '',
       content: textContent,
+      textSize: textStyles.textSize,
+      textColor: textStyles.textColor,
+      isBold: textStyles.isBold,
+      isItalic: textStyles.isItalic,
       startDate: this.formatDateForInput((event.startDate || event.startTime) ?? null),
       endDate: this.formatDateForInput((event.endDate || event.endTime) ?? null),
       orderNumber: event.priority || 0,
@@ -211,7 +228,11 @@ export class EventDetailComponent implements OnInit {
   private buildPreviewJsonContent(): string {
     const contentData = {
       uploadedImageUrl: this.previewUrl || null,
-      content: this.content?.value || ''
+      content: this.content?.value || '',
+      textSize: this.textSize?.value || this.defaultTextSize,
+      textColor: this.textColor?.value || this.defaultTextColor,
+      isBold: !!this.isBoldControl?.value,
+      isItalic: !!this.isItalicControl?.value
     };
     return JSON.stringify(contentData);
   }
@@ -286,6 +307,51 @@ export class EventDetailComponent implements OnInit {
     }
 
     return null;
+  }
+
+  /**
+   * Extract text style settings từ HtmlContent JSON.
+   */
+  private extractTextStyleSettingsFromHtml(html: string): { textSize: number; textColor: string; isBold: boolean; isItalic: boolean } {
+    const defaults = {
+      textSize: this.defaultTextSize,
+      textColor: this.defaultTextColor,
+      isBold: false,
+      isItalic: false
+    };
+
+    if (!html || html.trim().length === 0) {
+      return defaults;
+    }
+
+    try {
+      const jsonData = JSON.parse(html);
+      return {
+        textSize: this.normalizeTextSize(jsonData.textSize),
+        textColor: this.normalizeTextColor(jsonData.textColor),
+        isBold: !!jsonData.isBold,
+        isItalic: !!jsonData.isItalic
+      };
+    } catch {
+      return defaults;
+    }
+  }
+
+  private normalizeTextSize(value: unknown): number {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return Math.min(72, Math.max(10, Math.round(parsed)));
+    }
+
+    return this.defaultTextSize;
+  }
+
+  private normalizeTextColor(value: unknown): string {
+    if (typeof value === 'string' && /^#([0-9a-fA-F]{6})$/.test(value.trim())) {
+      return value.trim();
+    }
+
+    return this.defaultTextColor;
   }
 
   /**
@@ -400,10 +466,23 @@ export class EventDetailComponent implements OnInit {
     
     const contentData = {
       uploadedImageUrl: this.uploadedImageUrl || null,
-      content: formValue.content || ''
+      content: formValue.content || '',
+      textSize: this.normalizeTextSize(formValue.textSize),
+      textColor: this.normalizeTextColor(formValue.textColor),
+      isBold: !!formValue.isBold,
+      isItalic: !!formValue.isItalic
     };
 
     return JSON.stringify(contentData, null, 2);
+  }
+
+  toggleTextStyle(controlName: 'isBold' | 'isItalic'): void {
+    const control = this.eventForm.get(controlName);
+    if (!control) {
+      return;
+    }
+
+    control.setValue(!control.value);
   }
 
   createEvent(formValue: any, imageUrl: string | null): void {
@@ -489,6 +568,10 @@ export class EventDetailComponent implements OnInit {
   // Getters để truy cập form controls trong template
   get title() { return this.eventForm.get('title'); }
   get content() { return this.eventForm.get('content'); }
+  get textSize() { return this.eventForm.get('textSize'); }
+  get textColor() { return this.eventForm.get('textColor'); }
+  get isBoldControl() { return this.eventForm.get('isBold'); }
+  get isItalicControl() { return this.eventForm.get('isItalic'); }
   get startDate() { return this.eventForm.get('startDate'); }
   get endDate() { return this.eventForm.get('endDate'); }
   get orderNumber() { return this.eventForm.get('orderNumber'); }

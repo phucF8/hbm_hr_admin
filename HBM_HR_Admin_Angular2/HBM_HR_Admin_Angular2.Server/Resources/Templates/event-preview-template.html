@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    body {
+      background-image: {{IMAGE_URL}};
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    .preview-overlay {
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-content {
+      word-break: break-word;
+      color: white;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 90%;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-overlay">
+    <div class="preview-content">{{TEXT_CONTENT}}</div>
+  </div>
+</body>
+</html>
