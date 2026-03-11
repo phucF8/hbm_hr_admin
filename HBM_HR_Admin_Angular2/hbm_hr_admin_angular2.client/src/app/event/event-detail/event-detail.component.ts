@@ -130,7 +130,7 @@ export class EventDetailComponent implements OnInit {
 
     // Ưu tiên imageUrl từ API, nếu không có thì lấy từ htmlContent
     this.previewUrl = event.imageUrl || extractedBackgroundUrl;
-    this.uploadedImageUrl = null; // Reset upload URL khi load event cũ
+    this.uploadedImageUrl = this.getPersistedImageReference(extractedBackgroundUrl || event.imageUrl || null);
     if (this.previewUrl) {
       this.selectedImageName = this.extractFileNameFromUrl(this.previewUrl);
     }
@@ -390,14 +390,15 @@ export class EventDetailComponent implements OnInit {
 
     // Upload ảnh trước (nếu có), sau đó mới create/update event
     this.uploadImageIfNeeded().then(imageUrl => {
-      // Cập nhật htmlContent trước khi submit nếu chưa có
-      if (!formValue.htmlContent) {
-        const jsonContent = this.generateJsonContent();
-        this.eventForm.patchValue({
-          htmlContent: jsonContent
-        }, { emitEvent: false });
-        formValue.htmlContent = jsonContent;
-      }
+      this.uploadedImageUrl = this.getPersistedImageReference(
+        imageUrl || this.uploadedImageUrl || this.previewUrl || null
+      );
+
+      const jsonContent = this.generateJsonContent();
+      this.eventForm.patchValue({
+        htmlContent: jsonContent
+      }, { emitEvent: false });
+      formValue.htmlContent = jsonContent;
 
       if (this.isEditMode && this.data) {
         this.updateEvent(formValue, imageUrl);
@@ -465,7 +466,7 @@ export class EventDetailComponent implements OnInit {
     const formValue = this.eventForm.value;
     
     const contentData = {
-      uploadedImageUrl: this.uploadedImageUrl || null,
+      uploadedImageUrl: this.getPersistedImageReference(this.uploadedImageUrl || this.previewUrl || null),
       content: formValue.content || '',
       textSize: this.normalizeTextSize(formValue.textSize),
       textColor: this.normalizeTextColor(formValue.textColor),
@@ -483,6 +484,33 @@ export class EventDetailComponent implements OnInit {
     }
 
     control.setValue(!control.value);
+  }
+
+  private getPersistedImageReference(imageUrl: string | null): string | null {
+    if (!imageUrl) {
+      return null;
+    }
+
+    const trimmedUrl = imageUrl.trim();
+    if (!trimmedUrl) {
+      return null;
+    }
+
+    if (trimmedUrl.startsWith('data:', 0)) {
+      return null;
+    }
+
+    if (trimmedUrl.startsWith('http://', 0) || trimmedUrl.startsWith('https://', 0)) {
+      const uploadsSegmentIndex = trimmedUrl.toLowerCase().lastIndexOf('/uploads/');
+      if (uploadsSegmentIndex >= 0) {
+        const filePart = trimmedUrl.substring(uploadsSegmentIndex + '/uploads/'.length).split('?')[0].split('#')[0];
+        return filePart || null;
+      }
+
+      return trimmedUrl;
+    }
+
+    return trimmedUrl.replace(/\\/g, '/').split('/').pop() || null;
   }
 
   createEvent(formValue: any, imageUrl: string | null): void {
