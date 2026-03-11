@@ -31,14 +31,14 @@ export class EventDetailComponent implements OnInit {
   readonly defaultTextSize = 16;
   readonly defaultTextColor = '#ffffff';
   readonly defaultTextHeading: TextHeadingLevel = 'body';
-  readonly headingSizeOptions: Array<{ value: TextHeadingLevel; label: string; size: number }> = [
-    { value: 'h1', label: 'Rất lớn', size: 36 },
-    { value: 'h2', label: 'Lớn', size: 30 },
-    { value: 'h3', label: 'Hơi lớn', size: 24 },
-    { value: 'h4', label: 'Trung bình', size: 20 },
-    { value: 'h5', label: 'Vừa', size: 18 },
-    { value: 'h6', label: 'Nhỏ', size: 16 },
-    { value: 'body', label: 'Mặc định', size: 16 }
+  readonly headingSizeOptions: Array<{ value: TextHeadingLevel; label: string }> = [
+    { value: 'h1', label: 'Rất lớn' },
+    { value: 'h2', label: 'Lớn' },
+    { value: 'h3', label: 'Hơi lớn' },
+    { value: 'h4', label: 'Trung bình' },
+    { value: 'h5', label: 'Vừa' },
+    { value: 'h6', label: 'Nhỏ' },
+    { value: 'body', label: 'Mặc định' }
   ];
 
   eventForm!: FormGroup;
@@ -248,7 +248,6 @@ export class EventDetailComponent implements OnInit {
       uploadedImageUrl: this.previewUrl || null,
       content: this.content?.value || '',
       textHeading: this.textHeading?.value || this.defaultTextHeading,
-      textSize: this.textSize?.value || this.defaultTextSize,
       textColor: this.textColor?.value || this.defaultTextColor,
       isBold: !!this.isBoldControl?.value,
       isItalic: !!this.isItalicControl?.value
@@ -346,8 +345,9 @@ export class EventDetailComponent implements OnInit {
 
     try {
       const jsonData = JSON.parse(html);
-      const normalizedSize = this.normalizeTextSize(jsonData.textSize);
-      const heading = this.normalizeTextHeading(jsonData.textHeading) ?? this.inferHeadingFromTextSize(normalizedSize);
+      const heading = this.normalizeTextHeading(jsonData.textHeading)
+        ?? this.inferHeadingFromTextSize(this.normalizeTextSize(jsonData.textSize));
+      const normalizedSize = this.getTextSizeByHeading(heading);
       return {
         textHeading: heading,
         textSize: normalizedSize,
@@ -390,23 +390,33 @@ export class EventDetailComponent implements OnInit {
   }
 
   private inferHeadingFromTextSize(textSize: number): TextHeadingLevel {
-    const exactMatch = this.headingSizeOptions.find(option => option.size === textSize);
-    if (exactMatch) {
-      return exactMatch.value;
+    switch (textSize) {
+      case 36: return 'h1';
+      case 30: return 'h2';
+      case 24: return 'h3';
+      case 20: return 'h4';
+      case 18: return 'h5';
+      case 16: return 'h6';
+      default: return this.defaultTextHeading;
     }
+  }
 
-    return this.defaultTextHeading;
+  private getTextSizeByHeading(heading: TextHeadingLevel): number {
+    switch (heading) {
+      case 'h1': return 36;
+      case 'h2': return 30;
+      case 'h3': return 24;
+      case 'h4': return 20;
+      case 'h5': return 18;
+      case 'h6': return 16;
+      default: return this.defaultTextSize;
+    }
   }
 
   onTextHeadingChanged(): void {
     const heading = this.normalizeTextHeading(this.textHeading?.value) || this.defaultTextHeading;
-    const option = this.headingSizeOptions.find(item => item.value === heading);
-    if (!option) {
-      return;
-    }
-
     this.eventForm.patchValue({
-      textSize: option.size
+      textSize: this.getTextSizeByHeading(heading)
     }, { emitEvent: false });
 
     this.previewUpdate$.next();
@@ -538,7 +548,6 @@ export class EventDetailComponent implements OnInit {
       uploadedImageUrl: this.getPersistedImageReference(this.uploadedImageUrl || this.previewUrl || null),
       content: formValue.content || '',
       textHeading: this.normalizeTextHeading(formValue.textHeading) || this.defaultTextHeading,
-      textSize: this.normalizeTextSize(formValue.textSize),
       textColor: this.normalizeTextColor(formValue.textColor),
       isBold: !!formValue.isBold,
       isItalic: !!formValue.isItalic

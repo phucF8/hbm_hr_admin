@@ -477,7 +477,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         {
             string imageUrl = "none";
             string textContent = "Nội dung hiển thị sẽ xuất hiện tại đây";
-            var textSize = 16;
+            var textHeadingTag = "h6";
             var textColor = "#ffffff";
             var isBold = false;
             var isItalic = false;
@@ -525,7 +525,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                         textContent = FormatTextContent(contentElement.GetString());
                     }
 
-                    textSize = NormalizeTextSize(GetOptionalInt(root, "textSize"));
+                    textHeadingTag = ResolveTextHeadingTag(root);
                     textColor = NormalizeTextColor(GetOptionalString(root, "textColor"));
                     isBold = GetOptionalBoolean(root, "isBold");
                     isItalic = GetOptionalBoolean(root, "isItalic");
@@ -548,7 +548,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             }
 
             var htmlTemplate = GetEventHtmlTemplate();
-            var styledTextContent = BuildStyledTextContent(textContent, textSize, textColor, isBold, isItalic);
+            var styledTextContent = BuildStyledTextContent(textContent, textHeadingTag, textColor, isBold, isItalic);
             return htmlTemplate
                 .Replace(EventTemplateImagePlaceholder, imageUrl, StringComparison.Ordinal)
                 .Replace(EventTemplateTextPlaceholder, styledTextContent, StringComparison.Ordinal)
@@ -586,12 +586,12 @@ namespace HBM_HR_Admin_Angular2.Server.Services
                 .Replace("\n", "<br>", StringComparison.Ordinal);
         }
 
-        private static string BuildStyledTextContent(string textContent, int textSize, string textColor, bool isBold, bool isItalic)
+        private static string BuildStyledTextContent(string textContent, string headingTag, string textColor, bool isBold, bool isItalic)
         {
             var fontWeight = isBold ? "700" : "400";
             var fontStyle = isItalic ? "italic" : "normal";
 
-            return $"<span style=\"display: inline-block; width: 100%; font-size: {textSize}px !important; color: {textColor} !important; font-weight: {fontWeight} !important; font-style: {fontStyle} !important;\">{textContent}</span>";
+            return $"<{headingTag} style=\"margin: 0; width: 100%; color: {textColor} !important; font-weight: {fontWeight} !important; font-style: {fontStyle} !important;\">{textContent}</{headingTag}>";
         }
 
         private static string? GetOptionalString(JsonElement root, string propertyName)
@@ -599,26 +599,6 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             if (root.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String)
             {
                 return property.GetString();
-            }
-
-            return null;
-        }
-
-        private static int? GetOptionalInt(JsonElement root, string propertyName)
-        {
-            if (!root.TryGetProperty(propertyName, out var property))
-            {
-                return null;
-            }
-
-            if (property.ValueKind == JsonValueKind.Number && property.TryGetInt32(out var intValue))
-            {
-                return intValue;
-            }
-
-            if (property.ValueKind == JsonValueKind.String && int.TryParse(property.GetString(), out intValue))
-            {
-                return intValue;
             }
 
             return null;
@@ -640,14 +620,25 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             };
         }
 
-        private static int NormalizeTextSize(int? textSize)
+        private static string ResolveTextHeadingTag(JsonElement root)
         {
-            if (!textSize.HasValue)
+            var heading = GetOptionalString(root, "textHeading")?.Trim().ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(heading))
             {
-                return 16;
+                return "h6";
             }
 
-            return Math.Clamp(textSize.Value, 10, 72);
+            return heading switch
+            {
+                "h1" => "h1",
+                "h2" => "h2",
+                "h3" => "h3",
+                "h4" => "h4",
+                "h5" => "h5",
+                "h6" => "h6",
+                "body" => "h6",
+                _ => "h6"
+            };
         }
 
         private static string NormalizeTextColor(string? textColor)
