@@ -25,9 +25,60 @@
             </div>
           </div>
 
-          <!-- Nội dung hiển thị -->
           <div class="form-group">
-            <label class="required">Nội dung hiển thị</label>
+            <div class="content-header-row">
+              <label class="required">Nội dung hiển thị</label>
+
+              <div class="text-style-inline">
+                <div class="text-style-toolbar">
+                  <div class="text-style-field text-heading-field">
+                    <select
+                      id="event-text-heading"
+                      class="form-control"
+                      formControlName="textHeading"
+                      (change)="onTextHeadingChanged()"
+                      aria-label="Kiểu size chữ">
+                      <option *ngFor="let option of headingSizeOptions" [value]="option.value">
+                        {{ option.label }} ({{ option.size }}px)
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="text-style-field text-color-field">
+                    <div class="color-input-wrapper">
+                      <input
+                        id="event-text-color"
+                        type="color"
+                        class="color-picker"
+                        formControlName="textColor"
+                        aria-label="Màu chữ">
+                    </div>
+                  </div>
+
+                  <div class="text-style-field text-format-field">
+                    <div class="text-style-buttons">
+                      <button
+                        type="button"
+                        class="btn-style-toggle"
+                        [class.active]="isBoldControl?.value"
+                        (click)="toggleTextStyle('isBold')"
+                        aria-label="In đậm">
+                        <strong>B</strong>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-style-toggle"
+                        [class.active]="isItalicControl?.value"
+                        (click)="toggleTextStyle('isItalic')"
+                        aria-label="In nghiêng">
+                        <em>I</em>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <textarea 
               class="form-control textarea-large" 
               formControlName="content"
@@ -37,60 +88,6 @@
             <div class="error-message" *ngIf="content?.invalid && content?.touched">
               <span *ngIf="content?.errors?.['required']">Nội dung là bắt buộc</span>
               <span *ngIf="content?.errors?.['minlength']">Nội dung phải có ít nhất 10 ký tự</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Tùy chỉnh text</label>
-            <div class="text-style-toolbar">
-              <div class="text-style-field text-size-field">
-                <label for="event-text-size">Cỡ chữ</label>
-                <div class="size-input-wrapper">
-                  <input
-                    id="event-text-size"
-                    type="number"
-                    class="form-control"
-                    formControlName="textSize"
-                    min="10"
-                    max="72">
-                  <span class="size-unit">px</span>
-                </div>
-              </div>
-
-              <div class="text-style-field text-color-field">
-                <label for="event-text-color">Màu chữ</label>
-                <div class="color-input-wrapper">
-                  <input
-                    id="event-text-color"
-                    type="color"
-                    class="color-picker"
-                    formControlName="textColor">
-                  <span class="color-value">{{ textColor?.value }}</span>
-                </div>
-              </div>
-
-              <div class="text-style-field text-format-field">
-                <label>Kiểu chữ</label>
-                <div class="text-style-buttons">
-                  <button
-                    type="button"
-                    class="btn-style-toggle"
-                    [class.active]="isBoldControl?.value"
-                    (click)="toggleTextStyle('isBold')">
-                    <strong>B</strong>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn-style-toggle"
-                    [class.active]="isItalicControl?.value"
-                    (click)="toggleTextStyle('isItalic')">
-                    <em>I</em>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="error-message" *ngIf="textSize?.invalid && textSize?.touched">
-              <span *ngIf="textSize?.errors?.['min'] || textSize?.errors?.['max']">Cỡ chữ phải từ 10px đến 72px</span>
             </div>
           </div>
 

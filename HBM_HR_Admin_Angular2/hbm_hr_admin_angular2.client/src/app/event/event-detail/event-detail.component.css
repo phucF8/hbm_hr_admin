@@ -97,30 +97,50 @@
   color: #666;
 }
 
+.content-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.content-header-row > label {
+  margin-bottom: 0;
+  min-width: 140px;
+  line-height: 1.2;
+}
+
+.text-style-inline {
+  flex: 1;
+  max-width: 560px;
+  margin-left: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .text-style-toolbar {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  display: inline-flex;
+  gap: 3px;
   align-items: end;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  width: auto;
+  margin-left: auto;
 }
 
 .text-style-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
+  align-items: flex-end;
+  width: auto;
 }
 
-.text-style-field label {
-  margin-bottom: 0;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.size-input-wrapper,
 .color-input-wrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .size-unit,
@@ -131,29 +151,39 @@
 }
 
 .color-picker {
-  width: 48px;
-  height: 40px;
-  padding: 4px;
+  width: 30px;
+  height: 24px;
+  padding: 1px;
   border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #fff;
   cursor: pointer;
 }
 
 .text-style-buttons {
   display: flex;
-  gap: 8px;
+  gap: 3px;
+  justify-content: flex-end;
 }
 
 .btn-style-toggle {
-  min-width: 44px;
-  height: 40px;
+  min-width: 28px;
+  height: 24px;
   border: 1px solid #d0d7de;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #fff;
   color: #333;
   cursor: pointer;
+  font-size: 10px;
+  padding: 0 5px;
   transition: all 0.2s ease;
+}
+
+.text-style-field .form-control {
+  padding: 2px 5px;
+  font-size: 10px;
+  height: 24px;
+  min-width: 96px;
 }
 
 .btn-style-toggle:hover {
@@ -308,7 +338,22 @@
   }
 
   .text-style-toolbar {
-    grid-template-columns: 1fr;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .content-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .content-header-row > label {
+    min-width: auto;
+  }
+
+  .text-style-inline {
+    max-width: none;
   }
 
   .form-row {

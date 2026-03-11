@@ -9,6 +9,8 @@ import { FileService } from '@app/services/file.service';
 import Swal from 'sweetalert2';
 import { debounceTime, Subject } from 'rxjs';
 
+type TextHeadingLevel = 'body' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
 /**
  * Component dialog để tạo mới hoặc chỉnh sửa Event
  * Sử dụng Reactive Forms với validation
@@ -28,6 +30,16 @@ export class EventDetailComponent implements OnInit {
 
   readonly defaultTextSize = 16;
   readonly defaultTextColor = '#ffffff';
+  readonly defaultTextHeading: TextHeadingLevel = 'body';
+  readonly headingSizeOptions: Array<{ value: TextHeadingLevel; label: string; size: number }> = [
+    { value: 'h1', label: 'Rất lớn', size: 36 },
+    { value: 'h2', label: 'Lớn', size: 30 },
+    { value: 'h3', label: 'Hơi lớn', size: 24 },
+    { value: 'h4', label: 'Trung bình', size: 20 },
+    { value: 'h5', label: 'Vừa', size: 18 },
+    { value: 'h6', label: 'Nhỏ', size: 16 },
+    { value: 'body', label: 'Mặc định', size: 16 }
+  ];
 
   eventForm!: FormGroup;
   isEditMode: boolean = false;
@@ -84,6 +96,7 @@ export class EventDetailComponent implements OnInit {
     this.eventForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       content: ['', [Validators.required, Validators.minLength(10)]],
+      textHeading: [this.defaultTextHeading],
       textSize: [this.defaultTextSize, [Validators.required, Validators.min(10), Validators.max(72)]],
       textColor: [this.defaultTextColor, [Validators.required]],
       isBold: [false],
@@ -99,10 +112,14 @@ export class EventDetailComponent implements OnInit {
   }
 
   private registerPreviewSubscriptions(): void {
-    ['content', 'textSize', 'textColor', 'isBold', 'isItalic'].forEach(controlName => {
+    ['content', 'textSize', 'textColor', 'isBold', 'isItalic', 'textHeading'].forEach(controlName => {
       this.eventForm.get(controlName)?.valueChanges.subscribe(() => {
         this.previewUpdate$.next();
       });
+    });
+
+    this.eventForm.get('textSize')?.valueChanges.subscribe(() => {
+      this.syncHeadingFromTextSize();
     });
   }
 
@@ -116,6 +133,7 @@ export class EventDetailComponent implements OnInit {
     this.eventForm.patchValue({
       title: event.title || '',
       content: textContent,
+      textHeading: textStyles.textHeading,
       textSize: textStyles.textSize,
       textColor: textStyles.textColor,
       isBold: textStyles.isBold,
@@ -229,6 +247,7 @@ export class EventDetailComponent implements OnInit {
     const contentData = {
       uploadedImageUrl: this.previewUrl || null,
       content: this.content?.value || '',
+      textHeading: this.textHeading?.value || this.defaultTextHeading,
       textSize: this.textSize?.value || this.defaultTextSize,
       textColor: this.textColor?.value || this.defaultTextColor,
       isBold: !!this.isBoldControl?.value,
@@ -312,8 +331,9 @@ export class EventDetailComponent implements OnInit {
   /**
    * Extract text style settings từ HtmlContent JSON.
    */
-  private extractTextStyleSettingsFromHtml(html: string): { textSize: number; textColor: string; isBold: boolean; isItalic: boolean } {
+  private extractTextStyleSettingsFromHtml(html: string): { textHeading: TextHeadingLevel; textSize: number; textColor: string; isBold: boolean; isItalic: boolean } {
     const defaults = {
+      textHeading: this.defaultTextHeading,
       textSize: this.defaultTextSize,
       textColor: this.defaultTextColor,
       isBold: false,
@@ -326,8 +346,11 @@ export class EventDetailComponent implements OnInit {
 
     try {
       const jsonData = JSON.parse(html);
+      const normalizedSize = this.normalizeTextSize(jsonData.textSize);
+      const heading = this.normalizeTextHeading(jsonData.textHeading) ?? this.inferHeadingFromTextSize(normalizedSize);
       return {
-        textSize: this.normalizeTextSize(jsonData.textSize),
+        textHeading: heading,
+        textSize: normalizedSize,
         textColor: this.normalizeTextColor(jsonData.textColor),
         isBold: !!jsonData.isBold,
         isItalic: !!jsonData.isItalic
@@ -352,6 +375,52 @@ export class EventDetailComponent implements OnInit {
     }
 
     return this.defaultTextColor;
+  }
+
+  private normalizeTextHeading(value: unknown): TextHeadingLevel | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const normalized = value.trim().toLowerCase();
+    const available = this.headingSizeOptions.map(option => option.value);
+    return (available.includes(normalized as TextHeadingLevel)
+      ? (normalized as TextHeadingLevel)
+      : null);
+  }
+
+  private inferHeadingFromTextSize(textSize: number): TextHeadingLevel {
+    const exactMatch = this.headingSizeOptions.find(option => option.size === textSize);
+    if (exactMatch) {
+      return exactMatch.value;
+    }
+
+    return this.defaultTextHeading;
+  }
+
+  onTextHeadingChanged(): void {
+    const heading = this.normalizeTextHeading(this.textHeading?.value) || this.defaultTextHeading;
+    const option = this.headingSizeOptions.find(item => item.value === heading);
+    if (!option) {
+      return;
+    }
+
+    this.eventForm.patchValue({
+      textSize: option.size
+    }, { emitEvent: false });
+
+    this.previewUpdate$.next();
+  }
+
+  private syncHeadingFromTextSize(): void {
+    const size = this.normalizeTextSize(this.textSize?.value);
+    const inferredHeading = this.inferHeadingFromTextSize(size);
+
+    if (this.textHeading?.value !== inferredHeading) {
+      this.eventForm.patchValue({
+        textHeading: inferredHeading
+      }, { emitEvent: false });
+    }
   }
 
   /**
@@ -468,6 +537,7 @@ export class EventDetailComponent implements OnInit {
     const contentData = {
       uploadedImageUrl: this.getPersistedImageReference(this.uploadedImageUrl || this.previewUrl || null),
       content: formValue.content || '',
+      textHeading: this.normalizeTextHeading(formValue.textHeading) || this.defaultTextHeading,
       textSize: this.normalizeTextSize(formValue.textSize),
       textColor: this.normalizeTextColor(formValue.textColor),
       isBold: !!formValue.isBold,
@@ -596,6 +666,7 @@ export class EventDetailComponent implements OnInit {
   // Getters để truy cập form controls trong template
   get title() { return this.eventForm.get('title'); }
   get content() { return this.eventForm.get('content'); }
+  get textHeading() { return this.eventForm.get('textHeading'); }
   get textSize() { return this.eventForm.get('textSize'); }
   get textColor() { return this.eventForm.get('textColor'); }
   get isBoldControl() { return this.eventForm.get('isBold'); }
