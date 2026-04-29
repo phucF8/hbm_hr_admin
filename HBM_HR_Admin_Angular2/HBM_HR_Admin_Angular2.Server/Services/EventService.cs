@@ -28,7 +28,8 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         body {
             background-image: {{IMAGE_URL}};
             background-size: cover;
-            background-position: center;
+            background-color: black;
+            background-position: top center;
             background-repeat: no-repeat;
             display: flex;
             align-items: center;
@@ -102,7 +103,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
             {
                 // Lấy tất cả event active về memory trước để tránh lỗi SQL conversion
                 var activeEvents = await _context.EventPages
-                    .Where(e => e.IsActive)
+                    //.Where(e => e.IsActive)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -476,7 +477,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         public string GenerateHtmlFromContent(string htmlContentJson, string? requestBaseUrl = null)
         {
             string imageUrl = "none";
-            string textContent = "Nội dung hiển thị sẽ xuất hiện tại đây";
+            string textContent = "";
             var textHeadingTag = "h6";
             var textColor = "#ffffff";
             var isBold = false;
@@ -578,7 +579,7 @@ namespace HBM_HR_Admin_Angular2.Server.Services
         {
             if (string.IsNullOrWhiteSpace(textContent))
             {
-                return "Nội dung hiển thị sẽ xuất hiện tại đây";
+                return "";
             }
 
             return System.Net.WebUtility.HtmlEncode(textContent)

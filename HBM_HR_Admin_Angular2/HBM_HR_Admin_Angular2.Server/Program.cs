@@ -127,6 +127,7 @@ builder.Services.AddHangfire(config => {
 builder.Services.AddHangfireServer(); // chạy Hangfire server
 
 var app = builder.Build();
+app.UseStaticFiles(); // Cho phép truy cập file tĩnh từ wwwroot
 
 // Hangfire Dashboard
 app.UseHangfireDashboard("/hangfire");
